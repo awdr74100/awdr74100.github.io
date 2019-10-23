@@ -3,9 +3,9 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Roya的技術部落格
-subtitle:
-description: try it
+title: awdr74100 Blog
+subtitle: 朝向工程師邁進的小小人物
+description: Front-End-Developer</br>學會運用比學會使用還要來的有用
 keywords:
 author: Roya
 language: zh-TW
@@ -99,3 +99,6 @@ search:
   field: post
   format: html
   limit: 10000
+
+#RSS插件
+plugins: hexo-generate-feed
