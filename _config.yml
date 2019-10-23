@@ -5,9 +5,9 @@
 # Site
 title: Roya的技術部落格
 subtitle:
-description:
+description: try it
 keywords:
-author: John Doe
+author: Roya
 language: zh-TW
 timezone:
 
@@ -92,3 +92,10 @@ deploy:
   type: git
   repo: git@github.com:awdr74100/awdr74100.github.io.git
   branch: master
+
+#站內搜索功能
+search:
+  path: search.xml
+  field: post
+  format: html
+  limit: 10000
