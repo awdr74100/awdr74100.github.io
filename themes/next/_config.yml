@@ -176,7 +176,8 @@ avatar:
   # In site directory (source/uploads): /uploads/avatar.gif
   # You can also use other linking images.
   #url: #/images/avatar.gif
-  url: /images/header.jpg
+  # url: /images/header.jpg
+  url: /images/userLogo.jpg
   # If true, the avatar would be dispalyed in circle.
   rounded: true
   # If true, the avatar would be rotated with the cursor.
