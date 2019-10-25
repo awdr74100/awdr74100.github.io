@@ -2,7 +2,7 @@
 title: JavaScript 淺拷貝(Shallow Copy)與深拷貝(Deep Copy)
 date: 2019-10-24 15:54:42
 description: 
-#   - 代編輯
+#   - 8484
 categories:
   - JavaScript
 tags:
@@ -11,8 +11,8 @@ tags:
   - Deep Copy
 ---
 
-<!-- ## 動機 -->
-在開發 Vue 項目時，需要利用 Props 與 Emit 使元件互相溝通，當時沒注意到物件有 Shallow Copy 與 Deep Copy 等特性，使用 Computed 計算屬性時，無法完成預期效果，故使用筆記加強印象！
+## 動機
+在開發 Vue 項目時，需要利用 Props 與 Emit 使元件互相溝通，當時沒注意到物件有 Shallow Copy 與 Deep Copy 等特性，導致複製後的新物件影響原物件問題，特別深入學習此觀念！
 <!-- more -->
 
 ## 筆記重點
@@ -22,7 +22,8 @@ tags:
 + 深拷貝物件方式
 
 ## 基本型別與物件型別差異
-![JavaScript資料型別](https://www.supinfo.com/articles/resources/231580/5418/1.png)
+<img src="https://www.kamprasad.com/wp-content/uploads/2019/07/Javascript-DataType.png" alt="JavaScript型別參考" width=70%>
+
 
 在 JavaScript 的世界裡有基本型別與物件型別兩種定義。
 
@@ -180,6 +181,7 @@ jQuery 也有提供一個方法可以完成深拷貝，利用 $.extend 指定強
     console.log(data); // [ { name: 'Eric', weight: 60 } ]
     console.log(dataCP); // [ { name: 'Emma', weight: 60 }, { name: 'Alice', weight: 50 } ]
 ```
+
 
 
 
