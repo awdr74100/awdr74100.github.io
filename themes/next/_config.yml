@@ -621,7 +621,7 @@ comments:
 
 # Disqus
 disqus:
-  enable: true
+  enable: false
   shortname: Roya Blog
   count: true
   lazyload: false
