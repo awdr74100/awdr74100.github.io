@@ -2,7 +2,7 @@
 title: JavaScript 淺拷貝(Shallow Copy)與深拷貝(Deep Copy)
 date: 2019-10-24 15:54:42
 description: 
-  # - 代編輯
+#   - 代編輯
 categories:
   - JavaScript
 tags:
@@ -11,7 +11,7 @@ tags:
   - Deep Copy
 ---
 
-## 動機
+<!-- ## 動機 -->
 在開發 Vue 項目時，需要利用 Props 與 Emit 使元件互相溝通，當時沒注意到物件有 Shallow Copy 與 Deep Copy 等特性，使用 Computed 計算屬性時，無法完成預期效果，故使用筆記加強印象！
 <!-- more -->
 
@@ -29,7 +29,7 @@ tags:
 基本型別為：Number、String、Boolean、Null、Undefined、Symbol (ES6新增)
 其餘基本上都屬於物件型別，兩種資料型別最大的差異就在於傳值方式
 
-基本型別在賦值時，是採用**pass by value**方式，也就是**傳值**，如下範例：
+基本型別在賦值時，是採用 **pass by value** 方式，也就是**傳值**，如下範例：
 
 ``` js
 let a = 'blue';
@@ -39,7 +39,7 @@ b = 'red';
 console.log(b); // red
 ```
 
-而物件型別在賦值時，是採用**pass by reference**方式，也就是**傳址**，如下範例：
+而物件型別在賦值時，是採用 **pass by reference** 方式，也就是**傳址**，如下範例：
 
 ``` js
 let array = ['red','blue','yellow'];
@@ -60,7 +60,7 @@ console.log(objectCP); // { p1: '111', p2: '444', p3: '333' }
 看出兩者的差別了嗎！當你使用等號賦值時，會間接的影響原物件，因為都是指向**原物件記憶體位址**，並不會創造新的拷貝物件，這種方法是很不切實際的，牽一髮動全身的概念，所以當我們在**複製**物件或陣列時，基本上都是使用函式的方式去做處理。
 
 ## 淺拷貝(Shallow Copy) vs 深拷貝(Deep Copy)
-![拷貝示意圖](https://developer.apple.com/library/archive/documentation/General/Conceptual/DevPedia-CocoaCore/Art/object_copying_2x.png)
+![拷貝示意圖](https://kanboo.github.io/2018/01/27/JS-ShallowCopy-DeepCopy/js_03.png)
 
 當我們要進行**複製**動作時，最好先理解一下何謂淺拷貝與深拷貝：
 
