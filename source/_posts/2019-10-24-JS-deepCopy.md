@@ -11,7 +11,7 @@ tags:
   - Deep Copy
 ---
 
-## 動機
+## 前言
 在開發 Vue 項目時，需要利用 Props 與 Emit 使元件互相溝通，當時沒注意到物件有 Shallow Copy 與 Deep Copy 等特性，導致複製後的新物件影響原物件問題，特別深入學習此觀念！
 <!-- more -->
 
