@@ -112,7 +112,7 @@ console.log(data3); // [ { name: 'Emma', weight: 46, age: 18 } ]
 ```
 
 ## Array.prototype.find()
-find() 類似於 filter() ，不過其處理為回傳首個符合的項目，還有一個類似方法叫findIndex()，處理方式與find()相同，不過式回傳索引值。如下範例：
+find() 類似於 filter() ，不過其處理為回傳首個符合的項目，還有一個類似方法叫findIndex()，處理方式與find()相同，不過是回傳索引值。如下範例：
 + **依序判斷項目內容，回傳第一次判斷為 True 的項目**
 
 ``` js
