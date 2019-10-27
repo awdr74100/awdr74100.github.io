@@ -102,3 +102,7 @@ search:
 
 #RSS插件
 plugins: hexo-generate-feed
+
+#SiteMap
+sitemap:
+    path: sitemap.xml
