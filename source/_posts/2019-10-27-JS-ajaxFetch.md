@@ -11,7 +11,7 @@ tags:
 ---
 
 ## 前言
-大多人開發項目都是使用 Axios 或者 jQuery 庫的 $.ajax 方法來完成 HTTP 請求行為，如果要使用 JS 原生的方法，只有 XMLHttpRequest 可以選擇，但程序繁瑣、順序混亂等問題，我相信大家因該都有遇到過，這次來記錄一下 ES6 新增的原生方法 Fetch API
+大多人開發項目都是使用 Axios 或者 jQuery 庫的 $.ajax 方法來完成 HTTP 請求行為，如果要使用 JS 原生的方法，只有 XMLHttpRequest 可以選擇，但程序繁瑣、順序混亂等問題，我相信大家因該都有遇到過，這次來記錄一下 ES6 新增的原生方法 Fetch API。
 <!-- more -->
 
 ## 筆記重點
