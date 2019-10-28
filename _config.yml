@@ -106,3 +106,7 @@ plugins: hexo-generate-feed
 #SiteMap
 sitemap:
     path: sitemap.xml
+
+#nofollow
+nofollow:
+    enable: true
