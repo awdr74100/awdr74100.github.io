@@ -22,8 +22,7 @@ tags:
 + 深拷貝物件方式
 
 ## 基本型別與物件型別差異
-<img src="https://www.kamprasad.com/wp-content/uploads/2019/07/Javascript-DataType.png" alt="JavaScript型別參考" width=70%>
-
+<img src="https://i.imgur.com/VS93ysP.png" alt="JavaScript型別參考" width=70%>
 
 在 JavaScript 的世界裡有基本型別與物件型別兩種定義。
 
@@ -61,7 +60,7 @@ console.log(objectCP); // { p1: '111', p2: '444', p3: '333' }
 看出兩者的差別了嗎！當你使用等號賦值時，會間接的影響原物件，因為都是指向**原物件記憶體位址**，並不會創造新的拷貝物件，這種方法是很不切實際的，牽一髮動全身的概念，所以當我們在**複製**物件或陣列時，基本上都是使用函式的方式去做處理。
 
 ## 淺拷貝(Shallow Copy) vs 深拷貝(Deep Copy)
-![拷貝示意圖](https://kanboo.github.io/2018/01/27/JS-ShallowCopy-DeepCopy/js_03.png)
+<img src="https://i.imgur.com/lLTlgI2.png" alt="淺拷貝(Shallow Copy) vs 深拷貝(Deep Copy)">
 
 當我們要進行**複製**動作時，最好先理解一下何謂淺拷貝與深拷貝：
 

@@ -21,7 +21,7 @@ tags:
 + Fetch POST 行為
 
 ## 傳統 XMLHttpRequest 方法
-<img src="https://www.tutorialrepublic.com/lib/images/ajax-illustration.png" alt="">
+<img src="https://i.imgur.com/Iz6mnGL.png" alt="XMLHttpRequest行為">
 
 一般人對於 AJAX 行為的理解，差不多都是從封裝過後的方法去做學習，原因很簡單，容易理解、操作方便，但有時我們不想要套用框架，需要使用原生的寫法，我們就只能選擇 XMLHttpRequest 這一個物件去做使用，他是 JS 原生對於 HTTP 請求的操作物件，範例如下：
 
