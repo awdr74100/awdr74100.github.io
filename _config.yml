@@ -6,7 +6,7 @@
 title: Roya's Blog
 subtitle: 朝向工程師邁進的小小人物
 description: Front-End-Developer<br>學會運用比學會使用還要來的有用
-keywords:
+keywords: Roya
 author: Roya
 language: zh-TW
 timezone:
@@ -15,7 +15,7 @@ timezone:
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
 url: https://awdr74100.github.io/
 root: /
-permalink: :year/:month/:day/:title/
+permalink: :title/
 permalink_defaults:
 pretty_urls:
   trailing_index: true # Set to false to remove trailing index.html from permalinks
