@@ -89,3 +89,34 @@ Flexbox 主要由**外容器**與**內元件**組成，外容器可利用相關�
   flex-flow: row wrap;
 }
 ```
+
+### justify-content
+
+執行操作：**控制內元件在主軸對齊的位置**
+相關可配置屬性：
+
+- flex-start：預設值，對齊主軸起始位置
+- flex-end：對齊主軸終點位置
+- center：水平置中對齊
+- space-between：平均分配內元件，左右元件將會與主軸起始和主軸終點貼齊
+- space-around：平均分配內元件，間距也是平均分配
+
+```scss
+.container {
+  display: flex;
+  justify-content: flex-start; // flex-start 、 flex-end 、 center 、 space-between 、 space-around
+}
+```
+
+<img src="https://i.imgur.com/2zKnf4Q.png" alt="flex-wrap" width=90% >
+
+### align-items
+
+執行操作：**控制內元件在交錯軸對齊的位置**
+相關可配置屬性：
+
+- flex-start：預設值，對齊交錯軸起始位置
+- flex-end：對齊交錯軸終點位置
+- center：垂直置中對齊
+- stretch：預設值，將內元件全部撐開至容器的高度
+- baseline：以所有內元件的基線為對齊標準
