@@ -36,6 +36,7 @@ Flexbox 主要由**外容器**與**內元件**組成，外容器可利用相關�
 - flex-flow
 - justify-content
 - align-items
+- align-content
 
 ### flex-direction
 
@@ -50,7 +51,7 @@ Flexbox 主要由**外容器**與**內元件**組成，外容器可利用相關�
 ```scss
 .container {
   display: flex;
-  flex-direction: row; // row 、 row-reverse 、 column 、 column-reverse
+  flex-direction: row; // row-reverse 、 column 、 column-reverse
 }
 ```
 
@@ -69,7 +70,7 @@ Flexbox 主要由**外容器**與**內元件**組成，外容器可利用相關�
 ```scss
 .container {
   display: flex;
-  flex-wrap: nowrap; // nowrap 、 wrap 、 wrap-reverse
+  flex-wrap: nowrap; // wrap 、 wrap-reverse
 }
 ```
 
@@ -104,19 +105,60 @@ Flexbox 主要由**外容器**與**內元件**組成，外容器可利用相關�
 ```scss
 .container {
   display: flex;
-  justify-content: flex-start; // flex-start 、 flex-end 、 center 、 space-between 、 space-around
+  justify-content: flex-start; // flex-end 、 center 、 space-between 、 space-around
 }
 ```
 
-<img src="https://i.imgur.com/2zKnf4Q.png" alt="flex-wrap" width=90% >
+<img src="https://i.imgur.com/2zKnf4Q.png" alt="justify-content" width=90% >
 
 ### align-items
 
 執行操作：**控制內元件在交錯軸對齊的位置**
 相關可配置屬性：
 
-- flex-start：預設值，對齊交錯軸起始位置
+- flex-start：對齊交錯軸起始位置
 - flex-end：對齊交錯軸終點位置
 - center：垂直置中對齊
 - stretch：預設值，將內元件全部撐開至容器的高度
 - baseline：以所有內元件的基線為對齊標準
+
+```scss
+.container {
+  display: flex;
+  align-items: flex-start; // flex-end 、 center 、 stretch 、 baseline
+}
+```
+
+<img src="https://i.imgur.com/CQuTszq.png" alt="align-items">
+
+### align-content
+
+執行操作：**控制內元件存在多行時在交錯軸對齊的位置**
+注意事項：**與 align-items 有相同功能，align-content 只適用於控制多行的 flex 容器**
+
+- flex-start：對齊交錯軸起始位置
+- flex-end：對齊交錯軸終點位置
+- center：垂直置中對齊
+- space-between：將第一行與最後一行分別對齊最上方與最下方
+- space-around：每行平均分配間距
+- stretch：預設值，將內元件全部撐開至容器的高度
+
+```scss
+.container {
+  display: flex;
+  flex-flow: row wrap;
+  align-content: flex-start; // flex-sne 、 center 、 space-between 、 space-around 、 stretch
+}
+```
+
+<img src="https://i.imgur.com/H2n2ZpQ.png" alt="align-content">
+
+## Flexbox 內元件相關屬性
+
+在一般開發中，善加利用外容器的相關屬性，差不多就可以解決一般常見的網頁排版問題，如有需要更為細節的處理，就可以利用內元件的相關屬性，進行個別元件調試，內元件可配置的相關屬性如下：
+
+- align-self
+- order
+- flex
+
+### align-slef
