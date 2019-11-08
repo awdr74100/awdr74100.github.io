@@ -213,4 +213,49 @@ Flexbox 主要由**外容器**與**內元件**組成，外容器可利用相關�
 
 ### flex
 
+執行操作：**指定個別元件利用剩餘空間進行收縮放大應用**
+注意事項：**flex 是縮寫，主要由 flex-grow、flex-shrink、flex-basis 組成，如果只設定單個屬性，預設為 flex-grow**
+相關可配置屬性：
 
+- flex-grow：當外容器將總空間分配給所有內元件後，如果有剩餘空間，則依造比例將原有自身空間加上分配空間，預設值為 0
+- flex-shrink：當外容器總空間小於所需分配內元件空間，指定內元件將進行收縮應用，預設值為 1
+- flex-basis：元件的基準值，可使用不同的單位值
+
+```scss
+.container {
+  width: 800px;
+  display: flex;
+}
+
+.item {
+  width: 200px;
+  &--red {
+    flex: 1;
+  }
+}
+```
+
+<img src="https://i.imgur.com/nAB5Ooe.jpg" alt="flex-grow-1">
+
+```scss
+.container {
+  width: 900px;
+  display: flex;
+}
+
+.item {
+  width: 200px;
+  &--red {
+    flex: 1;
+  }
+  &--purple {
+    flex: 2;
+  }
+}
+```
+
+<img src="https://i.imgur.com/A9gyBOt.png" alt="flex-grow-2">
+
+## Flexbox 實際應用
+
+這一次實際利用 Flexbox 來開發常見的 navbar 導覽列。
