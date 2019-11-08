@@ -129,7 +129,7 @@ Flexbox 主要由**外容器**與**內元件**組成，外容器可利用相關�
 }
 ```
 
-<img src="https://i.imgur.com/CQuTszq.png" alt="align-items">
+<img src="https://i.imgur.com/BRBsPMf.png" alt="align-items">
 
 ### align-content
 
@@ -165,7 +165,7 @@ Flexbox 主要由**外容器**與**內元件**組成，外容器可利用相關�
 ### align-self
 
 執行操作：**控制個別元件在交錯軸對齊的位置**
-注意事項：**用法如同 align-items ，可針對個別元件取代外容器對於交錯軸控制**
+注意事項：**用法如同 align-items ，可針對個別元件設置交錯軸位置，並覆蓋容器原有設置**
 相關可配置屬性：
 
 - flex-start：對齊交錯軸起始位置
@@ -176,47 +176,41 @@ Flexbox 主要由**外容器**與**內元件**組成，外容器可利用相關�
 
 ```scss
 .container {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
+  display: flex;
+  align-items: center;
 
-    .item2 {
-        align-self: flex-start; // flex-end 、 center 、 stretch 、 baseline
-    }
+  .item2 {
+    align-self: flex-start; // flex-end 、 center 、 stretch 、 baseline
+  }
 }
 ```
+
+<img src="https://i.imgur.com/ihCjyki.png" alt="align-self">
 
 ### order
 
 執行操作：**指定個別元件排列順序**
-注意事項：**數字越小排序越前面，可為負數，元件預設順序為 0**
+注意事項：**數字越小排序越前面，可為負數，元件預設值為 0**
 相關可配置屬性：
 
-- number：預設為 0，可為負數 
+- number：預設為 0，可為負數
 
 ```scss
-.item {
-    flex: 1;
+.order-1 {
+  order: -1;
+}
 
-    &--order-1 {
-        order: -1;
-    }
+.order2 {
+  order: 2;
+}
 
-    &--order1 {
-        order: 1;
-    }
-
-    &--order2 {
-        order: 2;
-    }
-
-    &--order {
-        order: 3;
-    }
+.order3 {
+  order: 3;
 }
 ```
 
+<img src="https://i.imgur.com/YcVLKhk.jpg" alt="order">
 
-
+### flex
 
 
