@@ -258,4 +258,13 @@ Flexbox 主要由**外容器**與**內元件**組成，外容器可利用相關�
 
 ## Flexbox 實際應用
 
-這一次實際利用 Flexbox 來開發常見的 navbar 導覽列。
+開發應用：**navbar 導覽列**
+額外說明：
+
+- flex 子元件推擠：可使用 mr-auto 使自身右方元件向軸終點推擠
+- flex 子元件換行：可使用 w-100 使元件強迫換行，前提是容器需要有設定 wrap
+
+<iframe height="265" style="width: 100%;" scrolling="no" title="Flex Hamburger Menu" src="https://codepen.io/awdr74100/embed/zVJmqx?height=265&theme-id=dark&default-tab=css,result" frameborder="no" allowtransparency="true" allowfullscreen="true">
+  See the Pen <a href='https://codepen.io/awdr74100/pen/zVJmqx'>Flex Hamburger Menu</a> by awdr74100
+  (<a href='https://codepen.io/awdr74100'>@awdr74100</a>) on <a href='https://codepen.io'>CodePen</a>.
+</iframe>
