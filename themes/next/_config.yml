@@ -329,7 +329,7 @@ post_edit:
 # ---------------------------------------------------------------
 
 # Enable "cheers" for archive page.
-cheers: true
+cheers: false
 
 # TagCloud settings for tags page.
 tagcloud:
