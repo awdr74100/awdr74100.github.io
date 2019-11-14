@@ -19,8 +19,8 @@ tags:
 
 - 為什麼需要 Linter ？
 - ESLint 簡介
-- ESLint 安裝與配置
-- ESLint 常見錯誤提示
+- ESLint 安裝及使用
+- ESLint 配置規則
 
 ## 為什麼需要 Linter ？
 
@@ -51,4 +51,85 @@ ESLint 是眾多 JavaScript Linter 的其中一個，其優秀的支援性以及
 - 無效程序：已宣告卻未使用的變數、函式，建議刪除
 - 代碼測試：常見 <code>console.log</code> 行為，建議刪除
 
-## ESLint 安裝與配置
+## ESLint 安裝及使用
+
+> 安裝環境：[Node.js](https://nodejs.org/en/) >= 6.14、[npm](https://nodejs.org/en/) 3+
+> 相關插件：[ESLint](https://github.com/Microsoft/vscode-eslint) for VSCode
+
+使用 npm 全域安裝 ESLint：
+
+```shell
+$ npm install eslint -g
+```
+
+使用 VSCode 安裝 ESLint 擴展：
+
+- 切換至 Extensions，搜尋並安裝 ESLint
+
+專案目錄建立 package.json：
+
+```shell
+$ npm init
+```
+
+初始化 ESLint 項目：
+
+```shell
+$ eslint --init
+```
+
+<img src='https://i.imgur.com/p8jgDqT.gif' alt="eslint初始化" width="100%">
+
+自動檢測代碼並提示：
+
+<img src='https://i.imgur.com/gRwK5AV.jpg' alt='eslint插件'>
+
+根據提示修改代碼：
+
+安裝步驟大致上就到這邊，接下來就是依造他所提示的錯誤，做出修正，在初期錯誤可能會有點多，不過沒關係，修正同時，也可以同步修正觀念；下面是我常遇到的錯誤提示：
+
+- `Unary operator '++' used`
+  ：建議使用 i += 1 取代 i++
+- `Expected '===' and instead saw '=='`
+  ：建議使用 === 取代 ==
+- `'object' is never reassigned. Use 'const' instend`
+  ：不會更動的變數請用 const 宣告
+
+## ESLint 配置
+
+> 配置檔案：/.eslintrc.js
+
+> 可配置規則：[規則列表](https://eslint.org/docs/rules/)
+
+```js
+module.exports = {
+  env: {
+    browser: true,
+    es6: true,
+  },
+  extends: ['airbnb-base'],
+  globals: {
+    Atomics: 'readonly',
+    SharedArrayBuffer: 'readonly',
+  },
+  parserOptions: {
+    ecmaVersion: 2018,
+    sourceType: 'module',
+  },
+  rules: {
+    'no-alert': 0,
+    'no-console': [2, { allow: ['warn'] }],
+    'eol-last': 2,
+    'eqeqeq': [0, 'smart'],
+  },
+};
+```
+
+如果想要自行配置規則，可參考官方規則列表自行定義，主要有三部分須配置：
+
+- 規則名稱：no-alert、eqeqeq、eol-last 等等
+- 規則狀態：0 = off、1 = warn、2 = error
+- 可配置選項：部分規則可更改預設觸發模式，可經由此選項做更改
+
+
+
