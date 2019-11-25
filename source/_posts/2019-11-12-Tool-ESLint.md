@@ -5,8 +5,8 @@ description:
 categories:
   - Tools
 tags:
-  - ESLint
   - JavaScript
+  - ESlint
 ---
 
 ## 前言
