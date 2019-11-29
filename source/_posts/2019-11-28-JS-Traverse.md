@@ -20,7 +20,7 @@ tags:
 
 - 遍歷物件基本操作
 - 使用情境 - 非數值屬性
-- 使用情境 - 空元素
+- 使用情境 - 陣列的空元素
 - 使用情境 - this 的指向
 - 結論
 
@@ -161,7 +161,7 @@ Object.entries(obj).forEach((item) => {
 
 ## 使用情境 - 非數值屬性
 
-JavaScript 的陣列是類似列表的物件，這就意味著我們可以直接給陣列新增屬性：
+事實上 JavaScript 的陣列是類似列表的物件，這就意味著我們可以直接給陣列新增屬性：
 
 ```js
 let arr = ['red', 'blue', 'yellow'];
@@ -170,6 +170,8 @@ arr.newPrototype = 'value';
 
 console.log(arr); // [ 'red', 'blue', 'yellow', newPrototype: 'value' ]
 ```
+
+需要注意的是，遍歷相關語法對於非數值屬性的處理方式是不一樣的，主要分為兩種：
 
 > **不會忽略非數字屬性：for in**
 
@@ -206,7 +208,70 @@ arr.forEach((item) => {
 });
 ```
 
-## 使用情境 - 空元素
+由上面測試可得知，使用 for in 時，會連同非數字屬性也一起遍歷，其他 3 種則不會，正常來講，不應該連同非數字屬性一起遍歷才對，**遍歷陣列時，應該避免使用 for in**，轉而使用其他三種遍歷語法。
+
+## 使用情境 - 陣列的空元素
+
+JavaScript 中的陣列是允許有空元素的，如下範例：
+
+```js
+let arr = ['red', , 'blue'];
+arr[4] = 'black';
+
+console.log(arr.length); // 5
+```
+
+奇怪的地方在於，遍歷相關語法對於空元素的處理方式卻是不一樣的，主要分為兩種：
+
+> **跳過空元素：for in、forEach**
+
+```js
+let arr = ['red', , 'blue'];
+arr[4] = 'black';
+
+/* --- for in --- */
+for (const key in arr) {
+  console.log(arr[key]); // red 、 blue 、 black
+}
+
+/* --- forEach --- */
+arr.forEach((item) => {
+  console.log(item); // red 、 blue 、 black
+});
+```
+
+> **不會跳過空元素：for、for of**
+
+```js
+let arr = ['red', , 'blue'];
+arr[4] = 'black';
+
+/* --- for --- */
+for (let i = 0; i < arr.length; i += 1) {
+  console.log(arr[i]); // red 、 undefined 、 blue 、 undefined 、 black
+}
+
+/* --- for of --- */
+for (const value of arr) {
+  console.log(value); // red 、 undefined 、 blue 、 undefined 、 black
+}
+```
+
+> **額外補充：JSON 也不支援空元素**
+
+```js
+/* --- JSON.stringify --- */
+let arrString1 = ['red', , 'blue', 'black'];
+
+console.log(JSON.stringify(arrString1)); // ["red",null,"blue","black"]
+
+/* --- JSON.parse --- */
+let arrString2 = `["red", , "blue", "black"]`;
+
+console.log(JSON.parse(arrString2)); // SyntaxError: Unexpected token
+```
+
+由上面測試可得知，for in、forEach 遇到空元素會直接跳過，for、for of 則不會，**取決於你遍歷的目的是什麼，選擇相對應的方法**，同時也得注意 JSON 是否支援等問題。
 
 ## 使用情境 - this 的指向
 
