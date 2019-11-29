@@ -33,13 +33,13 @@ tags:
 - **for** (const interator **of** object) {}
 - array.**forEach**((item, index, array) => {} )
 
-作用陣列：
+> **處理陣列：**
 
 ```js
 let arr = ['Eric', 'Allen', 'Owen'];
 ```
 
-作用物件：
+> **處理物件：**
 
 ```js
 let obj = {
@@ -55,7 +55,7 @@ let obj = {
 作用對象：陣列
 遍歷對象：無
 
-- 遍歷陣列
+> **遍歷陣列**
 
 ```js
 for (let i = 0; i < arr.length; i++) {
@@ -68,7 +68,7 @@ for (let i = 0; i < arr.length; i++) {
 作用對象：陣列、物件
 遍歷對象：鍵(key)
 
-- 遍歷陣列
+> **遍歷陣列**
 
 ```js
 for (const key in arr) {
@@ -76,7 +76,7 @@ for (const key in arr) {
 }
 ```
 
-- 遍歷物件
+> **遍歷物件**
 
 ```js
 for (const key in obj) {
@@ -84,7 +84,7 @@ for (const key in obj) {
 }
 ```
 
-- 繼承屬性物件問題：hasOwnProperty
+> **繼承屬性物件問題：hasOwnProperty**
 
 ```js
 Array.prototype.newType = 'newValue';
@@ -101,7 +101,7 @@ for (const key in arr) {
 作用對象：陣列
 遍歷對象：值(value)
 
-- 遍歷陣列
+> **遍歷陣列**
 
 ```js
 for (const value of arr) {
@@ -109,7 +109,7 @@ for (const value of arr) {
 }
 ```
 
-- 遍歷物件：搭配 Object.values() - ES8 新增
+> **遍歷物件：搭配 Object.values() - ES8 新增**
 
 ```js
 for (const value of Object.values(obj)) {
@@ -117,7 +117,7 @@ for (const value of Object.values(obj)) {
 }
 ```
 
-- 遍歷物件：搭配 Object.entries() - ES8 新增
+> **遍歷物件：搭配 Object.entries() - ES8 新增**
 
 ```js
 for (const [key, value] of Object.entries(obj)) {
@@ -126,7 +126,7 @@ for (const [key, value] of Object.entries(obj)) {
 }
 ```
 
-- 遍歷陣列：搭配 Array.prototype.entries() - ES6 新增
+> **遍歷陣列：搭配 Array.prototype.entries() - ES6 新增**
 
 ```js
 for (const iterator of arr.entries()) {
@@ -139,7 +139,7 @@ for (const iterator of arr.entries()) {
 作用對象：陣列
 遍歷對象：鍵(key)、值(value)、作用對象(array)
 
-- 遍歷陣列
+> **遍歷陣列**
 
 ```js
 arr.forEach((item, index, array) => {
@@ -149,7 +149,7 @@ arr.forEach((item, index, array) => {
 });
 ```
 
-- 遍歷物件：搭配 Object.entries() - ES8 新增
+> **遍歷物件：搭配 Object.entries() - ES8 新增**
 
 ```js
 Object.entries(obj).forEach((item) => {
@@ -160,6 +160,51 @@ Object.entries(obj).forEach((item) => {
 ```
 
 ## 使用情境 - 非數值屬性
+
+JavaScript 的陣列是類似列表的物件，這就意味著我們可以直接給陣列新增屬性：
+
+```js
+let arr = ['red', 'blue', 'yellow'];
+
+arr.newPrototype = 'value';
+
+console.log(arr); // [ 'red', 'blue', 'yellow', newPrototype: 'value' ]
+```
+
+> **不會忽略非數字屬性：for in**
+
+```js
+let arr = ['red', 'blue', 'yellow'];
+
+arr.newPrototype = 'value';
+
+for (const key in arr) {
+  console.log(arr[key]); // red 、 blue 、 yellow 、 value
+}
+```
+
+> **會忽略非數字屬性：for、for of、forEach**
+
+```js
+let arr = ['red', 'blue', 'yellow'];
+
+arr.newPrototype = 'value';
+
+/* --- for --- */
+for (let i = 0; i < arr.length; i++) {
+  console.log(arr[i]); // red 、 blue 、 yellow
+}
+
+/* --- for of --- */
+for (const value of arr) {
+  console.log(value); // red 、 blue 、 yellow
+}
+
+/* --- forEach --- */
+arr.forEach((item) => {
+  console.log(item); // red 、 blue 、 yellow
+});
+```
 
 ## 使用情境 - 空元素
 
