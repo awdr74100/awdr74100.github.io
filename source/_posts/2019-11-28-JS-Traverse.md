@@ -300,7 +300,7 @@ for (const value of arr) {
 
 > **指向特定的對象：forEach**
 
-- 嚴謹模式
+- 非嚴謹模式
 
 ```js
 let arr = ['red'];
@@ -321,7 +321,7 @@ arr.forEach((item) => {
 });
 ```
 
-- 非嚴謹模式
+- 嚴謹模式
 
 ```js
 'use strict'; // JavaScript 嚴謹模式
