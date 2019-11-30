@@ -275,4 +275,75 @@ console.log(JSON.parse(arrString2)); // SyntaxError: Unexpected token
 
 ## 使用情境 - this 的指向
 
+在 JavaScript 中各遍歷語法對於 this 的指向都是大同小異的，基本上都是指向外部的 window 物件，唯獨 forEach 最特別，如下範例：
+
+> **保留外部作用域：for、for in、for of**
+
+```js
+let arr = ['red'];
+
+/* --- for --- */
+for (let i = 0; i < arr.length; i += 1) {
+  console.log(this); // window
+}
+
+/* --- fpr in --- */
+for (const key in arr) {
+  console.log(this); // window
+}
+
+/* --- for of --- */
+for (const value of arr) {
+  console.log(this); // window
+}
+```
+
+> **指向特定的對象：forEach**
+
+- 嚴謹模式
+
+```js
+let arr = ['red'];
+
+/* --- 定義 thisArg 參數 --- */
+arr.forEach(function(item) {
+  console.log(this); // 30
+}, 30);
+
+/* --- 未定義 thisArg 參數 --- */
+arr.forEach(function(item) {
+  console.log(this); // window
+});
+
+/* --- 箭頭函式 --- */
+arr.forEach((item) => {
+  console.log(this); // window
+});
+```
+
+- 非嚴謹模式
+
+```js
+'use strict'; // JavaScript 嚴謹模式
+
+let arr = ['red'];
+
+/* --- 定義 thisArg 參數 --- */
+arr.forEach(function(item) {
+  console.log(this); // 30
+}, 30);
+
+/* --- 未定義 thisArg 參數 --- */
+arr.forEach(function(item) {
+  console.log(this); // undefined
+});
+
+/* --- 箭頭函式 --- */
+arr.forEach((item) => {
+  console.log(this); // window
+});
+```
+
+由上例可看出，forEach 所指向的 this 是根據第 2 個 thisArg 參數所提供，相反的，**如果 thisArg 參數未定義或為 null，this 將根據設定模式指向對應的對象，嚴謹模式下為 undefined，非嚴謹模式下為 window**，盡可能的要求所有 callback function 必須使用箭頭函式。
+
 ## 使用情境 - 中斷迴圈
