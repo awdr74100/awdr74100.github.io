@@ -347,3 +347,85 @@ arr.forEach((item) => {
 由上例可看出，forEach 所指向的 this 是根據第 2 個 thisArg 參數所提供，相反的，**如果 thisArg 參數未定義或為 null，this 將根據設定模式指向對應的對象，嚴謹模式下為 undefined，非嚴謹模式下為 window**，盡可能的要求所有 callback function 必須使用箭頭函式。
 
 ## 使用情境 - 中斷迴圈
+
+在一般遍歷語法中，使用 break、return 中斷迴圈是再正常不過的事情，但這兩個語法使用在 forEach 上是行不通的，相關範例如下：
+
+> **中斷迴圈成功：for、for in、for of**
+
+```jS
+let arr = ['red', 'blue', 'black'];
+
+/* --- for --- */
+for (let i = 0; i < arr.length; i += 1) {
+  if (arr[i] === 'blue') {
+    break;
+  }
+  console.log(i); // 0
+}
+
+/* --- for in --- */
+for (const key in arr) {
+  if (arr[key] === 'blue') {
+    break;
+  }
+  console.log(key); // 0
+}
+
+/* --- for of --- */
+for (const [index, value] of arr.entries()) {
+  if (value === 'blue') {
+    break;
+  }
+  console.log(index); // 0
+}
+```
+
+> **中斷迴圈失敗：forEach**
+
+```js
+let arr = ['red', 'blue', 'black'];
+
+/* --- break --- */
+arr.forEach((item, index) => {
+  if (item === 'blue') {
+    break;
+  }
+  console.log(index); // SyntaxError: Illegal break statement
+});
+
+/* --- return --- */
+arr.forEach((item, index) => {
+  if (item === 'blue') {
+    return;
+  }
+  console.log(index); // 0 、 2
+});
+```
+
+> **其他遍歷方法：every、some**
+
+```js
+let arr = ['red', 'blue', 'black'];
+
+/* --- every --- */
+arr.every((item, index) => {
+  if (item === 'blue') {
+    return false;
+  }
+  console.log(index); // 0
+});
+
+/* --- some --- */
+arr.some((item, index) => {
+  if (item === 'blue') {
+    return true;
+  }
+  console.log(index); // 0
+});
+```
+
+由上例可看出，forEach 使用 break 會發生錯誤，使用 return 最多只能中斷當前遍歷項目，最後依然會遍歷後面的項目，個人建議，**如果有中斷迴圈需求，請使用 for、for in、for of 方法，或者利用 every、some 依序判斷項目特性來完成操作**。
+
+## 結論
+
+經過上面的討論，你會發現 for of 是遍歷陣列最可靠的方式，它比 for 語法簡潔，並且沒有 for in 與 forEach 那麼多奇怪的特例，唯二的缺點是取得索引值需要搭配其他方法才能完成，以及無法像 forEach 一樣鏈式操作物件；在 Airbnb 的 Style Guide 中，禁止使用 for 相關的遍歷方法，推薦使用 forEach 高階函數來完成遍歷，其主要原因為較容易推論結果，其實也蠻有道理的，除非遇到上述所講的特殊情境，使用 for of 較為容易，不然在一般情境中 forEach 或許是你更好的選擇。
