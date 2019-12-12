@@ -19,7 +19,7 @@ tags:
 - 何謂 Callback 與 Callback hell ？
 - Promise 狀態與流程
 - Promise 變體方法
-- Promise 限制
+- Promise 靜態方法
 
 ## 何謂 Callback 與 Callback hell ？
 
@@ -155,13 +155,19 @@ ES6 時代來臨，讓我們來看看新推出的 Promise 物件是如何改善 
 
 <img src="https://bitsofco.de/content/images/2016/06/Creating-Promises.png" alt="Promise ststus">
 
-在 Promise 物件中，我們所做的一切行為都是在控制它本身的狀態，從宣告開始，物件本身就已經擁有狀態了，我們可利用物件本身的 callback 去更改它的狀態，最後拿取 Promise 返回的狀態即可完成操作，讓我們從 Promise 的三種狀態開始說明：
+在 Promise 物件中，我們所做的一切行為都是在控制它本身的狀態，從宣告開始，物件本身就已經擁有狀態了，我們可利用物件本身的 callback 去更改它的狀態，最後拿取 Promise 返回的狀態即可完成操作。下面是 Promise 的建構函式：
+
+```js
+new Promise((resolve, reject) => {});
+```
+
+Promise 本身有三種狀態：
 
 - **pending：沒有回應**
 - **fulfilled：承諾兌現，操作完成**
 - **rejected：拒絕承諾，操作失敗**
 
-Promise 本身的 callback 可用來改變狀態，如下所示：
+Promise 本身的 callback 可用來改變狀態：
 
 - **resolve()：承諾兌現**
 - **reject()：拒絕承諾**
@@ -307,4 +313,6 @@ Promise.race([async_api(1000, true), async_api(2000, true), async_api(3000, true
 
 `Promise.race([...])` 會回傳一個 result，類似於 OR 處理，只要有任何一個 Promise 回傳成功即執行下一個任務，其餘捨棄，範例如上，`async_api 1s` 最快回傳成功，其他的事件直接捨棄即進行下一個任務。
 
-## Promise 限制
+## Promise 靜態方法
+
+
