@@ -17,9 +17,7 @@ tags:
 ## 筆記重點
 
 - 何謂 Callback 與 Callback hell ？
-- Promise 狀態與流程
-- Promise 變體方法
-- Promise 靜態方法
+- Promise 物件建立與基本使用
 
 ## 何謂 Callback 與 Callback hell ？
 
@@ -149,170 +147,50 @@ async_api1(() => {
 });
 ```
 
-ES6 時代來臨，讓我們來看看新推出的 Promise 物件是如何改善 callback 問題的。
+讓我們來看看 ES6 新推出的 Promise 物件是如何改善 callback hell 問題的。
 
-## Promise 狀態與流程
+## Promise 物件建立與基本使用
 
-<img src="https://bitsofco.de/content/images/2016/06/Creating-Promises.png" alt="Promise ststus">
+### Promise 物件的建立
 
-在 Promise 物件中，我們所做的一切行為都是在控制它本身的狀態，從宣告開始，物件本身就已經擁有狀態了，我們可利用物件本身的 callback 去更改它的狀態，最後拿取 Promise 返回的狀態即可完成操作。下面是 Promise 的建構函式：
+<div class="note warning">ES6 Promise 的實作中，會確保 Promise 物件一實體化後就會固定住狀態，要不就是"以實現"，要不就是"已拒絕"</div>
 
-```js
-new Promise((resolve, reject) => {});
-```
-
-Promise 本身有三種狀態：
-
-- **pending：沒有回應**
-- **fulfilled：承諾兌現，操作完成**
-- **rejected：拒絕承諾，操作失敗**
-
-Promise 本身的 callback 可用來改變狀態：
-
-- **resolve()：承諾兌現**
-- **reject()：拒絕承諾**
-
-Promise 本身的方法可用來接收狀態：
-
-- **then()：當承諾兌現即接收**
-- **catch()：拒絕承諾時接收**
-
-了解了 Promise 物件的執行流程，讓我們開始來做第一個範例：
+一個簡單的 Promise 語法結構如下：
 
 ```js
-const async_api = (timeout, status) =>
+const async_api = () =>
   new Promise((resolve, reject) => {
-    if (status) {
-      setTimeout(() => {
-        resolve('success');
-      }, timeout);
-    } else {
-      reject('error');
-    }
+    // 成功時
+    resolve('success');
+    // 失敗時
+    reject('error');
   });
 
-async_api(1000, true)
+async_api()
   .then((response) => {
-    console.log(response); // success
-  })
-  .catch((error) => {
-    console.log(error);
-  });
-/*
-  --- delay 1s ---
-  success
-*/
-```
-
-上面範例一樣使用了 setTimeout 來模擬非同步事件，當 Promise 狀態被改變時，使用 then() 來接收回傳的結果，是不是發現與 callback 相比，結構變得非常整潔，讓我們使用 Promise 來完成 callback 的範例看看：
-
-- **Promise Chain：使用 return & then 來完成，可依造流程來處理資料**
-
-```js
-const async_api = (timeout, status) =>
-  new Promise((resolve, reject) => {
-    if (status) {
-      setTimeout(() => {
-        resolve('success：' + timeout / 1000);
-      }, timeout);
-    } else {
-      reject('error');
-    }
-  });
-
-async_api(1000, true)
-  .then((response) => {
+    // on fulfillment (以實現時)
     console.log(response);
-    return async_api(2000, true);
-  })
-  .then((response2) => {
-    console.log(response2);
-    return async_api(3000, true);
-  })
-  .then((response3) => {
-    console.log(response3);
-    return async_api(444444, false);
   })
   .catch((error) => {
+    // on rejection (已拒絕時)
     console.log(error);
   });
-/*
-  --- delay 1s ---
-  success：1
-  --- delay 2s ---
-  success：2
-  --- delay 3s ---
-  success：3
-  error
-*/
 ```
 
-很明顯的，使用 Promise 對比 callback 來說，結構的簡潔性提高非常多，且提供統一的錯誤處理機制，方便控制內部所觸發的問題，我們也可以使用 return 與 then() 來控制非同步的流程，這也是一般人常講的 Promise Chain。
-
-## Promise 變體方法
-
-有時我們需要針對多個非同步事件來觸發相對應的動作，此時就可以使用 Promise 內建的變體方法來完成任務，相關方法如下：
-
-- **Promise.all([...])：所有的 Promise 都是成功的，才會執行**
-- **Promise.race([...])：執行第一個成功的 Promise，其他捨棄**
-
-### Promise.all([...])
+我們先來看 Promise 的建構函式，它的語法如下：
 
 ```js
-const async_api = (timeout, status) =>
-  new Promise((resolve, reject) => {
-    if (status) {
-      setTimeout(() => {
-        resolve('success：' + timeout / 1000);
-      }, timeout);
-    } else {
-      reject('error');
-    }
-  });
-
-Promise.all([async_api(1000, true), async_api(2000, true), async_api(3000, true)])
-  .then((list) => {
-    console.log(list);
-  })
-  .catch((error) => {
-    console.log(error);
-  });
-/*
-  --- delay 3s ---
-  [ 'success：1', 'success：2', 'success：3' ]
-*/
+new Promise(function(resolve, reject) { ... });
 ```
 
-`Promise.all([...])` 會回傳一個 Array，類似於 AND 處理，所有 Promise 都回傳成功才進行下一個任務，如果有任何一個 Promise 回傳失敗，則直接進入失敗的處理狀況，範例如上，`async_api 1s`、`async_api 2s`、`async_api 3s` 都完成才進行下一個任務。
-
-### Promise.race([...])
+用箭頭函式簡化一下：
 
 ```js
-const async_api = (timeout, status) =>
-  new Promise((resolve, reject) => {
-    if (status) {
-      setTimeout(() => {
-        resolve('success：' + timeout / 1000);
-      }, timeout);
-    } else {
-      reject('error');
-    }
-  });
-
-Promise.race([async_api(1000, true), async_api(2000, true), async_api(3000, true)])
-  .then((first) => {
-    console.log(first);
-  })
-  .catch((error) => {
-    console.log(error);
-  });
-/*
-  --- delay 1s ---
-  success：1
+new Promise((resolve, reject) => { ... });
 ```
 
-`Promise.race([...])` 會回傳一個 result，類似於 OR 處理，只要有任何一個 Promise 回傳成功即執行下一個任務，其餘捨棄，範例如上，`async_api 1s` 最快回傳成功，其他的事件直接捨棄即進行下一個任務。
+建構函式的傳入參數需要一個函式，參數名稱可自由定義，但建議要符合使用上的命名，如果沒有其他需求，使用 reslove 與 reject 更能夠提高其閱讀性。
 
-## Promise 靜態方法
+### Promise 基本的使用
 
-
+<div class="note warning"></div>
