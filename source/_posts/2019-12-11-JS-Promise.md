@@ -19,6 +19,9 @@ tags:
 - 何謂 Callback 與 Callback hell ？
 - Promise 物件建立與基本使用
 - Promise 執行流程與錯誤處理
+- Promise 靜態方法
+- Promise 變體方法
+- 改寫 Callback 函式
 
 ## 何謂 Callback 與 Callback hell ？
 
@@ -353,7 +356,7 @@ async_api()
 
 <div class="note warning">Promise.resolve 或 Promise.reject 只用於單純的傳入物件、值或外部的 thenable 物件，轉換為 Promise 物件的場合</div>
 
-`Promise.resolve` 與 `Promise.reject` 是 Promise 的靜態方法，`Promise.resolve` 等於是產生 `fulfilled` 狀態的物件，`Promise.reject` 則是 `rejected` 狀態，如下範例：
+`Promise.resolve` 與 `Promise.reject` 是 Promise 的靜態方法，`Promise.resolve` 可直接產生 `fulfilled` 狀態的 Promise 物件，`Promise.reject` 則是 `rejected` 狀態的 Promise 物件，如下範例：
 
 ```js
 let promiseObject = Promise.resolve(10);
@@ -363,4 +366,152 @@ promiseObject.then((num) => {
 });
 ```
 
+`Promise.resolve` 與 `Promise.reject` 與使用 Promise 建構式的方式相比，在使用上有很大的不同，以下面的例子說明：
+
+```js
+// 方式一： Promise 建構式
+const initPromise_1 = (value) => {
+  return new Promise((resolve, reject) => {
+    if (value % 2 === 0) {
+      resolve(value);
+    } else {
+      throw '發生錯誤';
+    }
+  });
+};
+
+// 方式二： Promise.resolve + Promise.reject
+const initPromise_2 = (value) => {
+  if (value % 2 === 0) {
+    return Promise.resolve(value);
+  } else {
+    return Promise.reject('發生錯誤');
+  }
+};
+
+// 方式三： Promise.resolve + throw
+const initPromise_3 = (value) => {
+  if (value % 2 === 0) {
+    return Promise.resolve(value);
+  } else {
+    throw '發生錯誤'; // error
+  }
+};
+
+initPromise_3(7)
+  .then((value) => {
+    console.log('success： ' + value);
+  })
+  .catch((error) => {
+    console.log('error： ' + error);
+  });
+```
+
+在上面的三種方法中，方法三會直接 `throw` 出意外，造成程式中斷，與 Promise 建構式相比，**Promise 靜態方法對於錯誤的處理方式是不同的**，如果你的函式處理較為複雜時，你在回傳 `Promise.reject` 或 `Promise.resolve` 前發生意外，是完全無法控制的。
+
+結論是 `Promise.reject` 或 `Promise.resolve` 只適用於單純的純入物件、值、或外部的 thenable 物件，如果你要把一整段程式碼或函式轉為 Promise 物件，不要使用這兩個靜態方法，要使用 Promise 建構式來產生物件才是正解。
+
 ## Promise 變體方法
+
+<div class="note warning">Promise.all 與 Promise.race 的參數值，通常使用陣列結構作為傳入參數，而陣列中要不就是一般的值，要不就是 Promise 物件</div>
+
+`Promise.all` 是**並行運算**使用的變體方法，它的語法如下：
+
+```js
+Promise.all([...]);
+```
+
+`Promise.all` 方法會將陣列中的值並行運算，全部完成後才會接著下個 `thne` 方法，在執行時有以下幾種狀況：
+
+- 陣列中的索引值與執行順序無關，大家起跑線都一樣
+- 陣列中的值如果不是 Promise 物件，會自動使用 `Promise.resolve`方法來轉換
+- 執行過程時，陣列中只要有**任何一個** Promise 物件發生例外錯誤，或是有 reject 狀態的物件，會立即回傳一個 rejected 狀態的 Promise 物件。
+- 實現完成後，接下來的 then 方法會獲取到的值為陣列值
+
+下面為 `Promise.all` 的範例：
+
+```js
+const a1 = Promise.resolve(3);
+const a2 = 98;
+const a3 = new Promise((resolve) => {
+  setTimeout(() => {
+    resolve(13);
+  }, 1000);
+});
+
+Promise.all([a1, a2, a3])
+  .then((response) => {
+    console.log(response);
+  })
+  .catch((error) => {
+    console.log(error);
+  });
+/*
+  --- delay 1s ---
+  [ 3, 98, 13 ]
+*/
+```
+
+`Promise.race` 也是一個變體方法，它的語法如下：
+
+```js
+Promise.race([...]);
+```
+
+`Promise.race` 方法就如同 `Promise.all`，一樣都是並行運算的變體，差別在於 `Promise.all` 指的是**所有的** Promise 物件都要 resolve 完成才進行下一步，而 `Promise.race` 則是**任何一個** Promise 物件 resolve 完成就進行下一步。用 **race(競賽)**這個字詞是在比喻就像賽跑一樣，只要有任何一個參賽者到達終點就結束了，當然它的回傳值也只會是那個優勝者而已。
+
+`Promise.race` 的規則與 `Promise.all` 相同，只不過實現的話，下一步的 `then` 方法只會獲取最快實現的那個值，範例如下：
+
+```js
+const test = (name, timeout) =>
+  new Promise((resolve) => {
+    setTimeout(() => {
+      resolve('優勝者：' + name + '  時間：' + timeout / 1000 + 's');
+    }, timeout);
+  });
+
+Promise.race([test('大熊', 2000), test('胖虎', 3000), test('靜香', 1000)]).then((response) => {
+  console.log(response); // 優勝者：靜香  時間：1s
+});
+```
+
+## 改寫 Callback 函式
+
+在前面我們有強調使用 callback 容易造成 callback hell，這一次我們使用 Promise 來改寫 callback 的範例吧：
+
+```js
+const async_api = (name, timeout) =>
+  new Promise((resolve, reject) => {
+    if (name || timeout === undefined) {
+      setTimeout(() => resolve(name + ' end'), timeout);
+    } else {
+      reject(name + 'error');
+    }
+  });
+
+async_api('async_api1', 1000)
+  .then((response) => {
+    console.log(response);
+    return async_api('async_api2', 2000);
+  })
+  .then((response) => {
+    console.log(response);
+    return async_api('async_api3', 3000);
+  })
+  .then((response) => {
+    console.log(response);
+  })
+  .catch((error) => {
+    console.log(error);
+  });
+/*
+  --- delay 1s ---
+  async_api1 end
+  --- delay 2s ---
+  async_api2 end
+  --- delay 3s ---
+  async_api3 end
+*/
+```
+
+很明顯的，使用 Promise 大幅提高了結構的易讀性，且提供統一的流程管理，光是這幾點，就值得你花時間學習它了，Promise 的應用場景一定不只有這些，非同步對於 JavaScript 來說，幾乎是必備的條件，而 Promise 物件的出現，就是用來改善傳統非同步情境可能會發生的問題，好東西，不學嗎？
