@@ -53,7 +53,6 @@
 
 <link rel="stylesheet" href="{{ url_for(theme.css) }}/main.css?v={{ next_version }}">
 
-<link href="https://fonts.googleapis.com/css?family=Noto+Sans+TC:300,700&display=swap&subset=chinese-traditional" rel="stylesheet">
 {{ next_font() }}
 
 {%- set font_awesome_uri = theme.vendors.fontawesome or next_vendors('font-awesome/css/font-awesome.min.css?v=4.7.0') %}
