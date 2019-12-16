@@ -3,7 +3,7 @@ title: JavaScript ES6 非同步操作 - Promise
 date: 2019-12-11 22:19:42
 description:
 categories:
- - JavaScript
+  - JavaScript
 tags:
   - ES6
   - JavaScript

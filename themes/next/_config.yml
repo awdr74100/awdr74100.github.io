@@ -140,7 +140,7 @@ menu:
 # Enable / Disable menu icons / item badges.
 menu_settings:
   icons: true
-  badges: false
+  badges: true
 
 
 # ---------------------------------------------------------------
@@ -179,7 +179,7 @@ avatar:
   # url: /images/header.jpg
   url: /images/userLogo.jpg
   # If true, the avatar would be dispalyed in circle.
-  rounded: true
+  rounded: false
   # If true, the avatar would be rotated with the cursor.
   rotated: false
 

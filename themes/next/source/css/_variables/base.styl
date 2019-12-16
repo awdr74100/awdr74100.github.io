@@ -55,9 +55,9 @@ get_font_family(config) {
 }
 
 // Font families.
-$font-family-chinese      = "Microsoft JhengHei";
+$font-family-chinese      = Helvetica, "PingFang SC", "Microsoft YaHei";
 
-$font-family-base         = Helvetica, $font-family-chinese, sans-serif;
+$font-family-base         = $font-family-chinese, sans-serif;
 $font-family-base         = get_font_family('global'), $font-family-chinese, sans-serif if get_font_family('global');
 
 $font-family-logo         = $font-family-base;
@@ -69,8 +69,8 @@ $font-family-headings     = get_font_family('headings'), $font-family-base if ge
 $font-family-posts        = $font-family-base;
 $font-family-posts        = get_font_family('posts'), $font-family-base if get_font_family('posts');
 
-$font-family-monospace    = consolas, Menlo, monospace, "Microsoft JhengHei" ;
-$font-family-monospace    = get_font_family('codes'), consolas, Menlo, monospace, $font-family-chinese if get_font_family('codes');
+$font-family-monospace    = consolas, Menlo, $font-family-chinese, monospace;
+$font-family-monospace    = get_font_family('codes'), consolas, Menlo, $font-family-chinese, monospace if get_font_family('codes');
 
 $font-family-icons        = 'FontAwesome';
 

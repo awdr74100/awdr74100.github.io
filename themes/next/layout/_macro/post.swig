@@ -156,9 +156,9 @@
             </span>
           {%- endif %}
 
-          {%- if post.description and (not theme.excerpt_description or not is_index) %}
+          {#%- if post.description and (not theme.excerpt_description or not is_index) %}
             <div class="post-description">{{ post.description }}</div>
-          {%- endif %}
+          {%- endif %#}
 
         </div>
       </header>
