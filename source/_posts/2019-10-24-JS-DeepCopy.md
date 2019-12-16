@@ -2,7 +2,6 @@
 title: JavaScript 淺拷貝(Shallow Copy)與深拷貝(Deep Copy)
 date: 2019-10-24 15:54:42
 description:
-#   - 8484
 categories:
   - JavaScript
 tags:
@@ -30,8 +29,8 @@ tags:
 
 在 JavaScript 的世界裡有基本型別與物件型別兩種定義。
 
-基本型別為：Number、String、Boolean、Null、Undefined、Symbol (ES6 新增)
-其餘基本上都屬於物件型別，兩種資料型別最大的差異就在於傳值方式
+基本型別為：`Number`、`String`、`Boolean`、`Null`、`Undefined`、`Symbol`
+其餘像是 `Array`、`Object` 這些都屬於物件型別，兩種資料型別最大的差異就在於傳值方式
 
 基本型別在賦值時，是採用 **pass by value** 方式，也就是**傳值**，如下範例：
 
@@ -76,9 +75,9 @@ console.log(objectCP); // { p1: '111', p2: '444', p3: '333' }
 - 深拷貝：
   深度複製指定物件，操作新物件不影響原物件，**兩者指向不同記憶體位址**。
 
-## 淺拷貝方法 - Objext.assign
+## 淺拷貝方法 - Object.assign
 
-Object.assign 是 ES6 新增的函式，可用來複製一個或多個物件自身所有可數的屬性到另一個目標物件。回傳的值為該目標物件，如下範例：
+`Object.assign` 是 ES6 新增的函式，可用來複製一個或多個物件自身所有可數的屬性到另一個目標物件。回傳的值為該目標物件，如下範例：
 
 ```js
 let array = ['red', 'blue', 'yellow'];
@@ -90,7 +89,7 @@ arrayCP[0] = 'black';
 let objectCP = Object.assign({}, object);
 objectCP.p2 = '444';
 
-console.log(array); // [ 'red', 'blue', 'yellow' ]  <= 原陣列沒有影響，
+console.log(array); // [ 'red', 'blue', 'yellow' ]  <= 原陣列沒有影響
 console.log(arrayCP); // [ 'black', 'blue', 'yellow' ]
 console.log(object); // { p1: '111', p2: '222', p3: '333' }  <= 原物件沒有影響
 console.log(objectCP); // { p1: '111', p2: '444', p3: '333' }
@@ -133,7 +132,7 @@ arrayCP[0] = 'black';
 let objectCP = { ...object };
 objectCP.p2 = '444';
 
-console.log(array); // [ 'red', 'blue', 'yellow' ]  <= 原陣列沒有影響，
+console.log(array); // [ 'red', 'blue', 'yellow' ]  <= 原陣列沒有影響
 console.log(arrayCP); // [ 'black', 'blue', 'yellow' ]
 console.log(object); // { p1: '111', p2: '222', p3: '333' }  <= 原物件沒有影響
 console.log(objectCP); // { p1: '111', p2: '444', p3: '333' }
@@ -143,8 +142,8 @@ console.log(objectCP); // { p1: '111', p2: '444', p3: '333' }
 
 ## 深拷貝方法 - JSON.stringify
 
-JSON.stringify 常見應用為 Local Storge 等存儲操作，他也可以使用在深拷貝應用！
-主要利用 JSON.stringify 把物件轉成字串，再用 JSON.parse 把字串轉為物件，如下範例：
+`JSON.stringify` 常見應用為 Local Storge 等存儲操作，他也可以使用在深拷貝應用！
+主要利用 `JSON.stringify` 把物件轉成字串，再用 `JSON.parse` 把字串轉為物件，如下範例：
 
 ```js
 let data = [
@@ -171,7 +170,7 @@ console.log(dataCP); // [ { name: 'Emma', weight: 60 }, { name: 'Alice', weight:
 
 ## 深拷貝方法 - \$.extend
 
-jQuery 也有提供一個方法可以完成深拷貝，利用 \$.extend 指定強制深拷貝，如下範例：
+jQuery 也有提供一個方法可以完成深拷貝，利用 `$.extend` 指定強制深拷貝，如下範例：
 
 ```js
 let data = [

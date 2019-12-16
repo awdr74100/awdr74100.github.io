@@ -83,9 +83,10 @@ let object = [
 
 ## Array.prototype.forEach()
 
-forEach() 是陣列方法中最單純的一個，他也是最好理解的一個，用法類似於 for 迴圈，相比之下，更讓人容易理解，應用。如下範例：
+`forEach()` 是陣列方法中最單純的一個，他也是最好理解的一個，用法類似於 for 迴圈，相比之下，更讓人容易理解，應用。如下範例：
 
-- **可直接利用參數操作陣列內容**
+- 特性：可直接利用參數操作陣列內容
+- callback 參數：currentItem、index、array
 
 ```js
 object.forEach(function(item, index, array) {
@@ -108,9 +109,10 @@ console.log(people); // undefined
 
 ## Array.prototype.filter()
 
-filter() 是我最愛使用的一個方法！傳統過濾陣列都是使用 for 迴圈加上許多判斷式， filter() 結合了兩者功能，配合箭頭函式，大幅提高效率與可讀性。如下範例：
+`filter()` 是我最愛使用的一個方法！傳統過濾陣列都是使用 for 迴圈加上許多判斷式， `filter()` 結合了兩者功能，配合箭頭函式，大幅提高效率與可讀性。如下範例：
 
-- **依序判斷項目內容，如果為 True 即放入新陣列，最後回傳新陣列**
+- 特性：依序判斷項目內容，如果為 True 即放入新陣列，最後回傳新陣列
+- callback 參數：currentItem、index、array
 
 ```js
 let data1 = object.filter(function(item, index, array) {
@@ -130,9 +132,10 @@ console.log(data3); // [ { name: 'Emma', weight: 46, age: 18 } ]
 
 ## Array.prototype.find()
 
-find() 類似於 filter() ，不過其處理為回傳首個符合的項目，還有一個類似方法叫 findIndex() ，處理方式與 find() 相同，不過是回傳索引值。如下範例：
+`find()` 類似於 `filter()` ，不過其處理為回傳首個符合的項目，還有一個類似方法叫 `findIndex()` ，處理方式與 `find()` 相同，不過是回傳索引值。如下範例：
 
-- **依序判斷項目內容，回傳第一次判斷為 True 的項目**
+- 特性：依序判斷項目內容，回傳第一次判斷為 True 的項目
+- callback 參數：currentItem、index、array
 
 ```js
 let data1 = object.find(function(item, index, array) {
@@ -152,10 +155,11 @@ console.log(data3); // { name: 'Eric', weight: 60, age: 28 }
 
 ## Array.prototype.map()
 
-map() 主要用來做陣列的修改，或是整體項目的判斷，通常可搭配**展開**做內容新增。如下範例：
+`map()` 主要用來做陣列的修改，或是整體項目的判斷，通常可搭配**展開**做內容新增。如下範例：
 
-- **依序處理項目內容，回傳陣列長度等於作用陣列長度**
-- **預設項目內容為 undefined**
+- 特性：依序處理項目內容，回傳陣列長度等於作用陣列長度
+- callback 參數：currentItem、index、array
+- 注意：預設項目內容為 undefined
 
 ```js
 let data1 = object.map(function(item, index, array) {});
@@ -176,10 +180,11 @@ console.log(data3); // [ { name: 'Eric', weight: 60, age: 28, overweight: '過�
 
 ## Array.prototype.every()
 
-evely() 可用來檢查陣列項目是否符合條件，類似於 AND 處理，**全部項目都符合**，回傳 True
+`every()` 可用來檢查陣列項目是否符合條件，類似於 AND 處理，**全部項目都符合**，回傳 True。如下範例：
 
-- **回傳內容只有 True 和 Flase**
-- **判斷全部項目是否都符合條件，否則回傳 False**
+- 特性：判斷全部項目是否都符合條件，否則回傳 False
+- callback 參數：currentItem、index、array
+- 注意：回傳內容只有 True 和 Flase
 
 ```js
 let data1 = object.every(function(item, index, array) {
@@ -196,10 +201,11 @@ console.log(data2); // false
 
 ## Array.prototype.some()
 
-some() 類似於 evely() ，等同 OR 處理，**部分項目符合**，回傳 True
+`some()` 類似於 `every()` ，等同 OR 處理，**部分項目符合**，回傳 True，如下範例：
 
-- **回傳內容只有 True 和 Flase**
-- **一個(含)以上項目符合條件，回傳 True**
+- 特性：一個(含)以上項目符合條件，回傳 True
+- callback 參數：currentItem、index、array
+- 注意：回傳內容只有 True 和 Flase
 
 ```js
 let data1 = object.some(function(item, index, array) {
@@ -216,10 +222,11 @@ console.log(data2); // false
 
 ## Array.prototype.reduce()
 
-reduce() 主要用來做**累加應用**或者是**項目間的判斷**，如下範例：
+`reduce()` 主要用來做**累加應用**或者是**項目間的判斷**，如下範例：
 
-- **初始化數值(前一個數值)，可由後方傳入**
-- **全部操作皆由初始數值與當前項目做應用**
+- 特性：初始化數值(前一個數值)，可由後方傳入
+- callback 參數：accumulator、currentItem、index、array
+- 注意：全部操作皆由初始數值與當前項目做應用
 
 ```js
 let data1 = object.reduce(function(accumulator, currentValue, currentIndex, array) {});
