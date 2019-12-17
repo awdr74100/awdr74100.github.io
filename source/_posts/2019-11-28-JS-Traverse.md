@@ -2,19 +2,16 @@
 title: JavaScript 容易混淆的遍歷方法
 date: 2019-11-28 17:18:16
 description:
-categories:
-  - JavaScript
-tags:
-  - JavaScript
-  - ES6
-  - ES8
+  [
+    在之前開發 Python 時，最常使用 for in 去遍歷物件；仔細想想，自己好像被 forEach 寵壞了，都忘記 JavaScript 也有相關的語法，實際使用下來，發現有部分觀念需要釐清，且某些情境可能不是這麼好用，需要搭配其他方法才能完成目的。此篇重點圍繞在 for、for/in、for/of、forEach 的使用情境與差別。,
+  ]
+categories: [JavaScript]
+tags: [JavaScript, ES6, ES8]
 ---
 
 ## 前言
 
 在之前開發 Python 時，最常使用 for in 去遍歷物件；仔細想想，自己好像被 forEach 寵壞了，都忘記 JavaScript 也有相關的語法，實際使用下來，發現有部分觀念需要釐清，且某些情境可能不是這麼好用，需要搭配其他方法才能完成目的。此篇重點圍繞在 for、for/in、for/of、forEach 的使用情境與差別。
-
-<!-- more -->
 
 ## 筆記重點
 

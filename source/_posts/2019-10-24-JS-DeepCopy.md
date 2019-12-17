@@ -2,19 +2,14 @@
 title: JavaScript 淺拷貝(Shallow Copy)與深拷貝(Deep Copy)
 date: 2019-10-24 15:54:42
 description:
-categories:
-  - JavaScript
-tags:
-  - JavaScript
-  - ES6
-  - Deep Copy
+  - 在開發 Vue 項目時，需要利用 Props 與 Emit 使元件互相溝通，當時沒注意到物件有 Shallow Copy 與 Deep Copy 等特性，導致複製後的新物件影響原物件問題，特別深入學習此觀念。
+categories: [JavaScript]
+tags: [JavaScript, ES6, Deep Copy]
 ---
 
 ## 前言
 
 在開發 Vue 項目時，需要利用 Props 與 Emit 使元件互相溝通，當時沒注意到物件有 Shallow Copy 與 Deep Copy 等特性，導致複製後的新物件影響原物件問題，特別深入學習此觀念。
-
-<!-- more -->
 
 ## 筆記重點
 
