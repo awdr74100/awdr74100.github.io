@@ -26,7 +26,7 @@ tags: [ES6, JavaScript]
 
 Callback 是 JavaScript 很常使用的一種處理方式，以下是一個簡單的 callback 範例：
 
-- **Callback：以參數型態傳入另一個函式的函式**
+<div class="note warning">Callback：以參數型態傳入另一個函式的函式</div>
 
 ```js
 function alertMsg() {
@@ -47,7 +47,7 @@ main(alertMsg);
 */
 ```
 
-在一般開發中，我們很常需要使用非同步處理去完成任務，像是 `XMLHttpRequest`、`setTimeout` ...之類的，以下使用 setTimeout 來模擬非同步事件：
+在一般開發中，我們很常需要使用非同步處理去完成任務，像是 `XMLHttpRequest`、`setTimeout` ...之類的，以下使用 `setTimeout` 來模擬非同步事件：
 
 ```js
 function alertMsg() {
@@ -98,7 +98,7 @@ main(alertMsg);
 
 使用 callback 解決了非同步事件引發的問題，但當結構變得複雜時，使用 callback 容易產生 callback hell，使得後期維護非常痛苦，閱讀性也變得非常差，如下範例：
 
-- **Callback hell：簡稱回調地獄，通常發生在程式間需按照順序執行**
+<div class="note warning">Callback hell：簡稱回調地獄，通常發生在程式間需按照順序執行</div>
 
 ```js
 const async_api1 = (callback2) => {
@@ -198,7 +198,7 @@ new Promise((resolve, reject) => { ... });
 
 <div class="note warning">then 方法是 Promise 的最核心方法，也是控制非同步事件最關鍵的因素</div>
 
-在 Promise 中，我們可以使用 `then` 與 `catch` 來接收回傳的內容，接續 Promise 物件的建立中的範例：
+在 Promise 中，我們可以使用 `then()` 與 `catch()` 來接收回傳的內容，接續 Promise 物件的建立中的範例：
 
 ```js
 async_api()
