@@ -44,7 +44,8 @@ pre {
 
 .highlight {
   @extend $code-block;
-
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
   *::selection {
     background: $highlight-selection;
   }
@@ -90,6 +91,8 @@ pre {
     padding-left: 10px;
     padding-right: 10px;
     text-align: right;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
   }
 
   .code pre {
