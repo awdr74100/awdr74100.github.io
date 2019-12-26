@@ -36,7 +36,8 @@ date: 2019-12-24 19:30:32
 
 ## Gulp 安裝
 
-> 安裝環境：[Node.js](https://nodejs.org/en/)、[npm](https://nodejs.org/en/)
+<!-- > 安裝環境：[Node.js](https://nodejs.org/en/)、[npm](https://nodejs.org/en/) -->
+<div class="note warning">本篇教學都是採用 Gulp 4，關於 Gulp 4 與 Gulp 3 的差異，之後將會再做介紹</div>
 
 Gulp 依賴 Node.js 環境，需先進行安裝。推薦使用 LTS 版本：
 
@@ -49,6 +50,25 @@ Gulp 依賴 Node.js 環境，需先進行安裝。推薦使用 LTS 版本：
 $ node -v   # v10.15.1
 ```
 
+在 Gulp 3 版，需要再全域與區域環境分別安裝 Gulp，關於全域與區域環境的差別，可參考下面：
+
+- Window：代表全域環境或是本機環境
+- Local：代表區域環境或是專案環境
+
+通常需要再全域環境連同安裝的套件，都是打算使用套件在全域環境內的相關指令，如 Gulp、Vue、ESLint 等等。
+
+在 Gulp 4 版，一樣都需要分別在全域與區域環境安裝 Gulp，不同的地方在於，Gulp 4 版的全域套件名稱為 `gulp-cli`，相關指令如下：
+
 ```shell
-$ npm -v   # 6.4.1
+$ npm install gulp -g   # Gulp 3 版，全域安裝指令
+```
+
+```shell
+$ npm install gulp-cli -g   # Gulp 4 版，全域安裝指令
+```
+
+在這邊我們使用 Gulp 4 為主要開發版本，當 Gulp 在全域環境安裝完成時，可以使用以下指令來檢查：
+
+```shell
+$ gulp -v
 ```
