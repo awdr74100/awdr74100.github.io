@@ -1,6 +1,6 @@
 ---
 title: 解析 CSS Flexbox 佈局模型
-date: 2019-11-06 16:23:49
+date: 2019-11-07 16:23:49
 description:
   [
     在之前我一直都是使用 float、position 來排版，但當網頁元素越來越多，相對的結構也會越來越複雜，且 float 還需要搭配 clearfix 來解決塌陷等麻煩問題；到了 CSS3 時代，推出了新型的 Flexbox 佈局模式，徹底改善傳統排版繁瑣等問題，就連 Bootstrap4 都引進了，好東西！不學嗎？,
