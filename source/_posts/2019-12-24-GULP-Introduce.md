@@ -22,7 +22,7 @@ date: 2019-12-24 19:30:32
 
 ## Gulp 簡介
 
-<img src="https://www.codeproject.com/KB/Nodejs/1064203/b65be634-9e8e-11e5-970d-f3f304641a14.png" alt="Gulp 介紹">
+<img src="https://i.imgur.com/h4dIXip.png" alt="Gulp 介紹">
 
 在之前為了加強對於網頁元素的應用，我很常去觀看各大網站的原始碼，但有時會發現某些網站的代碼全部都擠在一起，非常難以閱讀，當時的我以為他們是故意的，到了後來才發現這個應用叫做壓縮代碼，通常在將要正式上線的網站都會有壓縮代碼的步驟，原因很簡單，以網站效能來說，大小的控管是非常重要的，多餘的空間就足以造成整體效能的低落，而壓縮代碼這個服務就是依靠 Gulp、Webpack 等相關工具來完成的，在這邊我們不討論 Webpack，以後有時間再作介紹，Gulp 不只可以幫助我們完成壓縮代碼服務，其中也包含以下功能：
 
@@ -49,7 +49,7 @@ Gulp 依賴 Node.js 環境，需先進行安裝。推薦使用 LTS 版本：
 $ node -v
 ```
 
-<img src="https://i.imgur.com/AWBXtQP.png" alt="node.js 查看是否正確安裝">
+<img src="https://i.imgur.com/gVhAOaV.jpg" alt="node.js 查看是否正確安裝">
 
 在 Gulp 3 版，需要再全域與區域環境分別安裝 Gulp，關於全域與區域環境的差別，可參考下面：
 
@@ -74,13 +74,13 @@ $ npm install gulp-cli -g   # Gulp 4 版，全域安裝指令
 $ gulp -v
 ```
 
-<img src="https://i.imgur.com/v6GJhoE.jpg" alt="Gulp 查看是否正確安裝">
+<img src="https://i.imgur.com/zG66E9x.jpg" alt="Gulp 查看是否正確安裝">
 
 從上面可以發現，我們全域環境的 CLI 工具已經安裝完成，版本為 2.2.0，但專案環境的 Gulp 卻是顯示 Unknown，因為我們尚未在專案環境安裝 Gulp，關於專案環境的安裝步驟，我們從初始化專案段落開始做介紹。
 
 ## Gulp 初始化專案
 
-接下來我們進行初始化專案的動作，使用以下指令生成 package.json：
+接下來我們進行初始化專案的動作，使用以下指令生成 `package.json`：
 
 ```shell
 $ npm init
@@ -100,4 +100,46 @@ $ npm install gulp --save
 
 使用前面所提到的 `gulp -v` 檢查 Gulp 是否正確安裝，此時專案結構如下：
 
-<img src="https://i.imgur.com/8YAIlJZ.jpg">
+<img src="https://i.imgur.com/7q8lF8h.jpg" alt="Gulp 目前狀態">
+
+觀察專案環境下是否成功安裝 Gulp，如果有版本號的顯示，就代表成功安裝囉(當前版本為 `4.0.2`)。接下來開始編寫第一個 Gulp Task 吧！
+
+## 開發第一個 Gulp Task
+
+接續上面範例，請先新增 `index.html` 與 `gulpfile.js` 這兩個檔案，如下圖
+
+<img src="https://i.imgur.com/739TtqQ.jpg" alt="gulpfile Before">
+
+`gulpfile.js` 是 Gulp 核心的檔案，所有的 Task 任務都是在這邊編寫完成，我們可以嘗試輸入以下內容到 `gulpfile.js` 檔案內：
+
+```js
+// gulpDemo/gulpfile.js
+
+const gulp = require('gulp');
+
+gulp.task('copyFile', () => {
+  // 'copyFile' 是任務名稱，可自行定義
+  return gulp.src('./index.html').pipe(gulp.dest('./public'));
+});
+```
+
+在前面我們有講解到關於 Gulp 運行的概念，如果以上面程式做為參考，可做出以下統整：
+
+- `gulp.task()`：創建名為 copyFile 的任務(水管名稱)
+- `gulp.src()`：導入 index.html 這一個檔案(水的來源)
+- `.pipe()`：以 `gulp.src()` 導入的檔案需做的處理(截獲水源所做的處理)
+- `gulp.dest()`：檔案輸出的目錄(水該從何處流出)
+
+此時輸入以下指令：
+
+```shell
+$ gulp copyFile
+```
+
+你會發現 Gulp 複製了 index.html 這一個檔案到 public 目錄下，如下圖：
+
+<img src="https://i.imgur.com/Mw9OJUV.jpg" alt="gulpfile After">
+
+相信你們已經猜到上面這道指令的功能，在任何的 Gulp 任務名稱下，我們都可以使用 `gulp + 任務名稱` 執行指定的任務，就像剛剛這一個 copyFile 任務，我們使用 `gulp copyFile` 執行這一個任務，而這一個任務內容為，從`./index.html` 載入原始檔，當我們遇到第一個 `pipe()` 建構的節點，需要針對內容作處裡，剛好處理內容為使用 `gulp.dest()` 輸出到目錄，這也是 public/index.html 被創建得原因。
+
+恭喜你已經開發了第一個 Gulp Task，同時也學會開發 Gulp 大部分應用的能力，不要懷疑，剩下的應用我們等到載入套件章節再做說明，基本上整個 Gulp 的流程差不多就是這個樣子，後面的教學都會以結合套件的方式作介紹，如果你等不及了，可以直接觀看下一篇文章。
