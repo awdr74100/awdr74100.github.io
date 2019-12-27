@@ -11,13 +11,13 @@ date: 2019-12-24 19:30:32
 
 ## 前言
 
-相信大多數人多少都有聽過 Gulp 這個工具，但卻沒有實際的去使用過它，Gulp 是一個自動化工具，基於串流(Stream)的方式來完成所設立的任務(Task)，擁有豐富的套件可供使用，可滿足前端開發者大部分的需求。此篇將介紹 Gulp 的環境要如何安裝以及建立第一個 Task，關於套件的部分將會獨立在做介紹。,
+相信大多數人多少都有聽過 Gulp 這個工具，但卻沒有實際的去使用過它，Gulp 是一個自動化工具，基於串流(Stream)的方式來完成所設立的任務(Task)，擁有豐富的套件可供使用，可滿足前端開發者大部分的需求。此篇將介紹 Gulp 的環境要如何安裝以及建立第一個 Task，關於套件的部分將會獨立在做介紹。
 
 ## 筆記重點
 
 - Gulp 簡介
 - Gulp 安裝
-- Gulp 基本指令
+- Gulp 初始化專案
 - 開發第一個 Gulp Task
 
 ## Gulp 簡介
@@ -36,7 +36,6 @@ date: 2019-12-24 19:30:32
 
 ## Gulp 安裝
 
-<!-- > 安裝環境：[Node.js](https://nodejs.org/en/)、[npm](https://nodejs.org/en/) -->
 <div class="note warning">本篇教學都是採用 Gulp 4，關於 Gulp 4 與 Gulp 3 的差異，之後將會再做介紹</div>
 
 Gulp 依賴 Node.js 環境，需先進行安裝。推薦使用 LTS 版本：
@@ -47,8 +46,10 @@ Gulp 依賴 Node.js 環境，需先進行安裝。推薦使用 LTS 版本：
 安裝過程就不加以贅述，可使用以下指令查看是否正確安裝：
 
 ```shell
-$ node -v   # v10.15.1
+$ node -v
 ```
+
+<img src="https://i.imgur.com/AWBXtQP.png" alt="node.js 查看是否正確安裝">
 
 在 Gulp 3 版，需要再全域與區域環境分別安裝 Gulp，關於全域與區域環境的差別，可參考下面：
 
@@ -72,3 +73,31 @@ $ npm install gulp-cli -g   # Gulp 4 版，全域安裝指令
 ```shell
 $ gulp -v
 ```
+
+<img src="https://i.imgur.com/v6GJhoE.jpg" alt="Gulp 查看是否正確安裝">
+
+從上面可以發現，我們全域環境的 CLI 工具已經安裝完成，版本為 2.2.0，但專案環境的 Gulp 卻是顯示 Unknown，因為我們尚未在專案環境安裝 Gulp，關於專案環境的安裝步驟，我們從初始化專案段落開始做介紹。
+
+## Gulp 初始化專案
+
+接下來我們進行初始化專案的動作，使用以下指令生成 package.json：
+
+```shell
+$ npm init
+```
+
+剛剛有提到專案環境尚未安裝 Gulp，使用以下指令安裝：
+
+```shell
+$ npm install gulp
+```
+
+在 npm 5 版本 `--save` 已成為預設指令，這也代表上面這道指令等同於下面這道指令：
+
+```shell
+$ npm install gulp --save
+```
+
+使用前面所提到的 `gulp -v` 檢查 Gulp 是否正確安裝，此時專案結構如下：
+
+<img src="https://i.imgur.com/8YAIlJZ.jpg">
