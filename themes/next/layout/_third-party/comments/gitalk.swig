@@ -1,3 +1,6 @@
+{# 禁止訪問 #}
+{% if path !== 'tags/index.html' %}
+  {% if path !== 'categories/index.html' %}
 {%- if page.comments %}
 {%- set gitalk_css_uri = theme.vendors.gitalk_css or '//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css' %}
 <link rel="stylesheet" href="{{ gitalk_css_uri }}">
@@ -24,3 +27,5 @@
   }, window.Gitalk);
 </script>
 {%- endif %}
+  {% endif %}
+{% endif %}
