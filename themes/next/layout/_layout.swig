@@ -26,7 +26,12 @@
           <div class="content">
             {% block content %}{% endblock %}
           </div>
-          {% include '_partials/comments.swig' %}
+          {# 禁止訪問 #}
+          {% if path !== 'tags/index.html' %}
+            {% if path !== 'categories/index.html' %}
+              {% include '_partials/comments.swig' %}
+            {% endif %}
+          {% endif %}
         </div>
         {%- if theme.sidebar.display !== 'remove' %}
           {% block sidebar %}{% endblock %}
