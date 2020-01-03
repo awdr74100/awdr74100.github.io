@@ -47,7 +47,8 @@ gulpDemo/
 | - package.json       # 安裝 gulp、gulp-pug
 ```
 
-Pug 範例：
+撰寫 Pug 範例：
+路徑：`./source/index.pug`
 
 ```pug
 <!DOCTYPE html>
@@ -62,7 +63,8 @@ html(lang="en")
             .title 測試 Pug
 ```
 
-使用 gulp-pug：
+載入並使用 gulp-pug：
+路徑：`./gulpfile.js`
 
 ```js
 const gulp = require('gulp');
@@ -71,13 +73,8 @@ const pug = require('gulp-pug'); // 載入 gulp-pug 套件
 gulp.task('pug', () => {
   return gulp
     .src('source/**/*.pug') // Pug 主檔案路徑
-    .pipe(
-      // 使用 gulp-pug
-      pug({
-        pretty: true, // gulp-pug 可傳遞選項
-      })
-    )
-    .pipe(gulp.dest('public')); // 編譯完成輸出路徑
+    .pipe(pug()) // 使用 gulp-pug 進行編譯
+    .pipe(gulp.dest('public/')); // 編譯完成輸出路徑
 });
 ```
 
@@ -98,16 +95,16 @@ gulpDemo/
 |   | - index.html     # 編譯完成的 HTML 檔案
 |
 | - source/
-|   | - index.pug  # pug 主檔案
+|   | - index.pug      # pug 主檔案
 |
 ... 以下省略
 ```
 
-執行 gulp pug 指令後便會將 `source/index.pug` 編譯到 `public/index.html`，如果有即時編譯的需求，可使用 gulp.watch() 監控檔案變化，如下範例：
+執行 gulp pug 指令後便會將 `./source/index.pug` 編譯到 `./public/index.html`，如果有即時編譯的需求，可使用 gulp.watch() 監控檔案變化，如下範例：
 
 ```js
-gulp.task("watch", () => {
-  gulp.watch("./source/**/*.pug", gulp.series("pug"));
+gulp.task('watch', () => {
+  gulp.watch('./source/**/*.pug', gulp.series('pug'));
 });
 ```
 
@@ -115,4 +112,20 @@ gulp.task("watch", () => {
 
 可參考 [Pug API](https://pugjs.org/api/reference.html) 可傳遞參數列表，以下為常用的參數配置：
 
-- pretty： `false`(default)、`true`
+- pretty：`true` | `false`
+  增加代碼可讀性，默認為 `false`
+
+範例：
+
+```js
+gulp.task('pug', () => {
+  return gulp
+    .src('source/**/*.pug')
+    .pipe(
+      pug({
+        pretty: true,
+      })
+    )
+    .pipe(gulp.dest('public/'));
+});
+```

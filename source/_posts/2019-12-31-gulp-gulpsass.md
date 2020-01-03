@@ -17,12 +17,12 @@ Sass/SCSS 是 CSS 的預處理器，擴充了既有 CSS 的語法、規則及功
 
 - gulp-sass 安裝
 - gulp-sass 基本使用
-- gulp-sass 選項
+- gulp-sass 可傳遞選項
 - 補充：Dart Sass 與 Node Sass
 
 ## gulp-sass 安裝
 
-> 相關連結：[NPM](https://www.npmjs.com/package/gulp-sass)
+> 套件連結：[NPM](https://www.npmjs.com/package/gulp-sass)
 
 ```bash
 $ npm install gulp-sass
@@ -42,14 +42,14 @@ gulpDemo/
 | - source/            # 原始資料
 |   | - scss/
 |       | - all.scss   # SCSS 主檔案
-|   | - index.html
 |
 | - gulpfile.js        # gulp 主檔案
 | - package-lock.json
 | - package.json       # 安裝 gulp、gulp-sass
 ```
 
-SCSS 範例：
+撰寫 SCSS 範例：
+路徑：`./source/scss/all.scss`
 
 ```scss
 $color-primary: blue;
@@ -60,7 +60,8 @@ body {
 }
 ```
 
-使用 gulp-sass：
+載入並使用 gulp-sass
+路徑：`./gulpfile.js`
 
 ```js
 const gulp = require('gulp');
@@ -94,12 +95,11 @@ gulpDemo/
 | - source/
 |   | - scss/
 |       | - all.scss   # SCSS 主檔案
-|   | - index.html
 |
 ... 以下省略
 ```
 
-執行 gulp sass 指令後便會將 `source/scss/all.scss` 編譯到 `public/css/all.css`，如果有即時編譯的需求，可使用 gulp.watch() 監控檔案變化，如下範例：
+執行 gulp sass 指令後便會將 `./source/scss/all.scss` 編譯到 `./public/css/all.css`，如果有即時編譯的需求，可使用 gulp.watch() 監控檔案變化，如下範例：
 
 ```js
 gulp.task('watch', () => {
@@ -107,17 +107,16 @@ gulp.task('watch', () => {
 });
 ```
 
-## gulp-sass 選項
+## gulp-sass 可傳遞選項
 
 可參考 [Node Sass](https://github.com/sass/node-sass#options) 可傳遞參數列表，以下為常用的參數配置：
 
-- outputStyle：`nested`(default)、`expanded`、`compact`、`compressed`
+- outputStyle：`nested` | `expanded` | `compact` | `compressed`
+  輸出型態，默認為 `nested`
 
 範例：
 
 ```js
-// gulpfile.js
-
 gulp.task('sass', () => {
   return gulp
     .src('./source/**/*.scss')
