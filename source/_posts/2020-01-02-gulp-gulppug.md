@@ -18,7 +18,7 @@ Pug 原來的名稱為 Jade，是一套 HTML 的模板語言，你可以把它�
 - gulp-pug 安裝
 - gulp-pug 基本使用
 - gulp-pug 可傳遞選項
-  <!-- - 補充：Pug 起手式 -->
+- 補充：Pug 語法介紹
 
 ## gulp-pug 安裝
 
@@ -48,7 +48,6 @@ gulpDemo/
 ```
 
 撰寫 Pug 範例：
-路徑：`./source/index.pug`
 
 ```pug
 <!DOCTYPE html>
@@ -64,7 +63,6 @@ html(lang="en")
 ```
 
 載入並使用 gulp-pug：
-路徑：`./gulpfile.js`
 
 ```js
 const gulp = require('gulp');
@@ -74,7 +72,7 @@ gulp.task('pug', () => {
   return gulp
     .src('source/**/*.pug') // Pug 主檔案路徑
     .pipe(pug()) // 使用 gulp-pug 進行編譯
-    .pipe(gulp.dest('public/')); // 編譯完成輸出路徑
+    .pipe(gulp.dest('./public/')); // 編譯完成輸出路徑
 });
 ```
 
@@ -84,7 +82,7 @@ gulp.task('pug', () => {
 $ gulp pug
 ```
 
-完成編譯：
+生成 `./public/index.html` 檔案，此時檔案結構如下
 
 ```plain
 gulpDemo/
@@ -129,3 +127,11 @@ gulp.task('pug', () => {
     .pipe(gulp.dest('public/'));
 });
 ```
+
+## 補充：Pug 語法介紹
+
+> 官網介紹：[Pug](https://pugjs.org/api/getting-started.html)
+
+在前面有提到 Pug 可以幫助我們簡化語法和模組化開發，在這補充單元我們就針對這兩個特點去做說明，未來會有 Pug 完整的單元介紹，讓我們先來打好一點基礎以便未來更能夠得心應手。
+
+針對 Pug 簡化語法的特點，相信大多人在上面範例已經有稍微了解到了，先來看看下面這個範例：

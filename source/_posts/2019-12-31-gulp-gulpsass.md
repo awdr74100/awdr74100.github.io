@@ -49,7 +49,6 @@ gulpDemo/
 ```
 
 撰寫 SCSS 範例：
-路徑：`./source/scss/all.scss`
 
 ```scss
 $color-primary: blue;
@@ -60,8 +59,7 @@ body {
 }
 ```
 
-載入並使用 gulp-sass
-路徑：`./gulpfile.js`
+載入並使用 gulp-sass：
 
 ```js
 const gulp = require('gulp');
@@ -81,7 +79,7 @@ gulp.task('sass', () => {
 $ gulp sass
 ```
 
-完成編譯：
+生成 `./public/css/all.css` 檔案，此時檔案結構如下：
 
 ```plain
 gulpDemo/
@@ -89,7 +87,7 @@ gulpDemo/
 | - node_modules/
 |
 | - public/
-|   | - css
+|   | - css/
 |       | - all.css    # 編譯完成的 CSS 檔案
 |
 | - source/
@@ -112,7 +110,7 @@ gulp.task('watch', () => {
 可參考 [Node Sass](https://github.com/sass/node-sass#options) 可傳遞參數列表，以下為常用的參數配置：
 
 - outputStyle：`nested` | `expanded` | `compact` | `compressed`
-  輸出型態，默認為 `nested`
+  指定輸出型態，默認為 `nested`
 
 範例：
 
@@ -137,7 +135,7 @@ gulp.task('sass', () => {
 $ npm install dart-sass
 ```
 
-使用 Dart Sass：
+更改編譯器為 Dart Sass：
 
 ```js
 const gulp = require('gulp');
