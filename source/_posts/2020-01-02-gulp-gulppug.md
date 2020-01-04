@@ -135,3 +135,127 @@ gulp.task('pug', () => {
 在前面有提到 Pug 可以幫助我們簡化語法和模組化開發，在這補充單元我們就針對這兩個特點去做說明，未來會有 Pug 完整的單元介紹，讓我們先來打好一點基礎以便未來更能夠得心應手。
 
 針對 Pug 簡化語法的特點，相信大多人在上面範例已經有稍微了解到了，先來看看下面這個範例：
+
+```pug
+<!DOCTYPE html>
+html(lang="en")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        meta(http-equiv="X-UA-Compatible", content="ie=edge")
+        title Document
+    body
+        .container
+            .col-md-4.d-flex.justify-content-center
+                p textContent
+            .col-md-4.d-flex.align-items-center
+                p textContent
+            .col-md-4
+```
+
+上面這段程式碼等同於：
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="col-md-4 d-flex justify-content-center">
+        <p>textContent</p>
+      </div>
+      <div class="col-md-4 d-flex align-items-center">
+        <p>textContent</p>
+      </div>
+      <div class="col-md-4"></div>
+    </div>
+  </body>
+</html>
+```
+
+很明顯的 Pug 在撰寫時不需加入起始標籤與結束標籤也就是`<`和`>`，區分父子階層的準則為縮排，透過縮排就能將元素定義為子階層，整體的版面變得非常簡潔，讓我們來繼續來看 Pug 是如何進行模組化應用的。
+
+初始檔案結構：
+
+```plain
+pugDemo/
+|
+| - node_modules/
+|
+| - source/            # 原始資料
+|   | - modules/
+|       | - head.pug   # head 模組 - 供載入用
+|       | - navbar.pug # navbar 模組 - 供載入用
+|   | - index.pug      # 主要渲染檔案
+|   | - layout.pug     # template
+|
+... 以下省略
+```
+
+路徑：`./source/modules/head.pug`
+
+```pug
+meta(charset="UTF-8")
+meta(name="viewport", content="width=device-width, initial-scale=1.0")
+meta(http-equiv="X-UA-Compatible", content="ie=edge")
+title Document
+```
+
+路徑：`./source/modules/navbar.pug`
+
+```pug
+.navbar 這是 Navbar
+```
+
+路徑：`./source/layout.pug`
+
+```pug
+<!DOCTYPE html>
+html(lang="en")
+    head
+        include ./modules/head.pug
+    body
+        block navbar
+        block content
+```
+
+路徑：`./source/index.pug`
+
+```pug
+extend ./layout.pug
+
+block content
+    .content 這是內容
+
+block navbar
+    include ./modules/navbar
+```
+
+說明：在 Pug 中我們可以使用 `include` 方式插入內容，如同上面的 `head.pug` 與 `navbar.pug` 模塊，接著我們在主要的渲染檔案 `extned` 我們的 `layout` 檔案，這一個 `layout` 檔案就類似於我們的模板，定義了兩個 `block` 區塊，分別是 `navbar` 和 `content`，我們在 `index.pug` 這個主要檔案插入 `block` 內容，透過編譯，最後就會形成下面的 HTML 檔案：
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="navbar">這是 Navbar</div>
+    <div class="content">這是內容</div>
+  </body>
+</html>
+```
+
+我們可以針對上面這一個範例做出以下統整：
+
+- `include`：在指定的位置插入其他 Pug 內容
+- `extend`：指定檔案當作延伸依據，通常搭配 `block`
+- `block`：宣告區塊名稱，`extend` 區塊所屬檔案時，可在 `block` 位置插入內容
