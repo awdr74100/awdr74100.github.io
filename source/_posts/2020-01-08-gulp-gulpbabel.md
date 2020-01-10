@@ -205,7 +205,7 @@ var Circle = function Circle() {
 var promise = Promise.resolve();
 ```
 
-聰明的你應該發現問題了，Babel 不是會幫我們處理兼容性的問題嗎？`Array.prototype.filter` 與 `Promise` 物件好像都沒有編譯到的感覺，不要懷疑！Babel 真的沒有幫我們編譯到；事實上，如果你採用預設的編譯環境，`Babel 只會針對語法(Syntax)作編譯，底層的 API 與原型擴展，都不會進行編譯`，這也就代表兼容性的問題根本沒有解決，在 IE 11 等較舊瀏覽器上面，它還是不知道什麼是 Promise，運行時就會發生錯誤；在這邊還有一個問題，Babel 針對 Class 語法糖的處理，你會發現它新增了一個全域的 function 當作語法糖的呼叫，這樣子的處理會造成嚴重的全域汙染，如果你有多個 JavaScript 檔案，同時都進行編譯的動作，產生出來的 function 都會是一模一樣的，不僅造成檔案的肥大，也有可能發生汙染影響運行等問題；這時候就會需要 babel-runtime 與 babel-polyfill 的幫忙，在介紹這兩個組件時，我們先將 Babel 的設定移置專屬的設定檔，如下所示：
+聰明的你應該發現問題了，Babel 不是會幫我們處理兼容性的問題嗎？`Array.prototype.filter` 與 `Promise` 物件好像都沒有編譯到的感覺，不要懷疑！Babel 真的沒有幫我們編譯到；事實上，如果你採用預設的編譯環境，**Babel 只會針對語法(Syntax)做編譯，底層的 API 與原型擴展都不會進行編譯**，這也就代表兼容性的問題根本沒有解決，在 IE 11 等較舊瀏覽器上面，它還是不知道什麼是 Promise，運行時就會發生錯誤；在這邊還有一個問題，**Babel 針對 Class 語法糖的處理，你會發現它新增了一個全域的 function 當作語法糖的呼叫，這樣子的處理會造成嚴重的全域汙染**，如果你有多個 JavaScript 檔案，同時都進行編譯的動作，產生出來的 function 都會是一模一樣的，不僅造成檔案的肥大，也有可能發生汙染影響運行等問題；這時候就會需要 babel-runtime 與 babel-polyfill 的幫忙，在介紹這兩個組件時，我們先將 Babel 的設定移置專屬的設定檔，如下所示：
 
 路徑：`./gulpfile.js`：
 
