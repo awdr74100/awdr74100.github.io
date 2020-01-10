@@ -82,7 +82,7 @@ gulp.task('pug', () => {
 $ gulp pug
 ```
 
-生成 `./public/index.html` 檔案，此時檔案結構如下
+生成 `./public/index.html` 檔案，此時檔案結構如下：
 
 ```plain
 gulpDemo/
@@ -108,7 +108,7 @@ gulp.task('watch', () => {
 
 ## gulp-pug 可傳遞選項
 
-可參考 [Pug API](https://pugjs.org/api/reference.html) 可傳遞參數列表，以下為常用的參數配置：
+可參考 [Pug Options](https://pugjs.org/api/reference.html) 可傳遞參數列表，以下為常用的參數配置：
 
 - pretty：`true` | `false`
   增加代碼可讀性，默認為 `false`

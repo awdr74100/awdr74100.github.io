@@ -107,7 +107,7 @@ gulp.task('watch', () => {
 
 ## gulp-sass 可傳遞選項
 
-可參考 [Node Sass](https://github.com/sass/node-sass#options) 可傳遞參數列表，以下為常用的參數配置：
+可參考 [Node Sass Options](https://github.com/sass/node-sass#options) 可傳遞參數列表，以下為常用的參數配置：
 
 - outputStyle：`nested` | `expanded` | `compact` | `compressed`
   指定輸出型態，默認為 `nested`
