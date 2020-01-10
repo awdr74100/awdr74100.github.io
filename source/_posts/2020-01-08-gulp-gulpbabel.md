@@ -235,4 +235,140 @@ gulp.task('babel', () =>
 
 ## 補充：babel-runtime 使用方式
 
+babel-runtime 是由 Babel 提供的 polyfill 套件，由 core-js 和 regenerator 組成，core-js 是用於 JavaScript 的組合式標準化庫，它包含各種版本的 polyfills 實現；而 regenerator 是來自 facebook 的一個函式庫，主要用於實現 generator/yeild，async/await 等特性，我們先從安裝開始講起。
+
+> 套件連結：[NPM](https://www.npmjs.com/package/@babel/runtime)
+
+@babel-runtime：
+
+```bash
+$ npm install @babel/runtime
+```
+
+@babel/plugin-transform-runtime：
+
+```bash
+$ npm install @babel/plugin-transform-runtime --save-dev
+```
+
+在安裝 babel-runtime 時，記得不要安裝錯誤，新版的是帶有 `@` 開頭的；同時也必須安裝 @babel/plugin-transform-runtime 這個套件，babel 在運行時是依賴 plugin 去做取用，這兩個套件雖然不是相依套件，但實際使用時缺一不可，在後面會有相關說明，在這邊我們先把這兩個套件裝好就可以了。
+
+修改 `./.babelrc` 內容為下面範例：
+
+```js
+{
+    "presets": ["@babel/preset-env"],
+    "plugins": [["@babel/plugin-transform-runtime",{
+        "corejs": false
+    }]]
+}
+```
+
+我們以之前 JavaScript 檔案進行示範，執行 gulp-babel 指令進行編譯，結果如下：
+
+```js
+'use strict';
+
+var _interopRequireDefault = require('@babel/runtime/helpers/interopRequireDefault');
+
+var _classCallCheck2 = _interopRequireDefault(require('@babel/runtime/helpers/classCallCheck'));
+
+/* --- 箭頭函式、ES6 變數、ES6 陣列方法--- */
+var color = [1, 2, 3, 4, 5];
+var result = color.filter(function(item) {
+  return item > 2;
+});
+
+/* --- class 語法糖 --- */
+var Circle = function Circle() {
+  (0, _classCallCheck2['default'])(this, Circle);
+};
+
+/* --- Promise 物件 --- */
+var promise = Promise.resolve();
+```
+
+從編譯後的結果可以得知，之前提到的 Class 語法糖全域汙染問題已經解決了，透過 @babel/plugin-transform-runtime 這個套件，它會幫我們分析是否有 polyfill 的需求，並自動透過 require 的方式，向 babel-runtime 拿取 polyfill，簡單來講，**babel-runtime 提供了豐富的 polyfill 供組件使用，開發者可以自行 require，但自行 require 太慢了，使用 @babel/plugin-transform-runtime 可以自動分析並拿取 babel-runtime 的 polyfill**，這也是為什麼這兩個套件缺一不可的原因。
+
+可能有些人還是有疑問，透過 require 的方式為什麼就能避免全域污染的問題？事實上，當初我也很困惑，結果恍然大悟，終於理解了，簡單來講，當初是因為 babel 會在全域環境宣告 function，只要同時有 1 個檔案以上需要編譯時，這些 function 就會相遇干擾，實際運行就會發生錯誤，透過 babel-runtime 直接 require 的方式進行取用，最後編譯出來的檔案就不會汙染到全域環境，而是生成許多的 require 指令，**Node.js 默認是從緩存中載入模組，一個模組被加載一次之後，就會在緩存中維持一個副本，如果遇到重複取用問題，會直接向緩存拿取副本，這也就代表每個模組在緩存中止存在一個實例**。
+
+仔細觀察，Babel 還是沒有幫我們編譯 Promise 物件，那是因為我們還沒有解放 babel-runtime 這一個套件全部力量，由上面範例，你會發現我在 plugin 中傳遞了一個 corejs 選項，預設是關閉的，可傳遞的選項為：
+
+| corejs 選項 | 安裝指令                                  |
+| :---------- | :---------------------------------------- |
+| false       | npm install --save @babel/runtime         |
+| 2           | npm install --save @babel/runtime-corejs2 |
+| 3           | npm install --save @babel/runtime-corejs3 |
+
+事實上 babel-runtime 有許多的擴展版本，在之前的範例中，我們都是將 corejs 給關閉，這也就導致它並沒有幫我們編譯底層的 API 與相關的方法，這次我們就來使用各版本進行編譯，記得要執行相對應的安裝指令喔！
+
+修改 `./.babelrc` 內容為下面範例：
+
+```js
+{
+    "presets": ["@babel/preset-env"],
+    "plugins": [["@babel/plugin-transform-runtime",{
+        "corejs": 2 // 2 or 3
+    }]]
+}
+```
+
+corejs2 版本編譯結果：
+
+```js
+'use strict';
+
+var _interopRequireDefault = require('@babel/runtime-corejs2/helpers/interopRequireDefault');
+
+var _promise = _interopRequireDefault(require('@babel/runtime-corejs2/core-js/promise'));
+
+var _classCallCheck2 = _interopRequireDefault(require('@babel/runtime-corejs2/helpers/classCallCheck'));
+
+/* --- 箭頭函式、ES6 變數、ES6 陣列方法--- */
+var color = [1, 2, 3, 4, 5];
+var result = color.filter(function(item) {
+  return item > 2;
+});
+
+/* --- class 語法糖 --- */
+var Circle = function Circle() {
+  (0, _classCallCheck2['default'])(this, Circle);
+};
+
+/* --- Promise 物件 --- */
+var promise = _promise['default'].resolve();
+```
+
+corejs3 版本編譯結果：
+
+```js
+'use strict';
+
+var _interopRequireDefault = require('@babel/runtime-corejs3/helpers/interopRequireDefault');
+
+var _promise = _interopRequireDefault(require('@babel/runtime-corejs3/core-js-stable/promise'));
+
+var _classCallCheck2 = _interopRequireDefault(require('@babel/runtime-corejs3/helpers/classCallCheck'));
+
+var _filter = _interopRequireDefault(require('@babel/runtime-corejs3/core-js-stable/instance/filter'));
+
+/* --- 箭頭函式、ES6 變數、ES6 陣列方法--- */
+var color = [1, 2, 3, 4, 5];
+var result = (0, _filter['default'])(color).call(color, function(item) {
+  return item > 2;
+});
+
+/* --- class 語法糖 --- */
+var Circle = function Circle() {
+  (0, _classCallCheck2['default'])(this, Circle);
+};
+
+/* --- Promise 物件 --- */
+var promise = _promise['default'].resolve();
+```
+
+從上面結果可以得知，**corejs2 版本主要針對底層 API 做編譯，如 Promise、Fetch 等等；corejs3 版本主要針對底層 API 和相關擴展方法，如 Array.pototype.filter，Array.pototype.map 等等**，簡單來講，如果你要將兼容性的問題徹底解決，就得使用 corejs3 版本，到了這邊，我們之前所提到 Babel 的種種問題都已經解決了。
+
+<div class="note warning">使用 babel-runtime 能夠在不汙染全域環境下提供相對應的 polyfill，</div>
+
 ## 補充：babel-polyfill 使用方式
