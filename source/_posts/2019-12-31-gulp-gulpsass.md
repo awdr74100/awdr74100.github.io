@@ -5,7 +5,7 @@ description:
     Sass/SCSS 是 CSS 的預處理器，擴充了既有 CSS 的語法、規則及功能，目前已經算是前端必備的工具，但 .sass/.scss 檔案是無法再 Browser 運行的，需要透過編譯器使之編譯成 CSS 檔案才能成功運行，這一次我們來使用 gulp-sass 這一個套件編譯 .sass/.scss 檔案吧！,
   ]
 categories: [Gulp]
-tags: [Gulp 4, Node.js]
+tags: [Gulp 4, Node.js, SCSS]
 date: 2019-12-31 17:58:33
 ---
 
