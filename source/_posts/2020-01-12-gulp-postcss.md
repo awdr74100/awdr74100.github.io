@@ -37,7 +37,7 @@ $ npm install autoprefixer
 
 autoprefixer 為 PostCSS 最為著名的 CSS prefix 插件，前面會先以它當作第一個範例，請務必安裝。
 
-# gulp-postcss 基本使用
+## gulp-postcss 基本使用
 
 <div class="note warning">此次範例會搭配 gulp-sass 一起使用，相關文章連結：<a href="https://awdr74100.github.io/2019-12-31-gulp-gulpsass/">gulp-scss</a></div>
 
