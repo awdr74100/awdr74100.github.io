@@ -110,9 +110,7 @@ $ npm install gulp --save
 
 ## 開發第一個 Gulp Task
 
-接續上面範例，請先新增 `index.html` 與 `gulpfile.js` 這兩個檔案，如下圖
-
-<!-- <img src="https://i.imgur.com/739TtqQ.jpg" alt="gulpfile Before"> -->
+接續上面範例，請先新增 `index.html` 與 `gulpfile.js` 這兩個檔案，此時專案結構如下：
 
 ```plain
 gulpDemo/
@@ -151,7 +149,7 @@ gulp.task('copyFile', () => {
 $ gulp copyFile
 ```
 
-你會發現 Gulp 複製了 index.html 這一個檔案到新創建的 public 目錄裏頭，此時結構如下：
+你會發現 Gulp 複製了 index.html 這一個檔案到新創建的 public 目錄裏頭，此時專案結構如下：
 
 ```plain
 gulpDemo/

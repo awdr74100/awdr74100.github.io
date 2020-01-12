@@ -22,7 +22,7 @@ Sass/SCSS 是 CSS 的預處理器，擴充了既有 CSS 的語法、規則及功
 
 ## gulp-sass 安裝
 
-> 套件連結：[NPM](https://www.npmjs.com/package/gulp-sass)
+> 套件連結：[gulp-sass](https://www.npmjs.com/package/gulp-sass)
 
 ```bash
 $ npm install gulp-sass
@@ -32,7 +32,7 @@ node-sass 為 gulp-sass 的相依套件，安裝 gulp-sass 的同時會連同 no
 
 ## gulp-sass 基本使用
 
-初始檔案結構：
+初始專案結構：
 
 ```plain
 gulpDemo/
@@ -67,7 +67,7 @@ const sass = require('gulp-sass'); // 載入 gulp-sass 套件
 
 gulp.task('sass', () => {
   return gulp
-    .src('./source/**/*.scss') // SCSS 主檔案路徑
+    .src('./source/scss/*.scss') // SCSS 主檔案路徑
     .pipe(sass().on('error', sass.logError)) // 使用 gulp-sass 進行編譯
     .pipe(gulp.dest('./public/css')); // 編譯完成輸出路徑
 });
@@ -79,7 +79,7 @@ gulp.task('sass', () => {
 $ gulp sass
 ```
 
-生成 `./public/css/all.css` 檔案，此時檔案結構如下：
+生成 `./public/css/all.css` 檔案，此時專案結構如下：
 
 ```plain
 gulpDemo/
@@ -128,6 +128,8 @@ gulp.task('sass', () => {
 <div class="note warning">Dart Sass 與 Node Sass 都屬於 Sass 的編譯器，Dart Sass 具備編譯輸出為 JavaScript 的能力，目前為 Sass 的主要開發對象，這也代表各種新功能將優先引入；Node Sass 底層使用的是 LibSass，基於 C/C++ 編寫，這使其編譯速度快過 Dart Sass；對於一般開發建議使用 Node Sass，如有新功能的需求，可使用 Dart Sass。</div>
 
 在 gulp-sass 中，預設是使用 Node Sass，如果想將編譯器調整成 Dart Sass，可做以下動作：
+
+> 套件連結：[dart-sass](https://www.npmjs.com/package/dart-sass)
 
 安裝 Dart Sass：
 

@@ -22,7 +22,7 @@ Pug 原來的名稱為 Jade，是一套 HTML 的模板語言，你可以把它�
 
 ## gulp-pug 安裝
 
-> 套件連結：[NPM](https://www.npmjs.com/package/gulp-pug)
+> 套件連結：[gulp-pug](https://www.npmjs.com/package/gulp-pug)
 
 ```bash
 $ npm install gulp-pug
@@ -32,7 +32,7 @@ $ npm install gulp-pug
 
 ## gulp-pug 基本使用
 
-初始檔案結構：
+初始專案結構：
 
 ```plain
 gulpDemo/
@@ -82,7 +82,7 @@ gulp.task('pug', () => {
 $ gulp pug
 ```
 
-生成 `./public/index.html` 檔案，此時檔案結構如下：
+生成 `./public/index.html` 檔案，此時專案結構如下：
 
 ```plain
 gulpDemo/
@@ -180,7 +180,7 @@ html(lang="en")
 
 很明顯的 Pug 在撰寫時不需加入起始標籤與結束標籤也就是`<`和`>`，區分父子階層的準則為縮排，透過縮排就能將元素定義為子階層，整體的版面變得非常簡潔，讓我們來繼續來看 Pug 是如何進行模組化應用的。
 
-初始檔案結構：
+初始專案結構：
 
 ```plain
 pugDemo/

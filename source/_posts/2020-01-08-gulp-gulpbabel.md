@@ -24,7 +24,7 @@ Babel 是一款 JavaScript 的編譯器，你可能會有疑問，JavaScript 不
 
 ## gulp-babel 安裝
 
-> 套件連結：[NPM](https://www.npmjs.com/package/gulp-babel)
+> 套件連結：[gulp-babel](https://www.npmjs.com/package/gulp-babel)
 
 Babel 7：
 
@@ -42,7 +42,7 @@ $ npm install gulp-babel@7 babel-core babel-preset-env
 
 ## gulp-babel 基本使用
 
-初始檔案結構：
+初始專案結構：
 
 ```plain
 gulpDemo/
@@ -91,13 +91,13 @@ gulp.task(
 );
 ```
 
-執行指定任務
+執行指定任務：
 
 ```bash
 $ gulp babel
 ```
 
-生成 `./public/js/all.js` 檔案，此時檔案結構如下：
+生成 `./public/js/all.js` 檔案，此時專案結構如下：
 
 ```plain
 gulpDemo/
@@ -241,7 +241,7 @@ gulp.task('babel', () =>
 
 @babel/runtime 是由 Babel 提供的 polyfill 套件，由 core-js 和 regenerator 組成，core-js 是用於 JavaScript 的組合式標準化庫，它包含各種版本的 polyfills 實現；而 regenerator 是來自 facebook 的一個函式庫，主要用於實現 generator/yeild，async/await 等特性，我們先從安裝開始講起。
 
-> 套件連結：[NPM](https://www.npmjs.com/package/@babel/runtime)
+> 套件連結：[@babel/runtime](https://www.npmjs.com/package/@babel/runtime)、[@babel/plugin-transform-runtime](https://www.npmjs.com/package/@babel/plugin-transform-runtime)
 
 @babel/runtime：
 
