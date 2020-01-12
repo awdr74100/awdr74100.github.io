@@ -60,12 +60,16 @@ $ node -v
 
 在 Gulp 4 版，一樣都需要分別在全域與區域環境安裝 Gulp，不同的地方在於，Gulp 4 版的全域套件名稱為 `gulp-cli`，相關指令如下：
 
-```shell
-$ npm install gulp -g   # Gulp 3 版，全域安裝指令
-```
+Gulp 3 版本，全域安裝指令：
 
 ```shell
-$ npm install gulp-cli -g   # Gulp 4 版，全域安裝指令
+$ npm install gulp -g
+```
+
+Gulp 4 版本，全域安裝指令：
+
+```shell
+$ npm install gulp-cli -g
 ```
 
 在這邊我們使用 Gulp 4 為主要開發版本，當 Gulp 在全域環境安裝完成時，可以使用以下指令來檢查：
@@ -108,7 +112,18 @@ $ npm install gulp --save
 
 接續上面範例，請先新增 `index.html` 與 `gulpfile.js` 這兩個檔案，如下圖
 
-<img src="https://i.imgur.com/739TtqQ.jpg" alt="gulpfile Before">
+<!-- <img src="https://i.imgur.com/739TtqQ.jpg" alt="gulpfile Before"> -->
+
+```plain
+gulpDemo/
+|
+| - node_modules/
+|
+| - index.html         # HTML 主檔案(測試用)
+| - gulpfile.js        # Gulp 核心檔案
+| - package-lock.json
+| - package.json       # 安裝 gulp
+```
 
 `gulpfile.js` 是 Gulp 核心的檔案，所有的 Task 任務都是在這邊編寫完成，我們可以嘗試輸入以下內容到 `gulpfile.js` 檔案內：
 
@@ -136,9 +151,21 @@ gulp.task('copyFile', () => {
 $ gulp copyFile
 ```
 
-你會發現 Gulp 複製了 index.html 這一個檔案到 public 目錄下，如下圖：
+你會發現 Gulp 複製了 index.html 這一個檔案到新創建的 public 目錄裏頭，此時結構如下：
 
-<img src="https://i.imgur.com/Mw9OJUV.jpg" alt="gulpfile After">
+```plain
+gulpDemo/
+|
+| - node_modules/
+|
+| - public/
+|   | - index.html     # HTML 副本 (完成編譯)
+|
+| - index.html         # HTML 主檔案(等待編譯)
+| - gulpfile.js        # Gulp 核心檔案
+| - package-lock.json
+| - package.json       # 安裝 gulp
+```
 
 相信你們已經猜到上面這道指令的功能，在任何的 Gulp 任務名稱下，我們都可以使用 `gulp + 任務名稱` 執行指定的任務，就像剛剛這一個 copyFile 任務，我們使用 `gulp copyFile` 執行這一個任務，而這一個任務內容為，從`./index.html` 載入原始檔，當我們遇到第一個 `pipe()` 建構的節點，需要針對內容作處裡，剛好處理內容為使用 `gulp.dest()` 輸出到目錄，這也是 public/index.html 被創建得原因。
 
