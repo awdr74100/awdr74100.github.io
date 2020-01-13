@@ -62,7 +62,7 @@ gulpDemo/
 | - package.json       # 安裝 gulp、gulp-sass、gulp-sourcemaps
 ```
 
-`./source/scss/all.scss` 撰寫以下內容：
+SCSS 主檔案載入所有組件：
 
 ```scss
 // base
