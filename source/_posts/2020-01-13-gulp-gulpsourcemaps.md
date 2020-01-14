@@ -18,7 +18,7 @@ date: 2020-01-13 17:57:03
 - gulp-sourcemaps 安裝
 - gulp-sourcemaps 基本使用
 - gulp-sourcemaps 可傳遞選項
-- 補充：
+- 補充：gulp-concat 生成 sourcemap
 
 ## gulp-sourcemaps 安裝
 
@@ -32,7 +32,7 @@ $ npm install gulp-sourcemaps
 
 ## gulp-sourcemaps 基本使用
 
-<div class="note warning">此次範例會搭配 gulp-sass 一起使用，相關文章連結：<a href="https://awdr74100.github.io/2019-12-31-gulp-gulpsass/">gulp-sass</a></div>
+<div class="note warning">此次範例會結合 gulp-sass 套件一起使用，相關文章連結：<a href="https://awdr74100.github.io/2019-12-31-gulp-gulpsass/">gulp-sass</a></div>
 
 初始專案結構：
 
@@ -101,11 +101,11 @@ gulp.task('sass', function() {
 $ gulp sass
 ```
 
-生成 `./public/css/all.css` 檔案，開啟 DevTool 工具並觀察 sourcemap 是否映射成功：
+生成 `./public/css/all.css` 和 `./public/css/all.css.map`檔案，開啟 DevTool 工具並觀察 sourcemap 是否映射成功：
 
 <img src="https://i.imgur.com/C1e8h43.jpg" alt="DevTool 觀察 sourcemap">
 
-從上圖可以發現，各元素映射的 Style 路徑從原本的 all.css 改為尚未編譯的 .scss 路徑，這樣的結果也就代表 sourcemap 映射成功，相同的原理也可套用在 JavaScript 身上，下面會再做補充。
+從上圖可以發現，各元素映射的 Style 路徑從原本的 all.css 改為尚未編譯的 .scss 路徑，這樣的結果也就代表 sourcemap 映射成功，相同的原理也可套用在其他檔案類型身上，下面會再做補充。
 
 ## gulp-sourcemaps 可傳遞選項
 
@@ -130,3 +130,62 @@ gulp.task('sass', function() {
     .pipe(gulp.dest('public/css'));
 });
 ```
+
+## 補充：gulp-concat 生成 sourcemap
+
+gulp-concat 套件主要為合併檔案用，通常在開發專案時，我們會引入許多的套件，比如說 jquery、bootstrap 等等，這些分散的檔案我們需要一個一個引入，造成許多的麻煩，這時我們就可以利用合併檔案的方式彙整成一個檔案，供 HTML 引入，這時問題就來了，這一個彙整檔案是無法映射原始單獨檔案的，造成除錯(debug)較為困難，這一個問題也可以由 sourcemap 來解決，讓我們先從安裝開始。
+
+> 套件連結：[gulp-concat](https://www.npmjs.com/package/gulp-concat)、[jquery](https://www.npmjs.com/package/jquery)、[bootstrap](https://www.npmjs.com/package/bootstrap)
+
+gulp-concat：
+
+```bash
+$ npm install gulp-concat
+```
+
+jquery：
+
+```bash
+$ npm install jquery
+```
+
+bootstrap：
+
+```bash
+$ npm install bootstrap
+```
+
+此次範例會結合 jquery 與 bootstrap 一起使用，說明如何使用 gulp-concat 合併檔案並生成 sourcemap。
+
+載入並使用 gulp-concat：
+
+```js
+gulp.task('vendorsJs', () => {
+  return gulp
+    .src([
+      './node_modules/jquery/dist/jquery.slim.min.js',
+      './node_modules/bootstrap/dist/js/bootstrap.bundle.min.js',
+      './source/js/all.js',
+    ])
+    .pipe(sourcemaps.init()) // 初始化 sourcemaps
+    .pipe(concat('vendors.js')) // 合併檔案，名稱為：vendors.js
+    .pipe(sourcemaps.write('./')) // 寫入 sourcemaps
+    .pipe(gulp.dest('./public/js'));
+});
+```
+
+執行指定任務：
+
+```bash
+$ gulp vendorsJs
+```
+
+生成 `./public/js/vendors.js` 和 `./public/js/vendors.js.map` 檔案，開啟 DevTool 工具並觀察 sourcemap 是否映射成功：
+
+<img src="https://i.imgur.com/jMPTkLZ.jpg" alt="DevTool 觀察 sourcemap">
+
+從上圖可以發現，頁面映射的 JavaScript 路徑從原本的 vendors.css 改為尚未編譯的各獨立檔案路徑，這樣的結果也就代表 sourcemap 映射成功。
+
+從前面的幾個範例可以發現，sourcemap 的生成主要是利用 `sourcemaps.init()` 與 `sourcemaps.write()` 來完成，前者用來初始化，建議放置在第一個 pipe 節點，後者用來寫入 sourcemap，建議放在輸出文件的前一個 pipe 節點；事實上，gulp-sourcemaps 支援非常多種類型檔案生成 sourcemap，查詢檔案類型是否支援可參考下面連結：
+
+> 支援列表：[Plugins with gulp sourcemaps support](https://github.com/gulp-sourcemaps/gulp-sourcemaps/wiki/Plugins-with-gulp-sourcemaps-support)
