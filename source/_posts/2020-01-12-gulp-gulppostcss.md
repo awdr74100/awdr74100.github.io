@@ -5,7 +5,7 @@ description:
     PostCSS 是一套使用 JavaScript 轉換 CSS 的工具，有別於以往 Sass、Less 等預處理器將檔案編譯成 CSS，PostCSS 是針對 CSS 後續所作行為處理的後處理器，透過載入並使用 Plugin 的方式來完成目的，常見的使用情境為 CSS Prefix、CSS Conpress 等等，此篇將結合 gulp-postcss 與 gulp-sass 來說明，途中也會補充常見的 PostCSS Plugin，像是 autoprefixer 和 cssnano。,
   ]
 categories: [Gulp]
-tags: [Gulp 4, Node.js, SCSS]
+tags: [Gulp 4, Node.js, SCSS, CSS]
 date: 2020-01-12 14:50:41
 ---
 
@@ -124,15 +124,17 @@ gulpDemo/
   display: -webkit-box;
   display: flex;
   -webkit-box-pack: center;
-          justify-content: center;
+  justify-content: center;
   -webkit-box-align: center;
-          align-items: center;
+  align-items: center;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
-          flex-flow: row wrap; }
+  flex-flow: row wrap;
+}
 
 .text-primary {
-  color: blue; }
+  color: blue;
+}
 ```
 
 你會發現 autoprefixer 替我們增加了相關的 CSS Prefix，以往這些語法都需要手動增加，造成許多的不方便，使用此插件即可自動幫我們完成此操作，我認為 PostCSS 更像是一個平台，利用豐富的插件進行前後處理，有沒有發現我說的是前後處理？事實上，某些 PostCSS 插件是以預處理的方式進行，比如說：[postcss-each](https://www.npmjs.com/package/postcss-each)，所以我們並不能直接把 PostCSS 定義為後處理器，得看使用的性質而定。
@@ -203,18 +205,20 @@ IE 10
   display: -ms-flexbox;
   display: flex;
   -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
   -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
-      -ms-flex-flow: row wrap;
-          flex-flow: row wrap; }
+  -ms-flex-flow: row wrap;
+  flex-flow: row wrap;
+}
 
 .text-primary {
-  color: blue; }
+  color: blue;
+}
 ```
 
 觀察編譯後檔案可以發現 Autoprefixer 針對了我們的 `.browserslistrc` 配置進行編譯，大功告成！

@@ -110,3 +110,8 @@ sitemap:
 #nofollow
 nofollow:
     enable: true
+
+# hexo server
+server:
+    port: 5000
+    compress: true
