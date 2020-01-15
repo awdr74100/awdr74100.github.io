@@ -143,7 +143,7 @@ gulpDemo/
 
 可參考 [postcss.config.js](https://www.npmjs.com/package/postcss-load-config) 可傳遞參數列表，以下為常用的參數配置：
 
-- plugins：`Function`
+- plugins：`Array` | `Function`
   需要使用的插件，默認為 `none`
 
 - parser：`Function`

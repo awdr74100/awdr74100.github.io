@@ -111,7 +111,7 @@ $ gulp sass
 
 可參考 [sourcemap Options](https://www.npmjs.com/package/gulp-sourcemaps#init-options) 可傳遞參數列表，以下為常用的參數配置：
 
-- sourceMappingURLPrefix：`string`
+- sourceMappingURLPrefix：`String`
   設定映射源的前綴，默認為 `none`
 
 範例：
