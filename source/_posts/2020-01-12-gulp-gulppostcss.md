@@ -1,5 +1,5 @@
 ---
-title: Gulp 前端自動化 - PostCSS 後處理器
+title: Gulp 前端自動化 - PostCSS 與 Autoprefixer
 description:
   [
     PostCSS 是一套使用 JavaScript 轉換 CSS 的工具，有別於以往 Sass、Less 等預處理器將檔案編譯成 CSS，PostCSS 是針對 CSS 後續所作行為處理的後處理器，透過載入並使用 Plugin 的方式來完成目的，常見的使用情境為 CSS Prefix、CSS Conpress 等等，此篇將結合 gulp-postcss 與 gulp-sass 來說明，途中也會補充常見的 PostCSS Plugin，像是 autoprefixer 和 cssnano。,

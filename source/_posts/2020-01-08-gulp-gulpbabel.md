@@ -1,5 +1,5 @@
 ---
-title: Gulp 前端自動化 - 使用 Babel 編譯
+title: Gulp 前端自動化 - 使用 Babel 編譯 ES6
 description:
   [
     Babel 是一款 JavaScript 的編譯器，你可能會有疑問，JavaScript 不是可以直接在 Browser 上運行嗎？為何還需要編譯？事實上 JavaScript 從發行到現在，經過了許多版本的更新，常見的 ES6、ES7 都屬於較新的版本，最為穩定的版本為 ES5，兼容性也是最高的， Babel 的用意就是將較新版本的 JavaScript 編譯成穩定版本，提高兼容性，此篇將介紹如何透過 gulp-babel 這個套件編譯我們的 JavaScript。,

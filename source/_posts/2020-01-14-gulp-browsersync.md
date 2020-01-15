@@ -18,7 +18,6 @@ date: 2020-01-14 23:38:37
 - BrowserSync 安裝
 - BrowserSync 基本使用
 - BrowserSync 可傳遞選項
-- BrowserSync
 
 ## BrowserSync 安裝
 
@@ -51,7 +50,7 @@ gulpDemo/
 | - package.json       # 安裝 gulp、gulp-sass、browser-sync
 ```
 
-載入並使用 browser-sync
+載入並使用 browser-sync：
 
 ```js
 const gulp = require('gulp');
@@ -131,5 +130,3 @@ gulp.task('watch', () => {
   gulp.watch('./source/**/*.scss', gulp.series('sass'));
 });
 ```
-
-
