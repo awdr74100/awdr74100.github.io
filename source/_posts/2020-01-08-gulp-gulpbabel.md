@@ -106,11 +106,11 @@ gulpDemo/
 |
 | - public/
 |   | - js/
-|       | - all.js     # 編譯完成的 JavaScript 檔案
+|       | - all.js     # 編譯完成的 JavaScript 檔案(ES5 版本)
 |
 | - source/
 |   | - js
-|       | - all.js     # javascript 主檔案
+|       | - all.js     # javascript 主檔案(包含 ES6 以上版本)
 |
 ... 以下省略
 ```

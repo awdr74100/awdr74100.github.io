@@ -43,6 +43,7 @@ gulpDemo/
 | - source/
 |   | - scss/
 |       | - all.scss   # SCSS 主檔案
+|
 |   | - index.html     # HTML 主檔案
 |
 | - gulpfile.js        # gulp 主檔案

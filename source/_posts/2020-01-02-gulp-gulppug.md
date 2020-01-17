@@ -191,6 +191,7 @@ pugDemo/
 |   | - modules/
 |       | - head.pug   # head 模組 - 供載入用
 |       | - navbar.pug # navbar 模組 - 供載入用
+|
 |   | - index.pug      # 主要渲染檔案
 |   | - layout.pug     # template
 |
