@@ -7,7 +7,7 @@
     "clean": "hexo clean",
     "deploy": "hexo deploy",
     "server": "hexo server",
-    "dev":"hexo s -o"
+    "dev": "hexo s -o"
   },
   "hexo": {
     "version": "4.0.0"
