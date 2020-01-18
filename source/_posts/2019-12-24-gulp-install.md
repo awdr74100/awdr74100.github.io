@@ -117,7 +117,7 @@ gulpDemo/
 |
 | - node_modules/
 |
-| - index.html         # HTML 主檔案(測試用)
+| - index.html         # HTML 主檔案(複製用)
 | - gulpfile.js        # Gulp 核心檔案
 | - package-lock.json
 | - package.json       # 安裝 gulp

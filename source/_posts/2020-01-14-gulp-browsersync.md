@@ -46,7 +46,7 @@ gulpDemo/
 |
 |   | - index.html     # HTML 主檔案
 |
-| - gulpfile.js        # gulp 主檔案
+| - gulpfile.js        # Gulp 主檔案
 | - package-lock.json
 | - package.json       # 安裝 gulp、gulp-sass、browser-sync
 ```
@@ -67,7 +67,7 @@ gulp.task('sass', () => {
     .pipe(browserSync.stream()); // <= 注入更改內容
 });
 
-/* --- 複製 source/index.html --- */
+/* --- 複製 HTML 主檔案 --- */
 gulp.task('copyHTML', (done) => {
   gulp
     .src('./source/*.html')

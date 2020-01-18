@@ -2,7 +2,7 @@
 title: Gulp 前端自動化 - 使用 Babel 編譯 ES6
 description:
   [
-    Babel 是一款 JavaScript 的編譯器，你可能會有疑問，JavaScript 不是可以直接在 Browser 上運行嗎？為何還需要編譯？事實上 JavaScript 從發行到現在，經過了許多版本的更新，常見的 ES6、ES7 都屬於較新的版本，最為穩定的版本為 ES5，兼容性也是最高的， Babel 的用意就是將較新版本的 JavaScript 編譯成穩定版本，提高兼容性，此篇將介紹如何透過 gulp-babel 這個套件編譯我們的 JavaScript。,
+    Babel 是一款 JavaScript 的編譯器，你可能會有疑問，JavaScript 不是可以直接在 Browser 上運行嗎？為何還需要編譯？事實上 JavaScript 從發行到現在，經過了許多版本的更新，常見的 ES6、ES7 都屬於較新的版本，最為穩定的版本為 ES5，兼容性也是最高的， Babel 的用意就是將較新版本的 JavaScript 編譯成穩定版本，提高兼容性，此篇將介紹如何透過 gulp-babel 這個套件編譯我們的 JavaScript，後面也會補充介紹 @babel/runtime 與 @babel/polyfill 組件的使用。,
   ]
 categories: [Gulp]
 tags: [Gulp 4, Node.js, Babel]
@@ -11,7 +11,7 @@ date: 2020-01-08 23:25:41
 
 ## 前言
 
-Babel 是一款 JavaScript 的編譯器，你可能會有疑問，JavaScript 不是可以直接在 Browser 上運行嗎？為何還需要編譯？事實上 JavaScript 從發行到現在，經過了許多版本的更新，常見的 ES6、ES7 都屬於較新的版本，最為穩定的版本為 ES5，兼容性也是最高的， Babel 的用意就是將較新版本的 JavaScript 編譯成穩定版本，提高兼容性，此篇將介紹如何透過 gulp-babel 這個套件編譯我們的 JavaScript。
+Babel 是一款 JavaScript 的編譯器，你可能會有疑問，JavaScript 不是可以直接在 Browser 上運行嗎？為何還需要編譯？事實上 JavaScript 從發行到現在，經過了許多版本的更新，常見的 ES6、ES7 都屬於較新的版本，最為穩定的版本為 ES5，兼容性也是最高的， Babel 的用意就是將較新版本的 JavaScript 編譯成穩定版本，提高兼容性，此篇將介紹如何透過 gulp-babel 這個套件編譯我們的 JavaScript，後面也會補充介紹 @babel/runtime 與 @babel/polyfill 組件的使用。
 
 ## 筆記重點
 
@@ -50,15 +50,15 @@ gulpDemo/
 | - node_modules/
 |
 | - source/
-|   | - js             # 原始資料
-|       | - all.js     # javascript 主檔案
+|   | - js
+|       | - all.js     # JavaScript 主檔案
 |
-| - gulpfile.js        # gulp 主檔案
+| - gulpfile.js        # Gulp 主檔案
 | - package-lock.json
 | - package.json       # 安裝 gulp、gulp-babel
 ```
 
-撰寫 JavaScript 較新版本代碼：
+撰寫 JavaScript ES6+ 版本代碼：
 
 ```js
 const people = {
@@ -110,7 +110,7 @@ gulpDemo/
 |
 | - source/
 |   | - js
-|       | - all.js     # javascript 主檔案(包含 ES6 以上版本)
+|       | - all.js     # JavaScript 主檔案(包含 ES6+ 版本)
 |
 ... 以下省略
 ```
@@ -134,7 +134,7 @@ for (var _i = 0, _Object$entries = Object.entries(people); _i < _Object$entries.
 }
 ```
 
-看到編譯完成的代碼，你的第一個想法大概都是 WTF ... 這是什麼鬼？不用擔心，Babel 只是將你的代碼優化為兼容性較高版本的代碼，你也不需要針對這一個檔案做任何修改，可以直接給 HTML 讀取，工作的原理就如同未編譯的 JavaScript 檔案，你只需要專注於目標的建構，不管你用多新版本的代碼來實現，Babel 都可以幫你改善兼容性等相關問題。
+看到編譯完成的代碼，你的第一個想法大概都是 WTF ... 這是什麼鬼？不用擔心，Babel 只是將你的代碼優化為兼容性較高版本的代碼，你也不需要針對這一個檔案做任何修改，可以直接給 HTML 讀取，執行結果如同未編譯的 JavaScript 檔案，你只需要專注於目標的編程，不管你用多新版本的代碼來實現，Babel 都可以幫你改善兼容性等相關問題。
 
 ## gulp-babel 可傳遞選項
 
@@ -176,7 +176,7 @@ gulp.task('babel', () =>
 let color = [1, 2, 3, 4, 5];
 let result = color.filter((item) => item > 2);
 
-/* --- class 語法糖 --- */
+/* --- Class 語法糖 --- */
 class Circle {}
 
 /* --- Promise 物件 --- */
@@ -200,7 +200,7 @@ var result = color.filter(function(item) {
   return item > 2;
 });
 
-/* --- class 語法糖 --- */
+/* --- Class 語法糖 --- */
 var Circle = function Circle() {
   _classCallCheck(this, Circle);
 };
@@ -209,7 +209,7 @@ var Circle = function Circle() {
 var promise = Promise.resolve();
 ```
 
-聰明的你應該發現問題了，Babel 不是會幫我們處理兼容性的問題嗎？`Array.prototype.filter` 與 `Promise` 物件好像都沒有編譯到的感覺，不要懷疑！Babel 真的沒有幫我們編譯到；事實上，如果你採用預設的編譯環境，**Babel 只會針對語法(Syntax)做編譯，底層的 API 與原型擴展都不會進行編譯**，這也就代表兼容性的問題根本沒有解決，在 IE 11 等較舊瀏覽器上面，它還是不知道什麼是 Promise，運行時就會發生錯誤；在這邊還有一個問題，**Babel 針對 Class 語法糖的處理，你會發現它新增了一個全域的 function 當作語法糖的呼叫，這樣子的處理會造成嚴重的全域汙染**，如果你有多個 JavaScript 檔案，同時都進行編譯的動作，產生出來的 function 都會是一模一樣的，不僅造成檔案的肥大，也有可能發生汙染影響運行等問題；這時候就會需要 @babel/runtime 與 @babel/polyfill 的幫忙，在介紹這兩個組件時，我們先將 Babel 的設定移置專屬的設定檔，如下所示：
+聰明的你應該發現問題了，Babel 不是會幫我們處理兼容性的問題嗎？`Array.prototype.filter` 與 `Promise` 物件好像都沒有編譯到的感覺，不要懷疑！Babel 真的沒有幫我們編譯到；事實上，如果你採用預設的編譯環境，**Babel 只會針對語法(Syntax)做編譯，底層的 API 與原型擴展都不會進行編譯**，這也就代表兼容性的問題根本沒有解決，在 IE 11 等較舊瀏覽器上面，它還是不知道什麼是 Promise，運行時就會發生錯誤；在這邊還有一個問題，**Babel 針對 Class 語法糖的處理，你會發現它新增了一個全域的 function 當作語法糖的呼叫，這樣子的處理會造成嚴重的全域汙染**，如果你有多個 JavaScript 檔案，同時都進行編譯的動作，產生出來的 function 都會是一模一樣的，不僅造成檔案的肥大，也有可能發生全域汙染影響運行等問題；這時候就會需要 @babel/runtime 與 @babel/polyfill 的幫忙，在介紹這兩個組件時，我們先將 Babel 的設定移置專屬的設定檔，如下所示：
 
 路徑：`./gulpfile.js`：
 
@@ -320,7 +320,7 @@ var promise = Promise.resolve();
     [
       "@babel/plugin-transform-runtime",
       {
-        "corejs": 2 // 2 or 3
+        "corejs": 2
       }
     ]
   ]

@@ -57,12 +57,12 @@ gulpDemo/
 |
 |       | - all.scss   # SCSS 主檔案
 |
-| - gulpfile.js        # gulp 主檔案
+| - gulpfile.js        # Gulp 主檔案
 | - package-lock.json
 | - package.json       # 安裝 gulp、gulp-sass、gulp-sourcemaps
 ```
 
-SCSS 主檔案載入所有組件：
+`./source/scss/all.scss` 載入所有組件：
 
 ```scss
 // base

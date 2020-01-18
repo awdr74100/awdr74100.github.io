@@ -37,7 +37,7 @@ autoprefixer：
 $ npm install autoprefixer
 ```
 
-autoprefixer 為 PostCSS 最為著名的 CSS prefix 插件，前面會先以它當作第一個範例，請務必安裝。
+autoprefixer 為 PostCSS 最為著名的 CSS Prefix 插件，前面會先以它當作第一個範例，請務必安裝。
 
 ## gulp-postcss 基本使用
 
@@ -50,11 +50,11 @@ gulpDemo/
 |
 | - node_modules/
 |
-| - source/            # 原始資料
+| - source/
 |   | - scss/
 |       | - all.scss   # SCSS 主檔案
 |
-| - gulpfile.js        # gulp 主檔案
+| - gulpfile.js        # Gulp 主檔案
 | - package-lock.json
 | - package.json       # 安裝 gulp、gulp-sass、gulp-postcss、autoprefixer
 ```
@@ -229,6 +229,10 @@ cssnano 是基於 PostCSS 所建構的插件，集合多個優化、壓縮代碼
 
 > 套件連結：[cssnano](https://www.npmjs.com/package/cssnano)
 
+```bash
+$ npm install cssnano
+```
+
 載入並使用 cssnano：
 
 ```js
@@ -247,7 +251,7 @@ gulp.task('scss', () => {
 });
 ```
 
-執行 `gulp scss` 指令即可進行編譯及壓縮代碼應用，基本上大部分情境都只需要使用 cssnano 默認配置，如果有特殊場景需要單獨配置，可參考官方的說明：
+執行 gulp scss 指令即可進行編譯及壓縮代碼應用，基本上大部分情境都只需要使用 cssnano 默認配置，如果有特殊場景需要單獨配置，可參考官方的說明：
 
 > 預設轉換 vs 高級轉換：[optimisations](https://cssnano.co/optimisations/)
 

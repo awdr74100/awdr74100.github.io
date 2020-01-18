@@ -39,10 +39,10 @@ gulpDemo/
 |
 | - node_modules/
 |
-| - source/            # 原始資料
-|   | - index.pug      # pug 主檔案
+| - source/
+|   | - index.pug      # Pug 主檔案
 |
-| - gulpfile.js        # gulp 主檔案
+| - gulpfile.js        # Gulp 主檔案
 | - package-lock.json
 | - package.json       # 安裝 gulp、gulp-pug
 ```
@@ -93,7 +93,7 @@ gulpDemo/
 |   | - index.html     # 編譯完成的 HTML 檔案
 |
 | - source/
-|   | - index.pug      # pug 主檔案
+|   | - index.pug      # Pug 主檔案
 |
 ... 以下省略
 ```
@@ -187,13 +187,13 @@ pugDemo/
 |
 | - node_modules/
 |
-| - source/            # 原始資料
+| - source/
 |   | - modules/
 |       | - head.pug   # head 模組 - 供載入用
 |       | - navbar.pug # navbar 模組 - 供載入用
 |
 |   | - index.pug      # 主要渲染檔案
-|   | - layout.pug     # template
+|   | - layout.pug     # template 模板
 |
 ... 以下省略
 ```

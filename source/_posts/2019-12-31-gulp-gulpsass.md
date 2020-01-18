@@ -2,7 +2,7 @@
 title: Gulp 前端自動化 - 編譯 Sass/SCSS
 description:
   [
-    Sass/SCSS 是 CSS 的預處理器，擴充了既有 CSS 的語法、規則及功能，目前已經算是前端必備的工具，但 .sass/.scss 檔案是無法再 Browser 運行的，需要透過編譯器使之編譯成 CSS 檔案才能成功運行，這一次我們來使用 gulp-sass 這一個套件編譯 .sass/.scss 檔案吧！,
+    Sass/SCSS 是 CSS 的預處理器，擴充了既有 CSS 的語法、規則及功能，目前已經算是前端必備的工具，但 .sass/.scss 檔案是無法再 Browser 運行的，需要透過編譯器使之編譯成 CSS 檔案才能成功運行，這一次將介紹如何使用 gulp-sass 套件將 .sass/.scss 檔案編譯成 .css 檔案。,
   ]
 categories: [Gulp]
 tags: [Gulp 4, Node.js, SCSS]
@@ -11,7 +11,7 @@ date: 2019-12-31 17:58:33
 
 ## 前言
 
-Sass/SCSS 是 CSS 的預處理器，擴充了既有 CSS 的語法、規則及功能，目前已經算是前端必備的工具，但 .sass/.scss 檔案是無法再 Browser 運行的，需要透過編譯器使之編譯成 CSS 檔案才能成功運行，這一次我們來使用 gulp-sass 這一個套件編譯 .sass/.scss 檔案吧！
+Sass/SCSS 是 CSS 的預處理器，擴充了既有 CSS 的語法、規則及功能，目前已經算是前端必備的工具，但 .sass/.scss 檔案是無法再 Browser 運行的，需要透過編譯器使之編譯成 CSS 檔案才能成功運行，這一次將介紹如何使用 gulp-sass 套件將 .sass/.scss 檔案編譯成 .css 檔案。
 
 ## 筆記重點
 
@@ -39,11 +39,11 @@ gulpDemo/
 |
 | - node_modules/
 |
-| - source/            # 原始資料
+| - source/
 |   | - scss/
 |       | - all.scss   # SCSS 主檔案
 |
-| - gulpfile.js        # gulp 主檔案
+| - gulpfile.js        # Gulp 主檔案
 | - package-lock.json
 | - package.json       # 安裝 gulp、gulp-sass
 ```
