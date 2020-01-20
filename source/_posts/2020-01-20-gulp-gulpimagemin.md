@@ -30,3 +30,51 @@ $ npm install gulp-imagemin
 gulp-imagemin 套件可以幫助我們壓縮 PNG、JPEG、GIF、SVG 等類型圖檔，無任何相依套件需安裝，直接安裝此套件即可。
 
 ## gulp-imagemin 基本使用
+
+初始專案結構
+
+```plain
+gulpDemo/
+|
+| - node_modules/
+|
+| - source/
+|   | - img/
+|       | - IMG1.jpg   # JPG 圖檔
+|
+| - gulpfile.js        # Gulp 主檔案
+| - package-lock.json
+| - package.json       # 安裝 gulp、gulp-imagemin
+```
+
+載入並使用 gulp-imagemin：
+
+```js
+const gulp = require('gulp');
+const imagemin = require('gulp-imagemin');
+
+gulp.task('imagemin', () => {
+  return gulp
+    .src('source/img/*')
+    .pipe(imagemin())
+    .pipe(gulp.dest('public/img'));
+});
+```
+
+執行指定任務：
+
+```bash
+$ gulp imagemin
+```
+
+生成 `./public/img/IMG.JPG` 圖檔，觀察已壓縮與未壓縮檔案大小差異：
+
+未壓縮圖片資訊：
+
+<img src="https://i.imgur.com/grzZrmK.png" alt="未壓縮圖片資訊">
+
+以壓縮圖片資訊：
+
+<img src="https://i.imgur.com/EiWGpcr.png" alt="以壓縮圖片資訊">
+
+在不破壞原有圖檔畫質的情況下，gulp-imagemin 幫助我們壓縮了整整 50% 的大小，從原有的 144.7KB 變成 65.1KB，可以說是相當的有感，除此之外，我們還可以針對壓縮處理做細部設定，下面會再進行補充。
