@@ -2,7 +2,7 @@
 title: Gulp 前端自動化 - 生成 SourceMap 映射文件
 description:
   [
-    前端發展越來越複雜，各種預處理器的使用，導致實際運行代碼不同於開發代碼，除錯(debug)變得困難重重，常見的例子為 Sass/SCSS、CoffeeScript 等預處理器，通常代碼出錯時，編譯器只會告訴你第幾行第幾列出現錯誤，但這對於編譯後的代碼是毫無作用的，我們需要得知的是尚未編譯代碼片段的錯誤，並不是以編譯代碼片段的錯誤；此篇將利用 gulp-sourcemaps 套件生成 SourceMap 文件改善此問題。,
+    前端發展越來越複雜，各種預處理器的使用，導致實際運行代碼不同於開發代碼，除錯(debug)變得困難重重，常見的例子為 Sass/SCSS、CoffeeScript 等預處理器，通常代碼出錯時，編譯器只會告訴你第幾行第幾列出現錯誤，但這對於編譯後的代碼是毫無作用的，我們需要得知的是尚未編譯代碼片段的錯誤，並不是以編譯代碼片段的錯誤。此篇將利用 gulp-sourcemaps 套件生成 SourceMap 文件改善此問題。,
   ]
 categories: [Gulp]
 tags: [Gulp 4, Node.js, SCSS, Pug, Babel]
