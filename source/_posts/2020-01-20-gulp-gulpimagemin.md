@@ -18,6 +18,7 @@ date: 2020-01-20 02:01:36
 - gulp-imagemin 安裝
 - gulp-imagemin 基本使用
 - gulp-imagemin 可傳遞選項
+- 補充：optipng 圖片優化器
 
 ## gulp-imagemin 安裝
 
@@ -51,12 +52,12 @@ gulpDemo/
 
 ```js
 const gulp = require('gulp');
-const imagemin = require('gulp-imagemin');
+const imagemin = require('gulp-imagemin'); // 載入 gulp-imagemin 套件
 
 gulp.task('imagemin', () => {
   return gulp
     .src('source/img/*')
-    .pipe(imagemin())
+    .pipe(imagemin()) // 執行優化(壓縮)
     .pipe(gulp.dest('public/img'));
 });
 ```
@@ -78,3 +79,62 @@ $ gulp imagemin
 <img src="https://i.imgur.com/EiWGpcr.png" alt="以壓縮圖片資訊">
 
 在不破壞原有圖檔畫質的情況下，gulp-imagemin 幫助我們壓縮了整整 50% 的大小，從原有的 144.7KB 變成 65.1KB，可以說是相當的有感，除此之外，我們還可以針對壓縮處理做細部設定，下面會再進行補充。
+
+## gulp-imagemin 可傳遞選項
+
+gulp-imagemin 與其他 Gulp 套件相比較為不同，主要依靠各類圖檔優化器進行設定，相關優化器如下：
+
+- [gifsicle](https://github.com/imagemin/imagemin-gifsicle)：GIF 圖片優化器
+- [mozjpeg](https://github.com/imagemin/imagemin-mozjpeg)：JPEG 圖片優化器
+- [optipng](https://github.com/imagemin/imagemin-optipng)：PNG 圖片優化器
+- [svgo](https://github.com/imagemin/imagemin-svgo)：SVG 圖片優化器
+
+上述套件均為 gulp-imagemin 相依套件，無須進行任何下載，配置即可使用，下面為 mozjpeg 使用範例：
+
+```js
+const gulp = require('gulp');
+const imagemin = require('gulp-imagemin');
+const mozjpeg = require('imagemin-mozjpeg'); // 載入 imagemin-mozjpeg 套件
+
+gulp.task('imagemin', () => {
+  return gulp
+    .src('source/img/*')
+    .pipe(
+      imagemin([
+        mozjpeg({
+          quality: 75, // 壓縮品質
+        }),
+      ])
+    )
+    .pipe(gulp.dest('public/img'));
+});
+```
+
+## 補充：optipng 圖片優化器
+
+這邊補充一下關於 optipng 圖片優化器的應用：
+
+```js
+const gulp = require('gulp');
+const imagemin = require('gulp-imagemin');
+const mozjpeg = require('imagemin-mozjpeg');
+const optipng = require('imagemin-optipng'); // 載入 imagemin-optipng 套件
+
+gulp.task('imagemin', () => {
+  return gulp
+    .src('source/img/*')
+    .pipe(
+      imagemin([
+        mozjpeg({
+          quality: 75,
+        }),
+        optipng({
+          optimizationLevel: 3, // 優化級別
+        }),
+      ])
+    )
+    .pipe(gulp.dest('public/img'));
+});
+```
+
+基本上圖片優化器使用方式都大同小異，參照官方 API 文件即可進行配置。
