@@ -17,7 +17,8 @@ date: 2020-01-21 16:18:32
 
 - minimist 安裝
 - minimist 基本使用
-- minimist
+- minimist 可傳遞選項
+- 補充：Node.js 原生獲取命令行參數方法
 
 ## minimist 安裝
 
@@ -145,15 +146,60 @@ $ gulp --env production
 SCSS 編譯結果：
 
 ```scss
-.box1 {
-  color: red;
-}
-.box2 {
-  color: #00f;
-}
-.box3 {
-  color: #000;
-}
+.box1{color:red}.box2{color:#00f}.box3{color:#000}
 ```
 
 從上面範例可以得知，gulp-if 套件能夠幫助我們進行邏輯判斷，第一個參數為 `True` or `False`，第二個參數為作用的 gulp 套件，當我們成功獲取命令行傳遞參數時，即可針對這一個參數做邏輯判斷，development 與 production 環境就是由此方法來做區分。
+
+## minimist 可傳遞選項
+
+可參考 [minimist Options](https://www.npmjs.com/package/minimist) 可傳遞參數列表，以下為常用的參數配置：
+
+- opts.string：`Array` => `[ 參數(key), ... ]`
+  指定參數(key)內的參數(value)強制轉型為 string，默認為 `none`
+
+- opts.boolean：`Array` => `[ 參數(key), ... ]`
+  指定參數(key)內的參數(value)強制轉型為 boolean，默認為 `none`
+
+- opts.default：`Object` => `{ 參數(key): 參數(value) }`
+  預設命令行傳遞參數，默認為 `none`
+
+範例：
+
+```js
+const argv = require('minimist');
+
+/* --- minimist可傳遞選項 --- */
+const opts = {
+  string: ['env1'], // or 'env1'
+  boolean: ['env2'], // or 'env2'
+  default: { env: 'development' },
+};
+
+/* --- 終端機執行：node test.js --- */
+console.log('測試 1：' + argv(process.argv.slice(2))); // 測試 1：{ _: [], env2: false, env: 'development' }
+
+/* --- 終端機執行：node test.js --env production --- */
+console.log('測試 2：' + argv(process.argv.slice(2))); // 測試 2：{ _: [], env2: false, env: 'production' }
+
+/* --- 終端機執行：node test.js --env1 1234 --- */
+console.log('測試 3：' + argv(process.argv.slice(2))); // 測試 3：{ _: [], env2: false, env1: '1234', env: 'development' }
+
+/* --- 終端機執行：node test.js --env2 5678 --- */
+console.log('測試 4：' + argv(process.argv.slice(2))); // 測試 4：{ _: [ 5678 ], env2: true, env: 'development' }
+```
+
+## 補充：Node.js 原生獲取命令行參數方法
+
+事實上，minimist 套件是以 Node.js 中的 `process.argv` API 來實現，不過基於原生方法較為不這麼人性化，故大多人都是使用 minimist 套件完成獲取命令行傳遞參數任務。以下為 Node.js 原生獲取命令行參數範例：
+
+```js
+/* --- 終端機執行：node test.js --env development --- */
+const argv = process.argv;
+
+console.log(argv); // [Node.js 路徑, test.js 路徑, '--env', 'development']
+
+console.log(argv[3]); // development
+```
+
+從上面範例可以得知，原生的 Node.js 獲取命令行參數方法參數(key)與參數(value) 是沒有任何關聯性的，所有參數值都將成為陣列中的項目，實際使用起來很不人性化，建議使用 minimist 套件來完成。
