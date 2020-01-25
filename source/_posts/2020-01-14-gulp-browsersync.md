@@ -27,7 +27,7 @@ date: 2020-01-14 23:38:37
 $ npm install browser-sync
 ```
 
-NPM 上有一款名為 browsersync 的套件，這個套件並不是 BrowserSync 官方的套件，正確的套件名稱為 browser-sync，請安裝正確的官方套件，以便後面的範例能夠順利進行。
+npm 上有一款名為 browsersync 的套件，這個套件並不是 BrowserSync 官方的套件，正確的套件名稱為 browser-sync，請安裝正確的官方套件，以便後面的範例能夠順利進行。
 
 ## BrowserSync 基本使用
 
