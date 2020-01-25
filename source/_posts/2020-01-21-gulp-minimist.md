@@ -54,7 +54,7 @@ gulpDemo/
 | - gulpfile.js        # Gulp 主檔案
 | - test.js            # minimist 範例檔案
 | - package-lock.json
-| - package.json       # 安裝 gulp、gulp-scss、minimist、gulp-if
+| - package.json       # 安裝 gulp、gulp-sass、minimist、gulp-if
 ```
 
 minimist 語法：
@@ -98,27 +98,20 @@ const gulpif = require('gulp-if'); // 載入 gulp-if 套件
 // 獲取命令行參數
 const argv = parseArgs(process.argv.slice(2)).env;
 
-/* --- Scss 編譯 --- */
+/* --- SCSS 編譯 --- */
 gulp.task('sass', () => {
   return gulp
     .src('./source/scss/*.scss')
     .pipe(sass().on('error', sass.logError))
-    .pipe(gulpif(argv === 'production', cleanCSS({ compatibility: 'ie8' })))
+    .pipe(gulpif(argv === 'production', cleanCSS({ compatibility: 'ie8' }))) // 區分套件使用環境
     .pipe(gulp.dest('public/css'));
 });
-
-/* --- 複製 HTML --- */
-gulp.task('copyHTML', () => {
-  return gulp.src('./source/index.html').pipe(gulp.dest('public/'));
-});
-
-gulp.task('default', gulp.parallel('sass', 'copyHTML'));
 ```
 
 執行 development 環境：
 
 ```bash
-$ gulp --env development
+$ gulp sass --env development
 ```
 
 SCSS 編譯結果：
@@ -140,7 +133,7 @@ SCSS 編譯結果：
 執行 production 環境：
 
 ```bash
-$ gulp --env production
+$ gulp sass --env production
 ```
 
 SCSS 編譯結果：

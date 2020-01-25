@@ -158,7 +158,7 @@ const postcss = require('gulp-postcss');
 const autoprefixer = require('autoprefixer');
 const sugarss = require('sugarss');
 
-gulp.task('scss', () => {
+gulp.task('sass', () => {
   return gulp
     .src('./source/scss/*.scss')
     .pipe(sass().on('error', sass.logError))
@@ -242,7 +242,7 @@ const postcss = require('gulp-postcss');
 const autoprefixer = require('autoprefixer');
 const cssnano = require('cssnano'); // 載入 cssnano 套件
 
-gulp.task('scss', () => {
+gulp.task('sass', () => {
   return gulp
     .src('./source/scss/*.scss')
     .pipe(sass().on('error', sass.logError))
@@ -251,7 +251,7 @@ gulp.task('scss', () => {
 });
 ```
 
-執行 gulp scss 指令即可進行編譯及壓縮代碼應用，基本上大部分情境都只需要使用 cssnano 默認配置，如果有特殊場景需要單獨配置，可參考官方的說明：
+執行 gulp sass 指令即可進行編譯及壓縮代碼應用，基本上大部分情境都只需要使用 cssnano 默認配置，如果有特殊場景需要單獨配置，可參考官方的說明：
 
 > 預設轉換 vs 高級轉換：[optimisations](https://cssnano.co/optimisations/)
 
@@ -272,7 +272,7 @@ const postcss = require('gulp-postcss');
 const autoprefixer = require('autoprefixer');
 const cssnano = require('cssnano');
 
-gulp.task('scss', () => {
+gulp.task('sass', () => {
   return gulp
     .src('./source/scss/*.scss')
     .pipe(sass().on('error', sass.logError))
