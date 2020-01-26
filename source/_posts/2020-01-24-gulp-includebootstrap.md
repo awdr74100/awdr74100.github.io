@@ -1,5 +1,5 @@
 ---
-title: Gulp 前端自動化 - 導入 Bootstrap 並客製它
+title: Gulp 前端自動化 - 導入 Bootstrap 客製並編譯它
 description:
   [
     Bootstrap 目前已經算是前端必備的技能了，相信大部分人在使用時都是以 CDN 的方式進行載入，但這樣子的作法等同於將整個官方預編譯好的 Bootstrap 進行載入，當我們需要客製化 Bootstrap 樣式時，必定得採取其他方法。此篇將介紹如何使用 npm 方式載入 Bootstrap，並透過 Gulp 編譯屬於我們自己的客製化樣式。,
