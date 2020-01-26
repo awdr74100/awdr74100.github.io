@@ -40,6 +40,8 @@ minimist 套件為解析命令行傳遞參數用，我們可以使用 gulp-if �
 
 ## minimist 基本使用
 
+<div class="note warning">此次範例會結合 gulp-sass 套件一起使用，相關文章連結：<a href="https://awdr74100.github.io/2019-12-31-gulp-gulpsass/">gulp-sass</a></div>
+
 初始專案結構：
 
 ```plain
@@ -195,4 +197,4 @@ console.log(argv); // [Node.js 路徑, test.js 路徑, '--env', 'development']
 console.log(argv[3]); // development
 ```
 
-從上面範例可以得知，原生的 Node.js 獲取命令行參數方法參數(key)與參數(value) 是沒有任何關聯性的，所有參數值都將成為陣列中的項目，實際使用起來很不人性化，建議使用 minimist 套件來完成。
+從上面範例可以得知，原生的 Node.js 獲取命令行參數方法參數(key)與參數(value)是沒有任何關聯性的，所有參數值都將成為陣列中的項目，實際使用起來很不人性化，建議使用 minimist 套件來完成。
