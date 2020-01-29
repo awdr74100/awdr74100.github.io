@@ -1,8 +1,8 @@
 ---
-title: Gulp 前端自動化 - 從 Gulp 3 升級至 Gulp 4 完整文檔
+title: Gulp 前端自動化 - 升級至 Gulp 4 完整說明
 description:
   [
-    Gulp 4 已經推出有一段時間了，有礙於網上文章大多都是使用 Gulp 3 版本，對於學習 Gulp 4 的開發者來說較為不友善，此篇將完整解說 Gulp 3 與 Gulp 4 的差異，同時也會介紹 Gulp 4 新增的幾個好用語法，包含 gulp.series()、gulp.parallel() 等等，最後也會替這段時間介紹的 Gulp 套件做一個總整理，幫助讀者快速導入現有開發。,
+    Gulp 4 已經推出有一段時間了，有礙於網上文章大多都是使用 Gulp 3 版本，對於學習 Gulp 4 的開發者來說較為不友善，此篇將完整解說 Gulp 3 與 Gulp 4 的差異，同時也會介紹 Gulp 4 新增的幾個好用語法，比如 gulp.series()、gulp.parallel() 等等，最後也會替這段時間介紹的 Gulp 套件做一個總整理，幫助讀者快速導入現有開發。,
   ]
 categories: [Gulp]
 tags: [Gulp 4, Node.js]
@@ -11,7 +11,7 @@ date: 2020-01-28 20:29:52
 
 ## 前言
 
-Gulp 4 已經推出有一段時間了，有礙於網上文章大多都是使用 Gulp 3 版本，對於學習 Gulp 4 的開發者來說較為不友善，此篇將完整解說 Gulp 3 與 Gulp 4 的差異，同時也會介紹 Gulp 4 新增的幾個好用語法，包含 gulp.series()、gulp.parallel() 等等，最後也會替這段時間介紹的 Gulp 套件做一個總整理，幫助讀者快速導入現有開發。
+Gulp 4 已經推出有一段時間了，有礙於網上文章大多都是使用 Gulp 3 版本，對於學習 Gulp 4 的開發者來說較為不友善，此篇將完整解說 Gulp 3 與 Gulp 4 的差異，同時也會介紹 Gulp 4 新增的幾個好用語法，比如 gulp.series()、gulp.parallel() 等等，最後也會替這段時間介紹的 Gulp 套件做一個總整理，幫助讀者快速導入現有開發。
 
 ## 筆記重點
 
