@@ -26,7 +26,7 @@ Gulp 3：
 ```js
 const gulp = require('gulp');
 
-gulp.task('default', (cb) => {
+gulp.task('build', (cb) => {
   // 任務內容
   cb();
 });
@@ -41,12 +41,12 @@ function compile_Sass(cb) {
 }
 
 /* --- export.任務名稱 = 工作內容相關函式名稱 --- */
-exports.default = compile_Sass;
+exports.build = compile_Sass;
 ```
 
-使用 `function 工作內容相關函式名稱() {}` 即可建立任務，此時任務狀態為 Private，不會被 CLI 給偵測到，只能供檔案內使用，此時可以使用 `exports.工作名稱 = 工作內容相關函式名稱` 將任務導出，CLI 即可偵測到任務，狀態為 Public，最後執行 `gulp` 指令執行任務，結果會與 Gulp 3 相同，讓我們來看其他例子：
+使用 `function 工作內容相關函式名稱() {}` 即可建立任務，此時任務狀態為 Private，不會被 CLI 給偵測到，只能供內部使用，此時可以使用 `exports.工作名稱 = 工作內容相關函式名稱` 將任務導出，CLI 即可偵測到任務，狀態為 Public，最後執行 `gulp build` 指令執行任務，結果會與 Gulp 3 相同，讓我們來看其他例子：
 
-**gulp.series 非同步執行**：
+**多任務執行**：
 
 Gulp 3：
 
@@ -86,7 +86,7 @@ function pug(cb) {
 exports.build = gulp.series(scss, pug);
 ```
 
-上面這一個例子，清楚的說明何謂 Private Task 與 Public Task，我們可以使用 `gulp --tasks` 檢視所有任務：
+在 Gulp 3 我們都是使用字串形式的 `taskname` 作為參數執行任務，但在 Gulp 4 新增接受 `function` 作為參數執行任務，這也是之前文章提到可使用 CommonJS 模組化的關鍵，彈性與上個版本相比提高了不少，這確實是件好事，接著我們來說明之前提到的 Private Task 與 Public Task 究竟是什麼，請先使用 `gulp --tasks` 檢視所有任務：
 
 Gulp 3：
 
