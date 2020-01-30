@@ -119,6 +119,7 @@ gulpDemo/
 
 以下為經過 autoprefixer 處理後的 CSS 檔案內容：
 
+<!-- prettier-ignore-start -->
 ```css
 .d-flex {
   display: -webkit-box;
@@ -136,6 +137,7 @@ gulpDemo/
   color: blue;
 }
 ```
+<!-- prettier-ignore-end -->
 
 你會發現 autoprefixer 替我們增加了相關的 CSS Prefix，以往這些語法都需要手動增加，造成許多的不方便，使用此插件即可自動幫我們完成此操作，我認為 PostCSS 更像是一個平台，利用豐富的插件進行前後處理，有沒有發現我說的是前後處理？事實上，某些 PostCSS 插件是以預處理的方式進行，比如說：[postcss-each](https://www.npmjs.com/package/postcss-each)，所以我們並不能直接把 PostCSS 定義為後處理器，得看使用的性質而定。
 
@@ -199,6 +201,7 @@ IE 10
 
 執行 `gulp scss` 指令進行編譯，結果如下：
 
+<!-- prettier-ignore-start -->
 ```scss
 .d-flex {
   display: -webkit-box;
@@ -220,6 +223,7 @@ IE 10
   color: blue;
 }
 ```
+<!-- prettier-ignore-end -->
 
 觀察編譯後檔案可以發現 Autoprefixer 針對了我們的 `.browserslistrc` 配置進行編譯，大功告成！
 
