@@ -40,7 +40,7 @@ minimist 套件為解析命令行傳遞參數用，我們可以使用 gulp-if �
 
 ## minimist 基本使用
 
-<div class="note warning">此次範例會結合 gulp-sass 套件一起使用，相關文章連結：<a href="https://awdr74100.github.io/2019-12-31-gulp-gulpsass/">gulp-sass</a></div>
+<div class="note warning">此次範例會結合 gulp-sass 套件一起使用，相關文章連結：<a href="https://awdr74100.github.io/2019-12-31-gulp-gulpsass/" target="_blank">gulp-sass</a></div>
 
 初始專案結構：
 

@@ -32,7 +32,7 @@ $ npm install gulp-sourcemaps
 
 ## gulp-sourcemaps 基本使用
 
-<div class="note warning">此次範例會結合 gulp-sass 套件一起使用，相關文章連結：<a href="https://awdr74100.github.io/2019-12-31-gulp-gulpsass/">gulp-sass</a></div>
+<div class="note warning">此次範例會結合 gulp-sass 套件一起使用，相關文章連結：<a href="https://awdr74100.github.io/2019-12-31-gulp-gulpsass/" target="_blank">gulp-sass</a></div>
 
 初始專案結構：
 

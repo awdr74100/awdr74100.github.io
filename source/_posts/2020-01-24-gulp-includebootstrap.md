@@ -51,7 +51,7 @@ Bootstrap 4 主要由 SCSS 建構而成，當你使用 npm 方式進行安裝時
 
 ## 客製並編譯 Bootstrap 預設變數
 
-<div class="note warning">此次範例會結合 gulp-sass、gulp-postcss 套件一起使用，相關文章連結：<a href="https://awdr74100.github.io/2019-12-31-gulp-gulpsass/">gulp-sass</a>、<a href="https://awdr74100.github.io/2020-01-12-gulp-gulppostcss/">gulp-postcss</a></div>
+<div class="note warning">此次範例會結合 gulp-sass、gulp-postcss 套件一起使用，相關文章連結：<a href="https://awdr74100.github.io/2019-12-31-gulp-gulpsass/" target="_blank">gulp-sass</a>、<a href="https://awdr74100.github.io/2020-01-12-gulp-gulppostcss/" target="_blank">gulp-postcss</a></div>
 
 初始專案結構：
 
