@@ -40,7 +40,7 @@ minimist 套件為解析命令行傳遞參數用，我們可以使用 gulp-if �
 
 ## minimist 基本使用
 
-<div class="note warning">此次範例會結合 gulp-sass 套件一起使用，相關文章連結：<a href="https://awdr74100.github.io/2019-12-31-gulp-gulpsass/" target="_blank">gulp-sass</a></div>
+<div class="note warning">此次範例會結合 gulp-sass、gulp-clean-css 套件一起使用，相關文章連結：<a href="https://awdr74100.github.io/2019-12-31-gulp-gulpsass/" target="_blank">gulp-sass</a>、<a href="https://awdr74100.github.io/2020-01-17-gulp-gulphtmlmin-gulpcleancss-gulpuglify/" target="_blank">gulp-clean-css</a></div>
 
 初始專案結構：
 
@@ -56,7 +56,7 @@ gulpDemo/
 | - gulpfile.js        # Gulp 主檔案
 | - test.js            # minimist 範例檔案
 | - package-lock.json
-| - package.json       # 安裝 gulp、gulp-sass、minimist、gulp-if
+| - package.json       # 安裝 gulp、gulp-sass、gulp-clean-css、minimist、gulp-if
 ```
 
 minimist 語法：
@@ -110,7 +110,7 @@ gulp.task('sass', () => {
 });
 ```
 
-執行 development 環境：
+在 development 環境執行指定任務：
 
 ```bash
 $ gulp sass --env development
@@ -132,7 +132,7 @@ SCSS 編譯結果：
 }
 ```
 
-執行 production 環境：
+在 production 環境執行指定任務：
 
 ```bash
 $ gulp sass --env production
@@ -140,9 +140,11 @@ $ gulp sass --env production
 
 SCSS 編譯結果：
 
+<!-- prettier-ignore-start -->
 ```scss
 .box1{color:red}.box2{color:#00f}.box3{color:#000}
 ```
+<!-- prettier-ignore-end -->
 
 從上面範例可以得知，gulp-if 套件能夠幫助我們進行邏輯判斷，第一個參數為 `True` or `False`，第二個參數為作用的 gulp 套件，當我們成功獲取命令行傳遞參數時，即可針對這一個參數做邏輯判斷，development 與 production 環境就是由此方法來做區分。
 
