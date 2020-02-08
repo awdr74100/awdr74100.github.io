@@ -46,7 +46,7 @@ gulpDemo/
 |
 | - gulpfile.js        # Gulp 主檔案
 | - package-lock.json
-| - package.json       # 安裝 gulp、gulp-sass、gulp-clean-css、minimist、gulp-if、gulp-rename
+| - package.json       # 安裝 gulp、gulp-rename、other...
 ```
 
 載入並使用 gulp-rename：
