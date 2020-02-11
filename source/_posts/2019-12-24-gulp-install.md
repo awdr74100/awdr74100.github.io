@@ -45,7 +45,7 @@ Gulp 依賴 Node.js 環境，需先進行安裝。推薦使用 LTS 版本：
 
 安裝過程就不加以贅述，可使用以下指令查看是否正確安裝：
 
-```shell
+```bash
 $ node -v
 ```
 
@@ -62,19 +62,19 @@ $ node -v
 
 Gulp 3 版本，全域安裝指令：
 
-```shell
+```bash
 $ npm install gulp -g
 ```
 
 Gulp 4 版本，全域安裝指令：
 
-```shell
+```bash
 $ npm install gulp-cli -g
 ```
 
 在這邊我們使用 Gulp 4 為主要開發版本，當 Gulp 在全域環境安裝完成時，可以使用以下指令來檢查：
 
-```shell
+```bash
 $ gulp -v
 ```
 
@@ -86,19 +86,19 @@ $ gulp -v
 
 接下來我們進行初始化專案的動作，使用以下指令生成 `package.json`：
 
-```shell
+```bash
 $ npm init
 ```
 
 剛剛有提到專案環境尚未安裝 Gulp，使用以下指令安裝：
 
-```shell
+```bash
 $ npm install gulp
 ```
 
 在 npm 5 版本 `--save` 已成為預設指令，這也代表上面這道指令等同於下面這道指令：
 
-```shell
+```bash
 $ npm install gulp --save
 ```
 
@@ -145,7 +145,7 @@ gulp.task('copyFile', () => {
 
 此時輸入以下指令：
 
-```shell
+```bash
 $ gulp copyFile
 ```
 
