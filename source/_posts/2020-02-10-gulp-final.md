@@ -24,6 +24,9 @@ date: 2020-02-10 23:30:55
 - Browsersync 瀏覽器同步測試工具
 - 自動清除檔案與資料夾
 - 壓縮 HTML、CSS、JavaScript 代碼
+- 壓縮並優化圖片
+- Minimist 命令行參數解析工具
+- 替換 Stream 中的檔案名稱
 
 ## 本系列文章
 
@@ -618,4 +621,313 @@ module.exports = {
 
 ```bash
 $ gulp dev
+```
+
+## 壓縮並優化圖片
+
+將專案結構新增如下：
+
+```plain
+gulpDemo/
+|
+| - node_modules/
+|
+| - source/
+|   | - js
+|       | - all.js     # JavaScript 主檔案
+|
+|   | - scss/
+|       | - all.scss
+|
+|   | - index.pug
+|
+| - gulpfile.js        # Gulp 主檔案
+| - package-lock.json
+| - package.json
+```
+
+安裝 [gulp-imagemin](https://www.npmjs.com/package/gulp-imagemin) 套件
+
+```bash
+$ npm install gulp-imagemin
+```
+
+載入並使用 gulp-imagemin：
+
+<!-- prettier-ignore-start -->
+```js
+const gulp = require("gulp");
+const sass = require("gulp-sass");
+const pug = require("gulp-pug");
+const babel = require("gulp-babel");
+const postcss = require("gulp-postcss");
+const autoprefixer = require("autoprefixer");
+const sourcemaps = require("gulp-sourcemaps");
+const browserSync = require("browser-sync").create();
+const del = require("del");
+const htmlmin = require("gulp-htmlmin");
+const cleanCSS = require("gulp-clean-css");
+const uglify = require("gulp-uglify");
+const imagemin = require("gulp-imagemin");
+
+/* --- 編譯 Sass/SCSS --- */
+// ...
+
+/* --- 編譯 Pug --- */
+// ...
+
+/* --- 編譯 ES6+ 代碼 --- */
+// ...
+
+/* --- 本地伺服器 --- */
+// ...
+
+/* --- 刪除指定目錄檔案 --- */
+//...
+
+/* --- 壓縮圖檔 --- */
+const imageTask = () => {
+  return gulp
+    .src("source/img/*")
+    .pipe(imagemin()) // 執行優化(壓縮)
+    .pipe(gulp.dest("public/img"));
+};
+
+module.exports = {
+  scss: scssTask, // 單獨編譯 Sass/SCSS
+  pug: pugTask, // 單獨編譯 Pug
+  babel: babelTask, // 單獨編譯 ES6+ 代碼
+  image: imageTask, // 壓縮圖檔
+  clean: cleanTask, // 刪除指定檔案目錄
+  build: gulp.series(
+    cleanTask,
+    gulp.parallel(scssTask, pugTask, babelTask, imageTask)
+  ),
+  dev: gulp.series(
+    cleanTask,
+    gulp.parallel(scssTask, pugTask, babelTask, imageTask),
+    watch
+  )
+};
+```
+<!-- prettier-ignore-end -->
+
+執行指定任務即可完成編譯：
+
+```bash
+$ gulp image
+```
+
+## Minimist 命令行參數解析工具
+
+專案結構無須改變。
+
+安裝 [minimist](https://www.npmjs.com/package/minimist)、[gulp-if](https://www.npmjs.com/package/gulp-if) 套件：
+
+```bash
+$ npm install minimist gulp-if
+```
+
+載入並使用 minimist、gulp-if：
+
+<!-- prettier-ignore-start -->
+```js
+const gulp = require("gulp");
+const sass = require("gulp-sass");
+const pug = require("gulp-pug");
+const babel = require("gulp-babel");
+const postcss = require("gulp-postcss");
+const autoprefixer = require("autoprefixer");
+const sourcemaps = require("gulp-sourcemaps");
+const browserSync = require("browser-sync").create();
+const del = require("del");
+const htmlmin = require("gulp-htmlmin");
+const cleanCSS = require("gulp-clean-css");
+const uglify = require("gulp-uglify");
+const imagemin = require("gulp-imagemin");
+const parseArgs = require("minimist");
+const gulpif = require("gulp-if");
+
+/* --- 獲取命令行參數 --- */
+const argv = parseArgs(process.argv.slice(2)).env;
+
+/* --- 編譯 Sass/SCSS --- */
+const scssTask = () => {
+  return gulp
+    .src("./source/scss/*.scss")
+    .pipe(sourcemaps.init())
+    .pipe(sass().on("error", sass.logError))
+    .pipe(postcss([autoprefixer()]))
+    .pipe(gulpif(argv === "production", cleanCSS({ compatibility: "ie8" })))
+    .pipe(sourcemaps.write("./"))
+    .pipe(gulp.dest("./public/css"));
+};
+
+/* --- 編譯 Pug --- */
+const pugTask = () => {
+  return gulp
+    .src("source/**/*.pug")
+    .pipe(
+      pug({
+        pretty: true
+      })
+    )
+    .pipe(gulpif(argv === "production", htmlmin({ collapseWhitespace: true })))
+    .pipe(gulp.dest("./public/"));
+};
+
+/* --- 編譯 ES6+ 代碼 --- */
+const babelTask = () => {
+  return gulp
+    .src("./source/js/*.js") // javascript 檔案路徑
+    .pipe(babel())
+    .pipe(gulpif(argv === "production", uglify()))
+    .pipe(gulp.dest("./public/js/")); // 編譯完成輸出路徑
+};
+
+/* --- 本地伺服器 --- */
+// ...
+
+/* --- 刪除指定目錄檔案 --- */
+// ...
+
+/* --- 壓縮圖檔 --- */
+const imageTask = () => {
+  return gulp
+    .src("source/img/*")
+    .pipe(gulpif(argv === "production", imagemin())) // 執行優化(壓縮)
+    .pipe(gulp.dest("public/img"));
+};
+
+module.exports = {
+  scss: scssTask, // 單獨編譯 Sass/SCSS
+  pug: pugTask, // 單獨編譯 Pug
+  babel: babelTask, // 單獨編譯 ES6+ 代碼
+  image: imageTask, // 壓縮圖檔
+  clean: cleanTask, // 刪除指定檔案目錄
+  build: gulp.series(
+    cleanTask,
+    gulp.parallel(scssTask, pugTask, babelTask, imageTask)
+  ),
+  dev: gulp.series(
+    cleanTask,
+    gulp.parallel(scssTask, pugTask, babelTask, imageTask),
+    watch
+  )
+};
+```
+<!-- prettier-ignore-end -->
+
+在 development 環境執行指定任務：
+
+```bash
+$ gulp build --production
+```
+
+## 替換 Stream 中的檔案名稱
+
+專案結構無須改變。
+
+安裝 [gulp-rename](https://www.npmjs.com/package/gulp-rename) 套件
+
+```bash
+$ npm install gulp-rename
+```
+
+載入並使用 gulp-rename：
+
+<!-- prettier-ignore-start -->
+```js
+const gulp = require('gulp');
+const sass = require('gulp-sass');
+const pug = require('gulp-pug');
+const babel = require('gulp-babel');
+const postcss = require('gulp-postcss');
+const autoprefixer = require('autoprefixer');
+const sourcemaps = require('gulp-sourcemaps');
+const browserSync = require('browser-sync').create();
+const del = require('del');
+const htmlmin = require('gulp-htmlmin');
+const cleanCSS = require('gulp-clean-css');
+const uglify = require('gulp-uglify');
+const imagemin = require('gulp-imagemin');
+const parseArgs = require('minimist');
+const gulpif = require('gulp-if');
+const rename = require('gulp-rename');
+
+/* --- 獲取命令行參數 --- */
+const argv = parseArgs(process.argv.slice(2)).env;
+
+/* --- 編譯 Sass/SCSS --- */
+const scssTask = () => {
+  return gulp
+    .src('./source/scss/*.scss')
+    .pipe(sourcemaps.init())
+    .pipe(sass().on('error', sass.logError))
+    .pipe(postcss([autoprefixer()]))
+    .pipe(gulpif(argv === 'production', cleanCSS({ compatibility: 'ie8' })))
+    .pipe(
+      gulpif(
+        argv === 'production',
+        rename({
+          suffix: '.min',
+        })
+      )
+    )
+    .pipe(sourcemaps.write('./'))
+    .pipe(gulp.dest('./public/css'));
+};
+
+/* --- 編譯 Pug --- */
+// ...
+
+/* --- 編譯 ES6+ 代碼 --- */
+const babelTask = () => {
+  return gulp
+    .src("./source/js/*.js") // javascript 檔案路徑
+    .pipe(babel())
+    .pipe(gulpif(argv === "production", uglify()))
+    .pipe(
+      gulpif(
+        argv === "production",
+        rename({
+          suffix: ".min"
+        })
+      )
+    )
+    .pipe(gulp.dest("./public/js/")); // 編譯完成輸出路徑
+};
+
+/* --- 本地伺服器 --- */
+// ...
+
+/* --- 刪除指定目錄檔案 --- */
+// ...
+
+/* --- 壓縮圖檔 --- */
+// ...
+
+module.exports = {
+  scss: scssTask, // 單獨編譯 Sass/SCSS
+  pug: pugTask, // 單獨編譯 Pug
+  babel: babelTask, // 單獨編譯 ES6+ 代碼
+  image: imageTask, // 壓縮圖檔
+  clean: cleanTask, // 刪除指定檔案目錄
+  build: gulp.series(
+    cleanTask,
+    gulp.parallel(scssTask, pugTask, babelTask, imageTask)
+  ),
+  dev: gulp.series(
+    cleanTask,
+    gulp.parallel(scssTask, pugTask, babelTask, imageTask),
+    watch
+  )
+};
+```
+<!-- prettier-ignore-end -->
+
+在 development 環境執行指定任務：
+
+```bash
+$ gulp build --production
 ```
