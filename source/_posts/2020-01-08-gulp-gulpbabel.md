@@ -398,7 +398,7 @@ $ npm install @babel/polyfill
 Babel 版本 >= `v7.4.0`：
 
 ```bash
-$ npm intsall core-js regenerator-runtime/runtime
+$ npm install core-js regenerator-runtime/runtime
 ```
 
 從 Babel >= 7.4.0 後，@babel/polyfill 組件庫已被棄用，事實上 @babel/polyfill 本身就是由 stable 版本的 core-js 和 regenerator-runtime 組成，我們可以直接下載這兩個組件庫當作 @babel/polyfill 來使用，官方也推薦此做法，這邊要注意的是 regenerator-runtime 為 @babel/runtime 的相依套件，可以自行檢查是否有正確安裝。
@@ -445,7 +445,7 @@ var Circle = function Circle() {
 var promise = Promise.resolve();
 ```
 
-編譯結果就如同單純使用 Bbael 一樣，只有針對語法(Syntax)做編譯，那是因為我們尚未開啟 polyfill 的功能，可通過更改 `useBuiltIns` 來變更模式，可選模式為 `false`、`usage`、`entry`，以下為各模式的編譯結果：
+編譯結果就如同單純使用 Babel 一樣，只有針對語法(Syntax)做編譯，那是因為我們尚未開啟 polyfill 的功能，可通過更改 `useBuiltIns` 來變更模式，可選模式為 `false`、`usage`、`entry`，以下為各模式的編譯結果：
 
 useBuiltIns：`usage`：
 

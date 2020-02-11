@@ -20,6 +20,10 @@ date: 2020-02-10 23:30:55
 - 編譯 Sass/SCSS
 - 編譯 Pug
 - 使用 Babel 編譯 ES6
+- 生成 SourceMap 映射文件
+- Browsersync 瀏覽器同步測試工具
+- 自動清除檔案與資料夾
+- 壓縮 HTML、CSS、JavaScript 代碼
 
 ## 本系列文章
 
@@ -164,8 +168,13 @@ $ npm install gulp-pug
 載入並使用 gulp-pug：
 
 ```js
+const gulp = require('gulp');
+const sass = require('gulp-sass');
+const pug = require('gulp-pug');
+
 /* --- 編譯 Sass/SCSS --- */
 // ...
+
 /* --- 編譯 Pug --- */
 const pugTask = () => {
   return gulp
@@ -202,7 +211,7 @@ gulpDemo/
 |
 | - source/
 |   | - js
-|       | - all.js    # # JavaScript 主檔案
+|       | - all.js     # JavaScript 主檔案
 |
 |   | - scss/
 |       | - all.scss
@@ -223,10 +232,17 @@ $ npm install gulp-babel @babel/core @babel/preset-env
 載入並使用 gulp-babel：
 
 ```js
+const gulp = require('gulp');
+const sass = require('gulp-sass');
+const pug = require('gulp-pug');
+const babel = require('gulp-babel');
+
 /* --- 編譯 Sass/SCSS --- */
 // ...
+
 /* --- 編譯 Pug --- */
 // ...
+
 /* --- 編譯 ES6+ 代碼 --- */
 const babelTask = () => {
   return gulp
@@ -279,4 +295,327 @@ $ npm install @babel/runtime-corejs3 @babel/plugin-transform-runtime
 
 ```bash
 $ gulp babel
+```
+
+## PostCSS 與 Autoprefixer
+
+專案結構無須改變。
+
+安裝 [gulp-postcss](https://www.npmjs.com/package/gulp-postcss)、[autoprefixer](https://www.npmjs.com/package/autoprefixer) 套件：
+
+```bash
+$ npm install gulp-postcss autoprefixer
+```
+
+載入並使用 gulp-postcss：
+
+```js
+const gulp = require('gulp');
+const sass = require('gulp-sass');
+const pug = require('gulp-pug');
+const babel = require('gulp-babel');
+const postcss = require('gulp-postcss');
+const autoprefixer = require('autoprefixer');
+
+/* --- 編譯 Sass/SCSS --- */
+const scssTask = () => {
+  return gulp
+    .src('./source/scss/*.scss')
+    .pipe(sass().on('error', sass.logError))
+    .pipe(postcss([autoprefixer()]))
+    .pipe(gulp.dest('./public/css'));
+};
+
+/* --- 編譯 Pug --- */
+// ...
+
+/* --- 編譯 ES6+ 代碼 --- */
+// ...
+
+module.exports = {
+  scss: scssTask, // 單獨編譯 Sass/SCSS
+  pug: pugTask, // 單獨編譯 Pug
+  babel: babelTask, // 單獨編譯 ES6+ 代碼
+  build: gulp.parallel(scssTask, pugTask, babelTask), // 並行運行指定任務
+};
+```
+
+新增並配置 `.browserslistrc`：
+
+```json
+last 2 version
+> 1%
+IE 10
+```
+
+執行指定任務即可完成編譯：
+
+```bash
+$ gulp scss
+```
+
+## 生成 SourceMap 映射文件
+
+專案結構無須改變。
+
+安裝 [gulp-sourcemaps](https://www.npmjs.com/package/gulp-sourcemaps) 套件：
+
+```bash
+$ npm install gulp-sourcemaps
+```
+
+載入並使用 gulp-sourcemaps：
+
+```js
+const gulp = require('gulp');
+const sass = require('gulp-sass');
+const pug = require('gulp-pug');
+const babel = require('gulp-babel');
+const postcss = require('gulp-postcss');
+const autoprefixer = require('autoprefixer');
+const sourcemaps = require('gulp-sourcemaps');
+
+/* --- 編譯 Sass/SCSS --- */
+const scssTask = () => {
+  return gulp
+    .src('./source/scss/*.scss')
+    .pipe(sourcemaps.init())
+    .pipe(sass().on('error', sass.logError))
+    .pipe(postcss([autoprefixer()]))
+    .pipe(sourcemaps.write('./'))
+    .pipe(gulp.dest('./public/css'));
+};
+
+/* --- 編譯 Pug --- */
+// ...
+
+/* --- 編譯 ES6+ 代碼 --- */
+// ...
+
+module.exports = {
+  scss: scssTask, // 單獨編譯 Sass/SCSS
+  pug: pugTask, // 單獨編譯 Pug
+  babel: babelTask, // 單獨編譯 ES6+ 代碼
+  build: gulp.parallel(scssTask, pugTask, babelTask), // 並行運行指定任務
+};
+```
+
+執行指定任務即可完成編譯：
+
+```bash
+$ gulp scss
+```
+
+## Browsersync 瀏覽器同步測試工具
+
+專案結構無須改變。
+
+安裝 [browser-sync](https://browsersync.io/docs/gulp) 套件：
+
+```bash
+$ npm install browser-sync
+```
+
+載入並使用 browser-sync：
+
+```js
+const gulp = require('gulp');
+const sass = require('gulp-sass');
+const pug = require('gulp-pug');
+const babel = require('gulp-babel');
+const postcss = require('gulp-postcss');
+const autoprefixer = require('autoprefixer');
+const sourcemaps = require('gulp-sourcemaps');
+const browserSync = require('browser-sync').create();
+
+/* --- 編譯 Sass/SCSS --- */
+// ...
+
+/* --- 編譯 Pug --- */
+// ...
+
+/* --- 編譯 ES6+ 代碼 --- */
+// ...
+
+/* --- 開啟本地伺服器 --- */
+const watch = () => {
+  browserSync.init({
+    server: {
+      baseDir: './public',
+    },
+  });
+  gulp.watch('./source/js/*.js', gulp.series(babelTask));
+  gulp.watch('./source/*.pug', gulp.series(pugTask));
+  gulp.watch('./source/scss/*.scss', gulp.series(scssTask));
+};
+
+module.exports = {
+  scss: scssTask, // 單獨編譯 Sass/SCSS
+  pug: pugTask, // 單獨編譯 Pug
+  babel: babelTask, // 單獨編譯 ES6+ 代碼
+  build: gulp.parallel(scssTask, pugTask, babelTask), // 並行運行指定任務
+  dev: watch, // 開啟本地伺服器
+};
+```
+
+執行指定任務即可開啟本地伺服器：
+
+```bash
+$ gulp dev
+```
+
+## 自動清除檔案與資料夾
+
+專案結構無須改變。
+
+安裝 [del](https://www.npmjs.com/package/del) 套件
+
+```bash
+$ npm install del
+```
+
+載入並使用 del：
+
+<!-- prettier-ignore-start -->
+```js
+const gulp = require('gulp');
+const sass = require('gulp-sass');
+const pug = require('gulp-pug');
+const babel = require('gulp-babel');
+const postcss = require('gulp-postcss');
+const autoprefixer = require('autoprefixer');
+const sourcemaps = require('gulp-sourcemaps');
+const browserSync = require('browser-sync').create();
+const del = require('del');
+
+/* --- 編譯 Sass/SCSS --- */
+// ...
+
+/* --- 編譯 Pug --- */
+// ...
+
+/* --- 編譯 ES6+ 代碼 --- */
+// ...
+
+/* --- 本地伺服器 --- */
+// ...
+
+/* --- 刪除指定目錄檔案 --- */
+const cleanTask = () => {
+  return del(['./public']); // 需刪除檔案或目錄
+};
+
+module.exports = {
+  scss: scssTask, // 單獨編譯 Sass/SCSS
+  pug: pugTask, // 單獨編譯 Pug
+  babel: babelTask, // 單獨編譯 ES6+ 代碼
+  clean: cleanTask, // 刪除指定檔案目錄
+  build: gulp.series(
+    cleanTask, 
+    gulp.parallel(scssTask, pugTask, babelTask)
+  ),
+  dev: gulp.series(
+    cleanTask,
+    gulp.parallel(scssTask, pugTask, babelTask),
+    watch
+  )
+};
+```
+<!-- prettier-ignore-end -->
+
+執行指定任務即可開啟本地伺服器：
+
+```bash
+$ gulp dev
+```
+
+## 壓縮 HTML、CSS、JavaScript 代碼
+
+專案結構無須改變。
+
+安裝 [gulp-htmlmin](https://www.npmjs.com/package/gulp-htmlmin)、[gulp-clean-css](https://www.npmjs.com/package/gulp-clean-css)、[gulp-uglify](https://www.npmjs.com/package/gulp-uglify) 套件：
+
+```bash
+$ npm install gulp-htmlmin gulp-clean-css gulp-uglify
+```
+
+載入並使用 gulp-htmlmin、gulp-clean-css、gulp-uglify：
+
+<!-- prettier-ignore-start -->
+```js
+const gulp = require("gulp");
+const sass = require("gulp-sass");
+const pug = require("gulp-pug");
+const babel = require("gulp-babel");
+const postcss = require("gulp-postcss");
+const autoprefixer = require("autoprefixer");
+const sourcemaps = require("gulp-sourcemaps");
+const browserSync = require("browser-sync").create();
+const del = require("del");
+const htmlmin = require('gulp-htmlmin'); 
+const cleanCSS = require('gulp-clean-css');
+const uglify = require('gulp-uglify'); 
+
+/* --- 編譯 Sass/SCSS --- */
+const scssTask = () => {
+  return gulp
+    .src("./source/scss/*.scss")
+    .pipe(sourcemaps.init())
+    .pipe(sass().on("error", sass.logError))
+    .pipe(postcss([autoprefixer()]))
+    .pipe(cleanCSS({ compatibility: 'ie8' }))
+    .pipe(sourcemaps.write("./"))
+    .pipe(gulp.dest("./public/css"));
+};
+
+/* --- 編譯 Pug --- */
+const pugTask = () => {
+  return gulp
+    .src("source/**/*.pug")
+    .pipe(
+      pug({
+        pretty: true
+      })
+    )
+    .pipe(htmlmin({ collapseWhitespace: true }))
+    .pipe(gulp.dest("./public/"));
+};
+
+/* --- 編譯 ES6+ 代碼 --- */
+const babelTask = () => {
+  return gulp
+    .src("./source/js/*.js") // javascript 檔案路徑
+    .pipe(babel())
+    .pipe(uglify())
+    .pipe(gulp.dest("./public/js/")); // 編譯完成輸出路徑
+};
+
+/* --- 本地伺服器 --- */
+// ...
+
+/* --- 刪除指定目錄檔案 --- */
+// ...
+
+module.exports = {
+  scss: scssTask, // 單獨編譯 Sass/SCSS
+  pug: pugTask, // 單獨編譯 Pug
+  babel: babelTask, // 單獨編譯 ES6+ 代碼
+  clean: cleanTask, // 刪除指定檔案目錄
+  build: gulp.series(
+    cleanTask, 
+    gulp.parallel(scssTask, pugTask, babelTask)
+  ),
+  dev: gulp.series(
+    cleanTask,
+    gulp.parallel(scssTask, pugTask, babelTask),
+    watch
+  )
+};
+```
+<!-- prettier-ignore-end -->
+
+執行指定任務即可開啟本地伺服器：
+
+```bash
+$ gulp dev
 ```

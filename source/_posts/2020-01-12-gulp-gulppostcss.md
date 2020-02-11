@@ -187,7 +187,7 @@ package.json:
 
 ```json
 {
-  "browserslist": ["last 1 version", "> 1%", "IE 10"]
+  "browserslist": ["last 2 version", "> 1%", "IE 10"]
 }
 ```
 
