@@ -2,7 +2,7 @@
 title: Gulp 前端自動化 - 基於 Gulp 4 的學習總結
 description:
   [
-    此篇將紀錄從接觸 Gulp 開始到後來能夠獨立開發專案所需 Gulp 環境的學習總結。途中也會把之前所遇到的坑做一個解決辦法補充，比如透過 Babel 編譯後，require 語法無法在 Borwser 運行等問題，以及使用 gulp-rename 套件後，該如何連同 HTML 相關的引用路徑做一個響應變動等等，最後也會提供我最為常用的 Gulp 開發環境，供有興趣的開發者快速導入現有專案。,
+    此篇將紀錄從接觸 Gulp 開始到後來能夠獨立開發專案所需 Gulp 環境的學習總結。途中也會把之前所遇到的坑做一個解決辦法補充，比如透過 Babel 編譯後，require 語法無法在 Browser 運行等問題，以及使用 gulp-rename 套件後，該如何連同 HTML 相關的引用路徑做一個響應變動等等，最後也會提供我最為常用的 Gulp 開發環境，供有興趣的開發者快速導入現有專案。,
   ]
 categories: [Gulp]
 tags: [Gulp 4, Node.js, w3HexSchool, 學習總結]
@@ -11,7 +11,7 @@ date: 2020-02-10 23:30:55
 
 ## 前言
 
-此篇將紀錄從接觸 Gulp 開始到後來能夠獨立開發專案所需 Gulp 環境的學習總結。途中也會把之前所遇到的坑做一個解決辦法補充，比如透過 Babel 編譯後，require 語法無法在 Borwser 運行等問題，以及使用 gulp-rename 套件後，該如何連同 HTML 相關的引用路徑做一個響應變動等等，最後也會提供我最為常用的 Gulp 開發環境，供有興趣的開發者快速導入現有專案。
+此篇將紀錄從接觸 Gulp 開始到後來能夠獨立開發專案所需 Gulp 環境的學習總結。途中也會把之前所遇到的坑做一個解決辦法補充，比如透過 Babel 編譯後，require 語法無法在 Browser 運行等問題，以及使用 gulp-rename 套件後，該如何連同 HTML 相關的引用路徑做一個響應變動等等，最後也會提供我最為常用的 Gulp 開發環境，供有興趣的開發者快速導入現有專案。
 
 ## 筆記重點
 
@@ -198,7 +198,7 @@ $ gulp
 
 ## 踩坑 - HTML 引用路徑該如何做響應變動
 
-在我們之前介紹到 minimist 命令行參數解析工具時，有提到關於 development 與 production 環境的差別，當時是以 gulp-clean-css 與 gulp-rename 套件去做示例，假設目前為 production 環境時，使用 gulp-clean-css 壓縮代碼並且使用 gulp-rename 更改名稱為 `.min.css` 檔，當我們開啟 HTML 檔案時，會發現 js 與 css 都沒有被載入進來，因為它的名稱改變了，導致找不到 `.css` 與 `.js` 檔案，正確的連結名稱應該為 `.min.css` 與 `.min.js` 才對，這也就代表 HTML 需要針對使用環境引用不同的路徑，這時我們可以使用 gulp-html-replace 套件解決此問題，讓我們直接開始吧。
+在我們之前介紹到 minimist 命令行參數解析工具時，有提到關於 development 與 production 環境的差別，當時是以 gulp-clean-css 與 gulp-rename 套件去做示例，假設當前為 production 環境，需使用 gulp-clean-css 壓縮代碼並且使用 gulp-rename 更改名稱為 `.min.css` 檔，此時當我們開啟 index.html 檔案時，會發現 js 與 css 都沒有被載入進來，因為此環境編譯後檔案是不存在 `.js` 或 `.css` 檔案的，檔名通通都改成 `.min` 了，可能會有人手動去更改編譯前的引用路徑，但這有違使用自動化工具的目的，這時我們可以使用 gulp-html-replace 套件來解決這一個問題，讓我們直接開始吧！
 
 初始專案結構：
 
@@ -229,7 +229,7 @@ $ npm install del gulp-clean-css gulp-if gulp-rename minimist
 主要套件：
 
 ```bash
-$ nmp install gulp-html-replace
+$ npm install gulp-html-replace
 ```
 
 載入並使用 gulp-html-replace：
@@ -299,5 +299,71 @@ $ gulp --env production
 編譯結果：
 
 ```html
-
+<link rel="stylesheet" href="css/all.min.css" />
 ```
+
+從上面結果可得知，使用 gulp-html-replace 套件確實可以響應引用路徑，它的原理其實很簡單，如下範例：
+
+<!-- prettier-ignore-start -->
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+
+    <!-- build:css1 -->
+    <link rel="stylesheet" href="css/style1" />
+    <!-- endbuild -->
+
+    <!-- build:css2 -->
+    <link rel="stylesheet" href="css/style2" />
+    <!-- endbuild -->
+
+  </head>
+  <body>
+
+    <!-- build:js -->
+    <script src="js/js1"></script>
+    <script src="js/js2"></script>
+    <script src="js/js3"></script>
+    <!-- endbuild -->
+    
+  </body>
+</html>
+```
+<!-- prettier-ignore-end -->
+
+gulpfile.js：
+
+```js
+htmlreplace({
+  css1: 'css/style1.min.css', // 針對 css1 塊做替換
+  css2: 'css/style2.min.css', // 針對 css2 塊做替換
+  js: 'js/all.min.js', // 針對 js 塊做替換
+});
+```
+
+編譯結果：
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="css/style1.min.css" />
+
+    <link rel="stylesheet" href="css/style2.min.css" />
+  </head>
+  <body>
+    <script src="js/all.min.js"></script>
+  </body>
+</html>
+```
+
+使用 gulp-html-replace 的關鍵在於 `<!-- build:name -->` 註解中的 name 需要與 `htmlreplace` 中的 `key` 相互對應，告知此區塊開始進行處理，並且加入`<!-- endbuild -->` 告知此處結束處理，這邊要注意的是此操作是以塊的方式進行處理，如同上面範例的 js 區塊，不管有幾行的代碼，通通都會被取代成相對應的代碼，搭配 gulp-if 等相關套件即可解決 gulp-rename 後引用路徑錯誤的問題，達到真正的自動化效果。
+
+## 總結 - Gulp 常用開發環境
+
+| @babel/core | @babel/plugin-transform-runtime | @babel/preset-env | @babel/runtime-corejs3 | @babel/runtime |
+|-------------|---------------------------------|-------------------|------------------------|----------------|
+|             |                                 |                   |                        |                |
+|             |                                 |                   |                        |                |
+|             |                                 |                   |                        |                |
