@@ -41,7 +41,7 @@ date: 2020-02-10 23:30:55
 
 ## 踩坑 - require 語法無法在 Browser 運行
 
-在之前的 [使用 Babel 編譯 ES6](https://awdr74100.github.io/2020-01-08-gulp-gulpbabel/) 文章中，有提到關於 @babel/runtime 與 @babel/polyfill 的使用方式，滿足 Babel 預設只能處理 Syntax 的問題，但此時也就衍發了另一個問題，那就是編譯後檔案中的 require 語法是無法在 Browser 運行的，require 語法屬於 Node.js 的模組化語法，瀏覽器不兼容此語法，當初卡了這個問題好久，最後找到了 Webpack-stream 這一個套件，透過打包的方式解決此問題，讓我們直接來使用它吧！
+在之前的 [使用 Babel 編譯 ES6](https://awdr74100.github.io/2020-01-08-gulp-gulpbabel/) 文章中，有提到關於 @babel/runtime 與 @babel/polyfill 的使用方式，解決 Babel 預設只能處理 Syntax 的問題，但此時也就衍發了另一個問題，那就是編譯後檔案中的 require 語法是無法在 Browser 運行的，require 語法屬於 Node.js 的模組化語法，瀏覽器不兼容此語法，當初卡了這個問題好久，最後找到了 Webpack-stream 這一個套件，透過打包的方式解決此問題，讓我們直接來使用它吧！
 
 初始專案結構：
 
@@ -59,7 +59,7 @@ gulpDemo/
 | - package.json
 ```
 
-> 套件連結：[gulp-babel](https://www.npmjs.com/package/gulp-babel)、[@babel/runtime](https://www.npmjs.com/package/@babel/runtime)、[@babel/plugin-transform-runtime](https://www.npmjs.com/package/@babel/plugin-transform-runtime)
+> 套件連結：[gulp-babel](https://www.npmjs.com/package/gulp-babel)、[@babel/runtime-corejs3](https://www.npmjs.com/package/@babel/runtime-corejs3)、[@babel/plugin-transform-runtime](https://www.npmjs.com/package/@babel/plugin-transform-runtime)
 
 安裝 Babel：
 
@@ -70,7 +70,7 @@ $ npm install gulp-babel @babel/core @babel/preset-env
 安裝 Plugins：
 
 ```bash
-$ npm install @babel/runtime @babel/plugin-transform-runtime
+$ npm install @babel/runtime-corejs3 @babel/plugin-transform-runtime
 ```
 
 撰寫 ES6+ 版本代碼：
@@ -194,11 +194,11 @@ $ gulp
 
 `[ 4, 5 ]`
 
-相信熟悉 Webpack 的人對於上面配置應該再清楚不過了，事實上，Webpack-stream 就是用來導入 Webpack 的 Gulp 工具，當 Webpack 所在的 Stream 處理完成時，即進入下一個 pipi 節點，由於 babel-loader 的使用，我們也不需要使用 gulp-babel 了，Webpack 與 Gulp 的結合就是採用此方法來完成，有興趣的可以在進行研究，之後也會推出一系列的 Webpack 文章，敬請期待。
+相信熟悉 Webpack 的人對於上面配置應該再清楚不過了，事實上，Webpack-stream 就是用來導入 Webpack 的 Gulp 工具，當 Webpack 所在的 Stream 處理完成時，即進入下一個 pipe 節點，由於 babel-loader 的使用，我們也不需要使用 gulp-babel 了，Webpack 與 Gulp 的結合就是採用此方法來完成，有興趣的可以在進行研究，之後也會推出一系列的 Webpack 文章，敬請期待。
 
 ## 踩坑 - HTML 引用路徑該如何做響應變動
 
-在我們之前介紹到 minimist 命令行參數解析工具時，有提到關於 development 與 production 環境的差別，當時是以 gulp-clean-css 與 gulp-rename 套件去做示例，假設目前為 production 環境時，使用 gulp-clean-css 壓縮代碼並且使用 gulp-rename 更改名稱為 `.min.css` 檔，當我們開啟 HTML 檔案時，會發現 js 與 css 都沒有被載入進來，因為它的名稱改變了，導致找不到 `.css` 與 `.js` 檔案，正確的連結名稱應該為 `.min.css` 與 `.min.js` 才對，這也就代表 HTML 需要針對環境引用不同的路徑，這時我們可以使用 gulp-html-replace 套件解決此問題，讓我們直接開始吧。
+在我們之前介紹到 minimist 命令行參數解析工具時，有提到關於 development 與 production 環境的差別，當時是以 gulp-clean-css 與 gulp-rename 套件去做示例，假設目前為 production 環境時，使用 gulp-clean-css 壓縮代碼並且使用 gulp-rename 更改名稱為 `.min.css` 檔，當我們開啟 HTML 檔案時，會發現 js 與 css 都沒有被載入進來，因為它的名稱改變了，導致找不到 `.css` 與 `.js` 檔案，正確的連結名稱應該為 `.min.css` 與 `.min.js` 才對，這也就代表 HTML 需要針對使用環境引用不同的路徑，這時我們可以使用 gulp-html-replace 套件解決此問題，讓我們直接開始吧。
 
 初始專案結構：
 
@@ -296,4 +296,8 @@ exports.default = gulp.series(clean, gulp.parallel(htmlTask, cssTask));
 $ gulp --env production
 ```
 
+編譯結果：
 
+```html
+
+```
