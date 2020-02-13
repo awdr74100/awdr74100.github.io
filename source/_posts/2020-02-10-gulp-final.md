@@ -304,6 +304,8 @@ $ gulp --env production
 
 從上面結果可得知，使用 gulp-html-replace 套件確實可以響應引用路徑，它的原理其實很簡單，如下範例：
 
+`index.html`：
+
 <!-- prettier-ignore-start -->
 ```html
 <!DOCTYPE html>
@@ -332,7 +334,7 @@ $ gulp --env production
 ```
 <!-- prettier-ignore-end -->
 
-gulpfile.js：
+`gulpfile.js`：
 
 ```js
 htmlreplace({
@@ -393,7 +395,7 @@ Webpack-stream 相關套件：
 $ npm i babel-loader
 ```
 
-新增並配置 gulpfile.js：
+新增並配置 `gulpfile.js`：
 
 ```js
 const gulp = require('gulp');
@@ -527,7 +529,7 @@ module.exports = {
 };
 ```
 
-新增並配置 .babelrc：
+新增並配置 `.babelrc`：
 
 ```json
 {
@@ -543,7 +545,7 @@ module.exports = {
 }
 ```
 
-新增並配置 postcss.config.js：
+新增並配置 `postcss.config.js`：
 
 ```js
 module.exports = {
@@ -551,7 +553,7 @@ module.exports = {
 };
 ```
 
-新增並配置 .browserslistrc：
+新增並配置 `.browserslistrc`：
 
 ```json
 last 2 version
