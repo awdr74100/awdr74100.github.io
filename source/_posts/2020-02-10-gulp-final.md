@@ -2,7 +2,7 @@
 title: Gulp 前端自動化 - 基於 Gulp 4 的學習總結
 description:
   [
-    此篇將紀錄從接觸 Gulp 開始到後來能夠獨立開發專案所需 Gulp 環境的學習總結。途中也會把之前所遇到的坑做一個解決辦法補充，比如透過 Babel 編譯後，require 語法無法在 Browser 運行等問題，以及使用 gulp-rename 套件後，該如何連同 HTML 相關的引用路徑做一個響應變動等等，最後也會提供我最為常用的 Gulp 開發環境，供有興趣的開發者快速導入現有專案。,
+    此篇將紀錄從接觸 Gulp 開始到後來能夠獨立開發專案所需 Gulp 環境的學習總結。前面會先把之前所遇到的坑做一個解決辦法補充，比如透過 Babel 編譯後，require 語法無法在 Browser 運行等問題，以及使用 gulp-rename 套件後，該如何連同 HTML 相關的引用路徑做一個響應變動等等，最後也會提供我最為常用的 Gulp 開發環境，供有興趣的開發者快速導入現有專案。,
   ]
 categories: [Gulp]
 tags: [Gulp 4, Node.js, w3HexSchool, 學習總結]
@@ -11,7 +11,7 @@ date: 2020-02-10 23:30:55
 
 ## 前言
 
-此篇將紀錄從接觸 Gulp 開始到後來能夠獨立開發專案所需 Gulp 環境的學習總結。途中也會把之前所遇到的坑做一個解決辦法補充，比如透過 Babel 編譯後，require 語法無法在 Browser 運行等問題，以及使用 gulp-rename 套件後，該如何連同 HTML 相關的引用路徑做一個響應變動等等，最後也會提供我最為常用的 Gulp 開發環境，供有興趣的開發者快速導入現有專案。
+此篇將紀錄從接觸 Gulp 開始到後來能夠獨立開發專案所需 Gulp 環境的學習總結。前面會先把之前所遇到的坑做一個解決辦法補充，比如透過 Babel 編譯後，require 語法無法在 Browser 運行等問題，以及使用 gulp-rename 套件後，該如何連同 HTML 相關的引用路徑做一個響應變動等等，最後也會提供我最為常用的 Gulp 開發環境，供有興趣的開發者快速導入現有專案。
 
 ## 筆記重點
 
@@ -362,8 +362,201 @@ htmlreplace({
 
 ## 總結 - Gulp 常用開發環境
 
-| @babel/core | @babel/plugin-transform-runtime | @babel/preset-env | @babel/runtime-corejs3 | @babel/runtime |
-|-------------|---------------------------------|-------------------|------------------------|----------------|
-|             |                                 |                   |                        |                |
-|             |                                 |                   |                        |                |
-|             |                                 |                   |                        |                |
+| 主要套件                                                   | 優化套件                                                       | 輔助套件                                                             | 通用套件                                                       |
+| ---------------------------------------------------------- | -------------------------------------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------- |
+| [gulp-babel](https://www.npmjs.com/package/gulp-babel)     | [gulp-clean-css](https://www.npmjs.com/package/gulp-clean-css) | [gulp-rename](https://www.npmjs.com/package/gulp-rename)             | [browser-sync](https://www.npmjs.com/package/browser-sync)     |
+| [gulp-pug](https://www.npmjs.com/package/gulp-pug)         | [gulp-htmlmin](https://www.npmjs.com/package/gulp-htmlmin)     | [gulp-html-replace](https://www.npmjs.com/package/gulp-html-replace) | [minimist](https://www.npmjs.com/package/minimist)             |
+| [gulp-sass](https://www.npmjs.com/package/gulp-sass)       | [gulp-imagemin](https://www.npmjs.com/package/gulp-imagemin)   | [gulp-sourcemaps](https://www.npmjs.com/package/gulp-sourcemaps)     | [webpack-stream](https://www.npmjs.com/package/webpack-stream) |
+| [gulp-postcss](https://www.npmjs.com/package/gulp-postcss) | [gulp-uglify](https://www.npmjs.com/package/gulp-uglify)       | [gulp-if](https://www.npmjs.com/package/gulp-if)                     | [del](https://www.npmjs.com/package/del)                       |
+
+安裝套件：
+
+```bash
+$ npm i gulp-babel gulp-sass gulp-postcss gulp-clean-css gulp-htmlmin gulp-imagemin gulp-uglify gulp-rename gulp-html-replace gulp-sourcemaps gulp-if browser-sync minimist webpack-stream del
+```
+
+Babel 相關套件：
+
+```bash
+$ npm i @babel/core @babel/preset-env @babel/plugin-transform-runtime @babel/runtime-corejs3
+```
+
+PostCSS 相關套件：
+
+```bash
+$ npm i autoprefixer
+```
+
+Webpack-stream 相關套件：
+
+```bash
+$ npm i babel-loader
+```
+
+新增並配置 gulpfile.js：
+
+```js
+const gulp = require('gulp');
+const sass = require('gulp-sass');
+const pug = require('gulp-pug');
+const babel = require('gulp-babel');
+const postcss = require('gulp-postcss');
+const autoprefixer = require('autoprefixer');
+const sourcemaps = require('gulp-sourcemaps');
+const browserSync = require('browser-sync').create();
+const del = require('del');
+const htmlmin = require('gulp-htmlmin');
+const cleanCSS = require('gulp-clean-css');
+const uglify = require('gulp-uglify');
+const imagemin = require('gulp-imagemin');
+const parseArgs = require('minimist');
+const gulpif = require('gulp-if');
+const rename = require('gulp-rename');
+const htmlreplace = require('gulp-html-replace');
+const webpack = require('webpack-stream');
+
+/* --- 獲取命令行參數 --- */
+const argv = parseArgs(process.argv.slice(2)).env;
+
+/* --- 編譯 Sass/SCSS --- */
+const scssTask = () => {
+  return gulp
+    .src('./source/scss/*.scss')
+    .pipe(sourcemaps.init())
+    .pipe(sass().on('error', sass.logError))
+    .pipe(postcss())
+    .pipe(gulpif(argv === 'production', cleanCSS({ compatibility: 'ie8' })))
+    .pipe(
+      gulpif(
+        argv === 'production',
+        rename({
+          suffix: '.min',
+        })
+      )
+    )
+    .pipe(sourcemaps.write('./'))
+    .pipe(gulp.dest('./public/css'));
+};
+
+/* --- 編譯 HTML --- */
+const htmlTask = () => {
+  return gulp
+    .src('source/**/*.html')
+    .pipe(gulpif(argv === 'production', htmlmin({ collapseWhitespace: true })))
+    .pipe(
+      gulpif(
+        argv === 'production',
+        htmlreplace({
+          css: 'css/all.min.css',
+          js: 'js/all.min.js',
+        })
+      )
+    )
+    .pipe(gulp.dest('./public/'));
+};
+
+/* --- 編譯 ES6+ 代碼 --- */
+const babelTask = () => {
+  return gulp
+    .src('./source/js/*.js')
+    .pipe(babel())
+    .pipe(
+      webpack({
+        mode: 'development',
+        output: {
+          filename: 'all.js',
+        },
+        module: {
+          rules: [
+            {
+              test: /\.m?js$/,
+              exclude: /(node_modules|bower_components)/,
+              use: {
+                loader: 'babel-loader',
+              },
+            },
+          ],
+        },
+      })
+    )
+    .pipe(gulpif(argv === 'production', uglify()))
+    .pipe(
+      gulpif(
+        argv === 'production',
+        rename({
+          suffix: '.min',
+        })
+      )
+    )
+    .pipe(gulp.dest('./public/js/'));
+};
+
+/* --- 本地伺服器 --- */
+const watch = () => {
+  browserSync.init({
+    server: {
+      baseDir: './public',
+    },
+  });
+  gulp.watch('./source/js/*.js', gulp.series(babelTask));
+  gulp.watch('./source/*.html', gulp.series(htmlTask));
+  gulp.watch('./source/scss/*.scss', gulp.series(scssTask));
+};
+
+/* --- 刪除指定目錄檔案 --- */
+const cleanTask = () => {
+  return del(['./public']);
+};
+
+/* --- 壓縮圖檔 --- */
+const imageTask = () => {
+  return gulp
+    .src('source/img/*')
+    .pipe(gulpif(argv === 'production', imagemin()))
+    .pipe(gulp.dest('public/img'));
+};
+
+module.exports = {
+  scss: scssTask, // 單獨編譯 Sass/SCSS
+  html: htmlTask, // 單獨編譯 HTML
+  babel: babelTask, // 單獨編譯 ES6+ 代碼
+  image: imageTask, // 壓縮圖檔
+  clean: cleanTask, // 刪除指定檔案目錄
+  serve: gulp.series(cleanTask, gulp.parallel(scssTask, htmlTask, babelTask, imageTask), watch),
+  build: gulp.series(cleanTask, gulp.parallel(scssTask, htmlTask, babelTask, imageTask)),
+};
+```
+
+新增並配置 .babelrc：
+
+```json
+{
+  "presets": ["@babel/preset-env"],
+  "plugins": [
+    [
+      "@babel/plugin-transform-runtime",
+      {
+        "corejs": 3
+      }
+    ]
+  ]
+}
+```
+
+新增並配置 postcss.config.js：
+
+```js
+module.exports = {
+  plugins: [require('autoprefixer')],
+};
+```
+
+新增並配置 .browserslistrc：
+
+```json
+last 2 version
+> 1%
+IE 10
+```
+
+學到了這邊，看到很多相關文章都在探討 Webpack 將會取代 Gulp 成為主流，但我認為兩者本質上是不同的東西，何來比較？各有各的優缺點，雙方是互補的，在上面範例中，由於 require 無法運行在瀏覽器上面，我也是導入 Webpack-stream 用以打包代碼，並沒有誰好誰不好的說法，Gulp 適合小型開發，配置簡單，輕鬆上手，而 Wepack 適合開發稍有規模的專案，尤其是 SPA (單頁式應用)，對於筆者來講，兩個工具都把它學起來，就沒有這麼多的麻煩了，之後也會有一系列的 Webpack 文章，敬請期待。
