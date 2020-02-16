@@ -4,7 +4,7 @@ description:
   [
     當初在學習 ES6 Modules 相關語法時，主要得依靠 Babel 編譯才能在 Node.js 中運行，原因為 Node.js 預設是使用 CommonJS 模組規範，事實上，大可不必這麼麻煩，Node.js 原生是支援 ES6 Modules 模組規範的，不過得透過一些方法才能將其切換，且不同版本還有各自的切換方法。本篇將使用 nvm (Node Version Manager) 切換不同的 Node.js 版本，並介紹在不同版本下該如何啟用對 ECMAScript 模塊的支持。,
   ]
-categories: [NodeJS]
+categories: [Node.js]
 tags: [Node.js, JavaScript, ES6]
 date: 2020-02-16 17:23:15
 ---

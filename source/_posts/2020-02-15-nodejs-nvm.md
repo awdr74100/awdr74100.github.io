@@ -2,27 +2,21 @@
 title: 在 Windows 環境下使用 nvm 管控 NodeJS
 description:
   [
-    nvm 全名為 Node Version Manager，是一套用來管理 Node.js 版本的工具，在現代開發中，很多的套件都需要依賴 Node.js 來執行，比如說 Webpack、Gulp 等等，
+    nvm 全名為 Node Version Manager，是一套用來管理 Node.js 版本的工具，在現代開發中，我們很常導入現有的 npm 套件幫助開發，像是 Webpack、Gulp、Browserify 等等，而這些套件都得依靠 Node.js 環境才能運行，且由於版本的差異，可能會造成無法運行的錯誤，開發者須同時擁有多個 Node.js 版本才方便進行測試，有別於以往 Node.js 下載安裝檔造成版本的綁定，使用 nvm 可同時存在多個 Node.js 版本，使用簡單的指令即可切換版本，推薦給所有的 Node.js 開發者。,
   ]
-categories: [NodeJS]
+categories: [Node.js]
 tags: [Node.js]
 date: 2020-02-15 15:16:09
 ---
 
 ## 前言
 
-當初在學習 ES6 Modules 相關語法時，主要得依靠 Babel 編譯才能在 Node.js 中運行，原因為 Node.js 預設是使用 CommonJS 模組規範，事實上，大可不必這麼麻煩，Node.js 原生是支援 ES6 Modules 模組規範的，只不過得透過一些設定才能將其切換，且不同版本有各自的切換方法。本篇將結合 nvm (Node Version Manager) 共同介紹，說明該如何使用 nvm 安裝 Node.js，以及透過指令切換不同的 Node.js 版本，在不同版本下透過設定切換當前模組規範。
+nvm 全名為 Node Version Manager，是一套用來管理 Node.js 版本的工具，在現代開發中，我們很常導入現有的 npm 套件幫助開發，像是 Webpack、Gulp、Browserify 等等，而這些套件都得依靠 Node.js 環境才能運行，且由於版本的差異，可能會造成無法運行的錯誤，開發者須同時擁有多個 Node.js 版本才方便進行測試，有別於以往 Node.js 下載安裝檔造成版本的綁定，使用 nvm 可同時存在多個 Node.js 版本，使用簡單的指令即可切換版本，推薦給所有的 Node.js 開發者。
 
 ## 筆記重點
 
-- nvm 介紹
 - nvm 安裝
 - nvm 基本使用
-- Node.js 切換模組規範
-
-## nvm 介紹
-
-nvm 全名為 Node Version Manager，主要用來控管 Node.js 版本，透過輸入指令的方式，即可切換當下的 Node.js 版本，有別於以往透過官方下載造成的版本綁定，使用 nvm 可快速的在本機切換 Node.js 版本，方便進行測試，強烈建議所有開發者放棄使用官方下載，改而使用 nvm 下載 Node.js。
 
 ## nvm 安裝
 
