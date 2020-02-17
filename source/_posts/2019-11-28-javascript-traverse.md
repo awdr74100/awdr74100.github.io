@@ -7,6 +7,7 @@ description:
   ]
 categories: [JavaScript]
 tags: [JavaScript, ES6, ES8]
+updated: 2020-01-10 23:31:29
 ---
 
 ## 前言

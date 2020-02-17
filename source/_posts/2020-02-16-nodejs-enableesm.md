@@ -7,6 +7,7 @@ description:
 categories: [Node.js]
 tags: [Node.js, JavaScript, ES6]
 date: 2020-02-16 17:23:15
+updated: 2020-02-16 23:57:28
 ---
 
 ## 前言

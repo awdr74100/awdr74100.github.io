@@ -4,4 +4,5 @@ date: {{ date }}
 description: []
 categories: []
 tags: []
+updated: {{ date }}
 ---

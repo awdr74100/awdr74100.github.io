@@ -7,6 +7,7 @@ description:
   ]
 categories: [JavaScript]
 tags: [JavaScript, ES6, AJAX]
+updated: 2020-01-12 13:56:00
 ---
 
 ## 前言
