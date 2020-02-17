@@ -23,4 +23,3 @@ updated: 2020-02-17 17:29:46
 
 ![Webpack 介紹](https://img.magiclen.org/albums/webpack/shot-01.png)
 
-以往在開發網頁都是使用 HTML、CSS、JavaScript 來完成，到了現代，已經很少人用純語言來撰寫，你可能聽過 Sass/SCSS、ES6、Pug、Vue、React 等等、這些都是現代化開發不可或缺的一部分，
