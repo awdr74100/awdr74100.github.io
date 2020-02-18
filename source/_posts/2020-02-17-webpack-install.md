@@ -108,7 +108,7 @@ module.exports = {
 };
 ```
 
-讓我們來了解一下 Webpack 配置檔在寫什麼東西：
+讓我們來了解一下 Webpack 配置檔有什麼東西：
 
 - **entry**
   - 用來設定 entry 檔案的進入點，也就是 JavaScript 模組檔案的入口處
@@ -118,19 +118,16 @@ module.exports = {
     - `path.resolve(...)`：c:\Users\blue\Desktop\webpack-demo\dist
   - **filename**：打包後的 JavaScript 檔案名稱，你也可以這樣寫 `js/bundle.js`
 
-鍵入測試用 JavaScript 代碼：
+entry 檔案鍵入以下內容：
 
 ```js
-// src/main.js
-
-console.log('Hello World');
+const myName = 'Roya';
+console.log('Hello ' + myName);
 ```
 
-新增編譯 Webpack 指令：
+至 `package.json` 新增編譯指令：
 
 ```js
-// package.json
-
 {
   "scripts": {
     "start":"webpack --mode development"
@@ -143,3 +140,19 @@ console.log('Hello World');
 ```bash
 $ npm run start
 ```
+
+此時你會發現專案根目錄新增了 `dist/bundle.js` 檔案，這個檔案就是依照 `webpack.config.js` 配置所打包而成的 JavaScript 檔案，可直接做引入。
+
+新增 `./index.html` 並引入打包而成的 `bundle.js` 檔案：
+
+```html
+<!-- 其他省略... -->
+<script src="dist/bundle.js"></script>
+```
+
+觀察 Console 結果：
+
+![console](https://i.imgur.com/dFTKYWQ.png)
+
+當出現以上結果，即代表編譯成功，這也就是 Webpack 整個的處理流程，是不是很容易？但這僅僅是 Webpack 的冰山一角，我們可以透過其他配置來完成更為進階的操作，讓我們先從運行環境開始說起。
+
