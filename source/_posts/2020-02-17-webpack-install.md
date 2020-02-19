@@ -1,8 +1,8 @@
 ---
-title: Webpack 前端打包工具 - 環境安裝與執行
+title: Webpack 前端打包工具 - 環境安裝與基本配置
 description:
   [
-    Webpack 可說是近年來最為熱門的技術，以往在編寫 ES6、Sass/SCSS、Pug、CoffeeScript 等預處理器或需編譯內容時，通常都得透過自動化工具，如 Gulp、Grunt 等任務流程執行工具進行編譯處理，到了現在，Webpack 已逐漸取代這些工具，Webpack 本身提供許多強大的功能，包含現正熱門的 SPA (單頁式應用) 透過配置 loader 方式也能輕鬆應付。本篇將從 Webpack 運行原理開始做介紹，接著說明如何安裝 Webpack，最後透過打包方式產出我們的第一個 bundle.js 檔案。,
+    Webpack 可說是近年來最為熱門的技術，以往在編寫 ES6、Sass/SCSS、Pug、CoffeeScript 等預處理器或需編譯內容時，通常都得透過自動化工具，如 Gulp、Grunt 等任務流程執行工具進行編譯處理，到了現在，Webpack 已逐漸取代這些工具，Webpack 本身提供許多強大的功能，包含現正熱門的 SPA (單頁式應用) 透過配置 loader 方式也能輕鬆應付。本篇將從 Webpack 運行原理開始做介紹，接著說明該如何建立 Webpack 運行環境，最後透過打包方式產出我們的第一個 bundle.js 檔案。,
   ]
 categories: [Webpack]
 tags: [Webpack, Node.js, w3HexSchool]
@@ -12,7 +12,7 @@ updated: 2020-02-17 17:29:46
 
 ## 前言
 
-Webpack 可說是近年來最為熱門的技術，以往在編寫 ES6、Sass/SCSS、Pug、CoffeeScript 等預處理器或需編譯內容時，通常都得透過自動化工具，如 Gulp、Grunt 等任務流程執行工具進行編譯處理，到了現在，Webpack 已逐漸取代這些工具，Webpack 本身提供許多強大的功能，包含現正熱門的 SPA (單頁式應用) 透過配置 loader 方式也能輕鬆應付。本篇將從 Webpack 運行原理開始做介紹，接著說明如何安裝 Webpack，最後透過打包方式產出我們的第一個 bundle.js 檔案。
+Webpack 可說是近年來最為熱門的技術，以往在編寫 ES6、Sass/SCSS、Pug、CoffeeScript 等預處理器或需編譯內容時，通常都得透過自動化工具，如 Gulp、Grunt 等任務流程執行工具進行編譯處理，到了現在，Webpack 已逐漸取代這些工具，Webpack 本身提供許多強大的功能，包含現正熱門的 SPA (單頁式應用) 透過配置 loader 方式也能輕鬆應付。本篇將從 Webpack 運行原理開始做介紹，接著說明該如何建立 Webpack 運行環境，最後透過打包方式產出我們的第一個 bundle.js 檔案。
 
 ## 筆記重點
 
