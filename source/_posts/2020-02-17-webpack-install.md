@@ -2,7 +2,7 @@
 title: Webpack 前端打包工具 - 環境安裝與執行
 description:
   [
-    Webpack 可說是近年來最為熱門的技術，以往在編寫 ES6、Sass/SCSS、Pug、Vue、React 等預處理器或需編譯內容時，通常都得透過自動化工具，如 Gulp、Grunt 等任務流程執行工具進行編譯處理，到了現在，Webpack 已逐漸取代這些工具，Webpack 本身提供許多強大的功能，包含現正熱門的 SPA (單頁式應用) 透過配置 loader 方式也能輕鬆應付。本篇將從 Webpack 運行原理開始做介紹，接著說明如何安裝 Webpack，最後透過打包方式產出我們的第一個 bundle.js 檔案。,
+    Webpack 可說是近年來最為熱門的技術，以往在編寫 ES6、Sass/SCSS、Pug、CoffeeScript 等預處理器或需編譯內容時，通常都得透過自動化工具，如 Gulp、Grunt 等任務流程執行工具進行編譯處理，到了現在，Webpack 已逐漸取代這些工具，Webpack 本身提供許多強大的功能，包含現正熱門的 SPA (單頁式應用) 透過配置 loader 方式也能輕鬆應付。本篇將從 Webpack 運行原理開始做介紹，接著說明如何安裝 Webpack，最後透過打包方式產出我們的第一個 bundle.js 檔案。,
   ]
 categories: [Webpack]
 tags: [Webpack, Node.js, w3HexSchool]
@@ -12,15 +12,15 @@ updated: 2020-02-17 17:29:46
 
 ## 前言
 
-Webpack 可說是近年來最為熱門的技術，以往在編寫 ES6、Sass/SCSS、Pug、Vue、React 等預處理器或需編譯內容時，通常都得透過自動化工具，如 Gulp、Grunt 等任務流程執行工具進行編譯處理，到了現在，Webpack 已逐漸取代這些工具，Webpack 本身提供許多強大的功能，包含現正熱門的 SPA (單頁式應用) 透過配置 loader 方式也能輕鬆應付。本篇將從 Webpack 運行原理開始做介紹，接著說明如何安裝 Webpack，最後透過打包方式產出我們的第一個 bundle.js 檔案。
+Webpack 可說是近年來最為熱門的技術，以往在編寫 ES6、Sass/SCSS、Pug、CoffeeScript 等預處理器或需編譯內容時，通常都得透過自動化工具，如 Gulp、Grunt 等任務流程執行工具進行編譯處理，到了現在，Webpack 已逐漸取代這些工具，Webpack 本身提供許多強大的功能，包含現正熱門的 SPA (單頁式應用) 透過配置 loader 方式也能輕鬆應付。本篇將從 Webpack 運行原理開始做介紹，接著說明如何安裝 Webpack，最後透過打包方式產出我們的第一個 bundle.js 檔案。
 
 ## 筆記重點
 
 - Webpack 簡介
 - Webpack 安裝
 - Webpack 基本配置
-- Webpack 解析 - 指定運行環境
-- Webpack 解析 - 使用 ESM 模組規範
+- Webpack 額外說明 - 指定運行環境
+- Webpack 額外說明 - 使用 ESM 模組規範
 
 ## Webpack 簡介
 
@@ -156,9 +156,9 @@ $ npm run start
 
 ![console](https://i.imgur.com/dFTKYWQ.png)
 
-當出現以上結果，即代表成功打包了我們的第一個 JavaScript 檔案，這也就是 Webpack 整個的處理流程，是不是很容易？但這僅僅是 Webpack 的冰山一角，我們可以透過其他配置來完成更為進階的操作，讓我們先從運行環境開始說起。
+當出現以上結果，即代表操作流程正確無誤，同時也恭喜你成功打包了第一個項目，這也就是 Webpack 整個的處理流程，是不是很容易？但這僅僅是 Webpack 的冰山一角，我們可以透過其他配置來完成更為進階的操作，讓我們先從運行環境開始說起。
 
-## Webpack 解析 - 指定運行環境
+## Webpack 額外說明 - 指定運行環境
 
 在前面的 `package.json` 中，我們新增了以下的編譯指令：
 
@@ -182,7 +182,7 @@ $ npm run start
 
 執行 `npm run start` 指令並察看結果：
 
-![webpack運行環境](https://i.imgur.com/ruCiiGb.png)
+![webpack運行環境](https://i.imgur.com/S1c5Rok.png)
 
 你會發現 Webpack 雖然編譯成功，但跳出了相關的警告，警告內容為提醒你尚未配置 mode 選項，預設將以 production 為運行環境，此時觀察 `dist/bundle.js` 檔案，你會發現全部 JavaScript 都已被壓縮，這個概念就類似於使用 Uglify 套件進行壓縮，**Webpack 本身以集成壓縮相關套件**，在我們執行編譯命令時，可加入 mode 選項，指定當前的編譯環境並觸發相關的優化，以下為可選的項目：
 
@@ -213,5 +213,28 @@ module.exports = {
 
 經過了以上介紹，你會發現 Webpack 本身以集成了許多功能，以往在使用 Gulp 時，都必須倚賴相關套件才能達到相同效果，Webpack 把這些使用頻率較高的套件集成在自己身上，透過簡單配置，即可達到相同效益，非常的方便。
 
-## Webpack 解析 - 使用 ESM 模組規範
+## Webpack 額外說明 - 使用 ESM 模組規範
 
+以往在開發 Gulp 時，都只能使用 CommonJS 模組規範相關語法做撰寫，當然你也可以使用 `gulpfile.babel.js` 並導入 Babel 做撰寫，但你不會覺得這樣有點太麻煩了嗎？ESM 規範語法確實好用，但兼容性問題未解決之前，一切真的都免談。基於 Webpack 本身就是以模組為核心，他很完美的整合了各式的模組規範，你不需要載入任何的套件，照正常編寫即可，以下為 ES6 Modules 範例：
+
+請先新增 `src/js/module.js` 檔案並輸入以下內容：
+
+```js
+export default () => {
+  console.log('Hello World');
+};
+```
+
+在 entry 入口處引入模組：
+
+```js
+import fun from './js/module';
+
+fun();
+```
+
+執行 `npm run start` 進行打包並觀察引入後 Console 結果：
+
+![基於 Webpack 的 ESM 示範](https://i.imgur.com/QMSUbjr.png)
+
+當出現以上結果及代表編譯成功，我們沒有進行任何配置，就只是單純的使用 ESM 規範語法而已，這也是 Webpack 的其中一個特點，**在 entry 入口處的任意檔案能夠隨意使用任何模組規範**，透過 Webpack 解析模組間的相互依賴關係，最後打包成靜態檔案，當瀏覽器引入時也不存在兼容性等問題。
