@@ -19,6 +19,8 @@ Webpack 可說是近年來最為熱門的技術，以往在編寫 ES6、Sass/SCS
 - Webpack 簡介
 - Webpack 安裝
 - Webpack 基本配置
+- Webpack 解析 - 指定運行環境
+- Webpack 解析 - 使用 ESM 模組規範
 
 ## Webpack 簡介
 
@@ -73,7 +75,7 @@ $ npm init -y
 $ npm install webpack webpack-cli -D
 ```
 
-這邊要注意的是 Webpack 4 把以往都綁在 Webpack 內的 Webpack-CLI 挪出來另外安裝，所以除了安裝 Webpack 外還要記得安裝 Webpack-CLI。且由於 Webpack 不像是 Gulp 需要指定編譯內容，所以我們可將 Webpack 安裝在區域環境，並透過 npm script 執行即可，官方也推薦此做法。
+這邊要注意的是 Webpack 4 把以往都綁在 Webpack 內的 Webpack-CLI 挪出來另外安裝，所以除了安裝 Webpack 外還要記得安裝 Webpack-CLI。且由於 Webpack 不像是 Gulp 需要指定編譯內容，所以我們可將 Webpack 安裝在專案環境，並透過 npm script 執行即可，官方也推薦此做法。
 
 ## Webpack 基本配置
 
@@ -127,11 +129,11 @@ console.log('Hello ' + myName);
 
 至 `package.json` 新增編譯指令：
 
-```js
+```json
 {
   "scripts": {
-    "start":"webpack --mode development"
-  },
+    "start": "webpack --mode development"
+  }
 }
 ```
 
@@ -154,5 +156,62 @@ $ npm run start
 
 ![console](https://i.imgur.com/dFTKYWQ.png)
 
-當出現以上結果，即代表編譯成功，這也就是 Webpack 整個的處理流程，是不是很容易？但這僅僅是 Webpack 的冰山一角，我們可以透過其他配置來完成更為進階的操作，讓我們先從運行環境開始說起。
+當出現以上結果，即代表成功打包了我們的第一個 JavaScript 檔案，這也就是 Webpack 整個的處理流程，是不是很容易？但這僅僅是 Webpack 的冰山一角，我們可以透過其他配置來完成更為進階的操作，讓我們先從運行環境開始說起。
+
+## Webpack 解析 - 指定運行環境
+
+在前面的 `package.json` 中，我們新增了以下的編譯指令：
+
+```json
+{
+  "scripts": {
+    "start": "webpack --mode development"
+  }
+}
+```
+
+事實上，這道命令驅動了 Webpack 在 development 環境執行編譯，我們可以嘗試把 `--mode development` 拿掉，如下所示：
+
+```json
+{
+  "scripts": {
+    "start": "webpack"
+  }
+}
+```
+
+執行 `npm run start` 指令並察看結果：
+
+![webpack運行環境](https://i.imgur.com/ruCiiGb.png)
+
+你會發現 Webpack 雖然編譯成功，但跳出了相關的警告，警告內容為提醒你尚未配置 mode 選項，預設將以 production 為運行環境，此時觀察 `dist/bundle.js` 檔案，你會發現全部 JavaScript 都已被壓縮，這個概念就類似於使用 Uglify 套件進行壓縮，**Webpack 本身以集成壓縮相關套件**，在我們執行編譯命令時，可加入 mode 選項，指定當前的編譯環境並觸發相關的優化，以下為可選的項目：
+
+- development：指定為開發環境(未壓縮代碼)
+- production：指定為生產環境(壓縮代碼)
+- none：退出任何默認優化選項
+
+根據 [官方文件](https://webpack.js.org/configuration/mode/) 顯示，如果沒有指定當前環境，Webpack 會將 `mode` 選項設置為 `production` 環境，也就是默認選項。
+
+CLI 命令傳遞 `mode` 選項：
+
+```json
+{
+  "scripts": {
+    "start": "webpack --mode development"
+  }
+}
+```
+
+相當於在 `webpack.config.js` 中設置 `mode` 選項：
+
+```js
+module.exports = {
+  mode: 'development',
+  // 以下省略 ...
+};
+```
+
+經過了以上介紹，你會發現 Webpack 本身以集成了許多功能，以往在使用 Gulp 時，都必須倚賴相關套件才能達到相同效果，Webpack 把這些使用頻率較高的套件集成在自己身上，透過簡單配置，即可達到相同效益，非常的方便。
+
+## Webpack 解析 - 使用 ESM 模組規範
 
