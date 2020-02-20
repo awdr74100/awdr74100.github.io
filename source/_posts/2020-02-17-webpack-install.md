@@ -21,6 +21,7 @@ Webpack 可說是近年來最為熱門的技術，以往在編寫 ES6、Sass/SCS
 - Webpack 基本配置
 - Webpack 額外說明 - 指定運行環境
 - Webpack 額外說明 - 使用 ESM 模組規範
+- Webpack 額外說明 - 多個入口起點
 
 ## Webpack 簡介
 
@@ -120,7 +121,7 @@ module.exports = {
     - `path.resolve(...)`：c:\Users\blue\Desktop\webpack-demo\dist
   - **filename**：打包後的 JavaScript 檔案名稱，你也可以這樣寫 `js/bundle.js`
 
-entry 檔案鍵入以下內容：
+entry 入口處 (`src/main.js`) 鍵入以下內容：
 
 ```js
 const myName = 'Roya';
@@ -238,3 +239,65 @@ fun();
 ![基於 Webpack 的 ESM 示範](https://i.imgur.com/QMSUbjr.png)
 
 當出現以上結果及代表編譯成功，我們沒有進行任何配置，就只是單純的使用 ESM 規範語法而已，這也是 Webpack 的其中一個特點，**在 entry 入口處的任意檔案能夠隨意使用任何模組規範**，透過 Webpack 解析模組間的相互依賴關係，最後打包成靜態檔案，當瀏覽器引入時也不存在兼容性等問題。
+
+## Webpack 額外說明 - 多個入口起點
+
+上面所講述的，都是以單個頁面，也就是單個 `index.html` 為主，但有時我們會需要開發多個頁面的網站，這時該怎麼配置 Webpack 呢？請先在 `src` 資料夾建立以下所需檔案：
+
+```plain
+webpack-demo/
+|
+| - src/
+|   | - main.js         # entry 入口檔案(1)
+|   | - about.js        # entry 入口檔案(2)
+```
+
+至 `webpack.config.js` 進行配置：
+
+```js
+const path = require('path');
+
+module.exports = {
+  entry: {
+    main: './src/main.js',
+    about: './src/about.js',
+  },
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: '[name].js',
+  },
+};
+```
+
+事實上，entry 入口處除了以字串型式宣告入口文件路徑外，還能夠以物件的方式進行傳遞，如上面範例所示，且傳統我們會稱 `entry.main`、`entry.about` 為物件的 "key"，在 Webpack 中稱之為 "chunk"，而一個 "chunk" 對應一個 entry 入口文件路徑，這樣子的型式稱之為多入口文件，最後 output 時也會各自打包成獨立的 JavaScript 檔案，最後要注意的是 `output.filename` 中檔案名稱的寫法，等等會再作解釋，讓我們先執行 `npm run start` 編譯看看：
+
+![webpack result](https://i.imgur.com/12r89pn.png)
+
+觀察打包後的 dist 資料夾，確實生成了 `about.js` 與 `main.js` 檔案，有別於以往寫死名稱的作法，使用 `[name]` 能夠依照 "chunk" 名稱命名打包後的檔案名稱，提供更大的彈性，這邊要注意是，**使用多文件入口時，千萬不能把 filename 寫死，會發生打包後名稱相同問題，導致編譯失敗**。讓我們來看其他 `[name]` 的範例：
+
+```js
+const path = require('path');
+
+module.exports = {
+  entry: './src/about.js',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: '[name].js',
+  },
+};
+```
+
+上面為單個 entry 並搭配 `[name]` 的範例，我們並沒有使用物件方式配置 "chunk"，此時打包過後的檔案名稱是什麼呢？答案為 `main.js`，**其實使用字串方式宣告 entry 單入口文件路徑，等同於下面的寫法**：
+
+```js
+const path = require('path');
+
+module.exports = {
+  entry: {
+    main: './src/about.js',
+  },
+  // 以下省略 ...
+};
+```
+
+除了 `[name]` 用法以外，Webpack 還提供了很多類似用法，詳細可看 [這邊](https://webpack.js.org/configuration/output/#outputfilename)，以上就是 Webpack 多個入口起點該如何配置的簡單介紹。
