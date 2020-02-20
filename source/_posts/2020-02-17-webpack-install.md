@@ -25,7 +25,7 @@ Webpack 可說是近年來最為熱門的技術，以往在編寫 ES6、Sass/SCS
 
 ## Webpack 簡介
 
-![Webpack 介紹](https://img.magiclen.org/albums/webpack/shot-01.png)
+![Webpack 介紹](https://i.imgur.com/KznxzWD.png)
 
 Webpack 本身是一個開源的 JavaScript 模組打包工具，提供了前端缺乏的模組化開發方式，將各種靜態資源視為模組，當執行相關命令進行編譯時，將依 `webpack.config.js` 配置檔案執行優化並將其 entry 檔案打包成單個 JavaScript 檔案。
 
