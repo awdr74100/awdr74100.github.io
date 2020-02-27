@@ -90,7 +90,7 @@ webpack-demo/
 | - src/
 |   | - main.js         # entry 入口檔案
 |
-| - webpack.config.js   # webpack 配置檔案
+| - webpack.config.js   # Webpack 配置檔案
 | - package-lock.json
 | - package.json        # 已安裝 webpack、webpack-cli
 ```
@@ -149,8 +149,10 @@ $ npm run start
 新增 `./index.html` 並引入打包而成的 `bundle.js` 檔案：
 
 ```html
-<!-- 其他省略... -->
-<script src="dist/bundle.js"></script>
+<!-- 其他省略 -->
+<body>
+  <script src="dist/bundle.js"></script>
+</body>
 ```
 
 觀察 Console 結果：
