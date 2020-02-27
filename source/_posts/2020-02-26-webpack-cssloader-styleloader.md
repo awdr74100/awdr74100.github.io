@@ -268,11 +268,11 @@ module.exports = {
 
 當我們使用 style-loader 時，即代表是使用非獨立 CSS 的方式完成取用，但這有違一般開發的習慣，我們通常都是將 JavaScript、CSS 獨立抽取成單獨的檔案，並且利用 `<script>`、`<link>` 來引入檔案，我不能說單獨把 CSS 抽取成獨立檔案絕對是對的，以下是我對兩種方式的看法：
 
-|       獨立 CSS - `<link>` 引用        | 沒有獨立 CSS - `<style>` 撰寫 |
-| :----------------------------------: | :--------------------------: |
-| 減少 style 標籤 (舊版本的 IE 有限制) |     減少額外的 HTTP 請求     |
-|        獨立 CSS 較為方便修改         |     減少多餘的 CSS 檔案      |
-|  CSS 與 JS 並行加載，將提高載入速度  |   組件化更加乾淨的專案架構   |
-|            瀏覽器緩存機制            |              無              |
+|       獨立 CSS - `<link>` 引用       | 沒有獨立 CSS - `<style>` 撰寫 |
+| :----------------------------------: | :---------------------------: |
+| 減少 style 標籤 (舊版本的 IE 有限制) |     減少額外的 HTTP 請求      |
+|        獨立 CSS 較為方便修改         |      減少多餘的 CSS 檔案      |
+|  CSS 與 JS 並行加載，將提高載入速度  |   組件化更加乾淨的專案架構    |
+|            瀏覽器緩存機制            |              無               |
 
 針對以上兩種取用方法，Webpack 都有提供各自的套件，比如說 `<style>` 取用就是使用本文章所介紹的 [style-loader](https://github.com/webpack-contrib/style-loader)，而 `<link>` 引用則是使用 [mini-css-extract-plugin](https://github.com/webpack-contrib/mini-css-extract-plugin)，關於 mini-css-extract-plugin 的使用方式將會在下一篇文章獨立做介紹，歡迎有興趣的人前去觀看。
