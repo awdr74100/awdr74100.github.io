@@ -19,7 +19,7 @@ updated: 2020-02-28 02:12:58
 - css-loader 與 style-loader 安裝
 - css-loader 與 style-loader 基本使用
 - css-loader 與 style-loader 可傳遞選項
-- 補充：配置 loader 的另一種方式
+- 補充：loader 屬性的簡寫方式
 - 補充：獨立 CSS 與 非獨立 CSS 差別
 
 ## css-loader 與 style-loader 安裝
@@ -90,6 +90,13 @@ module.exports = {
   },
 };
 ```
+
+配置 loader 其實很簡單，先前已經有介紹過 **entry** 與 **output** 選項，這次來介紹另一個也很重要的屬性，也就是 module 屬性，用以配置 loader 的處理方式：
+
+- **module**：配置選項決定如何處理[不同類型的模組](https://webpack.docschina.org/concepts/modules)
+  - **rules**：創建模組時，匹配請求的規則數組
+    - **test**：查找符合 Regex (正規表達式) 副檔名的模組，如符合即使用 use 內指定的 loader
+    - **use**：定義需加載的 loader，可接受字串陣列或物件陣列傳遞。加載是由右到左依序作用
 
 entry 入口處 (`src/main.js`) 引入 CSS 檔案：
 
@@ -197,7 +204,7 @@ module.exports = {
 };
 ```
 
-## 補充：配置 loader 的另一種方式
+## 補充：loader 屬性的簡寫方式
 
 在上面配置 loader 的教學中，我們都是字串陣列的方式取用 loader，如下所示：
 
