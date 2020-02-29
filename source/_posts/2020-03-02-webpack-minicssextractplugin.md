@@ -34,6 +34,8 @@ $ npm install mini-css-extract-plugin -D
 
 ## mini-css-extract-plugin 基本使用
 
+<div class="note warning">此次範例會搭配 css-loader 一起使用，相關文章連結：<a href="https://awdr74100.github.io/2020-02-26-webpack-cssloader-styleloader/" target="_blank">css-loader</a></div>
+
 初始專案結構：
 
 ```plain
@@ -72,6 +74,7 @@ module.exports = {
   entry: './src/main.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
+    filename: 'bundle.js',
   },
   module: {
     rules: [
@@ -130,7 +133,7 @@ $ npm run build
 
 ![mini-css-extract-plugin 結果](https://i.imgur.com/Xhtm59r.png)
 
-是不是一切都正常多了？相比於使用 style-loader 將 CSS 注入到 HTML，我更喜歡使用 mini-css-extract-plugin 將 CSS 給獨立抽取出來，我相信這應該也是大多人開發的習慣，這邊還有一點要注意，CSS 檔案目前是生成在與 bundle.js 同一個階層目錄，我自己是習慣將 CSS 放置在自己的資料夾，這點在後面會在說明。
+是不是一切都正常多了？相比於使用 style-loader 將 CSS 注入到 HTML，我更喜歡使用 mini-css-extract-plugin 將 CSS 給獨立抽取出來，我相信這應該也是大多人開發的習慣，這邊還有一點要注意，CSS 檔案目前是生成在與 bundle.js 同一個階層目錄，我自己是習慣將 CSS 放置在各自的資料夾，這點在後面會在補充說明。
 
 ## mini-css-extract-plugin 可傳遞選項
 
@@ -166,6 +169,69 @@ module.exports = {
 };
 ```
 
-
 ## 補充：更改 CSS 檔案生成路徑
 
+以往我們在開發網頁時，習慣將各個語言放置在屬於自己資料夾，方便辨識之外，也有避免檔案過大等問題，但在初期配置 Webpack 時，你會發現 output 的檔案全部都生成在 `dist` 目錄階層下，相比於 Gulp ，簡單修改 `gulp.dest()` 即可更改放置目錄，Webpack 配置方式差不多，但可能有些小陷阱需要特別注意，先讓我們來看之前曾提過的 `bundle.js` 生成路徑修改範例：
+
+```js
+module.exports = {
+  entry: './src/main.js',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    // 把它想像成 gulp.dest(...)
+    filename: 'js/bundle.js',
+  },
+};
+```
+
+從上面範例可以看出，只需要修改 output 內的 `filename` 選項，即可將生成路徑做對應的修改，此時打包後的 `dist` 資料夾結構如下：
+
+```plain
+webpack-demo/
+|
+| - dist/
+|   | - js/
+|       | - bundle.js     # 打包生成的 JavaScrit 檔案
+```
+
+這邊千萬要注意，**修改路徑並不是修改 output 內的 path 選項**，這會導致所有的 loader 或 plugin 都得做相對應的修改，變得非常的麻煩！讓我們來看 mini-css-extract-plugin 該如何與上面範例一樣修改檔案生成路徑：
+
+```js
+const path = require('path');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+
+module.exports = {
+  entry: './src/main.js',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'js/bundle.js',
+  },
+  module: {
+    rules: [
+      {
+        test: /\.css$/i,
+        use: [MiniCssExtractPlugin.loader, 'css-loader'],
+      },
+    ],
+  },
+  plugins: [
+    new MiniCssExtractPlugin({
+      // 把它想像成 gulp.dest(...)
+      filename: 'css/[name].[hash:7].css',
+    }),
+  ],
+};
+```
+
+在每一個 plugin 中，都可以傳遞一個物件，而這一個物件可以配置 `filename`、`chunkFilename` 等屬性，配置原理如同 output 內的 `filename` 選項，同時也可以使用 output.filename 的模板字串，詳情可參考 [這裡](https://webpack.js.org/configuration/output/#template-strings)，此時打包後的 `dist` 資料夾結構如下：
+
+```plain
+webpack-demo/
+|
+| - dist/
+|   | - js/
+|       | - bundle.js     # 打包生成的 JavaScrit 檔案
+|
+|   | - css/
+|       | - main.???.css  # 打包生成的 CSS 檔案
+```
