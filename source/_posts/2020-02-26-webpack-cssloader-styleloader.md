@@ -91,7 +91,7 @@ module.exports = {
 };
 ```
 
-配置 loader 其實很簡單，先前已經有介紹過 **entry** 與 **output** 選項，這次來介紹另一個也很重要的屬性，也就是 module 屬性，用以配置 loader 的處理方式：
+配置 loader 其實很簡單，先前已經有介紹過 **entry** 與 **output** 選項，這次來介紹另一個也很重要的屬性，也就是 `module` 屬性，用以配置 loader 的處理方式：
 
 - **module**：配置選項決定如何處理[不同類型的模組](https://webpack.docschina.org/concepts/modules)
   - **rules**：創建模組時，匹配請求的規則數組
@@ -126,6 +126,7 @@ $ npm run build
 <!-- 其他省略 -->
 <body>
   <h1 class="text-primary">Hello World</h1>
+  <!-- 引入打包生成的 JavaScript -->
   <script src="dist/bundle.js"></script>
 </body>
 ```
