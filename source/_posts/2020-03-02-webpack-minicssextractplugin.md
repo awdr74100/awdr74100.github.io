@@ -217,7 +217,7 @@ module.exports = {
   plugins: [
     new MiniCssExtractPlugin({
       // 把它想像成 gulp.dest(...)
-      filename: 'css/[name].[hash:7].css',
+      filename: 'css/[name].[hash:3].css',
     }),
   ],
 };
