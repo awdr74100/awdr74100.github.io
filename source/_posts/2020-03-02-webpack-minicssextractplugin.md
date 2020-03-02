@@ -19,6 +19,7 @@ updated: 2020-03-02 15:15:50
 - mini-css-extract-plugin 安裝
 - mini-css-extract-plugin 基本使用
 - mini-css-extract-plugin 可傳遞選項
+- 補充：
 - 補充：更改 CSS 檔案生成路徑
 - 補充：publicPath 修改目標公共路徑
 
@@ -236,6 +237,4 @@ webpack-demo/
 |       | - main.???.css  # 打包生成的 CSS 檔案
 ```
 
-事實上，大部分的 loader 或 plugin 都可以藉由修改 `filename` 更改打包後的生成路徑，唯一要注意的是，像 CSS 這種檔案，你可能會使用 `background-image: url("../..")` 來顯示圖片，這時候問題就來了，`filename` 的生成路徑並不會響應樣式表內的相對路徑，打包出來的結果也就變成找不到圖片，這時候就得依靠 publicPath 可傳遞選項修改公共路徑，修正打包後的相對路徑，這樣說起來可能有點複雜，讓我們繼續看下去。
-
-## 補充：publicPath 修改目標公共路徑
+事實上，大部分的 loader 或 plugin 都可以藉由修改 `filename` 更改打包後的生成路徑，唯一要注意的是，像 CSS 這種檔案，你可能會使用 `background-image: url("../..")` 來載入圖片，這時問題就來了，`filename` 的生成路徑並不會響應樣式表內的相對路徑，打包出來的結果也就變成找不到圖片，這時候就得依靠 publicPath 可傳遞選項修改公共路徑，修正打包後的相對路徑，這樣說起來可能有點複雜，讓我們繼續往下看。
