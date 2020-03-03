@@ -7,7 +7,7 @@ description:
 categories: [Webpack]
 tags: [Webpack, Node.js, w3HexSchool]
 date: 2020-03-02 15:15:50
-updated: 2020-03-02 15:15:50
+updated: 2020-03-03 08:26:34
 ---
 
 ## 前言
@@ -174,7 +174,7 @@ module.exports = {
 
 ## background-image: url() 以相對路徑參考本地圖片時發生錯誤
 
-<div class="note warning">此章節會使用到 file-loader，由於目前還未曾介紹過此套件，建議讀者可先至相關連結閱讀其文章，再回來吸收本章節內容，效果可能會更好喔！本站文章連結：待補</div>
+<div class="note warning">此章節會使用到 file-loader，由於目前還未曾介紹過此套件，建議讀者可先至相關連結閱讀其文章，再回來吸收本章節內容，效果可能會更好喔！本站文章連結：file-loader</div>
 
 經過了上面的介紹，相信各位對使用 mini-css-extract-plugin 都有一定程度的了解，細心的朋友可能已經發現其中的問題了，那就是使用 `background-image: url()` 語法時，Webpack 打包會跳出錯誤，事實上，這個問題並不是歸咎於這一個語法，而是歸咎於使用相對路徑參考本地圖片，這邊要注意，是使用相對路徑參考，而不是使用絕對路徑參考，使用絕對路徑參考本地圖片是不會發生錯誤的，讓我們來探討這個問題該如何解決。
 
