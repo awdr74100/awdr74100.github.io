@@ -298,7 +298,7 @@ webpack-demo/
 }
 ```
 
-從上面結果可以得知，連同相對路徑也幫我們做了修正，這也是會什麼使用相對路徑參考本地圖片時，需要使用 file-loader 的原因，它會透過解析修正你的相對路徑，非常的方便，但這邊千萬要注意，**當你同時修改了 CSS 檔案的生成路徑，也務必要修改 mini-css-extract-plugin 的 publicPath 路徑**，這點在後面會有說明，讓我們先從更改檔案生成路徑開始做介紹。
+從上面結果可以得知，連同參考路徑也幫我們做了修正，這也是會什麼使用相對路徑參考本地圖片時，需要使用 file-loader 的原因，它會透過解析修正你的相對路徑，非常的方便，但這邊千萬要注意，**當你同時修改了 CSS 檔案的生成路徑，也務必要修改 mini-css-extract-plugin 的 publicPath 路徑**，這點在後面會有說明，讓我們先從更改檔案生成路徑開始做介紹。
 
 ## 補充：更改 CSS 檔案生成路徑
 
@@ -364,7 +364,192 @@ webpack-demo/
 |       | - bundle.js     # 打包生成的 JavaScrit 檔案
 |
 |   | - css/
-|       | - main.???.css  # 打包生成的 CSS 檔案
+|       | - main.18f.css  # 打包生成的 CSS 檔案
 ```
 
 事實上，大部分的 loader 或 plugin 都可以藉由修改 `filename` 更改打包後的生成路徑，唯一要注意的是，像 CSS 這種檔案，我們很常使用 `background-image: url("../..")` 來載入圖片，這時問題就來了，`filename` 的生成路徑並不會響應樣式表內的相對路徑，打包出來的結果也就變成找不到圖片，這時候就得依靠 publicPath 可傳遞選項修改公共路徑，修正打包後的相對路徑，這樣說起來可能有點複雜，讓我們繼續往下看。
+
+## 補充：publicPath 修改目標公共路徑
+
+讓我們結合以上所補充的兩點說明，此時 `webpack.config.js` 檔案配置如下：
+
+```js
+const path = require('path');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+
+module.exports = {
+  entry: './src/main.js',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'js/bundle.js', // 修改生成路徑
+  },
+  module: {
+    rules: [
+      {
+        test: /\.css$/i,
+        use: [MiniCssExtractPlugin.loader, 'css-loader'],
+      },
+      {
+        test: /\.(png|jpg|gif)$/i,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: 'img/[name].[ext]', // 修改生成路徑
+            },
+          },
+        ],
+      },
+    ],
+  },
+  plugins: [
+    new MiniCssExtractPlugin({
+      filename: 'css/[name].css', // 修改生成路徑
+    }),
+  ],
+};
+```
+
+這邊要注意 file-loader 的可傳遞選項 `name` 的寫法，這樣子的寫法相較於使用 `outputPath` 選項，我更推薦使用此種寫法，此時打包後的 `dist` 資料夾結構如下：
+
+```plain
+webpack-demo/
+|
+| - dist/
+|   | - js/
+|       | - bundle.js     # 打包生成的 JavaScrit 檔案
+|
+|   | - css/
+|       | - main.css      # 打包生成的 CSS 檔案
+|
+|   | - img
+|       | - test.jpg      # 自動抓取並通過 file-loader 的圖片檔
+```
+
+**打包前**的 CSS 檔案：
+
+```css
+.bg-img {
+  background-image: url('../img/test.jpg');
+}
+```
+
+**打包後**的 CSS 檔案
+
+```css
+.bg-img {
+  background-image: url(img/test.jpg);
+}
+```
+
+圖片跑不出來！打包後的路徑怎會變成這樣呢？因為我們修改了 CSS 預設的檔案生成路徑，對於 file-loader 來說，CSS 的檔案生成路徑還是以 `dist` 目錄下為主，這也就導致了圖片找不到的問題，解決方式也很簡單，主要有以下三種：
+
+- 使用 mini-css-extract-plugin 中的 `publicPath` 更改公共路徑 **(推薦)**：
+
+```js
+const path = require('path');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+
+module.exports = {
+  // 省略 ...
+  module: {
+    rules: [
+      {
+        test: /\.css$/i,
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              publicPath: '../', // 修改公共路徑
+            },
+          },
+          'css-loader',
+        ],
+      },
+      // 省略 ...
+    ],
+  },
+  plugins: [
+    new MiniCssExtractPlugin({
+      filename: 'css/[name].css',
+    }),
+  ],
+};
+```
+
+相對於使用其他方法，我自己是偏好這一個方法，你可以把 publicPath 想像成替所有參考圖片路徑增加一個前綴，由於我們更改了 CSS 檔案的生成路徑，也就是多新增了一層目錄放置檔案，相對的，publicPath 也必須往上一層去找檔案，此時打包後的 CSS 結果如下：
+
+```css
+.bg-img {
+  background-image: url(../img/test.jpg);
+}
+```
+
+---
+
+- 使用 Webpack 基本配置中的 `output.publicPath` 修改公共路徑：
+
+```js
+const path = require('path');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+
+module.exports = {
+  entry: './src/main.js',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'js/bundle.js',
+    publicPath: '/', // 修改公共路徑
+  },
+  // 省略 ...
+};
+```
+
+Webpack 中的 `output.publicPath` 選項，原理就如同 mini-css-extract-plugin 中的 `publicPath` 選項，一樣都是替資源中的相對路徑增加一個前綴，但與之不同的是，在 Webpack 中配置 publicPath 選項，會導致全域的修改，沒辦法像 mini-css-extract-plugin 獨立的配置，我自己是不太常用這一個方法，此時打包後的 CSS 結果如下：
+
+```css
+/* dist 目錄下 */
+.bg-img {
+  background-image: url(/img/test.jpg);
+}
+```
+
+---
+
+- 使用 file-loader 中的 `publicPath` 修改公共路徑：
+
+```js
+const path = require('path');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+
+module.exports = {
+  // 省略 ...
+  module: {
+    rules: [
+      // 省略
+      {
+        test: /\.(png|jpg|gif)$/i,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: 'img/[name].[ext]',
+              publicPath: '../', // 修改公共路徑
+            },
+          },
+        ],
+      },
+    ],
+  },
+  // 省略 ...
+};
+```
+
+file-loader 的 publicPath 選項，原理如同前面兩個，但它是針對所有通過 file-loader 的檔案進行配置，有時候某些 JavaScript 會引入需通過 file-loader 的檔案，這時候 publicPath 的路徑配置可能會跟 CSS 有些衝突，除非 file-loader 就只是用來處理圖片資源，不然不建議直接將 publicPath 設置在 file-loader， 此時打包後的 CSS 結果如下：
+
+```css
+.bg-img {
+  background-image: url(../img/test.jpg);
+}
+```
+
+以上三種方法都可以修正預設的引用路徑，使資源載入正確，到了這邊，問題通通都被解決了，這也是一開始我在學習時所遇到的坑，沒想到解決方式這麼簡單，推薦給大家。
