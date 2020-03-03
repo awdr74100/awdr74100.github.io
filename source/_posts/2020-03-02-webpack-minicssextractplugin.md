@@ -19,7 +19,7 @@ updated: 2020-03-02 15:15:50
 - mini-css-extract-plugin 安裝
 - mini-css-extract-plugin 基本使用
 - mini-css-extract-plugin 可傳遞選項
-- 補充：
+- 補充：background-image: url() 以相對路徑參考本地圖片時發生錯誤
 - 補充：更改 CSS 檔案生成路徑
 - 補充：publicPath 修改目標公共路徑
 
@@ -148,6 +148,8 @@ $ npm run build
 範例：
 
 ```js
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+
 module.exports = {
   // 其他省略
   module: {
@@ -169,6 +171,134 @@ module.exports = {
   plugins: [new MiniCssExtractPlugin()],
 };
 ```
+
+## background-image: url() 以相對路徑參考本地圖片時發生錯誤
+
+<div class="note warning">此章節會使用到 file-loader，由於目前還未曾介紹過此套件，建議讀者可先至相關連結閱讀其文章，再回來吸收本章節內容，效果可能會更好喔！本站文章連結：待補</div>
+
+經過了上面的介紹，相信各位對使用 mini-css-extract-plugin 都有一定程度的了解，細心的朋友可能已經發現其中的問題了，那就是使用 `background-image: url()` 語法時，Webpack 打包會跳出錯誤，事實上，這個問題並不是歸咎於這一個語法，而是歸咎於使用相對路徑參考本地圖片，這邊要注意，是使用相對路徑參考，而不是使用絕對路徑參考，使用絕對路徑參考本地圖片是不會發生錯誤的，讓我們來探討這個問題該如何解決。
+
+> 請先至 `src` 資料夾新增 `img` 資料夾並放入隨便一張圖片
+
+撰寫以**絕對路徑**參考本地圖片的 CSS 範例：
+
+```css
+.bg-img {
+  background-image: url('/src/img/test.jpg');
+}
+```
+
+執行編譯指令：
+
+```bash
+$ npm run build
+```
+
+成功編譯，打包後的 CSS 如下：
+
+```css
+.bg-img {
+  background-image: url('/src/img/test.jpg');
+}
+```
+
+從上面範例可以得知，使用絕對路徑方式參考本地圖片是不會發生任何錯誤的，但沒有人會使用這種方式參考圖片，主要原因為圖片並不會自動透過 Webpack 打包到 `dist` 資料夾，且最後生產環境是以 `dist` 資料夾為主，根本不存在 `src` 資料夾，這也就導致引入圖片失敗，故沒有人會使用絕對路徑來撰寫參考圖片，讓我們來看使用相對路徑的範例：
+
+撰寫以**相對路徑**參考本地圖片的 CSS 範例：
+
+```css
+.bg-img {
+  background-image: url('../img/test.jpg');
+}
+```
+
+執行編譯指令：
+
+```bash
+$ npm run build
+```
+
+編譯失敗，出現以下結果：
+
+![相對路徑參考本地圖片發生錯誤](https://i.imgur.com/NG2cD5C.png)
+
+簡單來講呢，就是 Webpack 會自動偵測 CSS 檔案內所參考的相對路徑圖片，並且把它轉換成 `require` 方式引用圖片，如下所示：
+
+```plain
+<!-- 遇到 -->
+background-image: url("test.jpg");
+
+<!-- 解析成 -->
+require("./test.jpg");
+```
+
+而為什麼會發生錯誤呢？原理如同之前所介紹的 Webpack 基礎知識，Webpack 本身只能處理 JavaScript 檔案，如果需要使用 CSS，就必須引入到 entry 內並配置 css-loader，而圖片檔則是依靠 url-loader 或 file-loader，這兩個 loader 就是專門用來處理圖片等類似檔案的，讓我們以 file-loader 來示範：
+
+```bash
+$ npm install file-loader -D
+```
+
+配置 `webpack.config.js` 檔案：
+
+```js
+const path = require('path');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+
+module.exports = {
+  entry: './src/main.js',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'bundle.js',
+  },
+  module: {
+    rules: [
+      {
+        test: /\.css$/i,
+        use: [MiniCssExtractPlugin.loader, 'css-loader'],
+      },
+      {
+        test: /\.(png|jpe?g|gif)$/i,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[name].[ext]',
+            },
+          },
+        ],
+      },
+    ],
+  },
+  plugins: [new MiniCssExtractPlugin()],
+};
+```
+
+關於 file-loader 的配置可至相關連結進行閱讀，這邊就不多加以說明，讓我們直接進行編譯看看：
+
+```bash
+$ npm run build
+```
+
+成功編譯！此時 `src` 資料夾內的圖片也通通打包進來了，以下為打包後的 `dist` 資料夾專案結構：
+
+```plain
+webpack-demo/
+|
+| - dist/
+|   | - bundle.js         # 打包生成的 JavaScrit 檔案
+|   | - main.css          # 打包生成的 CSS 檔案
+|   | - test.jpg          # 自動抓取並通過 file-loader 的圖片檔
+```
+
+觀察打包生成的 CSS 檔案：
+
+```css
+.bg-img {
+  background-image: url(test.jpg);
+}
+```
+
+從上面結果可以得知，連同相對路徑也幫我們做了修正，這也是會什麼使用相對路徑參考本地圖片時，需要使用 file-loader 的原因，它會透過解析修正你的相對路徑，非常的方便，但這邊千萬要注意，**當你同時修改了 CSS 檔案的生成路徑，也務必要修改 mini-css-extract-plugin 的 publicPath 路徑**，這點在後面會有說明，讓我們先從更改檔案生成路徑開始做介紹。
 
 ## 補充：更改 CSS 檔案生成路徑
 
@@ -224,7 +354,7 @@ module.exports = {
 };
 ```
 
-在每一個 plugin 中，都可以傳遞一個物件，而這一個物件可以配置 `filename`、`chunkFilename` 等屬性，配置原理如同 output 內的 `filename` 選項，同時也可以使用 output.filename 的模板字串，詳情可參考 [這裡](https://webpack.js.org/configuration/output/#template-strings)，此時打包後的 `dist` 資料夾結構如下：
+在每一個 plugin 中，都可以傳遞一個物件，而這一個物件可以配置 `filename`、`chunkFilename` 等屬性，配置原理如同 output 內的 `filename` 選項，同時也可以使用 `output.filename` 的模板字串，詳情可參考 [這裡](https://webpack.js.org/configuration/output/#template-strings)，此時打包後的 `dist` 資料夾結構如下：
 
 ```plain
 webpack-demo/
@@ -237,4 +367,4 @@ webpack-demo/
 |       | - main.???.css  # 打包生成的 CSS 檔案
 ```
 
-事實上，大部分的 loader 或 plugin 都可以藉由修改 `filename` 更改打包後的生成路徑，唯一要注意的是，像 CSS 這種檔案，你可能會使用 `background-image: url("../..")` 來載入圖片，這時問題就來了，`filename` 的生成路徑並不會響應樣式表內的相對路徑，打包出來的結果也就變成找不到圖片，這時候就得依靠 publicPath 可傳遞選項修改公共路徑，修正打包後的相對路徑，這樣說起來可能有點複雜，讓我們繼續往下看。
+事實上，大部分的 loader 或 plugin 都可以藉由修改 `filename` 更改打包後的生成路徑，唯一要注意的是，像 CSS 這種檔案，我們很常使用 `background-image: url("../..")` 來載入圖片，這時問題就來了，`filename` 的生成路徑並不會響應樣式表內的相對路徑，打包出來的結果也就變成找不到圖片，這時候就得依靠 publicPath 可傳遞選項修改公共路徑，修正打包後的相對路徑，這樣說起來可能有點複雜，讓我們繼續往下看。
