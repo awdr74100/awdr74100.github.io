@@ -50,7 +50,7 @@ webpack-demo/
 |
 |   | - main.js         # entry 入口檔案
 |
-| - index.html          # 引入 bundle.js 測試用檔案
+| - index.html          # 引入 bundle.js 與 main.css 測試用檔案
 | - webpack.config.js   # Webpack 配置檔案
 | - package-lock.json
 | - package.json        # 已安裝 webpack、webpack-cli、css-loader、mini-css-extract-plugin
@@ -60,7 +60,7 @@ webpack-demo/
 
 ```css
 .text-primary {
-  color: rgb(37, 37, 177);
+  color: #2525b1;
 }
 ```
 
@@ -126,13 +126,13 @@ $ npm run build
 <body>
   <h1 class="text-primary">Hello World</h1>
   <!-- 引入打包生成的 JavaScript -->
-  <script src="dist/main.js"></script>
+  <script src="dist/bundle.js"></script>
 </body>
 ```
 
 查看結果：
 
-![mini-css-extract-plugin 結果](https://i.imgur.com/Xhtm59r.png)
+![mini-css-extract-plugin 結果](https://i.imgur.com/8VdqkNr.png)
 
 是不是一切都正常多了？相比於使用 style-loader 將 CSS 注入到 HTML，我更喜歡使用 mini-css-extract-plugin 將 CSS 給獨立抽取出來，我相信這應該也是大多人開發的習慣，這邊還有一點要注意，CSS 檔案目前是生成在與 bundle.js 同一個階層目錄，我自己是習慣將 CSS 放置在各自的資料夾，這點在後面會在補充說明。
 
@@ -172,7 +172,7 @@ module.exports = {
 };
 ```
 
-## background-image: url() 以相對路徑參考本地圖片時發生錯誤
+## 補充：background-image: url() 以相對路徑參考本地圖片時發生錯誤
 
 <div class="note warning">此章節會使用到 file-loader，由於目前還未曾介紹過此套件，建議讀者可先至相關連結閱讀其文章，再回來吸收本章節內容，效果可能會更好喔！本站文章連結：file-loader</div>
 
