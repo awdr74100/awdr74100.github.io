@@ -210,7 +210,6 @@ CLI 命令傳遞 `mode` 選項：
 ```js
 module.exports = {
   mode: 'development',
-  // 以下省略 ...
 };
 ```
 
@@ -298,7 +297,6 @@ module.exports = {
   entry: {
     main: './src/about.js',
   },
-  // 以下省略 ...
 };
 ```
 

@@ -19,6 +19,7 @@ updated: 2020-03-04 15:25:06
 - sass-loader 安裝
 - sass-loader 基本使用
 - sass-loader 可傳遞選項
+- 補充：Dart Sass 與 Node Sass
 
 ## sass-loader 安裝
 
@@ -144,3 +145,94 @@ $ npm run build
 ## sass-loader 可傳遞選項
 
 可參考 [sass-loader Options](https://github.com/webpack-contrib/sass-loader#options) 可傳遞參數列表，以下為常用的參數配置：
+
+- sassOptions：`Object` | `Function`
+  [Node Sass](https://github.com/sass/node-sass/#options) 或 [Dart Sass](https://github.com/sass/dart-sass#javascript-api) 可傳遞的選項，預設為 `none`
+
+範例：
+
+```js
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.s[ac]ss$/i,
+        use: [
+          MiniCssExtractPlugin.loader,
+          'css-loader',
+          {
+            loader: 'sass-loader',
+            options: {
+              sassOptions: {
+                outputStyle: 'compressed', // Node Sass 的可傳遞選項
+              },
+            },
+          },
+        ],
+      },
+    ],
+  },
+};
+```
+
+## 補充：Dart Sass 與 Node Sass
+
+<div class="note warning">Dart Sass 與 Node Sass 都屬於 Sass 的編譯器，Dart Sass 具備編譯輸出為 JavaScript 的能力，目前為 Sass 的主要開發對象，這也代表各種新功能將優先引入；Node Sass 底層使用的是 LibSass，基於 C/C++ 編寫，這使其編譯速度快過 Dart Sass；對於一般開發建議使用 Node Sass，如有新功能的需求，可使用 Dart Sass。</div>
+
+在 sass-loader 中，與之前介紹的 gulp-sass 使用 Dart Sass 有所不同。sass-loader 在默認情況下，是以 `package.json` 中的依賴關係判定當下所需使用的編譯器，如下範例：
+
+使用 Node Sass 編譯器：
+
+```bash
+$ npm install node-sass -D
+```
+
+```json
+{
+  "devDependencies": {
+    "sass-loader": "^8.0.2",
+    "node-sass": "^4.13.1" // 只存在 node-sass
+  }
+}
+```
+
+使用 Dart Sass 編譯器：
+
+```bash
+$ npm install sass -D
+```
+
+```json
+{
+  "devDependencies": {
+    "sass-loader": "^8.0.2",
+    "sass": "^1.26.2" // 只存在 sass (dart-sass)
+  }
+}
+```
+
+從上面示例可以看出，sass-loader 是依造你當前環境唯一的編譯器做使用，如果只存在哪個編譯器就直接使用它，可能會有人問，那如果同時存在兩個編譯器呢？這種情況的話，sass-loader 默認會使用 node-sass，這也是當你安裝 sass-loader 且沒有安裝任何編譯器時，如果直接進行編譯的話，會跳出安裝 node-sass 的提示。
+
+sass-loader 也提供了一種 `implementation` 選項，用來使在同時安裝 node-sass 與 dart-sass 編譯器情況下，強制切換成需要的編譯器，如下範例：
+
+```js
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.s[ac]ss$/i,
+        use: [
+          MiniCssExtractPlugin.loader,
+          'css-loader',
+          {
+            loader: 'sass-loader',
+            options: {
+              implementation: require('sass'), // 強制使用 dart-sass 編譯器
+            },
+          },
+        ],
+      },
+    ],
+  },
+};
+```

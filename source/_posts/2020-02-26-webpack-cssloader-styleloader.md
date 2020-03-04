@@ -148,7 +148,6 @@ $ npm run build
 
 ```js
 module.exports = {
-  // 其他省略
   module: {
     rules: [
       {
@@ -182,7 +181,6 @@ module.exports = {
 
 ```js
 module.exports = {
-  // 其他省略
   module: {
     rules: [
       {
@@ -211,7 +209,6 @@ module.exports = {
 
 ```js
 module.exports = {
-  // 其他省略
   module: {
     rules: [
       {
@@ -227,7 +224,6 @@ module.exports = {
 
 ```js
 module.exports = {
-  // 其他省略
   module: {
     rules: [
       {
@@ -250,7 +246,6 @@ module.exports = {
 
 ```js
 module.exports = {
-  // 其他省略
   module: {
     rules: [
       {

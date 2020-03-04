@@ -151,7 +151,6 @@ $ npm run build
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
-  // 其他省略
   module: {
     rules: [
       {
@@ -451,7 +450,6 @@ const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
-  // 省略 ...
   module: {
     rules: [
       {
@@ -466,7 +464,6 @@ module.exports = {
           'css-loader',
         ],
       },
-      // 省略 ...
     ],
   },
   plugins: [
@@ -500,7 +497,6 @@ module.exports = {
     filename: 'js/bundle.js',
     publicPath: '/', // 修改公共路徑
   },
-  // 省略 ...
 };
 ```
 
@@ -522,10 +518,8 @@ const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
-  // 省略 ...
   module: {
     rules: [
-      // 省略
       {
         test: /\.(png|jpg|gif)$/i,
         use: [
@@ -540,7 +534,6 @@ module.exports = {
       },
     ],
   },
-  // 省略 ...
 };
 ```
 
