@@ -23,7 +23,7 @@ updated: 2020-03-04 15:25:06
 
 ## sass-loader 安裝
 
-> 套件連結：[sass-loader](https://github.com/webpack-contrib/sass-loader)
+> 套件連結：[sass-loader](https://github.com/webpack-contrib/sass-loader)、[css-loader](https://github.com/webpack-contrib/css-loader)、[mini-css-extract-plugin](https://github.com/webpack-contrib/mini-css-extract-plugin)
 
 sass-loader：
 
@@ -31,7 +31,7 @@ sass-loader：
 $ npm install sass-loader node-sass -D
 ```
 
-other：
+require：
 
 ```bash
 $ npm install css-loader mini-css-extract-plugin -D
@@ -88,7 +88,7 @@ module.exports = {
     rules: [
       {
         test: /\.s[ac]ss$/i,
-        // 把 sass-loader 放在最後一個
+        // 把 sass-loader 放在首要處理 (第一步)
         use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
       },
     ],
@@ -147,7 +147,7 @@ $ npm run build
 可參考 [sass-loader Options](https://github.com/webpack-contrib/sass-loader#options) 可傳遞參數列表，以下為常用的參數配置：
 
 - sassOptions：`Object` | `Function`
-  [Node Sass](https://github.com/sass/node-sass/#options) 或 [Dart Sass](https://github.com/sass/dart-sass#javascript-api) 可傳遞的選項，預設為 `none`
+  [Node Sass](https://github.com/sass/node-sass/#options) 或 [Dart Sass](https://github.com/sass/dart-sass#javascript-api) 的可傳遞的選項，預設為 `none`
 
 範例：
 
@@ -211,7 +211,7 @@ $ npm install sass -D
 }
 ```
 
-從上面示例可以看出，sass-loader 是依造你當前環境唯一的編譯器做使用，如果只存在哪個編譯器就直接使用它，可能會有人問，那如果同時存在兩個編譯器呢？這種情況的話，sass-loader 默認會使用 node-sass，這也是當你安裝 sass-loader 且沒有安裝任何編譯器時，如果直接進行編譯的話，會跳出安裝 node-sass 的提示。
+從上面示例可以看出，**sass-loader 是依造你當前環境唯一的編譯器做使用，不需要進行任何配置**，如果只存在哪個編譯器就直接使用它，可能會有人問，那如果同時存在兩個編譯器呢？這種情況的話，sass-loader 默認會使用 node-sass，這也是當你安裝 sass-loader 且沒有安裝任何編譯器時，如果直接進行編譯的話，會跳出安裝 node-sass 的提示。
 
 sass-loader 也提供了一種 `implementation` 選項，用來使在同時安裝 node-sass 與 dart-sass 編譯器情況下，強制切換成需要的編譯器，如下範例：
 

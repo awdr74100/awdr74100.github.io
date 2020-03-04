@@ -25,10 +25,18 @@ updated: 2020-03-03 08:26:34
 
 ## mini-css-extract-plugin 安裝
 
-> 套件連結：[mini-css-extract-plugin](https://github.com/webpack-contrib/mini-css-extract-plugin)
+> 套件連結：[mini-css-extract-plugin](https://github.com/webpack-contrib/mini-css-extract-plugin)、[css-loader](https://github.com/webpack-contrib/css-loader)
+
+mini-css-extract-plugin：
 
 ```bash
 $ npm install mini-css-extract-plugin -D
+```
+
+require：
+
+```bash
+$ npm install css-loader -D
 ```
 
 這邊要注意的是 mini-css-extract-plugin 是屬於 Webpack 的 Plugin，主要為 style-loader 的另一種類型套件，你可以不用下載 style-loader，但主要編譯還是得依靠 css-loader，也就是說 mini-css-extract-plugin 與 css-loader 都必須進行安裝。
@@ -443,7 +451,7 @@ webpack-demo/
 
 圖片跑不出來！打包後的路徑怎會變成這樣呢？因為我們修改了 CSS 預設的檔案生成路徑，對於 file-loader 來說，CSS 的檔案生成路徑還是以 `dist` 目錄下為主，這也就導致了圖片找不到的問題，解決方式也很簡單，主要有以下三種：
 
-- 使用 mini-css-extract-plugin 中的 `publicPath` 更改公共路徑 **(推薦)**：
+1. 使用 mini-css-extract-plugin 中的 `publicPath` 更改公共路徑 **(推薦)**：
 
 ```js
 const path = require('path');
@@ -484,7 +492,7 @@ module.exports = {
 
 ---
 
-- 使用 Webpack 基本配置中的 `output.publicPath` 修改公共路徑：
+2. 使用 Webpack 基本配置中的 `output.publicPath` 修改公共路徑：
 
 ```js
 const path = require('path');
@@ -511,7 +519,7 @@ Webpack 中的 `output.publicPath` 選項，原理就如同 mini-css-extract-plu
 
 ---
 
-- 使用 file-loader 中的 `publicPath` 修改公共路徑：
+3. 使用 file-loader 中的 `publicPath` 修改公共路徑：
 
 ```js
 const path = require('path');
