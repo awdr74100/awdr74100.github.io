@@ -20,6 +20,7 @@ updated: 2020-03-04 15:25:06
 - sass-loader 基本使用
 - sass-loader 可傳遞選項
 - 補充：Dart Sass 與 Node Sass
+- 補充：使用 resolve.alias 參考相對路徑圖片
 
 ## sass-loader 安裝
 
@@ -99,7 +100,7 @@ module.exports = {
 
 其實從上面的範例可以看出，配置 sass-loader 非常的簡單，只需要將其放置在使用 loader 的第一順位即可，後面的步驟就如同之前所介紹的，利用 css-loader 與 mini-css-extract-plugin 把 CSS 給獨立抽取成單獨檔案。
 
-entry 入口處 (`src/main.js`) 引入 CSS 檔案：
+entry 入口處 (`src/main.js`) 引入 SCSS 檔案：
 
 ```js
 import './scss/all.scss'; // 使用 ESM 方式引入
@@ -236,3 +237,117 @@ module.exports = {
   },
 };
 ```
+
+## 補充：使用 resolve.alias 參考相對路徑圖片
+
+<div class="note warning">此章節會使用到 file-loader，由於目前還未曾介紹過此套件，建議讀者可先至相關連結閱讀其文章，再回來吸收本章節內容，效果可能會更好喔！</div>
+
+之前完整介紹了有關 mini-css-extract-plugin 使用 publicPath 解決 `background-image: url()` 以相對路徑參考本地圖片時所發生的問題，連結在 [這裡](https://awdr74100.github.io/2020-03-02-webpack-minicssextractplugin/)，這一次我們在做一點更細微的補充，先讓我們來看目前的專案環境：
+
+```plain
+webpack-demo/
+|
+| - src/
+|   | - scss/
+|       | - base
+|           | - _reset.scss
+|
+|       | - helpers
+|           | - _variables.scss
+|
+|       | - component
+|           | - _navbar.scss
+|
+|       | - all.scss    # SCSS 主檔案
+|
+// 其他省略
+```
+
+在我們使用 Sass/SCSS 撰寫樣式表時，很常以上面這種結構來區分使用的對象，假設我們目前在撰寫 `navbar` 元件，且需要以 `background-image: url()` 來增加 logo 圖片，我們可能會這樣寫：
+
+```scss
+// path：src/scss/component/_navbar.scss
+
+.logo {
+  background-image: url('../../img/test.png');
+}
+```
+
+載入所有 SCSS 模組：
+
+```scss
+// path：src/scss/all.scss
+
+@import './component/navbar';
+// 其他省略
+```
+
+這時如果直接編譯，會跳出以下錯誤：
+
+![sass-loader 圖片找不到](https://i.imgur.com/xh9tus1.png)
+
+你可能會好奇，怎麼會跳出錯誤？且錯誤提示還是指出圖片的路徑錯誤，導致找不到圖片，其實原理很簡單，**在我們撰寫 SCSS 的模組時，所有的相對路徑都應該是基於 `all.scss` 檔案才對，也就是載入所有模組的主檔案**，如果以上面範例來說明，正確的路徑寫法應該如下：
+
+```scss
+// path：src/scss/component/_navbar.scss
+
+.logo {
+  background-image: url('../img/test.png');
+}
+```
+
+此時編譯結果就會是成功的了，但這樣子的寫法非常不直覺，且通常我們會一不小心就跟著編輯器的指示一路給他按下去，比如 VSCode 中的 Path Intellisense 套件，最後就會導致錯誤，因為大部分的提示都是基於當前所編輯的檔案所給出的相對路徑提示，並不能指定提示的基準為哪一個檔案，造成種種的麻煩，這時該怎麼辦呢？
+
+之前有說過，Webpack 最大的魅力就在於它會自動解析模組間的相互依賴關係，我們可以利用這一個專長來操作我們的圖片存取路徑。
+
+配置 `webpack.config.js` 檔案中的 `resolve.alias` 選項：
+
+```js
+module.exports = {
+  resolve: {
+    alias: {
+      '@img': path.resolve(__dirname, 'src/img'),
+    },
+  },
+};
+```
+
+使用 `alias` 指定圖片存取路徑：
+
+```scss
+// path：src/scss/component/_navbar.scss
+
+.logo {
+  background-image: url('~@img/test.png');
+}
+```
+
+這邊要注意在 SCSS 的環境中必須增加 `~` 前綴以使用 `alias` 的內容，避免被 Webpack 認知成相對路徑的模組，在 [官方文件](https://github.com/webpack-contrib/sass-loader#resolving-import-at-rules) 也有說明，此時讓我們直接編譯看看：
+
+```bash
+$ npm run build
+```
+
+編譯結果：
+
+![sass-loader 使用 resolve.alias](https://i.imgur.com/wXVbem1.png)
+
+編譯成功！且圖片存取路徑也正確，從上面範例可以看出，使用 `resolve.alias` 設置別名，不僅可以提高辨識度，且更為方便使用，當然這一個 `resolve.alias` 選項不只可以用來設置在 SCSS 環境，JavaScript 環境也可以，且不需要使用 `~` 前綴，直接定義即可，以下為 ESM 載入模組的範例
+
+```js
+module.exports = {
+  resolve: {
+    alias: {
+      '@src': path.resolve(__dirname, 'src'),
+    },
+  },
+};
+```
+
+entry 入口處 (`src/main.js`) 引入 SCSS 檔案：
+
+```js
+import '@src/scss/all.scss';
+```
+
+這邊要注意，`resolve.alias` 的 `key` 值是可以隨意命名的喔！並不是一定要依造上面這樣的寫法，完全依靠個人習慣以及喜好。
