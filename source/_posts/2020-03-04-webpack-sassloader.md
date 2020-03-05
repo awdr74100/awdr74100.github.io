@@ -24,7 +24,7 @@ updated: 2020-03-05 16:54:52
 
 ## sass-loader 安裝
 
-> 套件連結：[sass-loader](https://github.com/webpack-contrib/sass-loader)、[css-loader](https://github.com/webpack-contrib/css-loader)、[mini-css-extract-plugin](https://github.com/webpack-contrib/mini-css-extract-plugin)
+> 套件連結：[sass-loader](https://github.com/webpack-contrib/sass-loader)、[node-sass](https://github.com/sass/node-sass)、[css-loader](https://github.com/webpack-contrib/css-loader)、[mini-css-extract-plugin](https://github.com/webpack-contrib/mini-css-extract-plugin)
 
 sass-loader：
 
