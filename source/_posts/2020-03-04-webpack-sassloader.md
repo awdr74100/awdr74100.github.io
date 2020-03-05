@@ -1,5 +1,5 @@
 ---
-title: Webpack 前端打包工具 - 使用 sass-loader 編譯 Sass/SCSS
+title: Webpack 前端打包工具 - 使用 sass-loader 編譯 Sass/SCSS 預處理器
 description:
   [
     以我自己來說，已經很少用純 CSS 來撰寫樣式表了，大多時候都是直接使用 SCSS 作為開發語言，既方便又高效，雖然說得透過編譯器使之編譯成 CSS 檔案才能在瀏覽器運行，但這一切對於現代化開發來講，似乎已經不成問題了。此篇將介紹如何使用 sass-loader 編譯我們的 Sass/SCSS 預處理器，並說明途中可能會遇到的陷阱，以及一般人最為困惑的 Node Sass 與 Dart Sass 使用上的差別。,
