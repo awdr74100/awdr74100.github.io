@@ -140,7 +140,7 @@ gulpDemo/
 ```
 <!-- prettier-ignore-end -->
 
-你會發現 autoprefixer 替我們增加了相關的 CSS Prefix，以往這些語法都需要手動增加，造成許多的不方便，使用此插件即可自動幫我們完成此操作，我認為 PostCSS 更像是一個平台，利用豐富的插件進行前後處理，有沒有發現我說的是前後處理？事實上，某些 PostCSS 插件是以預處理的方式進行，比如說：[postcss-each](https://www.npmjs.com/package/postcss-each)，所以我們並不能直接把 PostCSS 定義為後處理器，得看使用的性質而定。
+你會發現 autoprefixer 替我們增加了相關的 CSS Prefix，以往這些語法都需要手動增加，造成許多的不方便，使用此插件即可自動幫我們完成此操作，我認為 PostCSS 更像是一個平台，利用豐富的插件進行前或後處理，有沒有發現我說的是前或後處理？事實上，某些 PostCSS 插件是以預處理的方式進行，比如說：[postcss-each](https://www.npmjs.com/package/postcss-each)，所以我們並不能直接把 PostCSS 定義為後處理器，得看使用的性質而定。
 
 ## gulp-postcss 可傳遞選項
 
@@ -174,7 +174,7 @@ gulp.task('sass', () => {
 
 Browserslist 是一款用於不同前端工具之間共享目標瀏覽器和 Node.js 版本的工具，在之前如果要配置 Babel、ESLint、Autoprefixer 等相關工具，需要再各自的配置文件依序設定，造成許多的麻煩，Browserslist 就是為了解決這一個麻煩而建構，只需配置 `.browserslistrc` 文件，上面所提到的工具即可共享專案配置，這次我們就來介紹如何使用 Browserslist 配置 Autoprefixer 吧！
 
-Browserslist 為 Autoprefixer 的相依套件，可自行檢查是否正確安裝，如需下載，可使用以下指令：
+Browserslist 為 Autoprefixer 的相依套件，可自行檢查是否已完成安裝，如需下載，可使用以下指令：
 
 ```bash
 $ npm install browserslist
@@ -184,7 +184,7 @@ Browserslist 可以在 `package.json` 中設定，也可以用單獨檔案 `.bro
 
 > 參考 [Full List](https://github.com/browserslist/browserslist#full-list) 進行配置：
 
-package.json:
+使用 `package.json` 配置:
 
 ```json
 {
@@ -192,7 +192,7 @@ package.json:
 }
 ```
 
-.browserslistrc：
+使用 `.browserslistrc` 單獨檔案配置：
 
 ```json
 last 2 version
@@ -203,7 +203,7 @@ IE 10
 執行 `gulp scss` 指令進行編譯，結果如下：
 
 <!-- prettier-ignore-start -->
-```scss
+```css
 .d-flex {
   display: -webkit-box;
   display: -ms-flexbox;
