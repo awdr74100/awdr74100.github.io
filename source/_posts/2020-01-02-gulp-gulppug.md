@@ -36,16 +36,16 @@ $ npm install gulp-pug
 初始專案結構：
 
 ```plain
-gulpDemo/
-|
-| - node_modules/
-|
-| - source/
-|   | - index.pug      # Pug 主檔案
-|
-| - gulpfile.js        # Gulp 主檔案
-| - package-lock.json
-| - package.json       # 安裝 gulp、gulp-pug
+gulp-demo/
+│
+└─── node_modules/
+└─── source/
+│   │
+│   └─── index.pug        # Pug 主檔案
+│
+└─── gulpfile.js          # Gulp 配置檔案
+└─── package-lock.json
+└─── package.json         # 安裝 gulp、gulp-pug
 ```
 
 撰寫 Pug 範例：
@@ -86,17 +86,18 @@ $ gulp pug
 生成 `./public/index.html` 檔案，此時專案結構如下：
 
 ```plain
-gulpDemo/
-|
-| - node_modules/
-|
-| - public/
-|   | - index.html     # 編譯完成的 HTML 檔案
-|
-| - source/
-|   | - index.pug      # Pug 主檔案
-|
-... 以下省略
+gulp-demo/
+│
+└─── node_modules/
+└─── public/
+│   │
+│   └─── index.html       # 編譯完成的 HTML 檔案
+│
+└─── source/
+│   │
+│   └─── index.pug        # Pug 主檔案
+│
+// 以下省略
 ```
 
 執行 gulp pug 指令後便會將 `./source/index.pug` 編譯到 `./public/index.html`，如果有即時編譯的需求，可使用 gulp.watch() 監控檔案變化，如下範例：
@@ -184,19 +185,20 @@ html(lang="en")
 初始專案結構：
 
 ```plain
-pugDemo/
-|
-| - node_modules/
-|
-| - source/
-|   | - modules/
-|       | - head.pug   # head 模組 - 供載入用
-|       | - navbar.pug # navbar 模組 - 供載入用
-|
-|   | - index.pug      # 主要渲染檔案
-|   | - layout.pug     # template 模板
-|
-... 以下省略
+gulp-demo/
+│
+└─── node_modules/
+└─── source/
+│   │
+│   └─── modules/
+│       │
+│       └─── head.pug     # head 模組 - 供載入用
+│       └─── navbar.pug   # navbar 模組 - 供載入用
+│   │
+│   └─── index.pug        # 主要渲染檔案
+│   └─── layout.pug       # template 模板
+│
+// 以下省略
 ```
 
 路徑：`./source/modules/head.pug`

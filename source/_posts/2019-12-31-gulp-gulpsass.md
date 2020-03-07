@@ -36,17 +36,18 @@ node-sass 為 gulp-sass 的相依套件，安裝 gulp-sass 的同時會連同 no
 初始專案結構：
 
 ```plain
-gulpDemo/
-|
-| - node_modules/
-|
-| - source/
-|   | - scss/
-|       | - all.scss   # SCSS 主檔案
-|
-| - gulpfile.js        # Gulp 主檔案
-| - package-lock.json
-| - package.json       # 安裝 gulp、gulp-sass
+gulp-demo/
+│
+└─── node_modules/
+└─── source/
+│   │
+│   └─── scss/
+│       │
+│       └─── all.scss     # SCSS 主檔案
+│
+└─── gulpfile.js          # Gulp 配置檔案
+└─── package-lock.json
+└─── package.json         # 安裝 gulp、gulp-sass
 ```
 
 撰寫 SCSS 範例：
@@ -83,19 +84,22 @@ $ gulp sass
 生成 `./public/css/all.css` 檔案，此時專案結構如下：
 
 ```plain
-gulpDemo/
-|
-| - node_modules/
-|
-| - public/
-|   | - css/
-|       | - all.css    # 編譯完成的 CSS 檔案
-|
-| - source/
-|   | - scss/
-|       | - all.scss   # SCSS 主檔案
-|
-... 以下省略
+gulp-demo/
+│
+└─── node_modules/
+└─── public/
+│   │
+│   └─── css/
+│       │
+│       └─── all.css      # 編譯完成的 CSS 檔案
+│
+└─── source/
+│   │
+│   └─── scss/
+│       │
+│       └─── all.scss     # SCSS 主檔案
+│
+// 以下省略
 ```
 
 執行 gulp sass 指令後便會將 `./source/scss/all.scss` 編譯到 `./public/css/all.css`，如果有即時編譯的需求，可使用 gulp.watch() 監控檔案變化，如下範例：

@@ -47,17 +47,18 @@ autoprefixer 為 PostCSS 最為著名的 CSS Prefix 插件，前面會先以它�
 初始專案結構：
 
 ```plain
-gulpDemo/
-|
-| - node_modules/
-|
-| - source/
-|   | - scss/
-|       | - all.scss   # SCSS 主檔案
-|
-| - gulpfile.js        # Gulp 主檔案
-| - package-lock.json
-| - package.json       # 安裝 gulp、gulp-sass、gulp-postcss、autoprefixer
+gulp-demo/
+│
+└─── node_modules/
+└─── source/
+│   │
+│   └─── scss/
+│       │
+│       └─── all.scss     # SCSS 主檔案
+│
+└─── gulpfile.js          # Gulp 配置檔案
+└─── package-lock.json
+└─── package.json         # 安裝 gulp、gulp-sass、gulp-postcss、autoprefixer
 ```
 
 撰寫 SCSS 範例：
@@ -103,19 +104,22 @@ $ gulp sass
 生成 `./public/css/all.css` 檔案，此時專案結構如下：
 
 ```plain
-gulpDemo/
-|
-| - node_modules/
-|
-| - public/
-|   | - css/
-|       | - all.css    # 編譯完成的 CSS 檔案
-|
-| - source/
-|   | - scss/
-|       | - all.scss   # SCSS 主檔案
-|
-... 以下省略
+gulp-demo/
+│
+└─── node_modules/
+└─── public/
+│   │
+│   └─── css/
+│       │
+│       └─── all.css      # 編譯完成的 CSS 檔案
+│
+└─── source/
+│   │
+│   └─── scss/
+│       │
+│       └─── all.scss     # SCSS 主檔案
+│
+// 以下省略
 ```
 
 以下為經過 autoprefixer 處理後的 CSS 檔案內容：
@@ -192,7 +196,13 @@ Browserslist 可以在 `package.json` 中設定，也可以用單獨檔案 `.bro
 }
 ```
 
-使用 `.browserslistrc` 單獨檔案配置：
+新增並使用 `.browserslistrc` 單獨檔案配置：
+
+```diff
+ gulp-demo/
+ │
++└─── .browserslistrc
+```
 
 ```json
 last 2 version

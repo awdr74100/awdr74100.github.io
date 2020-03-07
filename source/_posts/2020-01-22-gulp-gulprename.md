@@ -37,17 +37,18 @@ $ npm install gulp-rename
 初始專案結構：
 
 ```plain
-gulpDemo/
-|
-| - node_modules/
-|
-| - source/
-|   | - scss/
-|       | - all.scss   # SCSS 主檔案
-|
-| - gulpfile.js        # Gulp 主檔案
-| - package-lock.json
-| - package.json       # 安裝 gulp、gulp-rename、other...
+gulp-demo/
+│
+└─── node_modules/
+└─── source/
+│   │
+│   └─── scss/
+│       │
+│       └─── all.scss     # SCSS 主檔案
+│
+└─── gulpfile.js          # Gulp 配置檔案
+└─── package-lock.json
+└─── package.json         # 安裝 gulp、gulp-rename、other...
 ```
 
 載入並使用 gulp-rename：

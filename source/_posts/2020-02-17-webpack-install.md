@@ -84,15 +84,16 @@ $ npm install webpack webpack-cli -D
 
 ```plain
 webpack-demo/
-|
-| - node_modules/
-|
-| - src/
-|   | - main.js         # entry 入口檔案
-|
-| - webpack.config.js   # Webpack 配置檔案
-| - package-lock.json
-| - package.json        # 已安裝 webpack、webpack-cli
+│
+└─── node_modules/
+│
+└─── src/
+│   │
+│   └─── main.js          # entry 入口檔案
+│
+└─── webpack.config.js    # Webpack 配置檔案
+└─── package-lock.json
+└─── package.json         # 已安裝 webpack、webpack-cli
 ```
 
 請依造上面專案結構所示，新增 `src/main.js` 與 `webpack.config.js` 檔案。
@@ -133,7 +134,7 @@ console.log('Hello ' + myName);
 ```json
 {
   "scripts": {
-    "start": "webpack --mode development"
+    "build": "webpack --mode development"
   }
 }
 ```
@@ -141,7 +142,7 @@ console.log('Hello ' + myName);
 執行編譯指令：
 
 ```bash
-$ npm run start
+$ npm run build
 ```
 
 此時你會發現專案根目錄新增了 `dist/bundle.js` 檔案，這個檔案就是依照 `webpack.config.js` 配置所打包而成的 JavaScript 檔案，可直接做引入。
@@ -168,7 +169,7 @@ $ npm run start
 ```json
 {
   "scripts": {
-    "start": "webpack --mode development"
+    "build": "webpack --mode development"
   }
 }
 ```
@@ -178,12 +179,12 @@ $ npm run start
 ```json
 {
   "scripts": {
-    "start": "webpack"
+    "build": "webpack"
   }
 }
 ```
 
-執行 `npm run start` 指令並察看結果：
+執行 `npm run build` 指令並察看結果：
 
 ![webpack運行環境](https://i.imgur.com/S1c5Rok.png)
 
@@ -200,7 +201,7 @@ CLI 命令傳遞 `mode` 選項：
 ```json
 {
   "scripts": {
-    "start": "webpack --mode development"
+    "build": "webpack --mode development"
   }
 }
 ```
@@ -235,7 +236,7 @@ import fun from './js/module';
 fun();
 ```
 
-執行 `npm run start` 進行打包並觀察引入後 Console 結果：
+執行 `npm run build` 進行打包並觀察引入後 Console 結果：
 
 ![基於 Webpack 的 ESM 示範](https://i.imgur.com/QMSUbjr.png)
 
@@ -247,10 +248,11 @@ fun();
 
 ```plain
 webpack-demo/
-|
-| - src/
-|   | - main.js         # entry 入口檔案(1)
-|   | - about.js        # entry 入口檔案(2)
+│
+└─── src/
+│   │
+│   └─── main.js          # entry 入口檔案(1)
+│   └─── about.js         # entry 入口檔案(2)
 ```
 
 至 `webpack.config.js` 進行配置：
@@ -270,7 +272,7 @@ module.exports = {
 };
 ```
 
-事實上，entry 入口處除了以字串型式宣告入口文件路徑外，還能夠以物件的方式進行傳遞，如上面範例所示，且傳統我們會稱 `entry.main`、`entry.about` 為物件的 "key"，在 Webpack 中稱之為 "chunk"，而一個 "chunk" 對應一個 entry 入口文件路徑，這樣子的型式稱之為多入口文件，最後 output 時也會各自打包成獨立的 JavaScript 檔案，最後要注意的是 `output.filename` 中檔案名稱的寫法，等等會再作解釋，讓我們先執行 `npm run start` 編譯看看：
+事實上，entry 入口處除了以字串型式宣告入口文件路徑外，還能夠以物件的方式進行傳遞，如上面範例所示，且傳統我們會稱 `entry.main`、`entry.about` 為物件的 "key"，在 Webpack 中稱之為 "chunk"，而一個 "chunk" 對應一個 entry 入口文件路徑，這樣子的型式稱之為多入口文件，最後 output 時也會各自打包成獨立的 JavaScript 檔案，最後要注意的是 `output.filename` 中檔案名稱的寫法，等等會再作解釋，讓我們先執行 `npm run build` 編譯看看：
 
 ![webpack result](https://i.imgur.com/12r89pn.png)
 

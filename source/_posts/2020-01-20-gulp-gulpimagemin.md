@@ -36,17 +36,18 @@ gulp-imagemin 套件可以幫助我們壓縮 PNG、JPEG、GIF、SVG 等類型圖
 初始專案結構
 
 ```plain
-gulpDemo/
-|
-| - node_modules/
-|
-| - source/
-|   | - img/
-|       | - IMG1.jpg   # JPG 圖檔
-|
-| - gulpfile.js        # Gulp 主檔案
-| - package-lock.json
-| - package.json       # 安裝 gulp、gulp-imagemin
+gulp-demo/
+│
+└─── node_modules/
+└─── source/
+│   │
+│   └─── img/
+│       │
+│       └─── IMG1.jpg     # JPG 圖檔
+│
+└─── gulpfile.js          # Gulp 配置檔案
+└─── package-lock.json
+└─── package.json         # 安裝 gulp、gulp-imagemin
 ```
 
 載入並使用 gulp-imagemin：

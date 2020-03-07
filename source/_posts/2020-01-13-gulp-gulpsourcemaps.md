@@ -38,29 +38,34 @@ $ npm install gulp-sourcemaps
 初始專案結構：
 
 ```plain
-gulpDemo/
-|
-| - node_modules/
-|
-| - source/
-|   | - scss/
-|       | - base/
-|           | - _reset.scss
-|
-|       | - component/
-|           | - _button.scss
-|
-|       | - helpers/
-|           | - _variables.scss
-|
-|       | - layout/
-|           | - _footer.scss
-|
-|       | - all.scss   # SCSS 主檔案
-|
-| - gulpfile.js        # Gulp 主檔案
-| - package-lock.json
-| - package.json       # 安裝 gulp、gulp-sass、gulp-sourcemaps
+gulp-demo/
+│
+└─── node_modules/
+└─── source/
+│   │
+│   └─── scss/
+│       │
+│       └─── base
+│           │
+│           └─── _reset.scss
+│       │
+│       └─── component
+│           │
+│           └─── _button.scss
+│       │
+│       └─── helpers
+│           │
+│           └─── _variables.scss
+│       │
+│       └─── layout
+│           │
+│           └─── _footer.scss
+│       │
+│       └─── all.scss     # SCSS 主檔案
+│
+└─── gulpfile.js          # Gulp 配置檔案
+└─── package-lock.json
+└─── package.json         # 安裝 gulp、gulp-sass、gulp-sourcemaps
 ```
 
 `./source/scss/all.scss` 載入所有組件：

@@ -49,19 +49,20 @@ $ npm install css-loader -D
 
 ```plain
 webpack-demo/
-|
-| - node_modules/
-|
-| - src/
-|   | - css/
-|       | - all.css     # CSS 主檔案
-|
-|   | - main.js         # entry 入口檔案
-|
-| - index.html          # 引入 bundle.js 與 main.css 測試用檔案
-| - webpack.config.js   # Webpack 配置檔案
-| - package-lock.json
-| - package.json        # 已安裝 webpack、webpack-cli、css-loader、mini-css-extract-plugin
+│
+└─── node_modules/
+└─── src/
+│   │
+│   └─── css/
+│       │
+│       └─── all.css      # CSS 主檔案
+│   │
+│   └─── main.js          # entry 入口檔案
+│
+└─── index.html           # 引入 bundle.js 與 main.css 測試用檔案
+└─── webpack.config.js    # Webpack 配置檔案
+└─── package-lock.json
+└─── package.json         # 已安裝 webpack、webpack-cli、css-loader、mini-css-extract-plugin
 ```
 
 撰寫 CSS 範例：
@@ -187,6 +188,16 @@ module.exports = {
 
 > 請先至 `src` 資料夾新增 `img` 資料夾並放入隨便一張圖片
 
+```diff
+ webpack-demo/
+ │
+ └─── src/
+ │   │
++│   └─── img/
++│       │
++│       └─── test.jpg
+```
+
 撰寫以**絕對路徑**參考本地圖片的 CSS 範例：
 
 ```css
@@ -288,13 +299,14 @@ $ npm run build
 
 成功編譯！此時 `src` 資料夾內的圖片也通通打包進來了，以下為打包後的 `dist` 資料夾專案結構：
 
-```plain
+```diff
 webpack-demo/
-|
-| - dist/
-|   | - bundle.js         # 打包生成的 JavaScrit 檔案
-|   | - main.css          # 打包生成的 CSS 檔案
-|   | - test.jpg          # 自動抓取並通過 file-loader 的圖片檔
+│
+└─── dist/
+│   │
+│   └─── bundle.js        # 打包生成的 JavaScrit 檔案
+│   └─── main.css         # 打包生成的 CSS 檔案
+│   └─── test.jpg         # 自動抓取並通過 file-loader 的圖片檔
 ```
 
 觀察打包生成的 CSS 檔案：
@@ -326,10 +338,12 @@ module.exports = {
 
 ```plain
 webpack-demo/
-|
-| - dist/
-|   | - js/
-|       | - bundle.js     # 打包生成的 JavaScrit 檔案
+│
+└─── dist/
+│   │
+│   └─── js/
+│       │
+│       └─── bundle.js    # 打包生成的 JavaScrit 檔案
 ```
 
 這邊千萬要注意，**修改路徑並不是修改 output 內的 path 選項**，這會導致所有的 loader 或 plugin 都得做相對應的修改，變得非常的麻煩！讓我們來看 mini-css-extract-plugin 該如何與上面範例一樣修改檔案生成路徑：
@@ -365,13 +379,16 @@ module.exports = {
 
 ```plain
 webpack-demo/
-|
-| - dist/
-|   | - js/
-|       | - bundle.js     # 打包生成的 JavaScrit 檔案
-|
-|   | - css/
-|       | - main.18f.css  # 打包生成的 CSS 檔案
+│
+└─── dist/
+│   │
+│   └─── js/
+│       │
+│       └─── bundle.js    # 打包生成的 JavaScrit 檔案
+│   │
+│   └─── css/
+│       │
+│       └─── main.18f.css # 打包生成的 CSS 檔案
 ```
 
 事實上，大部分的 loader 或 plugin 都可以藉由修改 `filename` 更改打包後的生成路徑，唯一要注意的是，像 CSS 這種檔案，我們很常使用 `background-image: url("../..")` 來載入圖片，這時問題就來了，`filename` 的生成路徑並不會響應樣式表內的相對路徑，打包出來的結果也就變成找不到圖片，這時候就得依靠 publicPath 可傳遞選項修改公共路徑，修正打包後的相對路徑，這樣說起來可能有點複雜，讓我們繼續往下看。
@@ -421,16 +438,20 @@ module.exports = {
 
 ```plain
 webpack-demo/
-|
-| - dist/
-|   | - js/
-|       | - bundle.js     # 打包生成的 JavaScrit 檔案
-|
-|   | - css/
-|       | - main.css      # 打包生成的 CSS 檔案
-|
-|   | - img
-|       | - test.jpg      # 自動抓取並通過 file-loader 的圖片檔
+│
+└─── dist/
+│   │
+│   └─── js/
+│       │
+│       └─── bundle.js    # 打包生成的 JavaScrit 檔案
+│   │
+│   └─── css/
+│       │
+│       └─── main.css     # 打包生成的 CSS 檔案
+│   │
+│   └─── img/
+│       │
+│       └─── test.jpg     # 自動抓取並通過 file-loader 的圖片檔
 ```
 
 **打包前**的 CSS 檔案：

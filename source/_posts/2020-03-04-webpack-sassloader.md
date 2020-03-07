@@ -48,19 +48,20 @@ $ npm install css-loader mini-css-extract-plugin -D
 
 ```plain
 webpack-demo/
-|
-| - node_modules/
-|
-| - src/
-|   | - scss/
-|       | - all.scss    # SCSS 主檔案
-|
-|   | - main.js         # entry 入口檔案
-|
-| - index.html          # 引入 bundle.js 與 main.css 測試用檔案
-| - webpack.config.js   # Webpack 配置檔案
-| - package-lock.json
-| - package.json        # 已安裝 webpack、webpack-cli、css-loader、mini-css-extract-plugin、sass-loader、node-sass
+│
+└─── node_modules/
+└─── src/
+│   │
+│   └─── scss/
+│       │
+│       └─── all.scss     # SCSS 主檔案
+│   │
+│   └─── main.js          # entry 入口檔案
+│
+└─── index.html           # 引入 bundle.js 與 main.css 測試用檔案
+└─── webpack.config.js    # Webpack 配置檔案
+└─── package-lock.json
+└─── package.json         # 已安裝 webpack、webpack-cli、css-loader、mini-css-extract-plugin、sass-loader、node-sass
 ```
 
 撰寫 SCSS 範例：
@@ -242,25 +243,28 @@ module.exports = {
 
 <div class="note warning">此章節會使用到 file-loader，由於目前還未曾介紹過此套件，建議讀者可先至相關連結閱讀其文章，再回來吸收本章節內容，效果可能會更好喔！</div>
 
-之前完整介紹了有關 mini-css-extract-plugin 使用 publicPath 解決 `background-image: url()` 以相對路徑參考本地圖片時所發生的問題，連結在 [這裡](https://awdr74100.github.io/2020-03-02-webpack-minicssextractplugin/)，這一次我們在做一點更細微的補充，先讓我們來看目前的專案環境：
+之前完整介紹了有關 mini-css-extract-plugin 使用 publicPath 解決 `background-image: url()` 以相對路徑參考本地圖片時所發生的問題，連結在 [這裡](https://awdr74100.github.io/2020-03-02-webpack-minicssextractplugin/)，這一次我們在做一點更細微的補充，先讓我們來看目前的 SCSS 資料夾結構：
 
 ```plain
 webpack-demo/
-|
-| - src/
-|   | - scss/
-|       | - base
-|           | - _reset.scss
-|
-|       | - helpers
-|           | - _variables.scss
-|
-|       | - component
-|           | - _navbar.scss
-|
-|       | - all.scss    # SCSS 主檔案
-|
-// 其他省略
+│
+└─── src/
+│   │
+│   └─── scss/
+│       │
+│       └─── base
+│           │
+│           └─── _reset.scss
+│       │
+│       └─── helpers
+│           │
+│           └─── _variables.scss
+│       │
+│       └─── component
+│           │
+│           └─── _navbar.scss
+│       │
+│       └─── all.scss     # SCSS 主檔案
 ```
 
 在我們使用 Sass/SCSS 撰寫樣式表時，很常以上面這種結構來區分使用的對象，假設我們目前在撰寫 `navbar` 元件，且需要以 `background-image: url()` 來增加 logo 圖片，我們可能會這樣寫：

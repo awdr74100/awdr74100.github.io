@@ -46,17 +46,18 @@ $ npm install gulp-babel@7 babel-core babel-preset-env
 初始專案結構：
 
 ```plain
-gulpDemo/
-|
-| - node_modules/
-|
-| - source/
-|   | - js
-|       | - all.js     # JavaScript 主檔案
-|
-| - gulpfile.js        # Gulp 主檔案
-| - package-lock.json
-| - package.json       # 安裝 gulp、gulp-babel
+gulp-demo/
+│
+└─── node_modules/
+└─── source/
+│   │
+│   └─── js/
+│       │
+│       └─── all.js       # JavaScript 主檔案
+│
+└─── gulpfile.js          # Gulp 配置檔案
+└─── package-lock.json
+└─── package.json         # 安裝 gulp、gulp-babel
 ```
 
 撰寫 JavaScript ES6+ 版本代碼：
@@ -101,19 +102,22 @@ $ gulp babel
 生成 `./public/js/all.js` 檔案，此時專案結構如下：
 
 ```plain
-gulpDemo/
-|
-| - node_modules/
-|
-| - public/
-|   | - js/
-|       | - all.js     # 編譯完成的 JavaScript 檔案(ES5 版本)
-|
-| - source/
-|   | - js
-|       | - all.js     # JavaScript 主檔案(包含 ES6+ 版本)
-|
-... 以下省略
+gulp-demo/
+│
+└─── node_modules/
+└─── public/
+│   │
+│   └─── js/
+│       │
+│       └─── all.js       # 編譯完成的 JavaScript 檔案(ES5 版本)
+│
+└─── source/
+│   │
+│   └─── js/
+│       │
+│       └─── all.js       # JavaScript 主檔案(包含 ES6+ 版本)
+│
+// 以下省略
 ```
 
 讓我們打開編譯完成的 JavaScript 檔案，看看 Babel 究竟做了什麼處理：

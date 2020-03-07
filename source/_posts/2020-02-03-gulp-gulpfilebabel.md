@@ -36,17 +36,18 @@ Babel 的核心套件就不多加以介紹，這邊比較值得注意的是 @bab
 初始專案結構：
 
 ```plain
-gulpDemo/
-|
-| - node_modules/
-|
-| - source/
-|   | - scss/
-|       | - all.scss   # SCSS 主檔案
-|
-| - gulpfile.js        # Gulp 主檔案
-| - package-lock.json
-| - package.json       # 安裝 gulp、gulp-sass、@babel/core...
+gulp-demo/
+│
+└─── node_modules/
+└─── source/
+│   │
+│   └─── scss/
+│       │
+│       └─── all.scss     # SCSS 主檔案
+│
+└─── gulpfile.js          # Gulp 配置檔案
+└─── package-lock.json
+└─── package.json         # 安裝 gulp、gulp-sass、@babel/core...
 ```
 
 CommonJS 模組規範寫法：
@@ -71,8 +72,11 @@ exports.sass = compileSass;
 
 將 `gulpfile.js` 改為 `gulpfile.babel.js`：
 
-```bash
-$ mv gulpfile.js gulpfile.babel.js
+```diff
+ gulp-demo/
+ │
+-└─── gulpfile.js
++└─── gulpfile.babel.js
 ```
 
 新增並配置 `.babelrc`：

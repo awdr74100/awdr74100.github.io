@@ -7,7 +7,7 @@ description:
 categories: [Webpack]
 tags: [Webpack, Node.js, PostCSS, SCSS]
 date: 2020-03-05 20:09:44
-updated: 2020-03-05 20:09:44
+updated: 2020-03-06 22:10:32
 ---
 
 ## 前言
@@ -20,6 +20,7 @@ PostCSS 是一套使用 JavaScript 轉換 CSS 的工具，有別於以往 Sass�
 - postcss-loader 基本使用
 - postcss-loader 可傳遞選項
 - 補充：Autoprefixer 與 Browserslist
+- 補充：使用 postcss.config.js 配置 PostCSS
 
 ## postcss-loader 安裝
 
@@ -47,19 +48,20 @@ Webpack 通過 postcss-loader 來調用 PostCSS，直接安裝即可，以及下
 
 ```plain
 webpack-demo/
-|
-| - node_modules/
-|
-| - src/
-|   | - css/
-|       | - all.css     # CSS 主檔案
-|
-|   | - main.js         # entry 入口檔案
-|
-| - index.html          # 引入 bundle.js 與 main.css 測試用檔案
-| - webpack.config.js   # Webpack 配置檔案
-| - package-lock.json
-| - package.json        # 已安裝 webpack、webpack-cli、css-loader、mini-css-extract-plugin、postcss-loader、autoprefixer
+│
+└─── node_modules/
+└─── src/
+│   │
+│   └─── css/
+│       │
+│       └─── all.css      # CSS 主檔案
+│   │
+│   └─── main.js          # entry 入口檔案
+│
+└─── index.html           # 引入 bundle.js 與 main.css 測試用檔案
+└─── webpack.config.js    # Webpack 配置檔案
+└─── package-lock.json
+└─── package.json         # 已安裝 webpack、webpack-cli、css-loader、mini-css-extract-plugin、postcss-loader、autoprefixer
 ```
 
 撰寫 CSS 範例：
@@ -210,7 +212,13 @@ Browserslist 可以在 `package.json` 中設定，也可以用單獨檔案 `.bro
 }
 ```
 
-使用 `.browserslistrc` 單獨檔案配置：
+新增並使用 `.browserslistrc` 單獨檔案配置：
+
+```diff
+ webpack-demo/
+ │
++└─── .browserslistrc
+```
 
 ```json
 last 2 version
@@ -242,3 +250,50 @@ IE 10
 <!-- prettier-ignore-end -->
 
 觀察編譯後檔案可以發現 Autoprefixer 針對了我們的 `.browserslistrc` 配置進行編譯，大功告成！
+
+## 補充：使用 postcss.config.js 配置 PostCSS
+
+在前面我們是使用傳統 options 的方式配置 PostCSS，但其實還有另外一種配置方式可以使用，這邊要注意，並不是每一個 loader 都可以使用這種方式，主要得依靠官方是否支援專屬配置檔的設定，以下示範如何以專屬配置檔的方式配置 PostCSS：
+
+在 `./` 根目錄新增名為 `postcss.config.js` 的檔案：
+
+```diff
+ webpack-demo/
+ │
++└─── postcss.config.js
+```
+
+配置 `postcss.config.js` 檔案：
+
+```js
+module.exports = {
+  plugins: [require('autoprefixer')],
+};
+```
+
+上面的配置結果如同之前使用 options 的方式配置：
+
+```js
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.css$/i,
+        use: [
+          MiniCssExtractPlugin.loader,
+          'css-loader',
+          {
+            loader: 'postcss-loader',
+            // 如同這邊的配置
+            options: {
+              plugins: [require('autoprefixer')],
+            },
+          },
+        ],
+      },
+    ],
+  },
+};
+```
+
+此時的編譯結果會是一模一樣的，我自己是比較習慣單獨以 `postcss.config.js` 進行配置，往後如果要修改 PostCSS 的配置，直接到專屬檔案配置即可，比較不會造成眼花撩亂的問題。

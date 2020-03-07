@@ -27,10 +27,9 @@ CommonJS 為當初最早設計用來解決 JavaScript 模組化設計的規範�
 
 ```plain
 commonjs/
-|
-| - main.js            # JavaScript 主檔案
-|
-| - module.js          # JavaScript 模組
+│
+└─── main.js              # JavaScript 主檔案
+└─── module.js            # JavaScript 模組
 ```
 
 在之後講解到關於 CommonJS 規範相關語法時，都會以上面這一個專案結構做為測試目的。
@@ -259,21 +258,25 @@ $ npm install gulp-sass
 
 初始專案結構：
 
-```plain
-gulpDemo/
-| - gulpfile.js
-|   | - indedx.js      # Gulp 主檔案
-|   | - compile.js     # Gulp 模組檔案 - SCSS 編譯
-|
-| - node_modules/
-|
-| - source/
-|   | - scss/
-|       | - all.scss   # SCSS 主檔案
-|
-| - gulpfile.js        # Gulp 主檔案
-| - package-lock.json
-| - package.json       # 安裝 gulp、gulp-sass
+```diff
+ gulp-demo/
+ │
+ └─── node_modules/
+ │
++└─── gulpfile.js/         # Gulp 模組化配置相關檔案
++│   │
++│   └─── index.js         # 預設 Gulp 編譯主檔案
++│   └─── compile.js       # Gulp 模組檔案 - SCSS 編譯
+ │
+ └─── source/
+ │   │
+ │   └─── scss
+ │       │
+ │       └─── all.scss     # SCSS 主檔案
+ │
+-└─── gulpfile.js          # Gulp 單一配置檔
+ └─── package-lock.json
+ └─── package.json         # 安裝 gulp、gulp-sass
 ```
 
 請注意 Gulp 主檔案位置，原本我們都是使用 `gulpfile.js` 作為依據，設計模組化應用時，建議將同應用檔案放在同一個資料夾，所以我們新增了一個 `gulpfile.js` 資料夾，裡面新增了一個 `index.js` 檔案，這一個就是我們的 Gulp 主檔案，而 `compile.js` 是我們 SCSS 相關套件的模組檔案，下面會有說明。

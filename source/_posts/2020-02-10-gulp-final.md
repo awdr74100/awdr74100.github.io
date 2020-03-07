@@ -47,17 +47,18 @@ updated: 2020-02-13 18:25:51
 初始專案結構：
 
 ```plain
-gulpDemo/
-|
-| - node_modules/
-|
-| - source/
-|   | - js
-|       | - all.js
-|
-| - gulpfile.js
-| - package-lock.json
-| - package.json
+gulp-demo/
+│
+└─── node_modules/
+└─── source/
+│   │
+│   └─── js/
+│       │
+│       └─── all.js
+│
+└─── gulpfile.js
+└─── package-lock.json
+└─── package.json
 ```
 
 > 套件連結：[gulp-babel](https://www.npmjs.com/package/gulp-babel)、[@babel/runtime-corejs3](https://www.npmjs.com/package/@babel/runtime-corejs3)、[@babel/plugin-transform-runtime](https://www.npmjs.com/package/@babel/plugin-transform-runtime)
@@ -204,19 +205,20 @@ $ gulp
 初始專案結構：
 
 ```plain
-gulpDemo/
-|
-| - node_modules/
-|
-| - source/
-|   | - css/
-|       | - all.css
-|
-|   | - index.html
-|
-| - gulpfile.js
-| - package-lock.json
-| - package.json
+gulp-demo/
+│
+└─── node_modules/
+└─── source/
+│   │
+│   └─── css/
+│       │
+│       └─── all.css
+│   │
+│   └─── index.html
+│
+└─── gulpfile.js
+└─── package-lock.json
+└─── package.json
 ```
 
 > 套件連結：[del](https://www.npmjs.com/package/del)、[gulp-clean-css](https://www.npmjs.com/package/gulp-clean-css)、[gulp-if](https://www.npmjs.com/search?q=gulp-if)、[gulp-rename](https://www.npmjs.com/package/gulp-rename)、[minimist](https://www.npmjs.com/package/minimist)、[gulp-html-replace](https://www.npmjs.com/package/gulp-html-replace)

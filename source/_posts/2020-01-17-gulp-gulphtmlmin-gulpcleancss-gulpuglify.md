@@ -50,22 +50,24 @@ $ npm install gulp-uglify
 初始專案結構：
 
 ```plain
-gulpDemo/
-|
-| - node_modules/
-|
-| - source/
-|   | - css/
-|       | - style.css  # CSS 主檔案
-|
-|   | - js/
-|       | - main.js    # JavaScript 主檔案
-|
-|   | - index.html     # HTML 主檔案
-|
-| - gulpfile.js        # Gulp 主檔案
-| - package-lock.json
-| - package.json       # 安裝 gulp、gulp-htmlmin、gulp-clean-css、gulp-uglify
+gulp-demo/
+│
+└─── node_modules/
+└─── source/
+│   │
+│   └─── css/
+│       │
+│       └─── style.css    # CSS 主檔案
+│   │
+│   └─── js/
+│       │
+│       └─── main.js      # JavaScript 主檔案
+│   │
+│   └─── index.html       # HTML 主檔案
+│
+└─── gulpfile.js          # Gulp 配置檔案
+└─── package-lock.json
+└─── package.json         # 安裝 gulp、gulp-htmlmin、gulp-clean-css、gulp-uglify
 ```
 
 載入並使用 gulp-htmlmin、gulp-clean-css、gulp-uglify：
