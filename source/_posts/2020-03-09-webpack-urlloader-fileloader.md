@@ -19,6 +19,7 @@ updated: 2020-03-09 17:54:48
 - url-loader 與 file-loader 安裝
 - url-loader 與 file-loader 基本使用
 - url-loader 與 file-loader 可傳遞選項
+- 補充：url-loader 與 file-loader 實際應用
 
 ## url-loader 與 file-loader 安裝
 
@@ -314,3 +315,169 @@ module.exports = {
   },
 };
 ```
+
+## 補充：url-loader 與 file-loader 實際應用
+
+前面講解到了 url-loader 與 file-loader 的基本使用方式，這次讓我們帶入到實際應用內，加深各位對這兩個 loader 的印象。
+
+> 套件連結：[url-loader](https://github.com/webpack-contrib/url-loader)、[file-loader](https://github.com/webpack-contrib/file-loader)、[css-loader](https://github.com/webpack-contrib/css-loader)、[mini-css-extract-plugin](https://github.com/webpack-contrib/mini-css-extract-plugin)
+
+url-loader 與 file-loader：
+
+```bash
+$ npm install url-loader file-loader -D
+```
+
+require：
+
+```bash
+$ npm install css-loader mini-css-extract-plugin -D
+```
+
+初始專案結構：
+
+```plain
+webpack-demo/
+│
+└─── node_modules/
+└─── src/
+│   │
+│   └─── img/
+│       │
+│       └─── banner.jpg   # Size >= 10 KB
+│       └─── logo.jpg     # Size < 10 KB
+│   │
+│   └─── css/
+│       │
+│       └─── all.css      # CSS 主檔案
+│   │
+│   └─── main.js          # entry 入口檔案
+│
+└─── index.html           # 引入 bundle.js 與 main.css 測試用檔案
+└─── webpack.config.js    # Webpack 配置檔案
+└─── package-lock.json
+└─── package.json         # 已安裝 webpack、webpack-cli、css-loader、mini-css-extract-plugin、url-loader、file-loader
+```
+
+撰寫 CSS 範例：
+
+```css
+.w-100-h-100 {
+  width: 100px;
+  height: 100px;
+}
+
+.bg-cover {
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.banner {
+  background-image: url('../img/banner.jpg');
+}
+
+.logo {
+  background-image: url('../img/logo.png');
+}
+```
+
+配置 `webpack.config.js` 檔案：
+
+```js
+const path = require('path');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+
+module.exports = {
+  entry: './src/main.js',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'js/bundle.js',
+  },
+  module: {
+    rules: [
+      {
+        test: /\.css$/i,
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader,
+            // 由於 CSS 增加了一層的結構，相對的 publicPath 也需增加一層
+            options: {
+              publicPath: '../',
+            },
+          },
+          'css-loader',
+        ],
+      },
+      {
+        test: /\.(png|jpe?g|gif)$/i,
+        use: [
+          {
+            // 直接配置 url-loader 就好，超過上限的資源會自動 fallback 給 file-loader
+            loader: 'url-loader',
+            options: {
+              name: 'img/[name].[ext]',
+              limit: 10000,
+            },
+          },
+        ],
+      },
+    ],
+  },
+  plugins: [
+    new MiniCssExtractPlugin({
+      filename: 'css/[name].css',
+    }),
+  ],
+};
+```
+
+這邊要特別注意！並不是 file-loader 與 url-loader 都要進行配置，直接配置 url-loader 就等同於配置了 file-loader，`limit` 內的會交由 url-loader 處理，超過 `limit` 的資源則會 fallback 給 file-loader 進行處理。
+
+<div class="note danger">Webpack 會自動解析 CSS 內的參考圖檔，將它抓出來以 require 的方式處理，除非有特定資源需要透過 file-loader 處理，不然不需要另外的 import 這些 CSS 所用的圖檔</div>
+
+entry 入口處 (`src/main.js`) 引入 CSS 檔案：
+
+```js
+import './css/all.css';
+```
+
+至 `package.json` 新增編譯指令：
+
+```json
+{
+  "scripts": {
+    "build": "webpack --mode development"
+  }
+}
+```
+
+執行編譯指令：
+
+```bash
+$ npm run build
+```
+
+至 `./index.html` 引入打包而成的 `bundle.js` 與 `main.css` 檔案：
+
+```html
+<!-- 其他省略 -->
+<head>
+  <!-- 引入打包生成的 CSS -->
+  <link rel="stylesheet" href="dist/css/main.css" />
+</head>
+<body>
+  <div class="banner w-100-h-100 bg-cover"></div>
+  <div class="logo w-100-h-100 bg-cover"></div>
+  <!-- 引入打包生成的 JavaScript -->
+  <script src="dist/js/bundle.js"></script>
+</body>
+```
+
+查看結果：
+
+![file-loader 結果](https://i.imgur.com/MOMIu8C.png)
+
+![url-loader 結果](https://i.imgur.com/MoyAU11.png)
+
+從上面結果可以得知，logo.png 圖檔已被轉換成 base64 格式，而 banner.png 這張較大的圖檔，被 url-loader fallback 給 file-loader 處理，最後就只是在配置的指定位置生成而已。
