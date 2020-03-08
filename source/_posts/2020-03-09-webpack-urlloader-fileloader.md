@@ -6,8 +6,8 @@ description:
   ]
 categories: [Webpack]
 tags: [Webpack, Node.js, w3HexSchool]
-date: 2020-03-09 17:54:48
-updated: 2020-03-09 17:54:48
+date: 2020-03-09 01:12:33
+updated: 2020-03-09 01:12:33
 ---
 
 ## 前言
@@ -20,6 +20,7 @@ updated: 2020-03-09 17:54:48
 - url-loader 與 file-loader 基本使用
 - url-loader 與 file-loader 可傳遞選項
 - 補充：url-loader 與 file-loader 實際應用
+- 補充：file-loader 載入本地字體
 
 ## url-loader 與 file-loader 安裝
 
@@ -137,6 +138,8 @@ module.exports = {
 
 在 file-loader 中的 `name` 屬性就類似於其他 loader 或 plugin 的 `filename` 屬性，不同的地方在於，`name` 屬性得依照官方文件中的 [Placeholders](https://github.com/webpack-contrib/file-loader#placeholders) 配置才行，上面這個配置就是最基本的依照 entry 檔案的名稱以及附檔名進行 output。
 
+<div class='note danger'>切記先將 dist 資料夾完全刪除，以保證最新的編譯結果如同預期，之後也會介紹使用 clean-webpack-plugin 解決此問題</div>
+
 再次執行編譯指令：
 
 ```bash
@@ -223,8 +226,6 @@ module.exports = {
 
 url-loader 唯一的功能就在於將資源轉換為 `base64` 的格式，主要依靠 `limit` 控制需轉換的文件，轉為 `base64` 的好處就在於，往後網頁在渲染圖片時，不需要以 request 的方式加載圖片，直接向 JavaScript 檔案拿取即可，這樣子以效能來說，會提高許多，但你也不能把大小的上限設定太高，由於 `base64` 是存在於 bundle.js 內，這樣子的做法會導致 JavaScript 異常的肥大，對於效能來說反而會下降，衡量並設置適當的大小才是正確的作法。
 
-<div class='note danger'>切記先將 dist 資料夾完全刪除，以保證最新的編譯結果如同預期，之後也會介紹使用 clean-webpack-plugin 解決此問題</div>
-
 再次執行編譯指令：
 
 ```bash
@@ -242,7 +243,7 @@ webpack-demo/
 
 關於 `base64` 的實際應用將在下面補充，讓我們來做個總結：
 
-<div class="note warning">fiel-loader 用以將靜態資源載入到 Webpack 內，並且解析資源的相互依賴關係，最後 output 到指定的位置，而 url-loader 用以將指定大小上限內的圖片資源轉換為 base64 格式，如遇到超過上限的資源，將 fallback 給 file-loader 做處理，兩者功能並沒有衝突，由於處理對象相同，導致很多人會搞混，通常兩個 loader 都是一起使用居多，並且直接設置 url-loader 即可</div>
+<div class="note warning">file-loader 用以將靜態資源載入到 Webpack 內，並且解析資源的相互依賴關係，最後 output 到指定的位置，而 url-loader 用以將指定大小上限內的圖片資源轉換為 base64 格式，如遇到超過上限的資源，將 fallback 給 file-loader 做處理，兩者功能並沒有衝突，由於處理對象相同，導致很多人會搞混，通常兩個 loader 都是一起使用居多，並且直接設置 url-loader 即可</div>
 
 ## url-loader 與 file-loader 可傳遞選項
 
@@ -481,3 +482,135 @@ $ npm run build
 ![url-loader 結果](https://i.imgur.com/MoyAU11.png)
 
 從上面結果可以得知，logo.png 圖檔已被轉換成 base64 格式，而 banner.png 這張較大的圖檔，被 url-loader fallback 給 file-loader 處理，最後就只是在配置的指定位置生成而已。
+
+## 補充：file-loader 載入本地字體
+
+有時我們在開發網頁時，會需要使用一些特殊字體，像我本身就很常到 [Google Fonts](https://fonts.google.com/) 拉一些字體出來用，不僅可以增加網頁整體的質感，還可以擺脫傳統字體的呆板樣式。
+
+而外部字體的載入方式有很多種，包含一般最為常見的 CSS link，或是使用 `@import` 方式載入字體，我個人是偏好使用 `@font-face` 來載入字體，將字體給下載下來，提供較為穩定的載入字體方法。
+
+先前介紹了以 file-loader 或 url-loader 來處理圖片等靜態資源，此章節將介紹如何以 file-loader 處理 `.ttf`、`.otf` 等字體資源，讓我們直接開始吧！
+
+> 請先至 [Google Fonts](https://fonts.google.com/) 隨意下載字體，並放置在 `src/font` 內
+
+```diff
+ webpack-demo/
+ │
+ └─── src/
+ │   │
++│   └─── font/
++│       │
++│       └─── NotoSansTC-Regular.otf
+```
+
+以 `@font-face` 載入本地字體：
+
+```css
+@font-face {
+  font-family: 'NotoSansTC';
+  src: url('../font/NotoSansTC-Regular.otf') format('opentype');
+}
+
+p {
+  font-family: 'NotoSansTC';
+  font-size: 40px;
+}
+```
+
+配置 `webpack.config.js` 檔案：
+
+```js
+const path = require('path');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+
+module.exports = {
+  entry: './src/main.js',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'js/bundle.js',
+  },
+  module: {
+    rules: [
+      {
+        test: /\.css$/i,
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              publicPath: '../',
+            },
+          },
+          'css-loader',
+        ],
+      },
+      // 處理 require("font")
+      {
+        test: /\.(woff|woff2|eot|ttf|otf|)$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: 'font/[name].[ext]',
+            },
+          },
+        ],
+      },
+      // 處理 require("image")
+      {
+        test: /\.(png|jpe?g|gif)$/i,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              name: 'img/[name].[ext]',
+              limit: 10000,
+            },
+          },
+        ],
+      },
+    ],
+  },
+  plugins: [
+    new MiniCssExtractPlugin({
+      filename: 'css/[name].css',
+    }),
+  ],
+};
+```
+
+這邊要注意，如果你打算將圖片、文字打包後放置在同一個路徑下，可以不必另外寫一個 Regex 去處理，上面這種寫法，主要是將圖片與文字放置在不同的資料夾，千萬要記得，Webpack 會將 CSS 內的相關路徑參考語法轉換為 `require` 的方式進行處理，並不是說 file-loader 的配置只能在 url-loader 區塊內配置，Webpack 是以 Regex 配對相關的 use，千萬不要搞混了！
+
+執行編譯：
+
+```bash
+$ npm run build
+```
+
+此時 `src` 資料夾內的 `font` 也通通打包進來了，以下為打包後的 `dist` 資料夾專案結構：
+
+```plain
+webpack-demo/
+│
+└─── dist/
+│   │
+│   └─── font/
+│       │
+│       └─── NotoSansTC-Regular.otf
+// 其他省略
+```
+
+觀察打包生成的 CSS 檔案：
+
+```css
+@font-face {
+  font-family: 'NotoSansTC';
+  src: url(../font/NotoSansTC-Regular.otf) format('opentype');
+}
+
+p {
+  font-family: 'NotoSansTC';
+  font-size: 40px;
+}
+```
+
+從上面結果可以得知，CSS 內的 `@font-face` 連結也是正確的，此時打開網頁即可看到字體已被更改，我們打包字體的目的也就成功了。
