@@ -310,9 +310,9 @@ var promise = Promise.resolve();
 
 | corejs 選項 | 安裝指令                                  |
 | :---------- | :---------------------------------------- |
-| false       | npm install --save @babel/runtime         |
-| 2           | npm install --save @babel/runtime-corejs2 |
-| 3           | npm install --save @babel/runtime-corejs3 |
+| false       | npm install @babel/runtime         |
+| 2           | npm install @babel/runtime-corejs2 |
+| 3           | npm install @babel/runtime-corejs3 |
 
 事實上 @babel/runtime 有許多的擴展版本，在之前的範例中，我們都是將 corejs 給關閉，這也就導致它並沒有幫我們編譯底層的 API 與相關的方法，這次我們就來使用各版本進行編譯，記得要執行相對應的安裝指令喔！
 
