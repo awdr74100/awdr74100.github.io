@@ -115,7 +115,7 @@ module.exports = {
 };
 ```
 
-事實上，對於 PostCSS 的 options 配置來說，通常都是撰寫在獨立的 `postcss.config.js` 檔案內，不僅可以增加辨識度，還可以避免檔案結構混亂等問題，這點在下面會再補充，讓我們繼續完成它。
+通常在配置 PostCSS 時，我們都是習慣把 options 的內容撰寫在獨立的 `postcss.config.js` 檔案內，如果 PostCSS 的配置較為複雜，相比於撰寫在 `webpack.config.js` 內，使用 `postcss.config.js` 更能提高其辨識度，這點在下面會再補充，讓我們先暫時以此方式進行配置。
 
 entry 入口處 (`src/main.js`) 引入 CSS 檔案：
 
