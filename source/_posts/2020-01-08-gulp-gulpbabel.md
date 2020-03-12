@@ -308,8 +308,8 @@ var promise = Promise.resolve();
 
 仔細觀察，Babel 還是沒有幫我們編譯 Promise 物件，那是因為我們還沒有解放 @babel/runtime 這一個套件全部力量，由上面範例，你會發現我在 plugin 中傳遞了一個 corejs 選項，預設是關閉的，可傳遞的選項為：
 
-| corejs 選項 | 安裝指令                                  |
-| :---------- | :---------------------------------------- |
+| corejs 選項 | 安裝指令                           |
+| :---------- | :--------------------------------- |
 | false       | npm install @babel/runtime         |
 | 2           | npm install @babel/runtime-corejs2 |
 | 3           | npm install @babel/runtime-corejs3 |
@@ -488,12 +488,12 @@ var promise = Promise.resolve();
 
 useBuiltIns：`entry`：
 
-<div class="note warning">使用 entry 選項記得在前面 import core-js 和 regenerator-runtime/runtime 組件庫</div>
+<div class="note warning">使用 entry 選項記得在前面 import core-js/stable 和 regenerator-runtime/runtime 組件庫</div>
 
 待編譯檔案：
 
 ```js
-import 'core-js';
+import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 
 /* --- 箭頭函式、ES6 變數、ES6 陣列方法 --- */
