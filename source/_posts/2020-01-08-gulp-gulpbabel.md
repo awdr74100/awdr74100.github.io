@@ -214,7 +214,7 @@ var Circle = function Circle() {
 var promise = Promise.resolve();
 ```
 
-聰明的你應該發現問題了，Babel 不是會幫我們處理兼容性的問題嗎？`Array.prototype.filter` 與 `Promise` 物件好像都沒有編譯到的感覺，不要懷疑！Babel 真的沒有幫我們編譯到；事實上，如果你採用預設的編譯環境，**Babel 只會針對語法(Syntax)做編譯，底層的 API 與原型擴展都不會進行編譯**，這也就代表兼容性的問題根本沒有解決，在 IE 11 等較舊瀏覽器上面，它還是不知道什麼是 Promise，運行時就會發生錯誤；在這邊還有一個問題，**Babel 針對 Class 語法糖的處理，你會發現它新增了一個全域的 function 當作語法糖的呼叫，這樣子的處理會造成嚴重的全域汙染**，如果你有多個 JavaScript 檔案，同時都進行編譯的動作，產生出來的 function 都會是一模一樣的，不僅造成檔案的肥大，也有可能發生全域汙染影響運行等問題；這時候就會需要 @babel/runtime 與 @babel/polyfill 的幫忙，在介紹這兩個組件時，我們先將 Babel 的設定移置專屬的設定檔，如下所示：
+聰明的你應該發現問題了，Babel 不是會幫我們處理兼容性的問題嗎？`Array.prototype.filter` 與 `Promise` 物件好像都沒有編譯到的感覺，不要懷疑！Babel 真的沒有幫我們編譯到；事實上，如果你採用預設的編譯環境，**Babel 只會針對語法 (Syntax) 做編譯，底層的 API 與原型擴展都不會進行編譯**，這也就代表兼容性的問題根本沒有解決，在 IE 11 等較舊瀏覽器上面，它還是不知道什麼是 Promise，運行時就會發生錯誤；在這邊還有一個問題，**Babel 針對 Class 語法糖的處理，你會發現它新增了一個全域的 function 當作語法糖的呼叫，這樣子的處理會造成嚴重的全域汙染**，如果你有多個 JavaScript 檔案，同時都進行編譯的動作，產生出來的 function 都會是一模一樣的，不僅造成檔案的肥大，也有可能發生全域汙染影響運行等問題；這時候就會需要 @babel/runtime 與 @babel/polyfill 的幫忙，在介紹這兩個組件時，我們先將 Babel 的設定移置專屬的設定檔，如下所示：
 
 路徑：`./gulpfile.js`：
 
@@ -308,11 +308,11 @@ var promise = Promise.resolve();
 
 仔細觀察，Babel 還是沒有幫我們編譯 Promise 物件，那是因為我們還沒有解放 @babel/runtime 這一個套件全部力量，由上面範例，你會發現我在 plugin 中傳遞了一個 corejs 選項，預設是關閉的，可傳遞的選項為：
 
-| corejs 選項 | 安裝指令                           |
-| :---------- | :--------------------------------- |
-| false       | npm install @babel/runtime         |
-| 2           | npm install @babel/runtime-corejs2 |
-| 3           | npm install @babel/runtime-corejs3 |
+| corejs 選項 | 安裝指令                                                          |
+| :---------- | :---------------------------------------------------------------- |
+| false       | npm install <span>-<span><span>-save<span> @babel/runtime         |
+| 2           | npm install <span>-<span><span>-save<span> @babel/runtime-corejs2 |
+| 3           | npm install <span>-<span><span>-save<span> @babel/runtime-corejs3 |
 
 事實上 @babel/runtime 有許多的擴展版本，在之前的範例中，我們都是將 corejs 給關閉，這也就導致它並沒有幫我們編譯底層的 API 與相關的方法，這次我們就來使用各版本進行編譯，記得要執行相對應的安裝指令喔！
 
@@ -386,9 +386,9 @@ var Circle = function Circle() {
 var promise = _promise['default'].resolve();
 ```
 
-從上面結果可以得知，**corejs2 版本主要針對底層 API 做編譯，如 Promise、Fetch 等等；corejs3 版本主要針對底層 API 和相關擴展方法，如 Array.pototype.filter，Array.pototype.map 等等**，簡單來講，如果你要將兼容性的問題徹底解決，就得使用 corejs3 版本，到了這邊，我們之前所提到 Babel 的種種問題都已經獲得解決。
+從上面結果可以得知，**corejs2 版本主要針對底層 API 做編譯，如 Promise、Fetch 等等；corejs3 版本主要針對底層 API 和相關實例方法，如 Array.pototype.filter，Array.pototype.map 等等**，簡單來講，如果你要將兼容性的問題徹底解決，就得使用 corejs3 版本，到了這邊，我們之前所提到 Babel 的種種問題都已經獲得解決。
 
-<div class="note warning">使用 @babel/runtime 能夠在不汙染全域環境下提供相對應的 polyfill，擁有自動識別功能，有效減少體積，並不像 @babel/polyfill 一次性的載入全部 ployfill，造成體積異常肥大，如果你使用的 Babel 版本 >= 7.4.0。不要懷疑，直接使用 @babel-runtime 可以滿足你全部需求。 </div>
+<div class="note warning">使用 @babel/runtime 能夠在不汙染全域環境下提供相對應的 polyfill，擁有自動識別功能，在某些情況下，編譯出來的檔案大小可能比使用 @babel/polyfill 來的小，適合開發組件庫或對環境較為嚴格的專案</div>
 
 ## 補充：@babel/polyfill 使用方式
 
@@ -450,7 +450,7 @@ var Circle = function Circle() {
 var promise = Promise.resolve();
 ```
 
-編譯結果就如同單純使用 Babel 一樣，只有針對語法(Syntax)做編譯，那是因為我們尚未開啟 polyfill 的功能，可通過更改 `useBuiltIns` 來變更模式，可選模式為 `false`、`usage`、`entry`，以下為各模式的編譯結果：
+編譯結果就如同單純使用 Babel 一樣，只有針對語法 (Syntax) 做編譯，那是因為我們尚未開啟 polyfill 的功能，可通過更改 `useBuiltIns` 來變更模式，可選模式為 `false`、`usage`、`entry`，以下為各模式的編譯結果：
 
 useBuiltIns：`usage`：
 
@@ -541,7 +541,7 @@ var Circle = function Circle() {
 var promise = Promise.resolve();
 ```
 
-`entry` 這一個選項就簡單多了，不需要做任何的識別，直接將整個 ES 環境掛載到全局對象，確保瀏覽器可以兼容所有的新特性，但這樣子做的缺點也顯而易見，整個專案環境會較為肥大，你可能會好奇 `entry` 選項的必要，事實上 Babel 默認不會檢測第三方依賴組件，所以使用 `usage` 選項時，可能會出現引入第三方的代碼包未載入模組而引發的 Bug，這時就有使用 `entry` 的必要。
+`entry` 這一個選項就簡單多了，沒有做任何的識別，直接將整個 ES 環境掛載到全局對象，確保瀏覽器可以兼容所有的新特性，但這樣子做的缺點也顯而易見，整個專案環境會較為肥大，你可能會好奇 `entry` 選項的必要，事實上 Babel 默認不會檢測第三方依賴組件，所以使用 `usage` 選項時，可能會出現引入第三方的代碼包未載入模組而引發的 Bug，這時就有使用 `entry` 的必要。
 
 <div class="note warning">@babel/polyfill 提供一次性載入或自動識別載入 polyfill 的功能，使用掛載全局對象的方法，達到兼容新特性目的，適合開發在專案環境，較不適合開發組件庫或工具包，存在汙染全局對象疑慮。</div>
 
@@ -554,4 +554,5 @@ var promise = Promise.resolve();
 
 2. Babel 版本 >= `7.4.0`
 
-   - 不用考慮，直接選擇 @babel/runtime
+   - 配置較簡單，會汙染全域環境，選擇 @babel/polyfill
+   - 配置較繁瑣，不會汙染全域環境，選擇 @babel/runtime
