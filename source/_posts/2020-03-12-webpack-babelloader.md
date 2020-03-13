@@ -93,3 +93,22 @@ module.exports = {
 ```
 
 通常在配置 Babel 時，我們都是習慣把 options 的內容撰寫在獨立的 `.babelrc` 檔案內，如果 Babel 的配置較為複雜，相比於撰寫在 `webpack.config.js` 內，使用 `.babelrc` 更能提高其辨識度，在之後的 @babel/runtime 與 @babel/polyfill 章節會再做補充，讓我們先暫時以此方式進行配置。
+
+至 `package.json` 新增編譯指令：
+
+```json
+{
+  "scripts": {
+    "build": "webpack --mode development"
+  }
+}
+```
+
+執行編譯指令：
+
+```bash
+$ npm run build
+```
+
+讓我們打開編譯完成的 `bundle.js` 檔案，看看 Babel 究竟做了什麼處理：
+
