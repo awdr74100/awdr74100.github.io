@@ -3,16 +3,15 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "hexo generate",
-    "clean": "hexo clean",
-    "deploy": "hexo deploy",
-    "server": "hexo server",
-    "dev": "hexo s -o"
+    "dev": "hexo s -o",
+    "clean": "gulp"
   },
   "hexo": {
     "version": "4.0.0"
   },
   "dependencies": {
+    "del": "^5.1.0",
+    "gulp": "^4.0.2",
     "hexo": "^4.0.0",
     "hexo-autonofollow": "^1.0.1",
     "hexo-browsersync": "^0.3.0",
