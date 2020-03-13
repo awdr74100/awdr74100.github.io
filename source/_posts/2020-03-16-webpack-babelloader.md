@@ -6,8 +6,8 @@ description:
   ]
 categories: [Webpack]
 tags: [Webpack, Node.js, Babel, w3HexSchool]
-date: 2020-03-12 21:15:43
-updated: 2020-03-12 21:15:43
+date: 2020-03-16 00:12:03
+updated: 2020-03-17 00:26:32
 ---
 
 ## 前言
@@ -111,4 +111,3 @@ $ npm run build
 ```
 
 讓我們打開編譯完成的 `bundle.js` 檔案，看看 Babel 究竟做了什麼處理：
-
