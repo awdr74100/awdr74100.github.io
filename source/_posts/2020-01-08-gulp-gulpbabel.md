@@ -122,8 +122,15 @@ gulp-demo/
 
 讓我們打開編譯完成的 JavaScript 檔案，看看 Babel 究竟做了什麼處理：
 
+<!-- prettier-ignore-start -->
 ```js
-// 以上省略
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+
+function _iterableToArrayLimit(arr, i) { if (!(Symbol.iterator in Object(arr) || Object.prototype.toString.call(arr) === "[object Arguments]")) { return; } var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 var people = {
   name: 'Roya',
@@ -138,6 +145,7 @@ for (var _i = 0, _Object$entries = Object.entries(people); _i < _Object$entries.
   console.log(key, value);
 }
 ```
+<!-- prettier-ignore-end -->
 
 看到編譯完成的代碼，你的第一個想法大概都是 WTF ... 這是什麼鬼？不用擔心，Babel 只是將你的代碼優化為兼容性較高版本的代碼，你也不需要針對這一個檔案做任何修改，可以直接給 HTML 讀取，執行結果如同未編譯的 JavaScript 檔案，你只需要專注於目標的編程，不管你用多新版本的代碼來實現，Babel 都可以幫你改善兼容性等相關問題。
 
@@ -278,7 +286,7 @@ $ npm install @babel/plugin-transform-runtime --save-dev
 }
 ```
 
-我們以之前 JavaScript 檔案進行示範，執行 gulp-babel 指令進行編譯，結果如下：
+我們以之前 JavaScript 檔案進行示範，執行 gulp babel 指令進行編譯，結果如下：
 
 ```js
 'use strict';
@@ -490,7 +498,7 @@ useBuiltIns：`entry`：
 
 <div class="note warning">使用 entry 選項記得在前面 import core-js/stable 和 regenerator-runtime/runtime 組件庫</div>
 
-待編譯檔案：
+> 待編譯檔案：
 
 ```js
 import 'core-js/stable';
@@ -507,7 +515,7 @@ class Circle {}
 const promise = Promise.resolve();
 ```
 
-完成編譯檔案：
+> 完成編譯檔案：
 
 ```js
 'use strict';
