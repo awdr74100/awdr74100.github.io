@@ -62,7 +62,7 @@ const arr = ['Roya', 'Owen', 'Eric'];
 
 const index = arr.findIndex((item) => item === 'Owen');
 
-console.log(`Owen 排在第 ${index} 順位`);
+console.log(`Owen 排在第 ${index + 1} 順位`);
 ```
 
 配置 `webpack.config.js` 檔案：
@@ -124,13 +124,13 @@ $ npm run build
 
 <!-- prettier-ignore-start -->
 ```js
-/*!***********************!*\
-  !*** ./src/js/all.js ***!
-  \***********************/
+/*!********************!*\
+  !*** ./src/all.js ***!
+  \********************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-eval("var arr = [\"Roya\", \"Owen\", \"Eric\"];\nvar index = arr.findIndex(function (item) {\n  return item === \"Owen\";\n});\nconsole.log(\"Owen \\u6392\\u5728\\u7B2C \".concat(index, \" \\u9806\\u4F4D\"));\n\n//# sourceURL=webpack:///./src/js/all.js?");
+eval("var arr = [\"Roya\", \"Owen\", \"Eric\"];\nvar index = arr.findIndex(function (item) {\n  return item === \"Owen\";\n});\nconsole.log(\"Owen \\u6392\\u5728\\u7B2C \".concat(index + 1, \" \\u9806\\u4F4D\"));\n\n//# sourceURL=webpack:///./src/all.js?");
 
 /***/ }),
 ```
@@ -150,9 +150,9 @@ eval("var arr = [\"Roya\", \"Owen\", \"Eric\"];\nvar index = arr.findIndex(funct
 
 查看結果：
 
-![babel-loader console](https://i.imgur.com/quUfaoV.png)
+![babel-loader console](https://i.imgur.com/PbbKEpn.png)
 
-![babel-loader source](https://i.imgur.com/kl24ZAE.png)
+![babel-loader source](https://i.imgur.com/WbDDmyi.png)
 
 如果你覺得 `bundle.js` 檔案閱讀起來很吃力，你也可以先將其引入至 `index.html` 內，之後再按 `F12` 切換至 `Source` 觀察編譯結果，可能會更好理解喔！
 
