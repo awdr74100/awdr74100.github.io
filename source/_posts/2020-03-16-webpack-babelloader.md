@@ -25,6 +25,8 @@ Babel 是一款 JavaScript 的編譯器，你可能會有疑問，JavaScript 不
 
 ## babel-loader 安裝
 
+> 套件連結：[babel-loader](https://github.com/babel/babel-loader)
+
 babel-loader 相關套件：
 
 ```bash
