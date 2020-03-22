@@ -146,7 +146,7 @@ import './css/all.css'; // 使用 ESM 方式引入
 $ npm run build
 ```
 
-此時打包生成 `dist` 資料夾結構應如下：
+此時打包生成的 `dist` 資料夾結構應如下：
 
 ```plain
 webpack-demo/
