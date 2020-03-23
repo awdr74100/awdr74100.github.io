@@ -184,4 +184,26 @@ webpack-demo/
 ```
 <!-- prettier-ignore-end -->
 
+有沒有覺得很神奇？打包後的 `dist/index.html` 居然自動幫我們引入了所有的靜態檔案，包含 CSS、JavaScript 等等，增加任何位數的 hash 值也都沒問題，html-webpack-plugin 能夠自動去幫我們做辨識，解決手動引入的困擾。
+
+你可能在思考 html-webpack-plugin 的功能就只有這些嗎？當然不只！還有包含類似 ejs 模板語言的編寫方式以及依照 chunk 載入不同 JavaScript 等等，這些都將在下面進行補充，一般人最常使用的功能大概就是自動引入靜態資源功能了，其實這個方法是依靠 `inject` 可傳遞選項來完成的，如下所示：
+
+```js
+module.exports = {
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: './src/index.html',
+      filename: 'index.html',
+      inject: true, // 預設為 true
+    }),
+  ],
+};
+```
+
+## html-webpack-plugin 可傳遞選項
+
+可參考 [html-webpack-plugin Options](https://github.com/jantimon/html-webpack-plugin#options) 可傳遞參數列表，以下為常用的參數配置：
+
+- meta：`Object`
+  以 `name`:`content` 方式插入 `meta` 標籤，默認為 `{}`
 

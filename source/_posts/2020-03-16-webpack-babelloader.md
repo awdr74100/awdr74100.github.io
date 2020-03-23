@@ -162,6 +162,8 @@ eval("var arr = [\"Roya\", \"Owen\", \"Eric\"];\nvar index = arr.findIndex(funct
 
 ## babel-loader 可傳遞選項
 
+可參考 [babel-loader Options](https://github.com/babel/babel-loader#options) 可傳遞參數列表，以下為常用的參數配置：
+
 - presets：`Array`
   Babel 插件集，默認為 `none`
 
