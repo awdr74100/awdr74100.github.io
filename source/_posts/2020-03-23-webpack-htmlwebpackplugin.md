@@ -19,6 +19,7 @@ updated: 2020-03-24 02:10:10
 - html-webpack-plugin 安裝
 - html-webpack-plugin 基本使用
 - html-webpack-plugin 可傳遞選項
+- 補充：使用自帶的 EJS 模板引擎進行撰寫
 
 ## html-webpack-plugin 安裝
 
@@ -189,6 +190,8 @@ webpack-demo/
 你可能在思考 html-webpack-plugin 的功能就只有這些嗎？當然不只！還有包含類似 ejs 模板語言的編寫方式以及依照 chunk 載入不同 JavaScript 等等，這些都將在下面進行補充，一般人最常使用的功能大概就是自動引入靜態資源功能了，其實這個方法是依靠 `inject` 可傳遞選項來完成的，如下所示：
 
 ```js
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
 module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
@@ -207,3 +210,24 @@ module.exports = {
 - meta：`Object`
   以 `name`:`content` 方式插入 `meta` 標籤，默認為 `{}`
 
+- favicon：`String`
+  添加 favicon 圖示至 HTML，默認為 `""`
+
+範例：
+
+```js
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+module.exports = {
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: './src/index.html',
+      filename: 'index.html',
+      meta: {
+        viewport: 'width=device-width, initial-scale=1.0',
+      },
+      favicon: './src/img/favicon.ico',
+    }),
+  ],
+};
+```
