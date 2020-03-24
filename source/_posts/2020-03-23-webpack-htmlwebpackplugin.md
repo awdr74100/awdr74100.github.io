@@ -5,9 +5,9 @@ description:
     在之前介紹 Webpack 的各種 loader 時，最後都得手動生成 HTML 文件並引入相關的靜態檔案，這樣不是很矛盾嗎？Webpack 可是自動化工具阿！怎會有這麼個缺陷？不用擔心，那是因為我們還沒使用 html-webpack-plugin 這一個插件，html-webpack-plugin 可以幫助我們指定任意的 HTML 模板，並透過傳遞選項方式，生成對應的 HTML 文件，同時也會將 entry 內的所有靜態文件做引入動作，解決手動引入的困擾。此篇將介紹如何透過 html-webpack-plugin 生成自動引入靜態檔案的 HTML 文件。,
   ]
 categories: [Webpack]
-tags: [Webpack, Node.js]
+tags: [Webpack, Node.js, w3HexSchool]
 date: 2020-03-23 12:20:45
-updated: 2020-03-24 02:10:10
+updated: 2020-03-24 20:39:45
 ---
 
 ## 前言
