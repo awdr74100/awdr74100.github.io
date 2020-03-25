@@ -128,7 +128,7 @@ $ npm run build
 }
 ```
 
-再次執行 `npm run build` 指令，並查看編譯結果：
+再次執行 `npm run build` 指令，以下為編譯後的目錄結構：
 
 ```plain
 webpack-demo/
@@ -279,7 +279,7 @@ module.exports = {
 };
 ```
 
-有 `cleanOnceBeforeBuildPatterns` 的存在，想當然也有 `cleanAfterEveryBuildPatterns` 的存在，使用方式一模一樣，差別只在於一個是編譯前進行處理，一個是編譯後進行處理，各位可自行嘗試，下面為 `cleanAfterEveryBuildPatterns` 的預設值：
+有 `cleanOnceBeforeBuildPatterns` 的存在，想當然也有 `cleanAfterEveryBuildPatterns` 的存在，使用方式一模一樣，差別只在於一個是編譯前進行處理，一個是編譯後進行處理，各位可自行嘗試，下面為 `cleanAfterEveryBuildPatterns` 的範例：
 
 ```js
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
