@@ -42,6 +42,8 @@ $ npm install css-loader mini-css-extract-plugin -D
 
 ## html-webpack-plugin 基本使用
 
+<div class="note warning">此次範例會搭配 css-loader 與 mini-css-extract-plugin 一起使用，相關文章連結：<a href="https://awdr74100.github.io/2020-02-26-webpack-cssloader-styleloader/" target="_blank">css-loader</a>、<a href="https://awdr74100.github.io/2020-03-02-webpack-minicssextractplugin/" target="_blank">mini-css-extract-plugin</a></div>
+
 初始專案結構：
 
 ```plain
