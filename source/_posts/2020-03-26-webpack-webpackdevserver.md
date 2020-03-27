@@ -358,4 +358,4 @@ module.expores = {
 };
 ```
 
-前面有講解到關於 `contentBase` 的使用技巧，而 `watchContentBase` 這一個選項就是用來更改 `contentBase` 作用的，當你開啟這一個選項，它會幫你監控指定目錄或檔案是否有更動，如果有，即刷新頁面。當然如果你使用 Vue-loader 等套件時，並沒有這一個問題，因為都會通過 entry 入口處，而 html-webpack-plugin 是以抓取模板的方式進行處理，並不會通過 entry，這也導致了無法支援 HMR，說實在的，真的很可惜阿！
+前面有講解到關於 `contentBase` 的使用技巧，而 `watchContentBase` 這一個選項就是用來更改 `contentBase` 作用的，當你開啟這一個選項，它會幫你監控指定目錄或檔案是否有更動，如果有，即刷新頁面。當然如果你使用的是像 vue-loader 等方式進行畫面渲染的話，就沒有這一個問題，因為都會通過 entry 入口處，而 html-webpack-plugin 是以抓取模板的方式進行處理，並不會通過 entry，這也導致了無法支援 HMR，說實在的，真的很可惜阿！
