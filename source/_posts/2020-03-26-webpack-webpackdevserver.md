@@ -1,8 +1,8 @@
 ---
-title: Webpack 前端打包工具 - 使用 webpack-dev-server 實現 Live Reload 或 Hot Module Replacement 方式進行開發
+title: Webpack 前端打包工具 - 使用 webpack-dev-server 實現 Live Reload 或 HMR 方式進行開發
 description:
   [
-    在 Gulp 的環境中，我們會導入 Browsersync 套件方便以 Live Reload 方式做開發，在 Webpack 中也有類似的套件，名為 webpack-dev-server，與傳統 Live Reload 工具較為不同的是，除了支援 Live Reload 以外，還支援 HMR (Hot Module Replacement) 特性，再不刷新 Browser 的情況下注入修改過後的代碼，達到不丟失應用狀態下即時更新畫面。此篇將介紹如何使用 webpack-dev-server 以 Live Reload 或 HMR 方式進行開發，途中也會補充 publicPath 與 contentBase 這兩個坑人的選項正確用法。,
+    在 Gulp 的環境中，我們會導入 Browsersync 套件方便以 Live Reload 方式做開發，在 Webpack 中也有類似的套件，名為 webpack-dev-server，與傳統 Live Reload 工具較為不同的是，除了支援 Live Reload 方式以外，同時也支援 HMR (Hot Module Replacement) 特性，再不刷新 Browser 的情況下注入修改過後的代碼，達到不丟失應用狀態下即時更新畫面。此篇將介紹如何使用 webpack-dev-server 以 Live Reload 或 HMR 方式進行開發，途中也會補充 publicPath 與 contentBase 這兩個坑人的選項正確用法。,
   ]
 categories: [Webpack]
 tags: [Webpack, Node.js]
@@ -12,7 +12,7 @@ updated: 2020-03-27 22:00:10
 
 ## 前言
 
-在 Gulp 的環境中，我們會導入 Browsersync 套件方便以 Live Reload 方式做開發，在 Webpack 中也有類似的套件，名為 webpack-dev-server，與傳統 Live Reload 工具較為不同的是，除了支援 Live Reload 以外，還支援 HMR (Hot Module Replacement) 特性，再不刷新 Browser 的情況下注入修改過後的代碼，達到不丟失應用狀態下即時更新畫面。此篇將介紹如何使用 webpack-dev-server 以 Live Reload 或 HMR 方式進行開發，途中也會補充 publicPath 與 contentBase 這兩個坑人的選項正確用法。
+在 Gulp 的環境中，我們會導入 Browsersync 套件方便以 Live Reload 方式做開發，在 Webpack 中也有類似的套件，名為 webpack-dev-server，與傳統 Live Reload 工具較為不同的是，除了支援 Live Reload 方式以外，同時也支援 HMR (Hot Module Replacement) 特性，再不刷新 Browser 的情況下注入修改過後的代碼，達到不丟失應用狀態下即時更新畫面。此篇將介紹如何使用 webpack-dev-server 以 Live Reload 或 HMR 方式進行開發，途中也會補充 publicPath 與 contentBase 這兩個坑人的選項正確用法。
 
 ## 筆記重點
 
