@@ -1,5 +1,5 @@
 ---
-title: Gulp 前端自動化 - 導入 Bootstrap 客製並編譯它
+title: Gulp 前端自動化 - 客製化 Bootstrap 樣式並進行編譯
 description:
   [
     Bootstrap 目前已經算是前端必備的技能了，相信大部分人在使用時都是以 CDN 的方式進行載入，但這樣子的作法等同於將整個官方預編譯好的 Bootstrap 進行載入，當我們需要客製化 Bootstrap 樣式時，必定得採取其他方法。此篇將介紹如何使用 npm 方式載入 Bootstrap，並透過 Gulp 編譯屬於我們自己的客製化樣式。,
@@ -63,38 +63,45 @@ gulp-demo/
 └─── package.json         # 安裝 gulp、gulp-sass、gulp-postcss、autoprefixer、bootstrap
 ```
 
+<div class="note warning">推薦使用懶人覆蓋法，將 ./node_modules/bootstrap/scss/_variables.scss 另存新檔至本地端</div>
+
 `./source/scss/helpers/_variables.scss` 新增並修改預設變數(須查詢預設變數名稱)：
 
 ```scss
 /* 查詢 node_modules/bootstrap/scss/_variables.scss 預設變數並新增到本地檔案 */
 
-$primary: #178ba0;
+$primary: #178ba0; // 隨意修改變數
 $success: #35a327;
 ```
 
 `./source/scss/helpers/_variables.scss` 新增並修改預設變數(懶人覆蓋法)：
 
+<!-- prettier-ignore-start -->
 ```scss
 /* 另存新檔 node_modules/bootstrap/scss/_variables.scss 預設變數並修改 */
 
-$white: #e8e8e8 !default;
-// 以下省略
+// 其他省略 ...
+$primary:       #178ba0; // $blue !default;
+$success:       #35a327; // $green !default;
 ```
+<!-- prettier-ignore-end -->
 
-根據官方文檔說明，Bootstrap 4 中的每個 Sass 變數都包含 `!default` 標誌，允許您在自己的 Sass 中覆蓋變數的預設值，而無需修改 Bootstrap 的原始碼。唯一要注意的是**新變數必須在導入 Bootstrap 的 Sass 文件之前**，否則無法成功，如下範例：
+根據官方文檔說明，Bootstrap 4 中的每個 SCSS 變數都包含 `!default` 標誌，允許您在自己的 SCSS 中覆蓋變數的預設值，而無需修改 Bootstrap 的原始碼。唯一要注意的是**新變數必須在導入 Bootstrap 的 SCSS 主文件之前**，否則無法成功，如下範例：
 
-<div class="note warning">includePaths 為 gulp-sass 套件的可傳遞選項，接受屬性值為字串符陣列，默認為空陣列，主要用來讓解析引擎遍歷這些傳入的路徑，尋找 sass 模塊，已嘗試解析 @import 宣告</div>
+<div class="note warning">includePaths 為 gulp-sass 套件的可傳遞選項，接受屬性值為字串符陣列，默認為空陣列，主要用來讓解析引擎遍歷這些傳入的路徑，尋找 SCSS 模塊，已嘗試解析 @import 宣告</div>
 
 路徑：`./source/scss/all.scss`
 
 ```scss
-/* --- 本地端檔案 --- */
-@import './helpers/variables';
+/* --- Required (使用 includePaths 方法) --- */
+@import 'functions';
+@import './helpers/variables'; // 使用本地檔案
+@import 'mixins';
 
 /* --- Bootstrap 主檔案 --- */
 // @import "../../node_modules/bootstrap/scss/bootstrap.scss";
 
-/* --- Bootstrap 主檔案 - (使用 includePaths 方法) --- */
+/* --- Bootstrap 主檔案 (使用 includePaths 方法)--- */
 @import 'bootstrap';
 ```
 
@@ -186,30 +193,20 @@ Bootstrap 組成架構：
 ```scss
 // 路徑：node_modules/bootstrap/scss/bootstrap.scss
 
-/* --- 基本物件 --- */
 @import 'functions';
 @import 'variables';
 @import 'mixins';
-
-/* --- 重製 --- */
 @import 'root';
 @import 'reboot';
-@import 'print';
-
-/* --- 核心 --- */
 @import 'type';
 @import 'images';
 @import 'code';
 @import 'grid';
 @import 'tables';
-
-/* --- 元件 --- */
 @import 'forms';
 @import 'buttons';
 @import 'transitions';
-@import 'dropdown';
-@import 'button-group';
-// ... 以下省略
+// 以下省略 ...
 ```
 
 Bootstrap 是一個標準的 OOCSS 範例，也因為使用此設計準則，我們可以很輕鬆的移除沒有使用到的元件。請先將 Bootstrap 主檔案內容複製到 `./source/scss/all.scss` 內，接著註釋掉不需使用的元件，如下範例：
@@ -217,9 +214,12 @@ Bootstrap 是一個標準的 OOCSS 範例，也因為使用此設計準則，我
 ```scss
 // 路徑：./source/scss/all.scss
 
-// ... 以上省略
+// Required
+@import 'functions';
+@import 'variables';
+@import 'mixins';
 
-/* --- 元件 --- */
+// 自訂需載入的元件
 @import 'forms';
 @import 'buttons';
 // @import "transitions";
@@ -228,7 +228,7 @@ Bootstrap 是一個標準的 OOCSS 範例，也因為使用此設計準則，我
 // ... 以下省略
 ```
 
-`gulpfile.js` 檔案內容如同前面範例，唯一要注意的是 `includePaths` 須導入 `node_modules/bootstrap/scss/` 路徑，否則編譯器找不到 @import 宣告的檔案。
+`gulpfile.js` 檔案內容如同前面範例，這邊要注意的是，`function`、`variables`、`mixins` 是必要載入的檔案，所有元件都須依賴這三個檔案。
 
 執行指定任務
 
