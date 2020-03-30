@@ -88,7 +88,7 @@ console.log('測試 3：' + argv(process.argv.slice(2)).env); // 測試 3：prod
 console.log('測試 4：' + argv(process.argv.slice(2)).config); // 測試 4：HelloWorld
 ```
 
-從上面範例可以得知，使用 `parseArgs(process.argv.slice(2))` 即可取得命令行傳遞參數，命令行格式需為 `$ node test.js --參數(key) 參數(value)`；應用時只需拿取對應的參數(key)，即可獲得參數(key)內的參數(value)。讓我們來實際演練一番。
+從上面範例可以得知，使用 `parseArgs(process.argv.slice(2))` 即可取得命令行傳遞參數，命令行格式需為 `$ node test.js --參數(key) 參數(value)`；應用時只需拿取對應的參數 (key)，即可獲得參數 (key) 內的參數 (value)。讓我們來實際演練一番。
 
 載入並使用 minimist、gulp-if：
 
@@ -201,4 +201,4 @@ console.log(argv); // [Node.js 路徑, test.js 路徑, '--env', 'development']
 console.log(argv[3]); // development
 ```
 
-從上面範例可以得知，原生的 Node.js 獲取命令行參數方法參數(key)與參數(value)是沒有任何關聯性的，所有參數值都將成為陣列中的項目，實際使用起來很不人性化，建議使用 minimist 套件來完成。
+從上面範例可以得知，原生的 Node.js 獲取命令行參數方法參數 (key) 與參數 (value) 是沒有任何關聯性的，所有參數值都將成為陣列中的項目，實際使用起來很不人性化，建議使用 minimist 套件來完成。
