@@ -200,9 +200,9 @@ module.exports = {
 ```
 
 - `publicPath`
-- 打包生成的靜態文件在記憶體中的位置 (若 devServer.publicPath 沒有設置，則參考 output.publicPath 的值，若兩者都沒有設置，預設為 `/` )
+  - 打包生成的靜態文件在記憶體中的位置 (若 devServer.publicPath 沒有設置，則參考 output.publicPath 的值，若兩者都沒有設置，預設為 `/` )
 - `contentBase`
-- 告訴伺服器從何處提供原始內容。僅當你要提供靜態文件時才需要配置 (devServer.publicPath 優先於此選項使用，預設為當前執行目錄)
+  - 告訴伺服器從何處提供原始內容。僅當你要提供靜態文件時才需要配置 (devServer.publicPath 優先於此選項使用，預設為當前執行目錄)
 
 上面這兩個選項就有點抽象了，讓我們直接執行 `npm run dev` 查看結果：
 
@@ -321,7 +321,7 @@ if (module.hot) {
 
 以上測試是基於修改 `./src/js/all.js` 檔案而成，可以發現 HMR 確實成功啟用了，再不更新頁面的狀態下注入打包過後的新代碼，開發體驗提高不少，但這邊還有一個問題，就是修改 `./src/css/all.css` 檔案時，並沒有任何反應，那是因為我們還沒有開啟 mini-css-extract-plugin 的 HMR 支持，操作如下：
 
-<div class="note warning">style-loader 預設就已經開啟 HMR 支持，不需要特定做配置</div>
+<div class="note warning">style-loader 預設就已經開啟 HMR 支持，不需要特別做設定</div>
 
 ```js
 module.exports = {
@@ -359,4 +359,4 @@ module.expores = {
 };
 ```
 
-前面有講解到關於 `contentBase` 的使用技巧，而 `watchContentBase` 這一個選項就是用來更改 `contentBase` 作用的，當你開啟這一個選項，它會幫你監控指定目錄或檔案是否有更動，如果有，即刷新頁面。當然如果你使用的是像 vue-loader 等方式進行畫面渲染的話，就沒有這一個問題，因為都會通過 entry 入口處，而 html-webpack-plugin 是以抓取模板的方式進行處理，並不會通過 entry，這也導致了無法支援 HMR，說實在的，真的很可惜阿！
+前面有講解到關於 `contentBase` 的使用技巧，而 `watchContentBase` 這一個選項就是用來更改 `contentBase` 作用的，當你開啟這一個選項，它會幫你監控指定目錄或檔案是否有更動，如果有，即刷新頁面。當然如果你使用的是像 vue-loader 等方式進行畫面渲染的話，就沒有這一個問題，因為都會通過 entry 入口處，而 html-webpack-plugin 是以抓取模板的方式進行處理，並不會通過 entry，這也導致了無法支援 HMR，說實在的，真的很可惜阿。
