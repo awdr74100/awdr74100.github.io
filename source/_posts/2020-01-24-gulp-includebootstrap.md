@@ -65,7 +65,7 @@ gulp-demo/
 
 <div class="note warning">推薦使用懶人覆蓋法，將 ./node_modules/bootstrap/scss/_variables.scss 另存新檔至本地端</div>
 
-`./source/scss/helpers/_variables.scss` 新增並修改預設變數(須查詢預設變數名稱)：
+新增 `./source/scss/helpers/_variables.scss` 並修改預設變數(須查詢預設變數名稱)：
 
 ```scss
 /* 查詢 node_modules/bootstrap/scss/_variables.scss 預設變數並新增到本地檔案 */
@@ -74,7 +74,7 @@ $primary: #178ba0; // 隨意修改變數
 $success: #35a327;
 ```
 
-`./source/scss/helpers/_variables.scss` 新增並修改預設變數(懶人覆蓋法)：
+新增 `./source/scss/helpers/_variables.scss` 並修改預設變數(懶人覆蓋法)：
 
 <!-- prettier-ignore-start -->
 ```scss
