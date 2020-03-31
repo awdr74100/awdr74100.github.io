@@ -5,7 +5,7 @@ description:
     隨著 JavaScript 版本的推進，ES6 版本已逐漸大眾化，在各種開發環境下，ES6 相關語法都能夠更有效率的幫助你完成目的，唯一的問題是，在 Node 環境中，ES6 的大部分特性都以支援，唯獨模組化機制尚未完整支援，都還是得依靠 Babel 等相關編譯器將代碼編譯成 ES5 代碼以解決兼容性問題。此篇將使用 import/export 等 ES6 module 語法撰寫我們的 Gulpfile，並透過 Babel 編譯以保證任務成功運行。,
   ]
 categories: [Gulp]
-tags: [Gup 4, Node.js]
+tags: [Gulp 4, Node.js]
 date: 2020-02-03 18:57:47
 updated: 2020-02-04 18:26:55
 ---
