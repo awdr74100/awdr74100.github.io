@@ -297,7 +297,7 @@ npm run build
 
 ![bootstrap 依賴模組未安裝](https://i.imgur.com/gAUTawv.png)
 
-Bootstrap 的某些元件如 navbar、alert 需要依賴 jQuery 與 Popper.js 來動作，相信各位對這兩個模組不陌生，以往我們都是採用 CDN 方式引入，這邊我們改採用 Webpack 進行打包處理，這邊要注意的是，我們只需要下載 jQuery 即可，Popper.js 已經封裝在 `bootstrap.bundle.js` 內，直接做載入就能使用。
+Bootstrap 的某些元件如 navbar、alert 需要依賴 jQuery 與 Popper.js 來動作，相信各位對這兩個模組不陌生，以往我們都是採用 CDN 方式引入，這邊我們改採用 npm 方式載入，這邊要注意的是，我們只需要下載 jQuery 即可，Popper.js 已經封裝在 `bootstrap.bundle.js` 內，直接做載入就能使用。
 
 > 套件連結：[jquery](https://www.npmjs.com/package/jquery)
 

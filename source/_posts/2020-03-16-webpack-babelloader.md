@@ -210,7 +210,7 @@ module.exports = {
 
 <div class="note danger">Babel 默認只針對 Syntax 做轉換，例如：箭頭函式、ES6 變數、Class 語法糖等等，而自帶的 API 與原生內置的 methods 需要透過 polyfill 後才能在瀏覽器正常運行。</div>
 
-當前使用 Babel 版本：`v7.8.7`
+當前使用 Babel 版本：`v7.9.0`
 
 ---
 
