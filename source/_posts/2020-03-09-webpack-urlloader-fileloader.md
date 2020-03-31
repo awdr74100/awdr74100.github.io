@@ -26,16 +26,23 @@ updated: 2020-03-10 00:35:08
 
 > 套件連結：[url-loader](https://github.com/webpack-contrib/url-loader)、[file-loader](https://github.com/webpack-contrib/file-loader)
 
-url-loader：
+主要的套件：
 
 ```bash
-$ npm install url-loader -D
+npm install url-loader file-loader -D
 ```
 
-file-loader：
+package.json：
 
-```bash
-$ npm install file-loader -D
+```json
+{
+  "devDependencies": {
+    "file-loader": "^6.0.0",
+    "url-loader": "^4.0.0",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11"
+  }
+}
 ```
 
 在前面章節，我們會先以 file-loader 做示範，直到關於 `base64` 一詞的出現，才會使用到 url-loader，請先將兩個 loader 進行安裝。
@@ -58,7 +65,7 @@ webpack-demo/
 │
 └─── webpack.config.js    # Webpack 配置檔案
 └─── package-lock.json
-└─── package.json         # 已安裝 webpack、webpack-cli、url-loader、file-loader
+└─── package.json
 ```
 
 配置 `webpack.config.js` 檔案：
@@ -99,7 +106,7 @@ import './img/test.png';
 執行編譯指令：
 
 ```bash
-$ npm run build
+npm run build
 ```
 
 此時會生成名稱為 hash 值的圖片檔案：
@@ -143,7 +150,7 @@ module.exports = {
 再次執行編譯指令：
 
 ```bash
-$ npm run build
+npm run build
 ```
 
 此時會生成與 entry 檔案名稱相同的圖片檔案：
@@ -229,7 +236,7 @@ url-loader 唯一的功能就在於將資源轉換為 `base64` 的格式，主�
 再次執行編譯指令：
 
 ```bash
-$ npm run build
+npm run build
 ```
 
 通過 url-loader 的文件將轉成 `base64` 存在於 bundle.js 內：
@@ -326,13 +333,13 @@ module.exports = {
 url-loader 與 file-loader：
 
 ```bash
-$ npm install url-loader file-loader -D
+npm install url-loader file-loader -D
 ```
 
 require：
 
 ```bash
-$ npm install css-loader mini-css-extract-plugin -D
+npm install css-loader mini-css-extract-plugin -D
 ```
 
 初始專案結構：
@@ -456,7 +463,7 @@ import './css/all.css';
 執行編譯指令：
 
 ```bash
-$ npm run build
+npm run build
 ```
 
 至 `./index.html` 引入打包而成的 `bundle.js` 與 `main.css` 檔案：
@@ -583,7 +590,7 @@ module.exports = {
 執行編譯：
 
 ```bash
-$ npm run build
+npm run build
 ```
 
 此時 `src` 資料夾內的 `font` 也通通打包進來了，以下為打包後的 `dist` 資料夾專案結構：

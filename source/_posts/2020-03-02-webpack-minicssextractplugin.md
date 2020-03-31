@@ -27,16 +27,29 @@ updated: 2020-03-03 08:26:34
 
 > 套件連結：[mini-css-extract-plugin](https://github.com/webpack-contrib/mini-css-extract-plugin)、[css-loader](https://github.com/webpack-contrib/css-loader)
 
-mini-css-extract-plugin：
+主要的套件：
 
 ```bash
-$ npm install mini-css-extract-plugin -D
+npm install mini-css-extract-plugin -D
 ```
 
-require：
+過程使用的套件：
 
 ```bash
-$ npm install css-loader -D
+npm install css-loader -D
+```
+
+package.json：
+
+```json
+{
+  "devDependencies": {
+    "css-loader": "^3.4.2",
+    "mini-css-extract-plugin": "^0.9.0",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11"
+  }
+}
 ```
 
 這邊要注意的是 mini-css-extract-plugin 是屬於 Webpack 的 Plugin，主要為 style-loader 的另一種類型套件，你可以不用下載 style-loader，但主要編譯還是得依靠 css-loader，也就是說 mini-css-extract-plugin 與 css-loader 都必須進行安裝。
@@ -62,7 +75,7 @@ webpack-demo/
 └─── index.html           # 引入 bundle.js 與 main.css 測試用檔案
 └─── webpack.config.js    # Webpack 配置檔案
 └─── package-lock.json
-└─── package.json         # 已安裝 webpack、webpack-cli、css-loader、mini-css-extract-plugin
+└─── package.json
 ```
 
 撰寫 CSS 範例：
@@ -121,7 +134,7 @@ import './css/all.css'; // 使用 ESM 方式引入
 執行編譯指令：
 
 ```bash
-$ npm run build
+npm run build
 ```
 
 至 `./index.html` 引入打包而成的 `bundle.js` 與 `main.css` 檔案：
@@ -209,7 +222,7 @@ module.exports = {
 執行編譯指令：
 
 ```bash
-$ npm run build
+npm run build
 ```
 
 成功編譯，打包後的 CSS 如下：
@@ -233,7 +246,7 @@ $ npm run build
 執行編譯指令：
 
 ```bash
-$ npm run build
+npm run build
 ```
 
 編譯失敗，出現以下結果：
@@ -253,7 +266,7 @@ require("./test.jpg");
 而為什麼會發生錯誤呢？原理如同之前所介紹的 Webpack 基礎知識，Webpack 本身只能處理 JavaScript 檔案，如果需要使用 CSS，就必須引入到 entry 內並配置 css-loader，而圖片檔則是依靠 url-loader 或 file-loader，這兩個 loader 就是專門用來處理圖片等類似檔案的，讓我們以 file-loader 來示範：
 
 ```bash
-$ npm install file-loader -D
+npm install file-loader -D
 ```
 
 配置 `webpack.config.js` 檔案：
@@ -294,7 +307,7 @@ module.exports = {
 關於 file-loader 的配置可至相關連結進行閱讀，這邊就不多加以說明，讓我們直接進行編譯看看：
 
 ```bash
-$ npm run build
+npm run build
 ```
 
 成功編譯！此時 `src` 資料夾內的圖片也通通打包進來了，以下為打包後的 `dist` 資料夾專案結構：

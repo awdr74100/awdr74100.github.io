@@ -23,18 +23,32 @@ updated: 2020-03-26 00:03:11
 
 ## clean-webpack-plugin 安裝
 
-> 套件連結：[clean-webpack-plugin](https://github.com/johnagan/clean-webpack-plugin)、[css-loader](https://github.com/webpack-contrib/css-loader)、[mini-css-extract-plugin](https://github.com/webpack-contrib/mini-css-extract-plugin)
+> 套件連結：[clean-webpack-plugin](https://github.com/johnagan/clean-webpack-plugin)
 
-clean-webpack-plugin：
+主要的套件：
 
 ```bash
-$ npm install clean-webpack-plugin -D
+npm install clean-webpack-plugin -D
 ```
 
-require：
+過程會使用到的套件：
 
 ```bash
-$ npm install css-loader mini-css-extract-plugin -D
+npm install css-loader mini-css-extract-plugin -D
+```
+
+package.json：
+
+```json
+{
+  "devDependencies": {
+    "clean-webpack-plugin": "^3.0.0",
+    "css-loader": "^3.4.2",
+    "mini-css-extract-plugin": "^0.9.0",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11"
+  }
+}
 ```
 
 為了避免有任何誤會，請同時安裝 CSS 相關 loader 以及 clean-webpack-plugin，這一個 Plugin 主要是針對資料夾做操作，並不是針對特定檔案做操作，確保測試所建構出的檔案能夠完整被刪除。
@@ -59,7 +73,7 @@ webpack-demo/
 │
 └─── webpack.config.js    # Webpack 配置檔案
 └─── package-lock.json
-└─── package.json         # 已安裝 webpack、webpack-cli、css-loader、clean-webpack-plugin、mini-css-extract-plugin
+└─── package.json
 ```
 
 <div class="note warning">前面為示範之前所提到的遺留測試所建構檔案問題。</div>
@@ -119,7 +133,7 @@ module.exports = {
 執行編譯指令：
 
 ```bash
-$ npm run build
+npm run build
 ```
 
 隨意修改 CSS 使 hash 值更動：

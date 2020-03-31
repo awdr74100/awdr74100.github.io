@@ -7,7 +7,7 @@ description:
 categories: [Webpack]
 tags: [Webpack, Node.js, Bootstrap, PurgeCSS, CSS, w3HexSchool]
 date: 2020-03-30 13:37:33
-updated: 2020-03-30 13:37:33
+updated: 2020-03-31 18:15:05
 ---
 
 ## 前言
@@ -20,23 +20,22 @@ updated: 2020-03-30 13:37:33
 - purgecss-webpack-plugin 基本使用
 - purgecss-webpack-plugin 可傳遞選項
 - 補充：清除多餘的 Bootstrap 樣式
-- 補充：@fullhuman/postcss-purgecss 插件
 - 補充：PurifyCSS 線上縮減服務
 
 ## purgecss-webpack-plugin 安裝
 
 > 套件連結：[purgecss-webpack-plugin](https://purgecss.com/plugins/webpack.html)、[glob](https://www.npmjs.com/package/glob)
 
-主要套件：
+主要的套件：
 
 ```bash
 npm install purgecss-webpack-plugin glob -D
 ```
 
-次要套件：
+過程會使用到的套件：
 
 ```bash
-npm install autoprefixer css-loader html-webpack-plugin mini-css-extract-plugin node-sass postcss-loader sass-loader -D ; npm install bootstrap
+npm install html-webpack-plugin css-loader mini-css-extract-plugin sass-loader node-sass postcss-loader autoprefixer -D ; npm install bootstrap jquery -P
 ```
 
 package.json：
@@ -57,7 +56,8 @@ package.json：
     "webpack-cli": "^3.3.11"
   },
   "dependencies": {
-    "bootstrap": "^4.4.1"
+    "bootstrap": "^4.4.1",
+    "jquery": "^3.4.1"
   }
 }
 ```
@@ -151,7 +151,7 @@ module.exports = {
     new PurgecssPlugin({
       // 配置需解析檔案 (第四步)
       paths: glob.sync(`${path.resolve(__dirname, 'src')}/**/*`, {
-        nodir: true,
+        nodir: true, // 過濾資料夾結果 (第五步)
       }),
     }),
   ],
@@ -255,6 +255,7 @@ $ npm run build
 
 import './scss/all.scss';
 
+/* --- toggleClass --- */
 const btn = document.querySelector('.btn');
 const str = document.querySelector('h1');
 
@@ -316,3 +317,128 @@ module.exports = {
 
 ## 補充：清除多餘的 Bootstrap 樣式
 
+當我們了解了 PurgeCSS 的處理流程，對於移除 Bootstrap 多餘樣式來說就沒什麼難度了，但其中還是有些小陷阱需要大家注意，讓我們直接開始吧！
+
+至 `./src/scss/all.scss` 載入 Bootstrap：
+
+```scss
+/* --- 客製化樣式 --- */
+@import '~bootstrap/scss/functions';
+@import './helpers/variables';
+@import '~bootstrap/scss/mixins';
+
+/* --- Bootstrap 主檔案 --- */
+@import '~bootstrap/scss/bootstrap';
+```
+
+至 `./src/index.html` 新增 Bootstrap 元件：
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="#">Navbar</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item dropdown">
+            <a
+              class="nav-link dropdown-toggle"
+              href="#"
+              id="navbarDropdown"
+              role="button"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
+              Dropdown
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="#">Action</a>
+              <a class="dropdown-item" href="#">Another action</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="#">Something else here</a>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </body>
+</html>
+```
+
+entry 入口處 (`src/main.js`) 引入 Bootstrap 所需模組：
+
+```js
+import './scss/all.scss';
+
+// bootstrap require
+import 'jquery';
+import 'bootstrap/dist/js/bootstrap.bundle';
+```
+
+`webpack.config.js` 如同之前所配置，讓我們直接進行編譯並查看結果：
+
+![PurgeCSS 未分析 jquery 與 poopr](https://i.imgur.com/MMlqUVD.png)
+
+此時你會發現動態載入的樣式並不存在 `dist/css/main.css` 內，聰明的你應該可以問題了，那就是 Bootstrap 依賴的 JavaScript 我們並沒有傳入去做分析，導致代碼被移除了；解決方式也很簡單，那就是把他們通通傳入去做分析，這邊我們改使用 glob-all 套件取得多個檔案路徑：
+
+> 套件連結：[glob-all](https://www.npmjs.com/package/glob-all)
+
+```bash
+npm install glob-all -D
+```
+
+glob-all 與 glob 套件使用方式大同小異，glob-all 可由陣列方式傳入匹配路徑，詳細可看官方文檔。
+
+```js
+const glob = require('glob-all');
+
+module.exports = {
+  plugins: [
+    new PurgecssPlugin({
+      paths: glob.sync(
+        [
+          `${path.resolve(__dirname, 'src')}/**/*`,
+          path.resolve(__dirname, 'node_modules/jquery/dist/jquery.slim.js'),
+          path.resolve(__dirname, 'node_modules/bootstrap/dist/js/bootstrap.bundle.js'),
+        ],
+        {
+          nodir: true,
+        }
+      ),
+    }),
+  ],
+};
+```
+
+在這邊我們新增了 `bootstrap.bundle.js` 與 `jquery` 的檔案路徑用以讓 PurgeCSS 分析，再次執行編譯並查看結果：
+
+![PurgeCSS 成功分析 Bootstrap 的 CSS 與 JS](https://i.imgur.com/rkI1RWD.png)
+
+大功告成！
+
+## 補充：PurifyCSS 線上縮減服務
+
+> 連結：[PurifyCSS](https://purifycss.online/)
+
+PurifyCSS 是一款基於 PurgeCSS 所設計的應用，可由線上分析方式提供優化後得代碼，以下為示範：
+
+![PurifyCSS 服務](https://i.imgur.com/pslx6K4.png)

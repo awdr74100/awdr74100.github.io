@@ -24,18 +24,32 @@ updated: 2020-03-24 20:39:45
 
 ## html-webpack-plugin 安裝
 
-> 套件連結：[html-webpack-plugin](https://github.com/jantimon/html-webpack-plugin)、[css-loader](https://github.com/webpack-contrib/css-loader)、[mini-css-extract-plugin](https://github.com/webpack-contrib/mini-css-extract-plugin)
+> 套件連結：[html-webpack-plugin](https://github.com/jantimon/html-webpack-plugin)
 
-html-webpack-plugin：
+主要的套件：
 
 ```bash
-$ npm install html-webpack-plugin -D
+npm install html-webpack-plugin -D
 ```
 
-require：
+過程會使用到的套件：
 
 ```bash
-$ npm install css-loader mini-css-extract-plugin -D
+npm install css-loader mini-css-extract-plugin -D
+```
+
+package.json：
+
+```json
+{
+  "devDependencies": {
+    "css-loader": "^3.4.2",
+    "html-webpack-plugin": "^4.0.3",
+    "mini-css-extract-plugin": "^0.9.0",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11"
+  }
+}
 ```
 
 為了模擬一般開發常見的環境，請同時安裝 css-loader 與 mini-css-extract-plugin 用以處理 CSS 檔案，最後我們會透過 html-webpack-plugin 將這些靜態檔案做自動引入的動作，同時生成以 `templete` 可傳遞選項指定模板的 HTML 文件。
@@ -61,7 +75,7 @@ webpack-demo/
 │
 └─── webpack.config.js    # Webpack 配置檔案
 └─── package-lock.json
-└─── package.json         # 已安裝 webpack、webpack-cli、css-loader、mini-css-extract-plugin、html-webpack-plugin
+└─── package.json
 ```
 
 撰寫 CSS 範例：
@@ -147,7 +161,7 @@ import './css/all.css'; // 使用 ESM 方式引入
 執行編譯指令：
 
 ```bash
-$ npm run build
+npm run build
 ```
 
 此時打包生成的 `dist` 資料夾結構應如下：

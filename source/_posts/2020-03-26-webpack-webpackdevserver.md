@@ -23,18 +23,33 @@ updated: 2020-03-27 22:00:10
 
 ## webpack-dev-server 安裝
 
-> 套件連結：[webpack-dev-server](https://github.com/webpack/webpack-dev-server)、[css-loader](https://github.com/webpack-contrib/css-loader)、[html-webpack-plugin](https://github.com/jantimon/html-webpack-plugin)、[mini-css-extract-plugin](https://github.com/webpack-contrib/mini-css-extract-plugin)
+> 套件連結：[webpack-dev-server](https://github.com/webpack/webpack-dev-server)
 
-webpack-dev-server：
+主要的套件：
 
 ```bash
-$ npm install webpack-dev-server -D
+npm install webpack-dev-server -D
 ```
 
-require：
+過程會使用到的套件：
 
 ```bash
-$ npm install css-loader html-webpack-plugin mini-css-extract-plugin -D
+npm install css-loader html-webpack-plugin mini-css-extract-plugin -D
+```
+
+package.json：
+
+```json
+{
+  "devDependencies": {
+    "css-loader": "^3.4.2",
+    "html-webpack-plugin": "^4.0.3",
+    "mini-css-extract-plugin": "^0.9.0",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.10.3"
+  }
+}
 ```
 
 請先將一般開發環境所需的 loader 與 plugin 進行安裝，最後也必須安裝 webpack-dev-server 用以作為此次討論的目標。
@@ -64,7 +79,7 @@ webpack-demo/
 │
 └─── webpack.config.js    # Webpack 配置檔案
 └─── package-lock.json
-└─── package.json         # 已安裝 webpack、webpack-cli、webpack-dev-server、css-loader、html-webpack-plugin、mini-css-extract-plugin
+└─── package.json
 ```
 
 撰寫 CSS 範例：
@@ -157,7 +172,7 @@ import './js/all';
 執行 `dev` 指令：
 
 ```bash
-$ npm run dev
+npm run dev
 ```
 
 手動輸入 `localhost:8080` 開啟本地伺服器：
@@ -264,7 +279,7 @@ module.exports = {
 
 ## webpack-dev-server 可傳遞選項
 
-可參考 [webpack-dev-server Configuration](https://github.com/johnagan/clean-webpack-plugin#options-and-defaults-optional) 可傳遞參數列表，以下為常用的參數配置：
+可參考 [webpack-dev-server Configuration](https://webpack.js.org/configuration/dev-server/#devserverstats-) 可傳遞參數列表，以下為常用的參數配置：
 
 - stats：`none` | `errors-only` | `minimal` | `normal` | `verbose` | `Object`
   精準控制要顯示的 bundle 訊息，可使用集成配置或自訂配置，可參考 [stats 文檔](https://webpack.js.org/configuration/stats/)，默認為 `normal`

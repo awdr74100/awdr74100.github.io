@@ -24,18 +24,33 @@ updated: 2020-03-05 16:54:52
 
 ## sass-loader 安裝
 
-> 套件連結：[sass-loader](https://github.com/webpack-contrib/sass-loader)、[node-sass](https://github.com/sass/node-sass)、[css-loader](https://github.com/webpack-contrib/css-loader)、[mini-css-extract-plugin](https://github.com/webpack-contrib/mini-css-extract-plugin)
+> 套件連結：[sass-loader](https://github.com/webpack-contrib/sass-loader)、[node-sass](https://github.com/sass/node-sass)
 
-sass-loader：
+主要的套件：
 
 ```bash
-$ npm install sass-loader node-sass -D
+npm install sass-loader node-sass -D
 ```
 
-require：
+過程會使用到的套件：
 
 ```bash
-$ npm install css-loader mini-css-extract-plugin -D
+npm install css-loader mini-css-extract-plugin -D
+```
+
+package.json：
+
+```json
+{
+  "devDependencies": {
+    "css-loader": "^3.4.2",
+    "mini-css-extract-plugin": "^0.9.0",
+    "node-sass": "^4.13.1",
+    "sass-loader": "^8.0.2",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11"
+  }
+}
 ```
 
 請注意！安裝 sass-loader 並不像 gulp-sass 會將依賴的 node-sass 也一起安裝，也就是說 sass-loader 與 node-sass 都需要進行安裝。以及 sass-loader 只負責編譯 Sass/SCSS 部分，最後還是得依靠 css-loader 與 mini-css-extract-plugin 生成獨立的檔案，通通給他安裝下去就對了！
@@ -61,7 +76,7 @@ webpack-demo/
 └─── index.html           # 引入 bundle.js 與 main.css 測試用檔案
 └─── webpack.config.js    # Webpack 配置檔案
 └─── package-lock.json
-└─── package.json         # 已安裝 webpack、webpack-cli、css-loader、mini-css-extract-plugin、sass-loader、node-sass
+└─── package.json
 ```
 
 撰寫 SCSS 範例：
@@ -120,7 +135,7 @@ import './scss/all.scss'; // 使用 ESM 方式引入
 執行編譯指令：
 
 ```bash
-$ npm run build
+npm run build
 ```
 
 至 `./index.html` 引入打包而成的 `bundle.js` 與 `main.css` 檔案：
@@ -186,7 +201,7 @@ module.exports = {
 使用 Node Sass 編譯器：
 
 ```bash
-$ npm install node-sass -D
+npm install node-sass -D
 ```
 
 ```json
@@ -201,7 +216,7 @@ $ npm install node-sass -D
 使用 Dart Sass 編譯器：
 
 ```bash
-$ npm install sass -D
+npm install sass -D
 ```
 
 ```json
@@ -326,10 +341,10 @@ module.exports = {
 }
 ```
 
-這邊要注意在 SCSS 的環境中必須增加 `~` 前綴以使用 `alias` 的內容，避免被 Webpack 認知成相對路徑的模組，在 [官方文件](https://github.com/webpack-contrib/sass-loader#resolving-import-at-rules) 也有說明，此時讓我們直接編譯看看：
+這邊要注意在 sass-loader 處理的檔案中，必須增加 `~` 前綴以告知此不是相對路徑內容，而是需要 Webpack 去解析的模塊，在 [官方文件](https://github.com/webpack-contrib/sass-loader#resolving-import-at-rules) 也有說明，此時讓我們直接編譯看看：
 
 ```bash
-$ npm run build
+npm run build
 ```
 
 編譯結果：

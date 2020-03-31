@@ -27,10 +27,24 @@ Babel 是一款 JavaScript 的編譯器，你可能會有疑問，JavaScript 不
 
 > 套件連結：[babel-loader](https://github.com/babel/babel-loader)
 
-babel-loader 相關套件：
+主要的套件：
 
 ```bash
-$ npm install babel-loader @babel/core @babel/preset-env -D
+npm install babel-loader @babel/core @babel/preset-env -D
+```
+
+package.json：
+
+```json
+{
+  "devDependencies": {
+    "@babel/core": "^7.9.0",
+    "@babel/preset-env": "^7.9.0",
+    "babel-loader": "^8.1.0",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11"
+  }
+}
 ```
 
 Webpack 通過 babel-loader 調用 Babel，直接安裝即可，同時也必須安裝 @babel/core 與 @babel/preset-env，用作 Babel 核心與插件集。
@@ -54,7 +68,7 @@ webpack-demo/
 └─── index.html           # 引入 bundle.js 測試用檔案
 └─── webpack.config.js    # Webpack 配置檔案
 └─── package-lock.json
-└─── package.json         # 已安裝 webpack、webpack-cli、babel-loader @babel/core @babel/preset-env
+└─── package.json
 ```
 
 撰寫 ES6+ 版本代碼：
@@ -119,7 +133,7 @@ import './js/all'; // JavaScript 預設不需要附檔名
 執行編譯指令：
 
 ```bash
-$ npm run build
+npm run build
 ```
 
 讓我們打開編譯完成的 `bundle.js` 檔案，看看 Babel 究竟做了什麼處理：
@@ -260,13 +274,13 @@ module.exports = {
 @babel/runtime：
 
 ```bash
-$ npm install @babel/runtime
+npm install @babel/runtime
 ```
 
 @babel/plugin-transform-runtime：
 
 ```bash
-$ npm install @babel/plugin-transform-runtime --save-dev
+npm install @babel/plugin-transform-runtime --save-dev
 ```
 
 在安裝 @babel/runtime 時，記得不要安裝錯誤，新版的是帶有 `@` 開頭的；同時也必須安裝 @babel/plugin-transform-runtime 這個套件，babel 在運行時是依賴 plugin 去做取用，這兩個套件雖然不是相依套件，但實際使用時缺一不可，在後面會有相關說明，在這邊我們先把這兩個套件裝好就可以了。
@@ -340,13 +354,13 @@ corejs3 版本編譯結果：
 Babel 版本 < `v7.4.0`：
 
 ```bash
-$ npm install @babel/polyfill
+npm install @babel/polyfill
 ```
 
 Babel 版本 >= `v7.4.0`：
 
 ```bash
-$ npm install core-js regenerator-runtime/runtime
+npm install core-js regenerator-runtime/runtime
 ```
 
 從 Babel >= 7.4.0 後，@babel/polyfill 組件庫已被棄用，事實上 @babel/polyfill 本身就是由 stable 版本的 core-js 和 regenerator-runtime 組成，我們可以直接下載這兩個組件庫當作 @babel/polyfill 來使用，官方也推薦此做法，這邊要注意的是 regenerator-runtime 為 @babel/runtime 的相依套件，可以自行檢查是否有正確安裝。

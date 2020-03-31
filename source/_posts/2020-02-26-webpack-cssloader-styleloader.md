@@ -26,16 +26,23 @@ updated: 2020-02-28 02:12:58
 
 > 套件連結：[css-loader](https://github.com/webpack-contrib/css-loader)、[style-loader](https://github.com/webpack-contrib/style-loader)
 
-css-loader：
+主要的套件：
 
 ```bash
-$ npm install css-loader -D
+npm install css-loader style-loader -D
 ```
 
-style-loader：
+package.json：
 
-```bash
-$ npm install style-loader -D
+```json
+{
+  "devDependencies": {
+    "css-loader": "^3.4.2",
+    "style-loader": "^1.1.3",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11"
+  }
+}
 ```
 
 這邊要注意的是 css-loader 只是單純將 entry 內相關的 CSS 檔案抽取出來做轉換，最後必須透過 style-loader 將 CSS 注入到 HTML 的 `<style>` 標籤上，已進行存取，也就代表使用 style-loader 會以 HTML 標籤的形式完成存取，並不是以單獨的 CSS 檔案做引用完成存取，這邊需要特別注意！之後也會介紹如何透過 pluign 的方式，單獨把 CSS 抽取成獨立的檔案，這次就先從 css-loader 與 style-loader 開始做介紹。
@@ -59,7 +66,7 @@ webpack-demo/
 └─── index.html           # 引入 bundle.js 測試用檔案
 └─── webpack.config.js    # Webpack 配置檔案
 └─── package-lock.json
-└─── package.json         # 已安裝 webpack、webpack-cli、css-loader、style-loader
+└─── package.json
 ```
 
 撰寫 CSS 範例：
@@ -118,7 +125,7 @@ import './css/all.css'; // 使用 ESM 方式引入
 執行編譯指令：
 
 ```bash
-$ npm run build
+npm run build
 ```
 
 至 `./index.html` 引入打包而成的 `bundle.js` 檔案：

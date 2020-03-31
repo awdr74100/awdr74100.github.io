@@ -46,13 +46,13 @@ Webpack 最大的特色就在於模組打包，上圖所呈現的就是打包的
 Webpack 依賴 Node.js 環境，需先進行安裝。在這邊使用 nvm 進行安裝：
 
 ```bash
-$ nvm install 12.14.1
+nvm install 12.14.1
 ```
 
 當然你也可以使用 [官方安裝檔](https://nodejs.org/en/) 安裝 Node.js，接著使用以下指令查看是否正確安裝：
 
 ```bash
-$ node -v
+node -v
 ```
 
 ![node 是否正確安裝](https://i.imgur.com/ysAfrID.png)
@@ -60,20 +60,20 @@ $ node -v
 讓我們先建立一個專案資料夾並切換：
 
 ```bash
-$ mkdir webpack-demo
-$ cd webpack-demo
+mkdir webpack-demo
+cd webpack-demo
 ```
 
 初始化專案並生成 `package.json` 檔案：
 
 ```bash
-$ npm init -y
+npm init -y
 ```
 
 安裝 webpack 所需相關套件：
 
 ```bash
-$ npm install webpack webpack-cli -D
+npm install webpack webpack-cli -D
 ```
 
 這邊要注意的是 Webpack 4 把以往都綁在 Webpack 內的 Webpack-CLI 挪出來另外安裝，所以除了安裝 Webpack 外還要記得安裝 Webpack-CLI。且由於 Webpack 不像是 Gulp 需要指定編譯內容，所以我們可將 Webpack 安裝在專案環境，並透過 npm script 執行即可，官方也推薦此做法。
@@ -142,7 +142,7 @@ console.log('Hello ' + myName);
 執行編譯指令：
 
 ```bash
-$ npm run build
+npm run build
 ```
 
 此時你會發現專案根目錄新增了 `dist/bundle.js` 檔案，這個檔案就是依照 `webpack.config.js` 配置所打包而成的 JavaScript 檔案，可直接做引入。

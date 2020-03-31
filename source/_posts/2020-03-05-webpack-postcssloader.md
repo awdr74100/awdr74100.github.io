@@ -24,18 +24,33 @@ PostCSS 是一套使用 JavaScript 轉換 CSS 的工具，有別於以往 Sass�
 
 ## postcss-loader 安裝
 
-> 套件連結：[postcss-loader](https://github.com/postcss/postcss-loader)、[autoprefixer](https://github.com/postcss/autoprefixer)、[css-loader](https://github.com/webpack-contrib/css-loader)、[mini-css-extract-plugin](https://github.com/webpack-contrib/mini-css-extract-plugin)
+> 套件連結：[postcss-loader](https://github.com/postcss/postcss-loader)、[autoprefixer](https://github.com/postcss/autoprefixer)
 
-postcss-loader 與 autoprefixer：
+主要的套件：
 
 ```bash
-$ npm install postcss-loader autoprefixer -D
+npm install postcss-loader autoprefixer -D
 ```
 
-require：
+過程會使用到的套件：
 
 ```bash
-$ npm install css-loader mini-css-extract-plugin -D
+npm install css-loader mini-css-extract-plugin -D
+```
+
+package.json：
+
+```json
+{
+  "devDependencies": {
+    "autoprefixer": "^9.7.5",
+    "css-loader": "^3.4.2",
+    "mini-css-extract-plugin": "^0.9.0",
+    "postcss-loader": "^3.0.0",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11"
+  }
+}
 ```
 
 Webpack 通過 postcss-loader 來調用 PostCSS，直接安裝即可，以及下面將會以 autoprefixer 結合 PostCSS 作範例，同樣也必須安裝，最後包含基本的 css-loader 以及 mini-css-extract-plugin 也給它安裝下去就對了。
@@ -61,7 +76,7 @@ webpack-demo/
 └─── index.html           # 引入 bundle.js 與 main.css 測試用檔案
 └─── webpack.config.js    # Webpack 配置檔案
 └─── package-lock.json
-└─── package.json         # 已安裝 webpack、webpack-cli、css-loader、mini-css-extract-plugin、postcss-loader、autoprefixer
+└─── package.json
 ```
 
 撰寫 CSS 範例：
@@ -136,7 +151,7 @@ import './css/all.css'; // 使用 ESM 方式引入
 執行編譯指令：
 
 ```bash
-$ npm run build
+npm run build
 ```
 
 以下為經過 autoprefixer 處理後的 `dist/main.css` 檔案內容：
@@ -198,7 +213,7 @@ Browserslist 是一款用於不同前端工具之間共享目標瀏覽器和 Nod
 Browserslist 為 Autoprefixer 的相依套件，可自行檢查是否已完成安裝，如需下載，可使用以下指令：
 
 ```bash
-$ npm install browserslist
+npm install browserslist
 ```
 
 Browserslist 可以在 `package.json` 中設定，也可以用單獨檔案 `.browserslistrc` 設定。
