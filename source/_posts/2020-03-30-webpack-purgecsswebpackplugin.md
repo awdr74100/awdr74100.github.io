@@ -217,7 +217,7 @@ import './scss/all.scss';
 執行編譯指令：
 
 ```bash
-$ npm run build
+npm run build
 ```
 
 此時打包生成的 `dist/css/main.css` 檔案內容如下：
@@ -317,7 +317,7 @@ module.exports = {
 
 ## 補充：清除多餘的 Bootstrap 樣式
 
-當我們了解了 PurgeCSS 的處理流程，對於移除 Bootstrap 多餘樣式來說就沒什麼難度了，但其中還是有些小陷阱需要大家注意，讓我們直接開始吧！
+當我們了解 PurgeCSS 的處理流程，對於移除 Bootstrap 多餘樣式來說就沒什麼問題了，但其中還是有些小陷阱需要大家注意，讓我們直接開始吧！
 
 至 `./src/scss/all.scss` 載入 Bootstrap：
 
@@ -398,7 +398,7 @@ import 'bootstrap/dist/js/bootstrap.bundle';
 
 ![PurgeCSS 未分析 jquery 與 poopr](https://i.imgur.com/MMlqUVD.png)
 
-此時你會發現動態載入的樣式並不存在 `dist/css/main.css` 內，聰明的你應該可以問題了，那就是 Bootstrap 依賴的 JavaScript 我們並沒有傳入去做分析，導致代碼被移除了；解決方式也很簡單，那就是把他們通通傳入去做分析，這邊我們改使用 glob-all 套件取得多個檔案路徑：
+此時你會發現動態載入的樣式並不存在 `dist/css/main.css` 內，聰明的你應該發現問題了，那就是 Bootstrap 依賴的 JavaScript 我們並沒有傳入去做分析，導致動態載入的代碼被移除了；解決方式也很簡單，那就是把他們通通傳入去做分析，這邊我們改使用 glob-all 套件取得多個檔案路徑：
 
 > 套件連結：[glob-all](https://www.npmjs.com/package/glob-all)
 
