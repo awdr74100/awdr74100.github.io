@@ -48,16 +48,16 @@ minimist 套件為解析命令行傳遞參數用，我們可以使用 gulp-if �
 ```plain
 gulp-demo/
 │
-└─── node_modules/
-└─── source/
+├─── node_modules/
+├─── source/
 │   │
 │   └─── scss/
 │       │
 │       └─── all.scss     # SCSS 主檔案
 │
-└─── gulpfile.js          # Gulp 配置檔案
-└─── test.js              # minimist 範例檔案
-└─── package-lock.json
+├─── gulpfile.js          # Gulp 配置檔案
+├─── test.js              # minimist 範例檔案
+├─── package-lock.json
 └─── package.json         # 安裝 gulp、gulp-sass、gulp-clean-css、minimist、gulp-if
 ```
 

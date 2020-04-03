@@ -28,7 +28,7 @@ CommonJS 為當初最早設計用來解決 JavaScript 模組化設計的規範�
 ```plain
 commonjs/
 │
-└─── main.js              # JavaScript 主檔案
+├─── main.js              # JavaScript 主檔案
 └─── module.js            # JavaScript 模組
 ```
 
@@ -261,21 +261,21 @@ $ npm install gulp-sass
 ```diff
  gulp-demo/
  │
- └─── node_modules/
+ ├─── node_modules/
  │
-+└─── gulpfile.js/         # Gulp 模組化配置相關檔案
++├─── gulpfile.js/         # Gulp 模組化配置相關檔案
 +│   │
-+│   └─── index.js         # 預設 Gulp 編譯主檔案
++│   ├─── index.js         # 預設 Gulp 編譯主檔案
 +│   └─── compile.js       # Gulp 模組檔案 - SCSS 編譯
  │
- └─── source/
+ ├─── source/
  │   │
  │   └─── scss
  │       │
  │       └─── all.scss     # SCSS 主檔案
  │
--└─── gulpfile.js          # Gulp 單一配置檔
- └─── package-lock.json
+-├─── gulpfile.js          # Gulp 單一配置檔
+ ├─── package-lock.json
  └─── package.json         # 安裝 gulp、gulp-sass
 ```
 

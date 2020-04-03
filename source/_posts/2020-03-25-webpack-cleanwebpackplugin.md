@@ -62,8 +62,8 @@ package.json：
 ```plain
 webpack-demo/
 │
-└─── node_modules/
-└─── src/
+├─── node_modules/
+├─── src/
 │   │
 │   └─── css/
 │       │
@@ -71,8 +71,8 @@ webpack-demo/
 │   │
 │   └─── main.js          # entry 入口檔案
 │
-└─── webpack.config.js    # Webpack 配置檔案
-└─── package-lock.json
+├─── webpack.config.js    # Webpack 配置檔案
+├─── package-lock.json
 └─── package.json
 ```
 
@@ -149,14 +149,14 @@ npm run build
 ```plain
 webpack-demo/
 │
-└─── dist/
+├─── dist/
 │   │
 │   └─── css/
 │       │
-│       └─── main.341ff16a50939fca12a9.css
+│       ├─── main.341ff16a50939fca12a9.css
 |       └─── main.592df2c6643f48d39238.css
 │   │
-│   └─── main.341ff16a50939fca12a9.js
+│   ├─── main.341ff16a50939fca12a9.js
 |   └─── main.592df2c6643f48d39238.js
 ```
 
@@ -199,7 +199,7 @@ module.exports = {
 ```plain
 webpack-demo/
 │
-└─── dist/
+├─── dist/
 │   │
 │   └─── css/
 │       │

@@ -38,15 +38,15 @@ Babel 的核心套件就不多加以介紹，這邊比較值得注意的是 @bab
 ```plain
 gulp-demo/
 │
-└─── node_modules/
-└─── source/
+├─── node_modules/
+├─── source/
 │   │
 │   └─── scss/
 │       │
 │       └─── all.scss     # SCSS 主檔案
 │
-└─── gulpfile.js          # Gulp 配置檔案
-└─── package-lock.json
+├─── gulpfile.js          # Gulp 配置檔案
+├─── package-lock.json
 └─── package.json         # 安裝 gulp、gulp-sass、@babel/core...
 ```
 
@@ -75,7 +75,7 @@ exports.sass = compileSass;
 ```diff
  gulp-demo/
  │
--└─── gulpfile.js
+-├─── gulpfile.js
 +└─── gulpfile.babel.js
 ```
 

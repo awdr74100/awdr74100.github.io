@@ -69,8 +69,8 @@ Bootstrap 4 主要由 SCSS 建構而成，當你使用 npm 方式進行安裝時
 ```plain
 webpack-demo/
 │
-└─── node_modules/
-└─── src/
+├─── node_modules/
+├─── src/
 │   │
 │   └─── scss/
 │       │
@@ -80,11 +80,11 @@ webpack-demo/
 │       │
 │       └─── all.scss     # SCSS 主檔案
 │   │
-│   └─── index.html       # HTML 主檔案
+│   ├─── index.html       # HTML 主檔案
 │   └─── main.js          # entry 入口檔案
 │
-└─── webpack.config.js    # Webpack 配置檔案
-└─── package-lock.json
+├─── webpack.config.js    # Webpack 配置檔案
+├─── package-lock.json
 └─── package.json
 ```
 

@@ -40,8 +40,8 @@ $ npm install gulp-sourcemaps
 ```plain
 gulp-demo/
 │
-└─── node_modules/
-└─── source/
+├─── node_modules/
+├─── source/
 │   │
 │   └─── scss/
 │       │
@@ -63,8 +63,8 @@ gulp-demo/
 │       │
 │       └─── all.scss     # SCSS 主檔案
 │
-└─── gulpfile.js          # Gulp 配置檔案
-└─── package-lock.json
+├─── gulpfile.js          # Gulp 配置檔案
+├─── package-lock.json
 └─── package.json         # 安裝 gulp、gulp-sass、gulp-sourcemaps
 ```
 

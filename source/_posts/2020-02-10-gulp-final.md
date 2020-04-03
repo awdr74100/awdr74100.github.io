@@ -49,15 +49,15 @@ updated: 2020-02-13 18:25:51
 ```plain
 gulp-demo/
 │
-└─── node_modules/
-└─── source/
+├─── node_modules/
+├─── source/
 │   │
 │   └─── js/
 │       │
 │       └─── all.js
 │
-└─── gulpfile.js
-└─── package-lock.json
+├─── gulpfile.js
+├─── package-lock.json
 └─── package.json
 ```
 
@@ -207,8 +207,8 @@ $ gulp
 ```plain
 gulp-demo/
 │
-└─── node_modules/
-└─── source/
+├─── node_modules/
+├─── source/
 │   │
 │   └─── css/
 │       │
@@ -216,8 +216,8 @@ gulp-demo/
 │   │
 │   └─── index.html
 │
-└─── gulpfile.js
-└─── package-lock.json
+├─── gulpfile.js
+├─── package-lock.json
 └─── package.json
 ```
 

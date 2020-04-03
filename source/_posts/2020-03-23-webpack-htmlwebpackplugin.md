@@ -63,18 +63,18 @@ package.json：
 ```plain
 webpack-demo/
 │
-└─── node_modules/
-└─── src/
+├─── node_modules/
+├─── src/
 │   │
 │   └─── css/
 │       │
 │       └─── all.css      # CSS 主檔案
 │   │
-│   └─── index.html       # HTML 主檔案
+│   ├─── index.html       # HTML 主檔案
 │   └─── main.js          # entry 入口檔案
 │
-└─── webpack.config.js    # Webpack 配置檔案
-└─── package-lock.json
+├─── webpack.config.js    # Webpack 配置檔案
+├─── package-lock.json
 └─── package.json
 ```
 
@@ -169,7 +169,7 @@ npm run build
 ```plain
 webpack-demo/
 │
-└─── dist/
+├─── dist/
 │   │
 │   └─── static/
 │       │
@@ -372,11 +372,11 @@ html-webpack-plugin 還有一個很棒的功能在於依照 chunk 載入不同�
 ```diff
  webpack-demo/
  │
- └─── src/
+ ├─── src/
  │   │
- │   └─── index.html       # HTML 主檔案
-+│   └─── contact.html     # HTML 主檔案
- │   └─── main.js          # entry 入口檔案(main)
+ │   ├─── index.html       # HTML 主檔案
++│   ├─── contact.html     # HTML 主檔案
+ │   ├─── main.js          # entry 入口檔案(main)
 +│   └─── contact.js       # entry 入口檔案(contact)
 ```
 

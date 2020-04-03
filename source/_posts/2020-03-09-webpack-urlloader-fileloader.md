@@ -54,8 +54,8 @@ package.json：
 ```plain
 webpack-demo/
 │
-└─── node_modules/
-└─── src/
+├─── node_modules/
+├─── src/
 │   │
 │   └─── img/
 │       │
@@ -63,8 +63,8 @@ webpack-demo/
 │   │
 │   └─── main.js          # entry 入口檔案
 │
-└─── webpack.config.js    # Webpack 配置檔案
-└─── package-lock.json
+├─── webpack.config.js    # Webpack 配置檔案
+├─── package-lock.json
 └─── package.json
 ```
 
@@ -113,9 +113,10 @@ npm run build
 
 ```diff
  webpack-demo/
- └─── dist/
+ │
+ ├─── dist/
  │   │
-+│   └─── 4664caca877b29c20cf1cc536e41911e.png
++│   ├─── 4664caca877b29c20cf1cc536e41911e.png
  │   └─── bundle.js
 ```
 
@@ -157,9 +158,10 @@ npm run build
 
 ```diff
  webpack-demo/
- └─── dist/
+ │
+ ├─── dist/
  │   │
-+│   └─── test.png
++│   ├─── test.png
  │   └─── bundle.js
 ```
 
@@ -243,7 +245,8 @@ npm run build
 
 ```plain
 webpack-demo/
-└─── dist/
+│
+├─── dist/
 │   │
 │   └─── bundle.js    # 圖片轉為 base64 存在於 JavaScript 檔案內
 ```
@@ -330,13 +333,13 @@ module.exports = {
 
 > 套件連結：[url-loader](https://github.com/webpack-contrib/url-loader)、[file-loader](https://github.com/webpack-contrib/file-loader)、[css-loader](https://github.com/webpack-contrib/css-loader)、[mini-css-extract-plugin](https://github.com/webpack-contrib/mini-css-extract-plugin)
 
-url-loader 與 file-loader：
+主要的套件：
 
 ```bash
 npm install url-loader file-loader -D
 ```
 
-require：
+過程會使用的套件：
 
 ```bash
 npm install css-loader mini-css-extract-plugin -D
@@ -347,12 +350,12 @@ npm install css-loader mini-css-extract-plugin -D
 ```plain
 webpack-demo/
 │
-└─── node_modules/
-└─── src/
+├─── node_modules/
+├─── src/
 │   │
 │   └─── img/
 │       │
-│       └─── banner.jpg   # Size >= 10 KB
+│       ├─── banner.jpg   # Size >= 10 KB
 │       └─── logo.jpg     # Size < 10 KB
 │   │
 │   └─── css/
@@ -361,10 +364,10 @@ webpack-demo/
 │   │
 │   └─── main.js          # entry 入口檔案
 │
-└─── index.html           # 引入 bundle.js 與 main.css 測試用檔案
-└─── webpack.config.js    # Webpack 配置檔案
-└─── package-lock.json
-└─── package.json         # 已安裝 webpack、webpack-cli、css-loader、mini-css-extract-plugin、url-loader、file-loader
+├─── index.html           # 引入 bundle.js 與 main.css 測試用檔案
+├─── webpack.config.js    # Webpack 配置檔案
+├─── package-lock.json
+└─── package.json
 ```
 
 撰寫 CSS 範例：
@@ -503,7 +506,7 @@ npm run build
 ```diff
  webpack-demo/
  │
- └─── src/
+ ├─── src/
  │   │
 +│   └─── font/
 +│       │
@@ -598,7 +601,7 @@ npm run build
 ```plain
 webpack-demo/
 │
-└─── dist/
+├─── dist/
 │   │
 │   └─── font/
 │       │

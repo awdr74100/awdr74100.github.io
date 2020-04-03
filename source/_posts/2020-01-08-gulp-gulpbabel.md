@@ -48,15 +48,15 @@ $ npm install gulp-babel@7 babel-core babel-preset-env
 ```plain
 gulp-demo/
 │
-└─── node_modules/
-└─── source/
+├─── node_modules/
+├─── source/
 │   │
 │   └─── js/
 │       │
 │       └─── all.js       # JavaScript 主檔案
 │
-└─── gulpfile.js          # Gulp 配置檔案
-└─── package-lock.json
+├─── gulpfile.js          # Gulp 配置檔案
+├─── package-lock.json
 └─── package.json         # 安裝 gulp、gulp-babel
 ```
 
@@ -104,14 +104,14 @@ $ gulp babel
 ```plain
 gulp-demo/
 │
-└─── node_modules/
-└─── public/
+├─── node_modules/
+├─── public/
 │   │
 │   └─── js/
 │       │
 │       └─── all.js       # 編譯完成的 JavaScript 檔案(ES5 版本)
 │
-└─── source/
+├─── source/
 │   │
 │   └─── js/
 │       │

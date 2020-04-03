@@ -63,8 +63,8 @@ package.json：
 ```plain
 webpack-demo/
 │
-└─── node_modules/
-└─── src/
+├─── node_modules/
+├─── src/
 │   │
 │   └─── css/
 │       │
@@ -72,9 +72,9 @@ webpack-demo/
 │   │
 │   └─── main.js          # entry 入口檔案
 │
-└─── index.html           # 引入 bundle.js 與 main.css 測試用檔案
-└─── webpack.config.js    # Webpack 配置檔案
-└─── package-lock.json
+├─── index.html           # 引入 bundle.js 與 main.css 測試用檔案
+├─── webpack.config.js    # Webpack 配置檔案
+├─── package-lock.json
 └─── package.json
 ```
 
@@ -204,7 +204,7 @@ module.exports = {
 ```diff
  webpack-demo/
  │
- └─── src/
+ ├─── src/
  │   │
 +│   └─── img/
 +│       │
@@ -315,10 +315,10 @@ npm run build
 ```diff
 webpack-demo/
 │
-└─── dist/
+├─── dist/
 │   │
-│   └─── bundle.js        # 打包生成的 JavaScrit 檔案
-│   └─── main.css         # 打包生成的 CSS 檔案
+│   ├─── bundle.js        # 打包生成的 JavaScrit 檔案
+│   ├─── main.css         # 打包生成的 CSS 檔案
 │   └─── test.jpg         # 自動抓取並通過 file-loader 的圖片檔
 ```
 
@@ -352,7 +352,7 @@ module.exports = {
 ```plain
 webpack-demo/
 │
-└─── dist/
+├─── dist/
 │   │
 │   └─── js/
 │       │
@@ -393,7 +393,7 @@ module.exports = {
 ```plain
 webpack-demo/
 │
-└─── dist/
+├─── dist/
 │   │
 │   └─── js/
 │       │
@@ -452,7 +452,7 @@ module.exports = {
 ```plain
 webpack-demo/
 │
-└─── dist/
+├─── dist/
 │   │
 │   └─── js/
 │       │

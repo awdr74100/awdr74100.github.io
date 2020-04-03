@@ -54,8 +54,8 @@ package.json：
 ```plain
 webpack-demo/
 │
-└─── node_modules/
-└─── src/
+├─── node_modules/
+├─── src/
 │   │
 │   └─── css/
 │       │
@@ -63,9 +63,9 @@ webpack-demo/
 │   │
 │   └─── main.js          # entry 入口檔案
 │
-└─── index.html           # 引入 bundle.js 測試用檔案
-└─── webpack.config.js    # Webpack 配置檔案
-└─── package-lock.json
+├─── index.html           # 引入 bundle.js 測試用檔案
+├─── webpack.config.js    # Webpack 配置檔案
+├─── package-lock.json
 └─── package.json
 ```
 

@@ -38,13 +38,13 @@ $ npm install gulp-pug
 ```plain
 gulp-demo/
 │
-└─── node_modules/
-└─── source/
+├─── node_modules/
+├─── source/
 │   │
 │   └─── index.pug        # Pug 主檔案
 │
-└─── gulpfile.js          # Gulp 配置檔案
-└─── package-lock.json
+├─── gulpfile.js          # Gulp 配置檔案
+├─── package-lock.json
 └─── package.json         # 安裝 gulp、gulp-pug
 ```
 
@@ -88,12 +88,12 @@ $ gulp pug
 ```plain
 gulp-demo/
 │
-└─── node_modules/
-└─── public/
+├─── node_modules/
+├─── public/
 │   │
 │   └─── index.html       # 編譯完成的 HTML 檔案
 │
-└─── source/
+├─── source/
 │   │
 │   └─── index.pug        # Pug 主檔案
 │
@@ -187,15 +187,15 @@ html(lang="en")
 ```plain
 gulp-demo/
 │
-└─── node_modules/
-└─── source/
+├─── node_modules/
+├─── source/
 │   │
 │   └─── modules/
 │       │
-│       └─── head.pug     # head 模組 - 供載入用
+│       ├─── head.pug     # head 模組 - 供載入用
 │       └─── navbar.pug   # navbar 模組 - 供載入用
 │   │
-│   └─── index.pug        # 主要渲染檔案
+│   ├─── index.pug        # 主要渲染檔案
 │   └─── layout.pug       # template 模板
 │
 // 以下省略

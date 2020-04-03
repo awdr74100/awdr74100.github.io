@@ -63,8 +63,8 @@ package.json：
 ```plain
 webpack-demo/
 │
-└─── node_modules/
-└─── src/
+├─── node_modules/
+├─── src/
 │   │
 │   └─── css/
 │       │
@@ -74,11 +74,11 @@ webpack-demo/
 │       │
 │       └─── all.js       # JavaScript 主檔案
 │   │
-│   └─── index.html       # HTML 主檔案
+│   ├─── index.html       # HTML 主檔案
 │   └─── main.js          # entry 入口檔案
 │
-└─── webpack.config.js    # Webpack 配置檔案
-└─── package-lock.json
+├─── webpack.config.js    # Webpack 配置檔案
+├─── package-lock.json
 └─── package.json
 ```
 
@@ -234,7 +234,7 @@ module.exports = {
 ```plain
 localhost/
 │
-└─── assets/
+├─── assets/
 │   │
 │   └─── css/
 │       │

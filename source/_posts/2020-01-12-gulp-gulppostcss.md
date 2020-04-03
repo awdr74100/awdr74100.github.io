@@ -49,15 +49,15 @@ autoprefixer 為 PostCSS 最為著名的 CSS Prefix 插件，前面會先以它�
 ```plain
 gulp-demo/
 │
-└─── node_modules/
-└─── source/
+├─── node_modules/
+├─── source/
 │   │
 │   └─── scss/
 │       │
 │       └─── all.scss     # SCSS 主檔案
 │
-└─── gulpfile.js          # Gulp 配置檔案
-└─── package-lock.json
+├─── gulpfile.js          # Gulp 配置檔案
+├─── package-lock.json
 └─── package.json         # 安裝 gulp、gulp-sass、gulp-postcss、autoprefixer
 ```
 
@@ -106,14 +106,14 @@ $ gulp sass
 ```plain
 gulp-demo/
 │
-└─── node_modules/
-└─── public/
+├─── node_modules/
+├─── public/
 │   │
 │   └─── css/
 │       │
 │       └─── all.css      # 編譯完成的 CSS 檔案
 │
-└─── source/
+├─── source/
 │   │
 │   └─── scss/
 │       │

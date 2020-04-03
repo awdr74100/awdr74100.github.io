@@ -116,10 +116,10 @@ $ npm install gulp --save
 ```plain
 gulp-demo/
 │
-└─── node_modules/
-└─── index.html           # HTML 主檔案(複製用)
-└─── gulpfile.js          # Gulp 配置檔案
-└─── package-lock.json
+├─── node_modules/
+├─── index.html           # HTML 主檔案(複製用)
+├─── gulpfile.js          # Gulp 配置檔案
+├─── package-lock.json
 └─── package.json         # 安裝 gulp
 ```
 
@@ -154,14 +154,14 @@ $ gulp copyFile
 ```plain
 gulp-demo/
 │
-└─── node_modules/
-└─── public/
+├─── node_modules/
+├─── public/
 │   │
 │   └─── index.html       # HTML 副本 (完成編譯)
 │
-└─── index.html           # HTML 主檔案(等待編譯)
-└─── gulpfile.js          # Gulp 配置檔案
-└─── package-lock.json
+├─── index.html           # HTML 主檔案(等待編譯)
+├─── gulpfile.js          # Gulp 配置檔案
+├─── package-lock.json
 └─── package.json         # 安裝 gulp
 ```
 

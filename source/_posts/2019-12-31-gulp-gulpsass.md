@@ -38,15 +38,15 @@ node-sass 為 gulp-sass 的相依套件，安裝 gulp-sass 的同時會連同 no
 ```plain
 gulp-demo/
 │
-└─── node_modules/
-└─── source/
+├─── node_modules/
+├─── source/
 │   │
 │   └─── scss/
 │       │
 │       └─── all.scss     # SCSS 主檔案
 │
-└─── gulpfile.js          # Gulp 配置檔案
-└─── package-lock.json
+├─── gulpfile.js          # Gulp 配置檔案
+├─── package-lock.json
 └─── package.json         # 安裝 gulp、gulp-sass
 ```
 
@@ -86,14 +86,14 @@ $ gulp sass
 ```plain
 gulp-demo/
 │
-└─── node_modules/
-└─── public/
+├─── node_modules/
+├─── public/
 │   │
 │   └─── css/
 │       │
 │       └─── all.css      # 編譯完成的 CSS 檔案
 │
-└─── source/
+├─── source/
 │   │
 │   └─── scss/
 │       │

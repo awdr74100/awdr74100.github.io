@@ -47,8 +47,8 @@ Bootstrap 4 主要由 SCSS 建構而成，當你使用 npm 方式進行安裝時
 ```plain
 gulp-demo/
 │
-└─── node_modules/
-└─── source/
+├─── node_modules/
+├─── source/
 │   │
 │   └─── scss/
 │       │
@@ -58,8 +58,8 @@ gulp-demo/
 │       │
 │       └─── all.scss     # SCSS 主檔案
 │
-└─── gulpfile.js          # Gulp 配置檔案
-└─── package-lock.json
+├─── gulpfile.js          # Gulp 配置檔案
+├─── package-lock.json
 └─── package.json         # 安裝 gulp、gulp-sass、gulp-postcss、autoprefixer、bootstrap
 ```
 

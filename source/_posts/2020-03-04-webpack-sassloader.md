@@ -64,8 +64,8 @@ package.json：
 ```plain
 webpack-demo/
 │
-└─── node_modules/
-└─── src/
+├─── node_modules/
+├─── src/
 │   │
 │   └─── scss/
 │       │
@@ -73,9 +73,9 @@ webpack-demo/
 │   │
 │   └─── main.js          # entry 入口檔案
 │
-└─── index.html           # 引入 bundle.js 與 main.css 測試用檔案
-└─── webpack.config.js    # Webpack 配置檔案
-└─── package-lock.json
+├─── index.html           # 引入 bundle.js 與 main.css 測試用檔案
+├─── webpack.config.js    # Webpack 配置檔案
+├─── package-lock.json
 └─── package.json
 ```
 
@@ -263,7 +263,7 @@ module.exports = {
 ```plain
 webpack-demo/
 │
-└─── src/
+├─── src/
 │   │
 │   └─── scss/
 │       │

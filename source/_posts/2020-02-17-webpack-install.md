@@ -85,14 +85,14 @@ npm install webpack webpack-cli -D
 ```plain
 webpack-demo/
 │
-└─── node_modules/
+├─── node_modules/
 │
-└─── src/
+├─── src/
 │   │
 │   └─── main.js          # entry 入口檔案
 │
-└─── webpack.config.js    # Webpack 配置檔案
-└─── package-lock.json
+├─── webpack.config.js    # Webpack 配置檔案
+├─── package-lock.json
 └─── package.json         # 已安裝 webpack、webpack-cli
 ```
 
@@ -249,9 +249,9 @@ fun();
 ```plain
 webpack-demo/
 │
-└─── src/
+├─── src/
 │   │
-│   └─── main.js          # entry 入口檔案(1)
+│   ├─── main.js          # entry 入口檔案(1)
 │   └─── about.js         # entry 入口檔案(2)
 ```
 

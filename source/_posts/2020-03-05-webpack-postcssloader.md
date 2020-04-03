@@ -64,8 +64,8 @@ Webpack 通過 postcss-loader 來調用 PostCSS，直接安裝即可，以及下
 ```plain
 webpack-demo/
 │
-└─── node_modules/
-└─── src/
+├─── node_modules/
+├─── src/
 │   │
 │   └─── css/
 │       │
@@ -73,9 +73,9 @@ webpack-demo/
 │   │
 │   └─── main.js          # entry 入口檔案
 │
-└─── index.html           # 引入 bundle.js 與 main.css 測試用檔案
-└─── webpack.config.js    # Webpack 配置檔案
-└─── package-lock.json
+├─── index.html           # 引入 bundle.js 與 main.css 測試用檔案
+├─── webpack.config.js    # Webpack 配置檔案
+├─── package-lock.json
 └─── package.json
 ```
 
