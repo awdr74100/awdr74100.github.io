@@ -388,18 +388,17 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
   entry: {
     main: './src/main.js',
-    contact: './src/contact.js',
+    contact: './src/contact.js', // 新增名為 contact 的 chunk
   },
   plugins: [
     new HtmlWebpackPlugin({
       template: './src/index.html',
       filename: 'index.html',
-      chunks: ['main'],
     }),
+    // 新增一個實例
     new HtmlWebpackPlugin({
       template: './src/contact.html',
       filename: 'contact.html',
-      chunks: ['contact'],
     }),
   ],
 };
@@ -415,12 +414,14 @@ module.exports = {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>聯絡</title>
-    <link href="static/css/main.f60a0479443f89e1d582.css" rel="stylesheet" />
+    <title>首頁</title>
+    <link href="static/css/main.d39882878d291f6d7aef.css" rel="stylesheet" />
+    <link href="static/css/contact.d39882878d291f6d7aef.css" rel="stylesheet" />
   </head>
 
   <body>
-    <script src="static/js/main.f60a0479443f89e1d582.js"></script>
+    <script src="static/js/main.d39882878d291f6d7aef.js"></script>
+    <script src="static/js/contact.d39882878d291f6d7aef.js"></script>
   </body>
 </html>
 ```
@@ -433,32 +434,77 @@ module.exports = {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>首頁</title>
+    <title>聯絡</title>
+    <link href="static/css/main.d39882878d291f6d7aef.css" rel="stylesheet" />
+    <link href="static/css/contact.d39882878d291f6d7aef.css" rel="stylesheet" />
   </head>
 
   <body>
-    <script src="static/js/contact.f60a0479443f89e1d582.js"></script>
+    <script src="static/js/main.d39882878d291f6d7aef.js"></script>
+    <script src="static/js/contact.d39882878d291f6d7aef.js"></script>
   </body>
 </html>
 ```
 
-在 `HtmlWebpackPlugin` 實例中配置 `chunk` 選項，即可針對不同的 entry 檔案做響應載入，如果單個 HTML 檔案需要載入不同的 entry 檔案，直接在陣列中增加即可：
+基於預設配置，html-webpack-plugin 會將所有 chunk 對應的 bundle 內容附加在所有的 HTML 文件上，如果我們想要單獨配置 HTML 文件的 chunk 內容，有以下兩種方法：
+
+1. 配置 `chunks` 選項
 
 ```js
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-
 module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
-      template: './src/index.html',
-      filename: 'index.html',
-      chunks: ['main', 'contact'],
+      chunks: ['main'], // 僅添加名為 main 的 chunk
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['contact'], // 僅添加名為 contact 的 chunk
     }),
   ],
 };
 ```
 
-編譯結果：
+`chunks` 選項是以陣列的方式進行撰寫，我們可自由的訂製需載入的 chunk 內容。
+
+---
+
+2. 配置 `excludeChunks` 選項
+
+```js
+module.exports = {
+  plugins: [
+    new HtmlWebpackPlugin({
+      excludeChunks: ['contact'], // 排除名為 contact 的 chunk
+    }),
+    new HtmlWebpackPlugin({
+      excludeChunks: ['main'], // 排除名為 main 的 chunk
+    }),
+  ],
+};
+```
+
+前面有說過 html-webpack-plugin 預設會將所有 chunk 進行載入，我們可配置 `excludeChunks` 選項排除不必載入的 chunk，此方法一樣可達到與配置 `chunks` 相同的效果。
+
+執行 `npm run build` 指令，並查看編譯結果：
+
+- index.html 編譯結果：
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>首頁</title>
+    <link href="static/css/main.d39882878d291f6d7aef.css" rel="stylesheet" />
+  </head>
+
+  <body>
+    <script src="static/js/main.d39882878d291f6d7aef.js"></script>
+  </body>
+</html>
+```
+
+- contact.html 編譯結果：
 
 ```html
 <!DOCTYPE html>
@@ -467,12 +513,24 @@ module.exports = {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>聯絡</title>
-    <link href="static/css/main.f60a0479443f89e1d582.css" rel="stylesheet" />
+    <link href="static/css/contact.d39882878d291f6d7aef.css" rel="stylesheet" />
   </head>
 
   <body>
-    <script src="static/js/main.f60a0479443f89e1d582.js"></script>
-    <script src="static/js/contact.f60a0479443f89e1d582.js"></script>
+    <script src="static/js/contact.d39882878d291f6d7aef.js"></script>
   </body>
 </html>
+```
+
+這邊補充一點，有時候我們的 chunk 有所謂的順序性，假設 contact 需再 main 前面來說好了，我們可以將 `chunksSortMode` 改為 `manual`，此時 html-webpack-plugin 就會依造配置的 `chunks` 順序進行載入，如下範例：
+
+```js
+module.exports = {
+  plugins: [
+    new HtmlWebpackPlugin({
+      chunksSortMode: 'manual', // 將排序改為動手模式 (即根據 chunks 進行排序)
+      chunks: ['contact', 'main'],
+    }),
+  ],
+};
 ```
