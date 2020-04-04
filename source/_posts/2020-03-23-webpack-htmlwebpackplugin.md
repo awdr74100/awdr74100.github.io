@@ -528,7 +528,7 @@ module.exports = {
 module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
-      chunksSortMode: 'manual', // 將排序改為動手模式 (即根據 chunks 進行排序)
+      chunksSortMode: 'manual', // 將排序改為手動模式 (即根據 chunks 進行排序)
       chunks: ['contact', 'main'],
     }),
   ],
