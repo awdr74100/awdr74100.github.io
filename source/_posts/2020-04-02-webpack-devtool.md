@@ -56,7 +56,7 @@ package.json：
 
 ## 初始環境建構
 
-初始專案結構
+初始專案結構：
 
 ```plain
 webpack-demo/

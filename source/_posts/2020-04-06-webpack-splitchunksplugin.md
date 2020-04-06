@@ -47,3 +47,24 @@ package.json：
 在 Webpack 4 中，SplitChunksPlugin 已預設裝載，我們不需要進行任何安裝動作，配置即可使用，事實上，SplitChunksPlugin 本身就已經開啟了，但預設配置是針對較為"特別"的情境才有作用，這才導致我們沒有感覺 SplitChunksPlugin 已經作用在當前還環境，為了保證結果如同預期，請先安裝上面所陳列的相關套件。
 
 ## SplitChunksPlugin 基本使用
+
+初始專案結構
+
+```plain
+webpack-demo/
+│
+├─── node_modules/
+├─── src/
+│   │
+│   └─── js/
+│       │
+│       ├─── a.js         # JavaScript 模組 (1)
+│       └─── b.js         # JavaScript 模組 (2)
+│   │
+│   ├─── index.html       # HTML 主檔案
+│   └─── main.js          # entry 入口檔案
+│
+├─── webpack.config.js    # Webpack 配置檔案
+├─── package-lock.json
+└─── package.json
+```
