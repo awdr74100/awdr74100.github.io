@@ -20,6 +20,7 @@ updated: 2020-04-06 21:04:08
 - SplitChunksPlugin 基本使用
 - SplitChunksPlugin 可傳遞選項
 - 補充：Dynamic import()
+- 補充：解決 MPA 所造成的重複程式碼問題
 
 ## 相關套件安裝
 
@@ -426,3 +427,178 @@ webpack-demo/
 ```
 
 從上面結果可以得知，node_modules 內的模組都已經被抽離成獨立檔案了，因為 `all` 選項會同時處理動態與非動態載入的模組，你可能現在在想，為什麼 SplitChunksPlugin 預設的 `chunks` 選項不直接設為 `all` 呢？就不用這麼麻煩了啊！我是認為另外兩個選項在某些情境下還是有存在的必要，並不是說哪一個選項最好，還是得看當下情境較適合哪一個選項而定，並且，`all` 所產生的效果並非所有情境下都需要。
+
+## 補充：解決 MPA 所造成的重複程式碼問題
+
+初始專案結構：
+
+```plain
+webpack-demo/
+│
+├─── node_modules/
+├─── src/
+│   │
+│   └─── js/
+│       │
+│       ├─── a.js         # JavaScript 模組 (1)
+│       └─── b.js         # JavaScript 模組 (2)
+│   │
+│   ├─── contact.html     # HTML 檔案 (contact)
+│   ├─── contact.js       # entry 入口檔案 (contact)
+│   ├─── index.html       # HTML 主檔案 (index)
+│   └─── main.js          # entry 入口檔案 (index)
+│
+├─── webpack.config.js    # Webpack 配置檔案
+├─── package-lock.json
+└─── package.json
+```
+
+a.js：
+
+```js
+import $ from 'jquery';
+import fun from './c';
+```
+
+b.js：
+
+```js
+import axios from 'axios';
+import fun from './c';
+```
+
+c.js：
+
+```js
+export default () => {
+  console.log('Hello World');
+};
+```
+
+main.js：
+
+```js
+import './js/a';
+```
+
+contact.js：
+
+```js
+import './js/b';
+```
+
+配置 `webpack.config.js` 檔案：
+
+```js
+const path = require('path');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+module.exports = {
+  entry: {
+    main: './src/main.js',
+    contact: './src/contact.js',
+  },
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: '[name].js',
+  },
+  plugins: [
+    new CleanWebpackPlugin(),
+    new HtmlWebpackPlugin({
+      template: './src/index.html',
+      filename: 'index.html',
+    }),
+    new HtmlWebpackPlugin({
+      template: './src/contact.html',
+      filename: 'contact.html',
+    }),
+  ],
+};
+```
+
+以上是 MPA (Multi-Page Application) 基本的開發流程，讓我們直接進行編譯看看：
+
+```plain
+webpack-demo/
+│
+├─── dist/
+│   │
+│   ├─── contact.html
+│   ├─── contact.js
+│   ├─── index.html
+│   └─── index.js
+```
+
+從上面的編譯結果可以得知，確實相關的代碼都有成功被打包進去，但這邊有一個問題是，兩個頁面存在相同的代碼，也就是 `c.js` 的檔案內容，這樣會導致頁面加載到不必要的流量，關於這一個問題，我們一樣可以使用 SplitChunksPlugin 來解決，配置如下：
+
+```js
+module.exports = {
+  // ...
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        // 抽離 node_modules
+        vendors: {
+          test: /[\\/]node_modules[\\/]/,
+          chunks: 'initial',
+          name: 'vendors',
+          priority: 20,
+          enforce: true,
+        },
+        // 抽離公用模組
+        common: {
+          chunks: 'initial',
+          minSize: 0,
+          name: 'common',
+          minChunks: 2,
+          priority: 10,
+        },
+      },
+    },
+  },
+};
+```
+
+記得將全域的 `minSize` 與 `minChunks` 透過區域配置方式給覆蓋掉，避免無法進入 common 這個 `cacheGroups`。
+
+此時的編譯結果如下：
+
+```plain
+webpack-demo/
+│
+├─── dist/
+│   │
+│   ├─── common.ks         // 存在所有 node_modules 套件
+│   ├─── common.ks         // 只存在 c.js
+│   ├─── contact.html
+│   ├─── contact.js
+│   ├─── index.html
+│   └─── index.js
+```
+
+這邊要注意！html-webpack-plugin 預設是載入所有 chunk 的，我們需要再各自頁面排除其他不相干的 chunk，如下所示：
+
+```js
+const path = require('path');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+module.exports = {
+  plugins: [
+    new CleanWebpackPlugin(),
+    new HtmlWebpackPlugin({
+      template: './src/index.html',
+      filename: 'index.html',
+      chunks: ['main'], // 僅包含名為 main 的 chunk
+    }),
+    new HtmlWebpackPlugin({
+      template: './src/contact.html',
+      filename: 'contact.html',
+      chunks: ['contact'], // 僅包含名為 contact 的 chunk
+    }),
+  ],
+};
+```
+
+大功告成！
