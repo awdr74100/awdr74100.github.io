@@ -346,4 +346,83 @@ import './js/a';
 import './js/b';
 ```
 
-這次我們來介紹如何動態載入模組，並搭配 `async` 選像做使用，
+這次我們來介紹如何動態載入模組，並搭配 `async` 選項做使用，請先將 entry 入口處更改如下：
+
+```js
+// 靜態載入
+import $ from 'jquery'; // 請記得安裝
+
+// 動態載入
+import(/* webpackChunkName: 'a' */ './js/a');
+import(/* webpackChunkName: 'b' */ './js/b');
+```
+
+有別於使用 `import` 靜態載入模組，`import()` 在某些情況下可能帶來更高的效能，這邊要注意的是，必須以上面的寫法來載入模組，註解處是用已告知此模組的 chunkName，如果把註解給移除，預設的 chunkName 為數字，較為不直覺，建議還是直接定義 chunkName 比較好，
+
+配置 `webpack.config.js` 檔案：
+
+```js
+const path = require('path');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+module.exports = {
+  entry: './src/main.js',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: '[name].js',
+  },
+  plugins: [
+    new CleanWebpackPlugin(),
+    new HtmlWebpackPlugin({
+      template: './src/index.html',
+      filename: 'index.html',
+    }),
+  ],
+};
+```
+
+這邊就只是單純的配置相關選項，前面有提到 `chunks` 預設的值為 `async`，我們不需要進行任何配置，預設就以作用 vendors 這一個 `cacheGroups`，讓我們直接進行編譯看看：
+
+```plain
+webpack-demo/
+│
+├─── dist/
+│   │
+│   ├─── a.js
+│   ├─── b.js
+│   ├─── vendors~a~b.js
+│   ├─── main.js
+│   └─── index.html
+```
+
+從編譯結果可以得知，確實 node_modules 內的 axios 套件被抽離成 `vendors~a~b.js` 檔案，因為 `a.js` 與 `b.js` 是以動態載入的方式引入模組，檔案內的模組也就跟著作用，這邊有一點要注意的是，你會發現動態載入的模組也被抽離成獨立檔案了，這是基於 Webpack 預設的配置，與 SplitChunksPlugin 沒有關係。
+
+上面就是預設配置的 `async` 結果，眼尖的朋友應該發現其中的問題了，那就是 jQuery 也被打包進 main.js 內了，並沒有被抽離出來，原理如同之前所介紹的，SplitChunksPlugin 預設配置的 `async` 只針對動態載入的模組，如果我們需要同時處理動態與非動態載入的模組，可使用 `all` 選項，如下所示：
+
+```js
+module.exports = {
+  optimization: {
+    splitChunks: {
+      chunks: 'all',
+    },
+  },
+};
+```
+
+此時的編譯結果如下：
+
+```plain
+webpack-demo/
+│
+├─── dist/
+│   │
+│   ├─── a.js
+│   ├─── b.js
+│   ├─── vendors~a~b.js      // 非同步載入的 axios 套件
+│   ├─── vendors~main.js     // 同步載入的 jquery 套件
+│   ├─── main.js
+│   └─── index.html
+```
+
+從上面結果可以得知，node_modules 內的模組都已經被抽離成獨立檔案了，因為 `all` 選項會同時處理動態與非動態載入的模組，你可能現在在想，為什麼 SplitChunksPlugin 預設的 `chunks` 選項不直接設為 `all` 呢？就不用這麼麻煩了啊！我是認為另外兩個選項在某些情境下還是有存在的必要，並不是說哪一個選項最好，還是得看當下情境較適合哪一個選項而定，並且，`all` 所產生的效果並非所有情境下都需要。
