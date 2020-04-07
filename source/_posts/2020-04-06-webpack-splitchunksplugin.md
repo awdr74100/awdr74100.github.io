@@ -19,6 +19,7 @@ updated: 2020-04-06 21:04:08
 - 相關套件安裝
 - SplitChunksPlugin 基本使用
 - SplitChunksPlugin 可傳遞選項
+- 補充：Dynamic import()
 
 ## 相關套件安裝
 
@@ -48,7 +49,7 @@ package.json：
 
 ## SplitChunksPlugin 基本使用
 
-初始專案結構
+初始專案結構：
 
 ```plain
 webpack-demo/
@@ -68,3 +69,281 @@ webpack-demo/
 ├─── package-lock.json
 └─── package.json
 ```
+
+配置 `webpack.config.js` 檔案：
+
+```js
+const path = require('path');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+module.exports = {
+  entry: './src/main.js',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: '[name].js',
+  },
+  plugins: [
+    new CleanWebpackPlugin(),
+    new HtmlWebpackPlugin({
+      template: './src/index.html',
+      filename: 'index.html',
+    }),
+  ],
+  // optimization.splitChunks 預設配置
+  optimization: {
+    splitChunks: {
+      chunks: 'async',
+      minSize: 30000,
+      // minRemainingSize: 0, (Webpack 5 才有此選項)
+      maxSize: 0,
+      minChunks: 1,
+      maxAsyncRequests: 6,
+      maxInitialRequests: 4,
+      automaticNameDelimiter: '~',
+      cacheGroups: {
+        vendors: {
+          test: /[\\/]node_modules[\\/]/,
+          priority: -10,
+        },
+        default: {
+          minChunks: 2,
+          priority: -20,
+          reuseExistingChunk: true,
+        },
+      },
+    },
+  },
+};
+```
+
+SplitChunksPlugin 不需要進行下載，直接可在 `optimization` 選項內進行配置，在前面有說過 Webpack 預設是有開啟 SplitChunksPlugin 的，但只針對"特殊"情境才有作用，這點下面會在說明，讓我們繼續完成編譯動作。
+
+entry 入口處 (`src/main.js`) 引入 JavaScript 模組：
+
+```js
+import './js/a';
+import './js/b';
+```
+
+JavaScript 模組 (1)：
+
+```js
+import axios from 'axios';
+```
+
+JavaScript 模組 (2)：
+
+```js
+import axios from 'axios';
+```
+
+至 `package.json` 新增編譯指令：
+
+```json
+{
+  "scripts": {
+    "build": "webpack --mode development"
+  }
+}
+```
+
+執行編譯指令：
+
+```bash
+npm run build
+```
+
+此時打包生成的 `dist` 資料夾結構如下：
+
+```plain
+webpack-demo/
+│
+├─── dist/
+│   │
+│   ├─── main.js
+│   └─── index.html
+```
+
+過程如同之前所介紹的，什麼事都沒有發生，讓我們將 SplitChunksPlugin 配置更改如下：
+
+```js
+module.exports = {
+  //...
+  optimization: {
+    splitChunks: {
+      chunks: 'initial', // 全域配置
+    },
+  },
+};
+```
+
+再次執行編譯並查看結果：
+
+```plain
+webpack-demo/
+│
+├─── dist/
+│   │
+│   ├─── vendors~main.js
+│   ├─── main.js
+│   └─── index.html
+```
+
+此刻的你一定很錯亂，怎會突然新增了一個名為 `vendors~main.js` 的檔案，且檔案內容正好是 node_modules 內的相關模組 (此為 axios 套件)，太神奇了吧！讓我們先從剛剛修改的 `chunks` 選項開始說起：
+
+- chunks：`async` | `initial` | `all`
+  選擇那些類型的 chunk 是需要被優化的，默認為 `async`
+
+當初我在認識 `chunks` 選項時，是直接以實作的方式去學習，因為官方文檔完全說的不清不楚阿！且如果你搜尋相關的文章，你會發現大部分都是直接翻譯官方文檔，我完全不懂這樣子的意義在哪？經過了反覆的嘗試，得出以下結論：
+
+- `async`：只處理 [Lazy Loading](https://webpack.js.org/guides/lazy-loading/) 的 chunks，例如 `import(xxx)` 語法載入的模組
+- `initial`：只處理同步加載的 chunk，例如 `import xxx` 語法載入的模組
+- `all`：兼容以上兩種方式，通通進行處理
+
+我們在 entry 內的所有模組都是使用 `import` 方式進行載入，這才導致 SplitChunksPlugin 在預設配置下沒有任何反應，因為 `chunks` 預設配置是 `async`，關於 `async` 的實際應用將會在下面補充介紹。理解了 `chunks` 是做什麼用，接下來換最為重要的 `cacheGroups` 選項部分：
+
+- `cacheGroups`：定義 chunks 所屬的緩存組
+- `{cacheGroups}`：緩存組名稱，可由 `name` 屬性更改
+- `cacheGroups.{cacheGroups}.priority`：緩存組優先級，默認為 `0`
+- `cacheGroups.{cacheGroups}.test`：控制當下緩存組匹配的 chunk，省略它會選擇所有 chunk
+- `cacheGroups.{cacheGroups}.filename`：僅當 chunk 為同步加載時，才允許覆蓋文件名
+- `cacheGroups.{cacheGroups}.enforce`：忽略全域的[部分選項](https://webpack.js.org/plugins/split-chunks-plugin/#splitchunkscachegroupscachegroupenforce)
+
+`cacheGroups` 選項是使用 SplitChunksPlugin 成功與否的關鍵，這邊要注意的是上面提到的選項，都是 `cacheGroups` 專屬可配置的區域選項，有沒有注意到我說的是區域選項？事實上，`cacheGroups` 同層的選項都是屬於全域選項，也就是說你也可以在 `cacheGroups` 內配置 `chunks` 選項，一樣可以作用，且預設就已提供兩個 `cacheGroups` 供我們使用，為什麼前面單純的將 `chunks` 選項更改為 `initial` 就可以將 node_modules 內的模組抽離成獨立檔案，答案是不是呼之欲出了？
+
+```js
+module.exports = {
+  // ...
+  optimization: {
+    splitChunks: {
+      chunks: 'initial', // 將 async 改為 initial
+      cacheGroups: {
+        vendors: {
+          test: /[\\/]node_modules[\\/]/,
+          priority: -10,
+        },
+        default: {
+          minChunks: 2,
+          priority: -20,
+          reuseExistingChunk: true,
+        },
+      },
+    },
+  },
+};
+```
+
+沒錯！就是依靠預設配置的 `vendors` 這一個 `cacheGroups`，為什麼之前採預設配置都沒有反應，就是因為 `vendors` 參考的全域 `chunks` 配置屬性為 `async`，但我們是採用同步加載方式引入模組，當然會沒有反應，此時將 `chunks` 改為 `initial` 即可正常啟動抽離 chunk 的動作，但一般我們並不會使用預設的 `cacheGroups`，通常都會新增客製的 `cacheGroups` 做使用，如下所示：
+
+```js
+module.exports = {
+  // ...
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        vendors: {
+          test: /[\\/]node_modules[\\/]/,
+          chunks: 'initial',
+          name: 'vendors',
+          enforce: true,
+          priority: 10, // 預設為 0，必須大於預設 cacheGroups
+        },
+      },
+    },
+  },
+};
+```
+
+上面是一個抽離 node_modules 相關模組使之成為獨立檔案的標準寫法，我們並沒有更改預設的全域配置，直接以區域配置進行客製化，將符合正規表達式的 chunk 抽離出來，且 chunk 的載入方式須為同步載入，忽略全域的部分選項，最後將 chunk 名稱更改為 vendors，此時的編譯結果如下：
+
+```plain
+webpack-demo/
+│
+├─── dist/
+│   │
+│   ├─── vendors.js
+│   ├─── main.js
+│   └─── index.html
+```
+
+大功告成！如果 entry 內有任何引入 node_modules 模組的檔案，此模組都會被單獨打包進 vendors.js 內，如果你想要針對特定檔案進行抽離，只需要在正規表達式做撰寫即可，你也可以新增不同的 `cacheGroups` 專門針對不同要求做打包，優化整體的檔案結構。
+
+介紹到這邊，已經把最重要的 `cacheGroups` 與 `chunks` 屬性給釐清了，可能有人會問，那其他的屬性呢？像是 `minSize`、`maxSize`、`minChunks` 等等，是做什麼用的？事實上，這幾個選項就如同字面上的意思，舉個例子：
+
+```js
+module.exports = {
+  // ...
+  optimization: {
+    splitChunks: {
+      minSize: 70000, // 限制最小大小 ( byte )
+      cacheGroups: {
+        vendors: {
+          test: /[\\/]node_modules[\\/]/,
+          chunks: 'initial',
+          name: 'vendors',
+          enforce: true,
+        },
+      },
+    },
+  },
+};
+```
+
+上面這種寫法是不影響 vendors 這個 `cacheGroups` 的，因為我們啟用了 `enforce` 選項，代表不參考全域的屬性，正確的寫法應該如下：
+
+```js
+module.exports = {
+  // ...
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        vendors: {
+          test: /[\\/]node_modules[\\/]/,
+          chunks: 'initial',
+          name: 'vendors',
+          enforce: true,
+          minSize: 70000, // 限制最小大小 ( byte )
+        },
+      },
+    },
+  },
+};
+```
+
+此時如果 node_modules 內的套件並沒有超過 70 KB，也就不會進入這一個 `cacheGroups`，自然就不會產生 vendors 這個檔案，各位可自行試試看剩餘這這些選項，其實都大同小異，最重要的 `cacheGroups` 與 `chunks` 觀念學會比較重要。
+
+## SplitChunksPlugin 可傳遞選項
+
+可參考 [SplitChunksPlugin Options](https://webpack.js.org/plugins/split-chunks-plugin/) 可傳遞參數列表，以下為常用的參數配置：
+
+- automaticNameDelimiter：`String`
+  指定用於生成名稱的連結符號，默認為 `~`
+
+- minChunks：`Number`
+  在做抽離代碼動作前，chunks 的最小引用次數，默認為 `1`
+
+範例：
+
+```js
+module.exports = {
+  //...
+  optimization: {
+    splitChunks: {
+      automaticNameDelimiter: '@',
+      minChunks: 2,
+    },
+  },
+};
+```
+
+## 補充：Dynamic import()
+
+在前面有提到 `chunks` 選項預設的 `async` 不太適合我們當前的使用情境，因為我們是以靜態的方式載入模組，如下所示：
+
+```js
+import './js/a';
+import './js/b';
+```
+
+這次我們來介紹如何動態載入模組，並搭配 `async` 選像做使用，
