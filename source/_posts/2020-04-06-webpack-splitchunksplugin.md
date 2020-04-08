@@ -7,7 +7,7 @@ description:
 categories: [Webpack]
 tags: [Webpack, Node.js, w3HexSchool]
 date: 2020-04-06 21:04:08
-updated: 2020-04-06 21:04:08
+updated: 2020-04-08 16:37:29
 ---
 
 ## 前言
@@ -20,7 +20,8 @@ updated: 2020-04-06 21:04:08
 - SplitChunksPlugin 基本使用
 - SplitChunksPlugin 可傳遞選項
 - 補充：Dynamic import()
-- 補充：解決 MPA 所造成的重複程式碼問題
+- 補充：解決 MPA 所造成的重複代碼問題
+- 補充：抽離 Webpack 運行時代碼
 
 ## 相關套件安裝
 
@@ -417,18 +418,17 @@ module.exports = {
 webpack-demo/
 │
 ├─── dist/
-│   │
 │   ├─── a.js
 │   ├─── b.js
-│   ├─── vendors~a~b.js      // 非同步載入的 axios 套件
-│   ├─── vendors~main.js     // 同步載入的 jquery 套件
+│   ├─── vendors~a~b.js   # 非同步載入的 axios 套件
+│   ├─── vendors~main.js  # 同步載入的 jquery 套件
 │   ├─── main.js
 │   └─── index.html
 ```
 
 從上面結果可以得知，node_modules 內的模組都已經被抽離成獨立檔案了，因為 `all` 選項會同時處理動態與非動態載入的模組，你可能現在在想，為什麼 SplitChunksPlugin 預設的 `chunks` 選項不直接設為 `all` 呢？就不用這麼麻煩了啊！我是認為另外兩個選項在某些情境下還是有存在的必要，並不是說哪一個選項最好，還是得看當下情境較適合哪一個選項而定，並且，`all` 所產生的效果並非所有情境下都需要。
 
-## 補充：解決 MPA 所造成的重複程式碼問題
+## 補充：解決 MPA 所造成的重複代碼問題
 
 初始專案結構：
 
@@ -569,8 +569,8 @@ webpack-demo/
 │
 ├─── dist/
 │   │
-│   ├─── common.ks         // 存在所有 node_modules 套件
-│   ├─── common.ks         // 只存在 c.js
+│   ├─── common.js        # 存在所有 node_modules 套件
+│   ├─── common.js        # 只存在 c.js
 │   ├─── contact.html
 │   ├─── contact.js
 │   ├─── index.html
@@ -602,3 +602,72 @@ module.exports = {
 ```
 
 大功告成！
+
+## 補充：抽離 Webpack 運行時代碼
+
+Webpack 有 runtime 的概念，也就是在我們每次編譯後產生的檔案中落落長的那段代碼，為了盡可能的優化 Browser 緩存，我們可以將這段 runtime 代碼單獨抽離出來，這樣在某些文件發生改變後，一些與之相關的文件 hash 值並不會也隨之改變。
+
+通過配置 `runtimeChunk`：
+
+```js
+module.exports = {
+  optimization: {
+    runtimeChunk: 'multiple', // or true
+  },
+};
+```
+
+以上配置會為每個僅含有 runtime 的入口起點添加一個而外的 chunk，此時編譯結果如下：
+
+```plain
+webpack-demo/
+│
+├─── dist/
+│   │
+│   ├─── common.js
+│   ├─── contact.html
+│   ├─── contact.js
+│   ├─── index.html
+│   ├─── main.js
+│   ├─── runtime~contact.js    # contact 的 runtime 文件
+│   ├─── runtime~main.js       # main 的 runtime 文件
+│   └─── vendors.js
+```
+
+配置 `single` or `Object.name` 會創建一個在所有生成 chunk 之間共享的 runtime 文件，如下所示：
+
+```js
+module.exports = {
+  optimization: {
+    runtimeChunk: 'single', //  runtime 文件預設名稱為 runtime.js
+  },
+};
+```
+
+or
+
+```js
+module.exports = {
+  optimization: {
+    runtimeChunk: {
+      name: 'manifest', // runtime 文件名稱為 manifest.js
+    },
+  },
+};
+```
+
+在這邊我們使用自訂名稱的方式抽離 runtime 文件，此時編譯結果如下：
+
+```plain
+webpack-demo/
+│
+├─── dist/
+│   │
+│   ├─── common.js
+│   ├─── contact.html
+│   ├─── contact.js
+│   ├─── index.html
+│   ├─── main.js
+│   ├─── manifest.js           # 共享的 runtime 文件
+│   └─── vendors.js
+```
