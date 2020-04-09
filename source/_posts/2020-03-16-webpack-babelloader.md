@@ -393,7 +393,7 @@ useBuiltIns：`usage`：
 
 很明顯的將 useBuiltIns 更改為 `usage`，就如同使用 @babel/runtime-corejs3 一樣，自動識別需要 require 的新語法，將兼容性問題徹底解決，不同的地方在於，@babel/runtime 在不汙染全域環境下提供 polyfill，而 @babel/polyfill 則是將需要兼容的新語法掛載到全局對象，這樣子的做法即會造成所謂的全局汙染，讓我們來看最後一個 useBuiltIns 選項。
 
-useBuiltIns：`usage`：
+useBuiltIns：`entry`：
 
 <div class="note warning">使用 entry 選項記得在前面 import core-js/stable 和 regenerator-runtime/runtime 組件庫</div>
 
