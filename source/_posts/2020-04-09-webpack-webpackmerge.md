@@ -7,7 +7,7 @@ description:
 categories: [Webpack]
 tags: [Webpack, Node.js]
 date: 2020-04-09 10:41:50
-updated: 2020-04-09 10:41:50
+updated: 2020-04-09 21:22:16
 ---
 
 ## 前言
@@ -106,7 +106,7 @@ const merge = require('webpack-merge');
 // 載入需合併的配置檔 (第二步)
 const baseWebpackConfig = require('./webpack.base.conf');
 
-// 配置檔合併 (第三部)
+// 配置檔合併 (第三步)
 module.exports = merge(baseWebpackConfig, {
   mode: 'development',
   devtool: 'cheap-module-eval-source-map',
