@@ -281,6 +281,15 @@ module.exports = {
 
 可參考 [webpack-dev-server Configuration](https://webpack.js.org/configuration/dev-server/#devserverstats-) 可傳遞參數列表，以下為常用的參數配置：
 
+- clientLogLevel：`silent` | `trace` | `debug` | `info` | `warn` | `error` | `none` | `warning`
+  控制台需顯示何種狀態下的訊息，默認為 `info`
+
+- compress：`Boolean`
+  啟用 [gzip](https://betterexplained.com/articles/how-to-optimize-your-site-with-gzip-compression/) 壓縮，默認為 `false`
+
+- overlay：`Boolean` | `Object: { errors : boolean, warnings : boolean}`
+  出現錯誤或警告時，在瀏覽器全屏顯示內容，默認為 `false`
+
 - stats：`none` | `errors-only` | `minimal` | `normal` | `verbose` | `Object`
   精準控制要顯示的 bundle 訊息，可使用集成配置或自訂配置，可參考 [stats 文檔](https://webpack.js.org/configuration/stats/)，默認為 `normal`
 
@@ -289,12 +298,10 @@ module.exports = {
 ```js
 module.exports = {
   devServer: {
-    stats: {
-      assets: true,
-      cached: false,
-      chunkModules: false,
-      chunkOrigins: false,
-    },
+    clientLogLevel: 'warn',
+    compress: true,
+    overlay: true,
+    stats: 'errors-only',
   },
 };
 ```
