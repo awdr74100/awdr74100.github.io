@@ -113,3 +113,90 @@ webpack-demo/
 ├─── package-lock.json
 └─── package.json
 ```
+
+配置 `build/webpack.base.conf.js` 檔案：
+
+```js
+const path = require('path');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const VueLoaderPlugin = require('vue-loader/lib/plugin');
+
+module.exports = {
+  context: path.resolve(__dirname, '../'),
+  entry: './src/main.js',
+  output: {
+    path: path.resolve(__dirname, '../dist'),
+    filename: 'static/js/[name].[hash].js',
+    publicPath: '/',
+  },
+  resolve: {
+    extensions: ['.vue', '.mjs', '.js', '.json'],
+    alias: {
+      '@assets': path.resolve(__dirname, '../src/assets'),
+      '@img': path.resolve(__dirname, '../src/assets/img'),
+      vue$: 'vue/dist/vue.runtime.esm.js',
+    },
+  },
+  module: {
+    rules: [
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader',
+      },
+      {
+        test: /\.m?js$/,
+        exclude: /(node_modules|bower_components)/,
+        loader: 'babel-loader',
+      },
+      {
+        test: /\.(png|jpe?g|gif)$/i,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              limit: 8192,
+              name: 'static/img/[name].[ext]',
+            },
+          },
+        ],
+      },
+    ],
+  },
+  plugins: [
+    new VueLoaderPlugin(),
+    new CleanWebpackPlugin(),
+    new HtmlWebpackPlugin({
+      template: './public/index.html',
+      filename: 'index.html',
+      favicon: './public/favicon.ico',
+    }),
+  ],
+  optimization: {
+    runtimeChunk: {
+      name: 'manifest',
+    },
+    splitChunks: {
+      cacheGroups: {
+        vendors: {
+          test: /[\\/]node_modules[\\/]/,
+          chunks: 'all',
+          name: 'vendors',
+          enforce: true,
+        },
+        default: false,
+      },
+    },
+  },
+};
+```
+
+在 `webpack.base.conf.js` 的配置中，我們做了以下事情：
+
+- 配置 [babel-loader]() 編譯並轉換 ES6+ 代碼，node_modules 內的套件除外
+- 配置 [url-loader]() 將上限內的資源轉換為 Base64 編碼，超過上限的資源 fallback 給 [file-loader]() 處理
+- 配置 [clean-webpack-plugin]() 在每次編譯前刪除 `output.path` 的檔案，以保證編譯結果為最新
+- 配置 [html-webpack-plugin]() 將指定的本地模板自動引入相關資源並生成到 `output.path` 位置
+- 配置 [SplitChunksPlugin]() 將 node_modules 內的套件抽離成獨立檔案
+- 配置 [runtimeChunk]() 將 Webpack 運行時代碼抽離成獨立檔案
+- 配置 vue-loader 提取單文件組件 ([SFCs](https://vue-loader.vuejs.org/zh/spec.html)) 的每個語言塊，並透過相關 loader 做對應的處理，最後將他們組裝成一個 ES Module
