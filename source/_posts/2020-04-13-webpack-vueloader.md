@@ -70,4 +70,4 @@ package.json：
 
 當你安裝 vue-loader 時，也請記得 vue-template-compiler 也需安裝，vue-loader 主要依靠其套件進行編譯 `.vue` 檔案的動作，最後當然也少不了我們的 vue，同樣也需進行安裝，連同其餘之前所介紹的 loader 或 plugin 等等。
 
-每個 vue 的新版本發布時，一個相對應的 vue-template-compiler 也會隨之發布。編譯器必須和基本的 vue 版本保持同步，這樣 vue-loader 就會生成兼容 runtime 的代碼。這意味著你每次升級專案中的 vue 版本時，也必須匹配升級 vue-template-compiler。
+每個 vue 的新版本發布時，一個相對應的 vue-template-compiler 也會隨之發布。編譯器必須和基本的 vue 版本保持同步，這樣 vue-loader 就會生成兼容 runtime 的代碼。這意味著你每次升級專案中的 vue 版本時，也必須同時升級 vue-template-compiler。
