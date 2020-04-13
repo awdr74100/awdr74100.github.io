@@ -68,6 +68,48 @@ package.json：
 }
 ```
 
-當你安裝 vue-loader 時，也請記得 vue-template-compiler 也需安裝，vue-loader 主要依靠其套件進行編譯 `.vue` 檔案的動作，最後當然也少不了我們的 vue，同樣也需進行安裝，連同其餘之前所介紹的 loader 或 plugin 等等。
+當你安裝 vue-loader 的同時，也請記得安裝 vue-template-compiler，vue-loader 主要得依靠其套件進行編譯 `.vue` 檔的動作，最後當然少不了我們的 vue 主套件，同樣也須進行安裝。
 
-每個 vue 的新版本發布時，一個相對應的 vue-template-compiler 也會隨之發布。編譯器必須和基本的 vue 版本保持同步，這樣 vue-loader 就會生成兼容 runtime 的代碼。這意味著你每次升級專案中的 vue 版本時，也必須同時升級 vue-template-compiler。
+> 每當 vue 有新版本發布時，一個相對應的 vue-template-compiler 也會隨之發布。兩者的版本必須保持同步，這樣 vue-loader 才能正常生成兼容 runtime 的代碼。這意味著你每次升級專案中的 vue 時，也必須同時升級 vue-template-compiler。
+
+## vue-loader 基本使用
+
+初始專案結構：
+
+```plain
+webpack-demo/
+│
+├─── build/
+│   │
+│   ├─── webpack.base.conf.js     # Webpack 共用配置檔 (等待合併)
+│   ├─── webpack.dev.conf.js      # 開發環境配置檔
+│   └─── webpack.prod.conf.js     # 生產環境配置檔
+│
+├─── node_modules/
+├─── public/
+│   │
+│   ├─── favicon.ico
+│   └─── index.html               # HTML 主檔案
+│
+├─── src/
+│   │
+│   └─── assets/
+│       │
+│       └─── img/
+│           │
+│           └─── test.jpg         # 測試 file-loader 是否成功解析
+│       │
+│       └─── scss/
+│           │
+│           └─── all.scss         # SCSS 主檔案
+│
+│   │
+│   ├─── App.vue                  # Vue 主檔案
+│   └─── main.js                  # entry 入口檔案
+│
+├─── .browserslistrc
+├─── babel.config.js
+├─── postcss.config.js
+├─── package-lock.json
+└─── package.json
+```

@@ -80,7 +80,7 @@ webpack-demo/
 └─── package.json
 ```
 
-webpack.base.conf.js：
+配置 `build/webpack.base.conf.js` 檔案：
 
 ```js
 const path = require('path');
@@ -98,7 +98,7 @@ module.exports = {
 
 以往我們都是將配置全部寫在單獨的檔案內，現在我們可以將不管是 development 還是 production 環境都會用到且不需要切換的配置拆分到 `webpack.base.conf.js` 檔案內，等等會說明如何透過 webpack-merge 合併這一支檔案，這邊要注意檔案路徑是否正確，為了方便，我們配置了 `context` 並指向上一層目錄也就是專案根目錄，預設為 `process.cwd()`。
 
-webpack.dev.conf.js：
+配置 `build/webpack.dev.conf.js` 檔案：
 
 ```js
 // 載入 webpack-merge (第一步)
@@ -132,7 +132,7 @@ module.exports = merge(baseWebpackConfig, {
 
 在 development 的環境下，我們使用 style-loader 用做樣式表的處理，並且透過 webpack-merge 合併檔案，你會發現 webpack-merge 使用方式蠻簡單的，只需要以 `merge(等待合併檔案,{})` 語法做撰寫即可，最後記得一樣透過 `module.exports` 導出模塊，我們到最後會指定這一個檔案進行編譯。
 
-webpack.prod.conf.js：
+配置 `webpack.prod.conf.js` 檔案：
 
 ```js
 const merge = require('webpack-merge');
@@ -231,7 +231,7 @@ module.exports = {
 };
 ```
 
-此時我們可在 entry 內的環境讀取這邊變數：
+此時我們可在 entry 內的環境讀取這個變數：
 
 ```js
 // > $ webpack --mode development
