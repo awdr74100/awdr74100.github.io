@@ -20,3 +20,54 @@ updated: 2020-04-13 00:01:10
 - vue-loader 基本使用
 
 ## vue-loader 安裝
+
+> 套件連結：[vue-loader](https://vue-loader.vuejs.org/guide/#vue-cli)、[vue](https://vuejs.org/v2/guide/installation.html)
+
+主要的套件：
+
+```bash
+npm install vue-loader vue-template-compiler -D ; npm install vue -P
+```
+
+過程會使用到的套件：
+
+```bash
+npm install webpack webpack-cli webpack-merge  webpack-dev-server url-loader file-loader html-webpack-plugin clean-webpack-plugin babel-loader @babel/core @babel/preset-env core-js sass-loader node-sass postcss-loader autoprefixer css-loader style-loader mini-css-extract-plugin -D
+```
+
+package.json：
+
+```json
+{
+  "devDependencies": {
+    "@babel/core": "^7.9.0",
+    "@babel/preset-env": "^7.9.5",
+    "autoprefixer": "^9.7.6",
+    "babel-loader": "^8.1.0",
+    "clean-webpack-plugin": "^3.0.0",
+    "core-js": "^3.6.5",
+    "css-loader": "^3.5.2",
+    "file-loader": "^6.0.0",
+    "html-webpack-plugin": "^4.2.0",
+    "mini-css-extract-plugin": "^0.9.0",
+    "node-sass": "^4.13.1",
+    "postcss-loader": "^3.0.0",
+    "sass-loader": "^8.0.2",
+    "style-loader": "^1.1.3",
+    "url-loader": "^4.1.0",
+    "vue-loader": "^15.9.1",
+    "vue-template-compiler": "^2.6.11",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.10.3",
+    "webpack-merge": "^4.2.2"
+  },
+  "dependencies": {
+    "vue": "^2.6.11"
+  }
+}
+```
+
+當你安裝 vue-loader 時，也請記得 vue-template-compiler 也需安裝，vue-loader 主要依靠其套件進行編譯 `.vue` 檔案的動作，最後當然少不了我們的 vue 主角，同樣也需進行安裝，連同其餘之前所介紹的 loader 或 plugin 等等。
+
+每個 vue 的新版本發布時，一個相對應的 vue-template-compiler 也會隨之發布。編譯器必須和基本的 vue 版本保持同步，這樣 vue-loader 就會生成兼容 runtime 的代碼。這意味著你每次升級專案中的 vue 版本時，也必須匹配升級 vue-template-compiler。
