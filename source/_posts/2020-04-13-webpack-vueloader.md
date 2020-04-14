@@ -19,6 +19,7 @@ updated: 2020-04-13 00:01:10
 - vue-loader 安裝
 - vue-loader 基本使用
 - vue-loader 可傳遞選項
+- 補充：載入並使用 Vue Router
 
 ## vue-loader 安裝
 
@@ -543,3 +544,99 @@ module.exports = {
   },
 };
 ```
+
+## 補充：載入並使用 Vue Router
+
+當我們手動建置出 Vue CLI 環境時，要集成任何的 Vue Plugin 就難不倒我們了，這邊示範如何手動將 Vue Router 載入做使用，讓我們先從安裝開始：
+
+> 套件連結：[vue-router](https://router.vuejs.org/installation.html)
+
+```bash
+npm install vue-router -P
+```
+
+新增 `./src/views/Home.vue` 撰寫以下內容：
+
+```html
+<template>
+  <div>
+    <h1>{{ title }}</h1>
+  </div>
+</template>
+
+<script>
+  export default {
+    data() {
+      return {
+        title: 'This is an home page',
+      };
+    },
+  };
+</script>
+```
+
+新增 `./src/views/About.vue` 撰寫以下內容：
+
+```html
+<template>
+  <div>
+    <h1>{{ title }}</h1>
+  </div>
+</template>
+
+<script>
+  export default {
+    data() {
+      return {
+        title: 'This is an about page',
+      };
+    },
+  };
+</script>
+```
+
+新增 `./src/router/index.js` 撰寫我們的路由：
+
+```js
+import Vue from 'vue';
+import VueRouter from 'vue-router';
+import Home from '@/views/Home';
+
+Vue.use(VueRouter);
+
+export default new VueRouter({
+  routes: [
+    {
+      path: '/',
+      name: 'Home',
+      component: Home,
+    },
+    {
+      path: '/about',
+      name: 'About',
+      component: () => import(/* webpackChunkName: "about" */ '@/views/About'),
+    },
+  ],
+});
+```
+
+這剛好也是 Vue CLI v3 版本的預設配置，提供了兩種方式加載元件，如果你想透過 [Lazy Loading](https://router.vuejs.org/guide/advanced/lazy-loading.html) 方式加載元件，可參考上面 About 元件的寫法。
+
+掛載 router 實例至 Vue 實體上：
+
+```js
+import Vue from 'vue';
+import App from './App';
+import router from './router';
+
+new Vue({
+  router, // ES6 縮寫，等同於 router: router
+  render: (h) => h(App),
+}).$mount('#app');
+```
+
+執行 `npm run dev` 並查看結果：
+
+![結合 Vue Router](https://i.imgur.com/U2dp9dd.png)
+
+大功告成！事實上，當你了解整個 Vue CLI 是如何建構出來的，那麼你對於這些基礎的配置應該是沒啥難度了，拍手 ~
