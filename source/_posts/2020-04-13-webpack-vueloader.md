@@ -201,7 +201,7 @@ module.exports = {
 - 配置 [runtimeChunk]() 將 Webpack 運行時代碼抽離成獨立檔案
 - 配置 vue-loader 提取單文件組件 ([SFCs](https://vue-loader.vuejs.org/zh/spec.html)) 的每個語言塊，並透過相關 loader 做對應的處理，最後將他們組裝成一個 ES Module
 
-這邊唯一沒有介紹過的就屬 vue-loader 了，讓我們額外針對它做介紹：
+這邊唯一沒有介紹過的就只有 vue-loader 了，讓我們來看它是如何如何配置的：
 
 ```js
 // 載入 vue-loader/lib/plugin (第一步)
@@ -307,6 +307,132 @@ module.exports = merge(baseWebpackConfig, {
 
 在 `webpack.dev.conf.js` 的配置中，我們做了以下事情：
 
+- 配置 [webpack-merge]() 將 `webpack.base.conf.js` 基礎配置合併進來
 - 配置 [sass-loader]() 編譯並轉換 Sass/SCSS 預處理器代碼
 - 配置 [postcss-loader]() 搭配 autoprefixer 自動為 CSS 增加 Prefix
-- 配置 [css-loader]() 將 
+- 配置 [css-loader]() 將 CSS 透過 `@import` 或 `url()` 的方式載入到 JavaScript 內
+- 配置 [style-loader]() 將 CSS 以 `<style>` 標籤的方式嵌入至 HTML 中
+- 配置 [devServer]() 並開啟 HMR (Hot Module Replacement) 功能
+- 將 [devtool]() 選為 development 環境較適合的 sourceMap 類型
+
+在開發環境我們選擇使用 style-loader 處理 CSS 樣式，預設的 Vue CLI 配置是使用 vue-style-loader，這兩個 loader 功能基本上是一樣的，只不過 vue-style-loader 有針對 SSR (Server-Side Rendering ) 做支持，且移除了部分的功能，詳細可參考[官方文件](https://github.com/vuejs/vue-style-loader#differences-from-style-loader)。
+
+配置 `webpack.prod.conf.js` 檔案：
+
+```js
+const merge = require('webpack-merge');
+const baseWebpackConfig = require('./webpack.base.conf');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+
+module.exports = merge(baseWebpackConfig, {
+  mode: 'production',
+  devtool: false,
+  module: {
+    rules: [
+      {
+        test: /\.s[ac]ss$/i,
+        use: [MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader', 'sass-loader'],
+      },
+    ],
+  },
+  plugins: [
+    new MiniCssExtractPlugin({
+      filename: 'static/css/[name].[hash].css',
+    }),
+  ],
+});
+```
+
+在 `webpack.prod.conf.js` 的配置中，我們做了以下事情：
+
+- 可參考 `webpack.dev.conf.js` 配置
+- 配置 [mini-css-extract-plugin]() 將 CSS 單獨抽離成獨立檔案
+- 將 [devtool]() 選為 `false`，在 production 環境不生成 sourceMap
+
+Vue CLI v3 在生產環境預設是開啟 sourceMap 的，但我是偏好不開啟 sourceMap 的，存在風險的疑慮，如果想要在生產環境開啟 sourceMap 的話，只需要將 `devtool` 設為 `source-map` 即可。
+
+配置 `./.browserslistrc` 檔案：
+
+```plain
+last 2 version
+> 1%
+IE 10
+```
+
+配置 `./babel.config.js` 檔案：
+
+```js
+module.exports = {
+  presets: [
+    [
+      '@babel/preset-env',
+      {
+        useBuiltIns: 'usage',
+        corejs: 3,
+      },
+    ],
+  ],
+};
+```
+
+在 Vue CLI 3 版本的 Babel 處理，預設是使用 @babel/polyfill 方式進行編譯，在這邊我們也使用相同方式進行處理，之前在 [babel-loader](https://awdr74100.github.io/2020-03-16-webpack-babelloader/) 文章有提到關於 @babel/runtime 與 @babel/polyfill 的差異，有興趣的可以前去觀看。
+
+配置 `./postcss.config.js` 檔案：
+
+```js
+module.exports = {
+  plugins: [require('autoprefixer')],
+};
+```
+
+entry 入口處 (`src/main.js`) 引入並創建 Vue 實例：
+
+```js
+import Vue from 'vue';
+import App from './App';
+
+new Vue({
+  render: (h) => h(App),
+}).$mount('#app');
+```
+
+在 `main.js` 檔案中，我們新增了一個 Vue 實例，並透過 `$mount()` 手動掛載到指定的 DOM 元素上，與配置 `el` 的方式是沒有任何區別的，如下所示：
+
+```js
+new Vue({
+  el: '#app',
+  render: (h) => h(App),
+});
+```
+
+比較困惑的可能是 `render` 這一段語法，事實上，它是下面寫法的縮寫：
+
+```js
+new Vue({
+  render: function (createElement) {
+    return createElement(App);
+  },
+});
+```
+
+進一步縮寫為 ES6 語法：
+
+```js
+new Vue({
+  render(createElement) {
+    return createElement(App);
+  },
+});
+```
+
+以箭頭函式縮寫：
+
+```js
+new Vue({
+  render: (h) => h(App),
+});
+```
+
+`h` 這一個參數的作用就是生成一個 VNode 節點，`render` 函數得到這一個 VNode 節點之後，返回給 Vue 的 `mount` 函數渲染成真實的 DOM 節點，並掛載到根節點上。
+
+而為什麼取作 `h` 呢？它來自 `hyperscript` 這個單字，這個單字通常用在 Virtual DOM 的實現中。Hyperscript 本身是指生成 HTML 結構的 Script 腳本，因為 HTML 是 HyperText Markup Language 的縮寫 (超文本標記語言)。
