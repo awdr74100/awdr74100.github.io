@@ -2,7 +2,7 @@
 title: Webpack 前端打包工具 - 使用 vue-loader 手動建置出 Vue CLI 環境
 description:
   [
-    從 Vue CLI v3 開始引入了 webpack-chain 套件，同時針對配置進行了高度抽象化，我們不能以先前配置 Webpack 的方式進行撰寫，而是必須閱讀官方文件配置在專屬的 vue.config.js 檔案內才能起作用，是不是覺得這樣太麻煩了？不如我們依照自己習慣手動建置一個 Vue CLI 環境吧！此篇將介紹如何使用 vue-loader 並搭配先前所介紹的 loader 與 plugin 手動建置出 Vue CLI 的環境。,
+    從 Vue CLI v3 開始引入了 webpack-chain 套件，同時針對配置進行了高度抽象化，我們不能以先前配置 Webpack 的方式進行撰寫，而是必須閱讀官方文件配置在專屬的 vue.config.js 檔案內才能起作用，是不是覺得這樣太麻煩了？不如我們依照自己習慣手動建置一個 Vue CLI 環境吧！此篇將介紹如何使用 vue-loader 並搭配先前所介紹的 loader 與 plugin 手動建置出 Vue CLI 環境。,
   ]
 categories: [Webpack]
 tags: [Webpack, Node.js, Vue.js, w3HexSchool]
@@ -12,7 +12,7 @@ updated: 2020-04-13 00:01:10
 
 ## 前言
 
-從 Vue CLI v3 開始引入了 webpack-chain 套件，同時針對配置進行了高度抽象化，我們不能以先前配置 Webpack 的方式進行撰寫，而是必須閱讀官方文件配置在專屬的 vue.config.js 檔案內才能起作用，是不是覺得這樣太麻煩了？不如我們依照自己習慣手動建置一個 Vue CLI 環境吧！此篇將介紹如何使用 vue-loader 並搭配先前所介紹的 loader 與 plugin 手動建置出 Vue CLI 的環境。
+從 Vue CLI v3 開始引入了 webpack-chain 套件，同時針對配置進行了高度抽象化，我們不能以先前配置 Webpack 的方式進行撰寫，而是必須閱讀官方文件配置在專屬的 vue.config.js 檔案內才能起作用，是不是覺得這樣太麻煩了？不如我們依照自己習慣手動建置一個 Vue CLI 環境吧！此篇將介紹如何使用 vue-loader 並搭配先前所介紹的 loader 與 plugin 手動建置出 Vue CLI 環境。
 
 ## 筆記重點
 
@@ -128,7 +128,7 @@ module.exports = {
   entry: './src/main.js',
   output: {
     path: path.resolve(__dirname, '../dist'),
-    filename: 'static/js/[name].[hash].js',
+    filename: 'static/js/[name].js',
     publicPath: '/',
   },
   resolve: {
@@ -239,24 +239,6 @@ module.exports = {
 };
 ```
 
-這邊做一個補充，vue-loader 主要是透過 `compiler` 這個可傳遞選項引入 vue-template-compiler 用做編譯器，如下所示：
-
-```js
-module.exports = {
-  module: {
-    rules: [
-      {
-        test: /\.vue$/,
-        loader: 'vue-loader',
-        options: {
-          compiler: require('vue-template-compiler'), // 此為預設值
-        },
-      },
-    ],
-  },
-};
-```
-
 配置 `webpack.dev.conf.js` 檔案：
 
 ```js
@@ -328,6 +310,9 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 module.exports = merge(baseWebpackConfig, {
   mode: 'production',
   devtool: false,
+  output: {
+    filename: 'static/js/[name].[hash].js',
+  },
   module: {
     rules: [
       {
@@ -516,15 +501,15 @@ if (module.hot) {
 ```json
 {
   "scripts": {
-    "build": "webpack --config ./build/webpack.prod.conf.js",
-    "dev": "webpack --config ./build/webpack.dev.conf.js"
+    "dev": "webpack-dev-server --config ./build/webpack.dev.conf.js",
+    "build": "webpack --config ./build/webpack.prod.conf.js"
   }
 }
 ```
 
 執行 `npm run dev` 指令並查看結果：
 
-![手動建置 Vue CLI 環境](https://i.imgur.com/kG3QWHQ.png)
+![手動建置 Vue CLI 環境](https://i.imgur.com/grGyrsW.png)
 
 大功告成！我們已經手動建置出 Vue CLI 環境了。當初在學習 Vue 時，都是透過 Vue CLI 直接將環境給建構起來，但總是有些陌生感，Webpack 的配置也都搞不清楚作用是什麼，透過一陣子的學習，目前已經能夠針對專案需求，客製出 Webpack 的環境，滿滿的成就感阿！分享給大家。
 
