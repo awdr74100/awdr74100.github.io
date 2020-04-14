@@ -477,7 +477,7 @@ if (module.hot) {
 </html>
 ```
 
-這邊唯一的重點就是記得要新增一個 id 為 `#app` 的元素，用以讓 Vue 將內容掛載上去。在 Vue CLI 中，是使用 [copy-webpack-plugin](https://webpack.js.org/plugins/copy-webpack-plugin/) 引入 favicon.ico 圖示，在這邊不必這麼麻煩，我們直接使用 html-webpack-plugin 的 `favicon` 來完成即可。
+這邊唯一的重點就是記得要新增當時宣告的 `#app` 元素，用以讓 Vue 將內容掛載上去。在 Vue CLI 中，是使用 [copy-webpack-plugin](https://webpack.js.org/plugins/copy-webpack-plugin/) 引入 favicon.ico 圖示，在這邊不必這麼麻煩，我們直接使用 html-webpack-plugin 的 `favicon` 來完成即可。
 
 至 `./src/assets/scss/all.scss` 撰寫 SCSS 範例：
 
