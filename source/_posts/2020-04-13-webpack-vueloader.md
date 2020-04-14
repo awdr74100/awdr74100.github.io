@@ -195,12 +195,12 @@ module.exports = {
 
 在 `webpack.base.conf.js` 的配置中，我們做了以下事情：
 
-- 配置 [babel-loader]() 編譯並轉換 ES6+ 代碼，node_modules 內的套件除外
-- 配置 [url-loader]() 將上限內的資源轉換為 Base64 編碼，超過上限的資源 fallback 給 [file-loader]() 處理
-- 配置 [clean-webpack-plugin]() 在每次編譯前刪除 `output.path` 的檔案，以保證編譯結果為最新
-- 配置 [html-webpack-plugin]() 將指定的本地模板自動引入相關資源並生成到 `output.path` 位置
-- 配置 [SplitChunksPlugin]() 將 node_modules 內的套件抽離成獨立檔案
-- 配置 [runtimeChunk]() 將 Webpack 運行時代碼抽離成獨立檔案
+- 配置 [babel-loader](https://awdr74100.github.io/2020-03-16-webpack-babelloader/) 編譯並轉換 ES6+ 代碼，node_modules 內的套件除外
+- 配置 [url-loader](https://awdr74100.github.io/2020-03-09-webpack-urlloader-fileloader/) 將上限內的資源轉換為 Base64 編碼，超過上限的資源 fallback 給 [file-loader](https://awdr74100.github.io/2020-03-09-webpack-urlloader-fileloader/) 處理
+- 配置 [clean-webpack-plugin](https://awdr74100.github.io/2020-03-25-webpack-cleanwebpackplugin/) 在每次編譯前刪除 `output.path` 的檔案，以保證編譯結果為最新
+- 配置 [html-webpack-plugin](https://awdr74100.github.io/2020-03-23-webpack-htmlwebpackplugin/) 將指定的本地模板自動引入相關資源並生成到 `output.path` 位置
+- 配置 [SplitChunksPlugin](https://awdr74100.github.io/2020-04-06-webpack-splitchunksplugin/) 將 node_modules 內的套件抽離成獨立檔案
+- 配置 [runtimeChunk](https://awdr74100.github.io/2020-04-06-webpack-splitchunksplugin/#%E8%A3%9C%E5%85%85%EF%BC%9A%E6%8A%BD%E9%9B%A2-Webpack-%E9%81%8B%E8%A1%8C%E6%99%82%E4%BB%A3%E7%A2%BC) 將 Webpack 運行時代碼抽離成獨立檔案
 - 配置 vue-loader 提取單文件組件 ([SFCs](https://vue-loader.vuejs.org/zh/spec.html)) 的每個語言塊，並透過相關 loader 做對應的處理，最後將他們組裝成一個 ES Module
 
 這邊唯一沒有介紹過的就只有 vue-loader 了，讓我們來看它是如何如何配置的：
@@ -291,13 +291,13 @@ module.exports = merge(baseWebpackConfig, {
 
 在 `webpack.dev.conf.js` 的配置中，我們做了以下事情：
 
-- 配置 [webpack-merge]() 將 `webpack.base.conf.js` 基礎配置合併進來
-- 配置 [sass-loader]() 編譯並轉換 Sass/SCSS 預處理器代碼
-- 配置 [postcss-loader]() 搭配 autoprefixer 自動為 CSS 增加 Prefix
-- 配置 [css-loader]() 將 CSS 透過 `@import` 或 `url()` 的方式載入到 JavaScript 內
-- 配置 [style-loader]() 將 CSS 以 `<style>` 標籤的方式嵌入至 HTML 中
-- 配置 [devServer]() 並開啟 HMR (Hot Module Replacement) 功能
-- 將 [devtool]() 選為 development 環境較適合的 sourceMap 類型
+- 配置 [webpack-merge](https://awdr74100.github.io/2020-04-09-webpack-webpackmerge/) 將 `webpack.base.conf.js` 基礎配置合併進來
+- 配置 [sass-loader](https://awdr74100.github.io/2020-03-04-webpack-sassloader/) 編譯並轉換 Sass/SCSS 預處理器代碼
+- 配置 [postcss-loader](https://awdr74100.github.io/2020-03-05-webpack-postcssloader/) 搭配 autoprefixer 自動為 CSS 增加 Prefix
+- 配置 [css-loader](https://awdr74100.github.io/2020-02-26-webpack-cssloader-styleloader/) 將 CSS 透過 `@import` 或 `url()` 的方式載入到 JavaScript 內
+- 配置 [style-loader](https://awdr74100.github.io/2020-02-26-webpack-cssloader-styleloader/) 將 CSS 以 `<style>` 標籤的方式嵌入至 HTML 中
+- 配置 [devServer](https://awdr74100.github.io/2020-03-26-webpack-webpackdevserver/) 並開啟 HMR (Hot Module Replacement) 功能
+- 將 [devtool](https://awdr74100.github.io/2020-04-02-webpack-devtool/) 選為 development 環境較適合的 sourceMap 類型
 
 在開發環境我們選擇使用 style-loader 處理 CSS 樣式，預設的 Vue CLI 配置是使用 vue-style-loader，這兩個 loader 功能基本上是一樣的，只不過 vue-style-loader 有針對 SSR (Server-Side Rendering ) 做支持，且移除了部分的功能，詳細可參考[官方文件](https://github.com/vuejs/vue-style-loader#differences-from-style-loader)。
 
@@ -333,8 +333,8 @@ module.exports = merge(baseWebpackConfig, {
 在 `webpack.prod.conf.js` 的配置中，我們做了以下事情：
 
 - 可參考 `webpack.dev.conf.js` 配置
-- 配置 [mini-css-extract-plugin]() 將 CSS 單獨抽離成獨立檔案
-- 將 [devtool]() 選為 `false`，在 production 環境不生成 sourceMap
+- 配置 [mini-css-extract-plugin](https://awdr74100.github.io/2020-03-02-webpack-minicssextractplugin/) 將 CSS 單獨抽離成獨立檔案
+- 將 [devtool](https://awdr74100.github.io/2020-04-02-webpack-devtool/) 選為 `false`，在 production 環境不生成 sourceMap
 
 Vue CLI v3 在生產環境預設是開啟 sourceMap 的，但我是偏好不開啟 sourceMap 的，存在風險的疑慮，如果想要在生產環境開啟 sourceMap 的話，只需要將 `devtool` 設為 `source-map` 即可。
 
