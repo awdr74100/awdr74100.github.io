@@ -18,10 +18,11 @@ updated: 2020-04-13 00:01:10
 
 - vue-loader 安裝
 - vue-loader 基本使用
+- vue-loader 可傳遞選項
 
 ## vue-loader 安裝
 
-> 套件連結：[vue-loader](https://vue-loader.vuejs.org/guide/#vue-cli)、[vue](https://vuejs.org/v2/guide/installation.html)
+> 套件連結：[vue-loader](https://vue-loader.vuejs.org/guide/#vue-cli)、[vue-templete-compiler](https://github.com/vuejs/vue/tree/dev/packages/vue-template-compiler#options)、[vue](https://vuejs.org/v2/guide/installation.html)
 
 主要的套件：
 
@@ -32,7 +33,7 @@ npm install vue-loader vue-template-compiler -D ; npm install vue -P
 過程會使用到的套件：
 
 ```bash
-npm install webpack webpack-cli webpack-merge  webpack-dev-server url-loader file-loader html-webpack-plugin clean-webpack-plugin babel-loader @babel/core @babel/preset-env core-js sass-loader node-sass postcss-loader autoprefixer css-loader style-loader mini-css-extract-plugin -D
+npm install webpack webpack-cli webpack-merge webpack-dev-server url-loader file-loader html-webpack-plugin clean-webpack-plugin babel-loader @babel/core @babel/preset-env sass-loader node-sass postcss-loader autoprefixer css-loader style-loader mini-css-extract-plugin -D ; npm i core-js -P
 ```
 
 package.json：
@@ -45,7 +46,6 @@ package.json：
     "autoprefixer": "^9.7.6",
     "babel-loader": "^8.1.0",
     "clean-webpack-plugin": "^3.0.0",
-    "core-js": "^3.6.5",
     "css-loader": "^3.5.2",
     "file-loader": "^6.0.0",
     "html-webpack-plugin": "^4.2.0",
@@ -63,6 +63,7 @@ package.json：
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
+    "core-js": "^3.6.5",
     "vue": "^2.6.11"
   }
 }
@@ -97,7 +98,7 @@ webpack-demo/
 │       │
 │       └─── img/
 │           │
-│           └─── test.jpg         # 測試 file-loader 是否成功解析
+│           └─── logo.png         # 測試圖片是否成功解析 ( Size < 8KB )
 │       │
 │       └─── scss/
 │           │
@@ -415,7 +416,7 @@ new Vue({
 });
 ```
 
-進一步縮寫為 ES6 語法：
+改為 ES6 的函式縮寫：
 
 ```js
 new Vue({
@@ -425,7 +426,7 @@ new Vue({
 });
 ```
 
-以箭頭函式縮寫：
+進一步改以箭頭函式縮寫：
 
 ```js
 new Vue({
@@ -436,3 +437,124 @@ new Vue({
 `h` 這一個參數的作用就是生成一個 VNode 節點，`render` 函數得到這一個 VNode 節點之後，返回給 Vue 的 `mount` 函數渲染成真實的 DOM 節點，並掛載到根節點上。
 
 而為什麼取作 `h` 呢？它來自 `hyperscript` 這個單字，這個單字通常用在 Virtual DOM 的實現中。Hyperscript 本身是指生成 HTML 結構的 Script 腳本，因為 HTML 是 HyperText Markup Language 的縮寫 (超文本標記語言)。
+
+你可能會有疑問，在 `webpack.dev.conf.js` 配置中，不是有開啟 HMR 功能嗎？我們不需要加入以下語法嗎？
+
+```js
+if (module.hot) {
+  module.hot.accept();
+}
+```
+
+答案是不用的，vue-loader 內部使用的 [vue-hot-reload-api](https://github.com/vuejs/vue-hot-reload-api) 已經幫我們做開啟的動作了，這也是為什麼 Vue CLI 預設就已開啟 HMR 功能，但你卻都找不到這段語法的原因。
+
+至 `./src/App.vue` 撰寫範例：
+
+```html
+<template>
+  <div id="app">
+    <h1 class="text-primary">{{ title }}</h1>
+    <div class="logo"></div>
+  </div>
+</template>
+
+<script>
+  export default {
+    data() {
+      return {
+        title: 'Hello Vue',
+      };
+    },
+  };
+</script>
+
+<style lang="scss">
+  @import '~@/assets/scss/all.scss';
+</style>
+```
+
+關於 Vue 的語法就暫時不做說明，未來一樣會有一系列的文章專門在講解 Vue，敬請期待！為了測試 sass-loader 是否成功作用，我們刻意在 `App.vue` 中載入 SCSS 的主檔案，當然你也可以在 entry 檔案進行載入，全看個人喜好。
+
+至 `./public/index.html` 撰寫 HTML 範例：
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+  </body>
+</html>
+```
+
+這邊唯一的重點就是記得要新增一個 id 為 `#app` 的元素，用以讓 Vue 將內容掛載上去。在 Vue CLI 中，是使用 [copy-webpack-plugin](https://webpack.js.org/plugins/copy-webpack-plugin/) 引入 favicon.ico 圖示，在這邊不必這麼麻煩，我們直接使用 html-webpack-plugin 的 `favicon` 來完成即可。
+
+至 `./src/assets/scss/all.scss` 撰寫 SCSS 範例：
+
+```scss
+.text-primary {
+  color: rgb(45, 124, 214);
+}
+
+.logo {
+  width: 100px;
+  height: 100px;
+  background-image: url('~@img/logo.png');
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+```
+
+至 `package.json` 新增編譯指令：
+
+```json
+{
+  "scripts": {
+    "build": "webpack --config ./build/webpack.prod.conf.js",
+    "dev": "webpack --config ./build/webpack.dev.conf.js"
+  }
+}
+```
+
+執行 `npm run dev` 指令並查看結果：
+
+![手動建置 Vue CLI 環境](https://i.imgur.com/kG3QWHQ.png)
+
+大功告成！我們已經手動建置出 Vue CLI 環境了。當初在學習 Vue 時，都是透過 Vue CLI 直接將環境給建構起來，但總是有些陌生感，Webpack 的配置也都搞不清楚作用是什麼，透過一陣子的學習，目前已經能夠針對專案需求，客製出 Webpack 的環境，滿滿的成就感阿！分享給大家。
+
+## vue-loader 可傳遞選項
+
+可參考 [vue-loader Options](https://vue-loader.vuejs.org/options.html) 可傳遞參數列表，以下為常用的參數配置：
+
+- compiler：`VueTemplateCompiler`
+  覆蓋用來編譯單文件組件中 `<templete>` 塊的默認編譯器，默認為 `require('vue-template-compiler')`
+
+- compilerOptions：`Object`
+  當編譯器為 vue-template-compiler 時，可添加此選像自定義編譯器指令，默認為 `{}`
+
+範例：
+
+```js
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader',
+        options: {
+          compiler: require('vue-template-compiler'), // 此為預設值
+          compilerOptions: {
+            whitespace: 'condense', // Vue CLI v3 預設選項
+          },
+        },
+      },
+    ],
+  },
+};
+```
