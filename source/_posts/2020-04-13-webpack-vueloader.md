@@ -518,7 +518,7 @@ if (module.hot) {
 可參考 [vue-loader Options](https://vue-loader.vuejs.org/options.html) 可傳遞參數列表，以下為常用的參數配置：
 
 - compiler：`VueTemplateCompiler`
-  覆蓋用來編譯單文件組件中 `<templete>` 塊的默認編譯器，默認為 `require('vue-template-compiler')`
+  單文件組件中 `<templete>` 塊的默認編譯器，默認為 `require('vue-template-compiler')`
 
 - compilerOptions：`Object`
   當編譯器為 vue-template-compiler 時，可添加此選像自定義編譯器指令，默認為 `{}`
