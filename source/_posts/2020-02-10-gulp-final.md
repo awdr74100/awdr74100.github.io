@@ -5,7 +5,7 @@ description:
     此篇將紀錄從接觸 Gulp 開始到後來能夠獨立開發專案所需 Gulp 環境的學習總結。前面會先把之前所遇到的坑做一個解決辦法補充，比如透過 Babel 編譯後，require 語法無法在 Browser 運行等問題，以及使用 gulp-rename 套件後，該如何連同 HTML 相關的引用路徑做一個響應變動等等，最後也會提供我最為常用的 Gulp 開發環境，供有興趣的開發者快速導入現有專案。,
   ]
 categories: [Gulp]
-tags: [Gulp 4, Node.js, w3HexSchool, 學習總結]
+tags: [Gulp 4, Node.js, w3HexSchool]
 date: 2020-02-10 23:30:55
 updated: 2020-02-13 18:25:51
 ---
@@ -91,11 +91,7 @@ console.log(result);
 const gulp = require('gulp');
 const babel = require('gulp-babel');
 
-const babelTask = () =>
-  gulp
-    .src('./source/js/*.js')
-    .pipe(babel())
-    .pipe(gulp.dest('public/js'));
+const babelTask = () => gulp.src('./source/js/*.js').pipe(babel()).pipe(gulp.dest('public/js'));
 
 exports.default = babelTask;
 ```
@@ -132,7 +128,7 @@ var _interopRequireDefault = require('@babel/runtime-corejs3/helpers/interopRequ
 var _filter = _interopRequireDefault(require('@babel/runtime-corejs3/core-js-stable/instance/filter'));
 
 var arr = [1, 2, 3, 4, 5];
-var result = (0, _filter['default'])(arr).call(arr, function(item) {
+var result = (0, _filter['default'])(arr).call(arr, function (item) {
   return item > 3;
 });
 console.log(result);
