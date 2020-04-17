@@ -99,7 +99,7 @@ git config --list
 
 如果出現 `user.name` 與 `user.email` 即代表設定成功。
 
-這邊介紹另一種檢查的方法，至 `C:\Users\xxx\.gitconfig` 查看內容：
+這邊介紹另一種檢查的方法，至 `C:\Users\${USER}\.gitconfig` 查看內容：
 
 ```plain
 [user]
@@ -245,7 +245,7 @@ git log
 - 新增區域使用者 (姓名)：`git config --local user.name "姓名"`
 - 新增區域使用者 (信箱)：`git config --local user.email "信箱"`
 - 檢查使用者設定：`git config --list`
-- 全域 Git 設定檔：`C:\Users\xxx\.gitconfig`
+- 全域 Git 設定檔：`C:\Users\${USER}\.gitconfig`
 - 專案 Git 設定檔：`/.git/config`
 - 初始化 Git Repositroy：`git init`
 - 查看當前目錄狀態：`git status`

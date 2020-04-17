@@ -17,5 +17,43 @@ updated: 2020-04-17 18:27:27
 ## 筆記重點
 
 - 在 GitHub 開一個遠端數據庫
+- 設定 GitHub SSH 金鑰
 
 ## 在 GitHub 開一個遠端數據庫
+
+首先我們當然要有一個遠端數據庫託管我們的專案，在這邊示範 GitHub 的流程。
+
+註冊 [GitHub](https://github.com/join?source=header-home) 帳號：
+
+![Register GitHub](https://i.imgur.com/n0pIThT.png)
+
+點擊畫面左邊的 New 按鈕，新增一個 Repository：
+
+![New Repository](https://i.imgur.com/cGtent2.png)
+
+此為 Repository 的各種設定，Name 為必要設定，其他都用預設值就好，反正後面還可以更改：
+
+![Repository First Setting](https://i.imgur.com/q2mQFRg.png)
+
+成功顯示：
+
+![Repository success](https://i.imgur.com/iPyCrV1.png)
+
+當你跑出以上畫面即代表遠端數據庫已成功被建立，你會看到一堆 Git 的指令，這些在下面都會做介紹，接下來進入本地數據庫連接遠端數據庫的部分。
+
+## 設定 GitHub SSH 金鑰
+
+在我們將本地數據庫連結遠端數據庫之前，有一個很重要的觀念是關於 SSH 與 HTTPS 的差異，GitHub 為了保證當前使用者就是此 Repository 的授權用戶，提供了兩種的驗證方式：
+
+- SSH：已經將金鑰設定完成，與遠端數據庫交流時不需輸入帳密 (可針對私鑰使用設定密碼)
+- HTTPS：與遠端數據庫交流時需輸入 GitHub 帳密，如果不需要輸入通常是帳密已存在電腦裡
+
+GitHub 本身是推薦使用 HTTPS，使用起來會比較安全，且你也不需要做任何設定，跳出 GitHub 登入視窗，就給它輸入就對了；但我個人比較推薦使用 SSH 的方式，並針對私鑰設定使用密碼，這樣在每次與遠端數據庫交流時，都會跑出輸入密碼的提示，你可能會想，這樣不是很麻煩嗎？但換個角度去想，假設你在提交的途中後悔了呢？我是不是就可以避免此次的提交？類似 Git 要設立索引區的用意，下面介紹了 SSH 該如何設定。
+
+開啟終端機並輸入以下指令，用以生成 SSH Key：
+
+```bash
+ssh-keygen
+```
+
+
