@@ -183,19 +183,19 @@ git status
 
 ![git status](https://i.imgur.com/7jvZNjc.png)
 
-從 Git 的提示可以看出，我們的 `index.html` 檔案目前狀態是 `Untracked`，關於檔案狀態的部分會再之後的章節做討論，這邊我們只需要記得一個重點就是，**所有剛新增的檔案初始存在區域都是屬於工作目錄**，也就是上圖的第一個地方，請注意，**在工作目錄且狀態為 `Untracked` 的檔案是不受 Git 版控的**，也就是說如果你在這邊做任何的修改，是無法擁有之前展示的復原、切換版本功能的，此時 Git 就沒有任何意義了。我們所需做的是將此檔案提交至索引區，執行以下指令：
+從 Git 的提示可以看出，我們的 `index.html` 檔案目前狀態是 `Untracked`，關於檔案狀態的部分會再之後的檔案復原獨立文章在做討論，這邊我們只需要記得一個重點就是，**所有剛新增的檔案初始存在區域都是屬於工作目錄**，也就是上圖的第一個地方，請注意，**在沒有提交半次 commit 的檔案，都是不受 Git 所版控的**，也就是說，每一次的工作流程，都必須跑到最後一次 commit 記錄發生時，才能使用檔案復原或切換這些上面曾經展示過的功能，現在讓我們跑下一個工作流程，也就是將工作目錄檔案提交至索引區，執行以下指令：
 
 ```bash
 git add index.html
 ```
 
-or
+or (全部檔案)
 
 ```bash
 git add .
 ```
 
-or
+or (在 Git 2.x 之後，效果如同 `git add .`)
 
 ```bash
 git add --all
@@ -223,7 +223,7 @@ git commit -m '新增 index.html'
 git config --global core.editor 'code --wait'
 ```
 
-到這邊一個基本的 Git 處理流程也就完成了。此時可利用以下指令查看所有的 commit 紀錄：
+到這邊一個基本的 Git 工作流程也就完成了，代表 commit 紀錄已經成功生成。此時可利用以下指令查看所有的 commit 紀錄：
 
 ```bash
 git log
@@ -244,13 +244,14 @@ git log
 - 新增全域使用者 (信箱)：`git config --global user.email "信箱"`
 - 新增區域使用者 (姓名)：`git config --local user.name "姓名"`
 - 新增區域使用者 (信箱)：`git config --local user.email "信箱"`
+- 檢查使用者設定：`git config --list`
 - 全域 Git 設定檔：`C:\Users\xxx\.gitconfig`
 - 專案 Git 設定檔：`/.git/config`
 - 初始化 Git Repositroy：`git init`
 - 查看當前目錄狀態：`git status`
 - 將工作目錄檔案提交至索引區 (指定檔案)：`git add <提交檔案>`
 - 將工作目錄檔案提交至索引區 (全部檔案)：`git add .`
-- 將工作目錄檔案提交至索引區 (在 Git 2.x 之後，效果如同 git add .)：`git add --all`
+- 將工作目錄檔案提交至索引區 (在 Git 2.x 之後，效果如同 `git add .`)：`git add --all`
 - 將索引區檔案提交至本地數據庫：`git commit -m '訊息'`
 - 將索引區檔案提交至本地數據庫 (開啟預設編輯器)：`git commit`
 - 將預設的 Vim 編輯器改為 VSCode：`git config --global core.editor "code --wait"`
