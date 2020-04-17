@@ -117,7 +117,7 @@ git config --local user.name 'Eric'
 git config --local user.email 'asdwef@gmail.com'
 ```
 
-區域配置的設定一樣會有專屬設定檔，專案資料夾內的 `.git/config` 檔案就是了，同樣可檢查是否成功設定：
+區域配置的設定一樣會有專屬設定檔，專案資料夾內的 `/.git/config` 檔案就是了，同樣可檢查是否成功設定：
 
 ```plain
 [user]
@@ -211,13 +211,25 @@ git add --all
 git commit -m '新增 index.html'
 ```
 
-當我們執行了上面這道命令後，**存在索引區的檔案就會被提交至本地數據庫**，也就是圖中第三個部分，一個基本的 Git 處理流程也就完成了。此時可利用以下指令查看所有的 commit 紀錄：
+當我們執行了上面這道命令後，**存在索引區的檔案就會被提交至本地數據庫**，也就是圖中第三個部分，這邊的 `-m` 是指 message 的意思，你可以替這一次提交附加一個訊息，以供未來檢視，可能會有人問，我可以直接打 `git commit` 就好嗎？此時會跳到 Vim 的命令模式，如下圖：
+
+![Vie insert](https://i.imgur.com/oD6TcQa.png)
+
+看來還是得輸入訊息，如果你發現不能打字，可以按 `i` 進行 insert 的操作，就可以輸入內容了，最後輸入 `:wq` 完成編輯，也就是 `:w` 儲存後再 `:q` 關閉檔案。**不管是使用哪一種方式，絕對不能輸入空的訊息內容**，就算輸入並儲存了，Git 也會提示由於提交訊息為空而中止提交，也就是保持在索引區狀態，這點要注意！
+
+如果你認為預設的 Vim 編輯器不對你的胃口，你也可以更改為記事本或其他編輯器，下面為更改為 `VSCode` 編譯器的指令：
+
+```bash
+git config --global core.editor 'code --wait'
+```
+
+到這邊一個基本的 Git 處理流程也就完成了。此時可利用以下指令查看所有的 commit 紀錄：
 
 ```bash
 git log
 ```
 
-在使用 `git log` 指令時，如果加上額外參數，可以看到不一樣的輸出格式，例如加上 `--oneline` 或 `--graph`，以下為輸出結果：
+在使用 `git log` 指令時，如果加上額外參數，可以看到不一樣的輸出格式，例如加上 `--oneline` 或 `--graph`，各位可以自己試看看，以下為一般輸出結果：
 
 ![git log](https://i.imgur.com/mMaJ7rN.png)
 
@@ -226,3 +238,22 @@ git log
 到了這邊，我們已經成功提交了第一個 commit 記錄了，你可以嘗試提交多一點的紀錄，以加深整個流程的印象，可能會有人問，那上面那張圖的第四個部分呢？怎沒有講到？事實上，本地端的 Git 操作，就只包含前三個部分，所謂的遠端數據庫就是指像是 GitHub、GitLab、Bitbucket 等平台，這些的本體都是屬於 Git 伺服器，我們一樣可透過 Git 指令將指定目錄推上去，達到遠端存取的作用，關於這一部分，將在下一篇文章做介紹，敬請期待。
 
 ## Git 指令小抄
+
+- 檢查 Git 版本：`git --version`
+- 新增全域使用者 (姓名)：`git config --global user.name "姓名"`
+- 新增全域使用者 (信箱)：`git config --global user.email "信箱"`
+- 新增區域使用者 (姓名)：`git config --local user.name "姓名"`
+- 新增區域使用者 (信箱)：`git config --local user.email "信箱"`
+- 全域 Git 設定檔：`C:\Users\xxx\.gitconfig`
+- 專案 Git 設定檔：`/.git/config`
+- 初始化 Git Repositroy：`git init`
+- 查看當前目錄狀態：`git status`
+- 將工作目錄檔案提交至索引區 (指定檔案)：`git add <提交檔案>`
+- 將工作目錄檔案提交至索引區 (全部檔案)：`git add .`
+- 將工作目錄檔案提交至索引區 (在 Git 2.x 之後，效果如同 git add .)：`git add --all`
+- 將索引區檔案提交至本地數據庫：`git commit -m '訊息'`
+- 將索引區檔案提交至本地數據庫 (開啟預設編輯器)：`git commit`
+- 將預設的 Vim 編輯器改為 VSCode：`git config --global core.editor "code --wait"`
+- 查看目錄日誌：`git log`
+- 查看目錄日誌 (精簡化)：`git log --oneline`
+- 查看目錄日誌 (線路圖)：`git log --oneline --graph`
