@@ -56,4 +56,21 @@ GitHub 本身是推薦使用 HTTPS，使用起來會比較安全，且你也不�
 ssh-keygen
 ```
 
+- Created directory：生成路徑 (採預設即可)
+- Enter passphrase：私鑰密碼 (可為空值，但建議輸入，上面有說明)
+- Enter same passphrase again：再次輸入密碼
+- ... 金鑰相關資訊
 
+成功生成 SSH Key：
+
+![ssh-keygen created](https://i.imgur.com/5G0gngn.png)
+
+將 `C:\Users\${USER}\.ssh\id_rsa.pub` 公鑰內容複製到 GitHub > Setting > SSH and GPG keys 上，如下所示：
+
+![SSH Key push](https://i.imgur.com/0mX7Tb5.png)
+
+點擊 New SSH Key 並將剛剛複製內容貼到 Key 欄位，最後按 Add SSH key 提交公鑰，完成圖如下：
+
+![SSH Key success](https://i.imgur.com/NoCocJc.png)
+
+到這邊就已經完成 GitHub SSH 金鑰設定的部分，下面我們就可以透過 SSH 方式與遠端數據庫交流囉。
