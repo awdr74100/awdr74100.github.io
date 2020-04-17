@@ -65,7 +65,9 @@ ssh-keygen
 
 ![ssh-keygen created](https://i.imgur.com/5G0gngn.png)
 
-將 `C:\Users\${USER}\.ssh\id_rsa.pub` 公鑰內容複製到 GitHub > Setting > SSH and GPG keys 上，如下所示：
+將 `C:\Users\${USER}\.ssh\id_rsa.pub` 公鑰內容提交至 GitHub 上：
+
+位置：GitHub > Setting > SSH and GPG keys
 
 ![SSH Key push](https://i.imgur.com/0mX7Tb5.png)
 
