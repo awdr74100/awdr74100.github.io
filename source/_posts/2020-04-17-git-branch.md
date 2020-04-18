@@ -2,7 +2,7 @@
 title: Git 版本控制系統 - 分支的建立與合併分支的兩種方式
 description:
   [
-    上次介紹了 Git 基本的工作流程，這一次來介紹 Git 另一個強大的功能，分支 (branch) 的部分。你如果曾上網搜尋 Git 的圖片，你會發現別人的 Git 怎看起來都好複雜，一堆各種顏色的線，這些線就是屬於分支，通常在多人開發時，我們不太可能像之前所操作的，只在 master 這一條主線進行開發，我們會開一條分支專門處理專案的特定部分，最後當我們要做實際呈現時，才會將此分支合併到主線上面，而合併分支在 Git 又有所謂的快轉機制，即 Fast-forward，該如何正確的建立分支與合併分支，本篇都會講到。,
+    上次介紹了 Git 基本的工作流程，這一次來介紹 Git 另一個強大的功能，分支 (branch) 的部分。你如果曾上網搜尋 Git 的圖片，你會發現別人的 Git 怎看起來都好複雜，一堆各種顏色的線，這些線就是屬於分支，通常在多人開發時，我們不太可能像之前所操作的，只在 master 這一條主線進行開發，我們會開一條分支專門處理專案的特定部分，最後當我們要做實際呈現時，才會將此分支合併到主線上面，而合併分支在 Git 又有所謂的快轉機制，即 fast-forward，該如何正確的建立分支與合併分支，本篇都會講到。,
   ]
 categories: [Git]
 tags: [Git]
@@ -124,7 +124,7 @@ git merge dev
 
 ![查看 commit 紀錄-3](https://i.imgur.com/rrg34x6.png)
 
-你現在一定很困惑，這樣子的結果跟直接在 `master` 分支提交 commit 紀錄有何差別？確實是沒有差別的，因為我們採用的是 `Fast-forward` 方式合併分支，在線路圖是看不到 `db.json` 是由 `dev` 所開發而成的，關於 `Fast-forward` 機制，將在下面做介紹，在這邊我們只需要知道如何建立分支與合併分支就可以了。
+你現在一定很困惑，這樣子的結果跟直接在 `master` 分支提交 commit 紀錄有何差別？確實是沒有差別的，因為我們採用的是 `fast-forward` 方式合併分支，在線路圖是看不到 `db.json` 是由 `dev` 所開發而成的，關於 `fast-forward` 機制，將在下面做介紹，在這邊我們只需要知道如何建立分支與合併分支就可以了。
 
 ## fast-forward 與 non-fast-forward 合併差異
 
@@ -162,19 +162,19 @@ git merge dev --no-ff
 ![commit 提交訊息](https://i.imgur.com/EYriIpE.png)
 
 由於我已更改預設編輯器，你看到的可能是 Vim 的視窗，不過這都沒差，我們可以採用預設的訊息即可，接著儲存後關閉檔案，此時會跳出提交 commit 的訊息，如下所示：
-00
+
 ![git merge dev --no-ff](https://i.imgur.com/kluzaio.png)
 
 你一定覺得很神奇，為什麼會跳出 commit 提交的訊息呢？不用緊張，先用 `git log` 壓壓驚：
 
 ![取消快轉機制](https://i.imgur.com/QsawRvA.png)
 
-神奇的事情發生了，線路圖多了一條分支的線路，也就是 `dev` 分支的線路圖，且在最新的 commit 紀錄上，新增了一個合併分支的 commit 紀錄，這樣子的結果才能夠清楚辨別哪些 commit 是由那些分支提交而成的，讓我們回過頭來說明何謂 `Fast-forward` 快轉機制：
+神奇的事情發生了，線路圖多了一條分支的線路，也就是 `dev` 分支的線路圖，且在最新的 commit 紀錄上，新增了一個合併分支的 commit 紀錄，這樣子的結果才能夠清楚辨別哪些 commit 是由那些分支提交而成的，讓我們回過頭來說明何謂 `fast-forward` 快轉機制：
 
-- `Fast-forward`：將被合併分支紀錄合併至請求合併分支內，意被合併分支紀錄將被刪除，不會有獨立線路可參照
-- `non Fast-forward`：保留被合併分支的紀錄，意被合併分支紀錄不會被刪除，會有獨立線路可參照
+- `fast-forward`：將被合併分支紀錄合併至請求合併分支內，意被合併分支紀錄將被刪除，不會有獨立線路可參照
+- `non-fast-forward`：保留被合併分支的紀錄，意被合併分支紀錄不會被刪除，會有獨立線路可參照
 
-以實際層面來講呢，就是 `dev` 分支提交了許多次 commit 紀錄，但 `master` 分支沒有任何的變化，此時如果直接在 `master` 分支合併 `dev` 分支，預設就會採用 `Fast-forward` 快轉合併，即會造成最初的結果，而使用 `--no-ff` 則是取消快轉機制，保留被合併分支的全部記錄，這樣就會產生剛剛實驗的結果。
+以實際層面來講呢，就是 `dev` 分支提交了許多次 commit 紀錄，但 `master` 分支沒有任何的變化，此時如果直接在 `master` 分支合併 `dev` 分支，預設就會採用 `fast-forward` 快轉合併，即會造成最初的結果，而使用 `--no-ff` 則是取消快轉機制，保留被合併分支的全部記錄，這樣就會產生剛剛實驗的結果。
 
 你可能會想，那假設我在 `dev` 分支提交 commit 紀錄後，又回到 `master` 分支提交 commit 呢？我們直接來模擬這一個狀況：
 
@@ -204,11 +204,11 @@ $ git commit -m '新增 all.scss'
 
 ![Sourcetree 線路圖](https://i.imgur.com/wj4q9T8.png)
 
-這樣看起來比較好懂，`master` 與 `dev` 都各提交了一次 commit，像在這種情況下，我們就不需要添加 `--no-ff` 選項，預設就以使用 `non Fast-forward`，直接執行 `git merge dev`：
+這樣看起來比較好懂，`master` 與 `dev` 都各提交了一次 commit，像在這種情況下，我們就不需要添加 `--no-ff` 選項，預設就以使用 `non-fast-forward`，直接執行 `git merge dev`：
 
 ![查看 commit 紀錄-6](https://i.imgur.com/14gyq8r.png)
 
-此時的線路圖就會是如同前面使用 `--no-ff` 一樣，這也就是 Git 內建的 Fast-forward 快轉機制的各種變化，主要就是看你想呈現怎樣的線路圖，假設 `master` 分支在建立 `dev` 分支後沒有做任何動作，反而是 `dev` 提交了多次 commit，這時候如果你想要使用 `Fast-forward` 快轉合併，直接下 `git merge dev` 就可以了，假設你想要保留分支的 commit 紀錄，就下 `git merge dev --no-ff` 取消快轉，此時就會呈現各分支的 commit 紀錄。另外一種情況是，在 `master` 建立了 `dev` 分支，且 `dev` 分支也提交了多次 commit 紀錄，但你發現了 Bug，回過頭來修復 `master` 分支，同時提交了 commit 紀錄，這時 `dev` 與 `master` 分支都有較新的 commit 紀錄，此時就不需要使用 `--no-ff`，因為兩個分支本身已擁有獨自的線路，直接下 `git merge dev` 就可以了。
+此時的線路圖就會是如同前面使用 `--no-ff` 一樣，這也就是 Git 內建的 fast-forward 快轉機制的各種變化，主要就是看你想呈現怎樣的線路圖，假設 `master` 分支在建立 `dev` 分支後沒有做任何動作，反而是 `dev` 提交了多次 commit，這時候如果你想要使用 `fast-forward` 快轉合併，直接下 `git merge dev` 就可以了，假設你想要保留分支的 commit 紀錄，就下 `git merge dev --no-ff` 取消快轉，此時就會呈現各分支的 commit 紀錄。另外一種情況是，在 `master` 建立了 `dev` 分支，且 `dev` 分支也提交了多次 commit 紀錄，但你發現了 Bug，回過頭來修復 `master` 分支，同時提交了 commit 紀錄，這時 `dev` 與 `master` 分支都有較新的 commit 紀錄，此時就不需要使用 `--no-ff`，因為兩個分支本身已擁有獨自的線路，直接下 `git merge dev` 就可以了。
 
 ## 重命名指定分支
 
@@ -337,3 +337,15 @@ git branch ex 070af85
 讓我們做點複習，`HEAD` 主要用來指向我們目前所在的 commit 紀錄上，方便我們四處查看，當我們使用 `checkout` 切換到沒有分支的 commit 紀錄上時，此狀態稱之為斷頭 `detached HEAD`，在此狀態也可以進行 commit 提交，但要注意在將 HEAD 切換為分支時，此 commit 紀錄會被隱藏掉，如果堅持保留這一個 commit 紀錄，可以在這一個 commit 紀錄上開立分支，這樣就不會被隱藏了。
 
 ## 章節 Git 指令回顧
+
+- 查看目前所有分支：`git branch`
+- 建立分支：`git branch <branch>`
+- 切換至指定分支：`git checkout <branch>`
+- 建立並切換到指定分支：`git checkout -b <branch>`
+- 合併分支：`git merge <branch>`
+- 合併分支 (使用 non-fast-forward)：`git merge <branch> --no-ff`
+- 更改分支名稱：`git branch -m <old branch> <new branch>`
+- 刪除分支 (分支以合併)：`git branch -d <branch>`
+- 強制刪除分支 (分支未合併)：`git branch -D <branch>`
+- 在指定節點添加分支：`git branch <new branch> <SHA-1>`
+- 切換到指定 commit 節點：`git checkout <SHA-1>`
