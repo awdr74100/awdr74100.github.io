@@ -322,7 +322,7 @@ git checkout master
 
 ![有一個 commit 被隱藏](https://i.imgur.com/pSJRHOh.png)
 
-這就是剛剛提到的 commit 被隱藏掉了，當然你也可以使用 `git checkout 070af85` 回到這個 commit 紀錄上，但如果你堅持保留這一個 commit 紀錄，更好的最法是新增一個 branch：
+這就是剛剛提到的 commit 被隱藏掉了，當然你也可以使用 `git checkout 070af85` 回到這個 commit 紀錄上，但如果你堅持保留這一個 commit 紀錄，更好的最法是建立一個分支：
 
 ```bash
 git branch ex 070af85
@@ -337,4 +337,3 @@ git branch ex 070af85
 讓我們做點複習，`HEAD` 主要用來指向我們目前所在的 commit 紀錄上，方便我們四處查看，當我們使用 `checkout` 切換到沒有分支的 commit 紀錄上時，此狀態稱之為斷頭 `detached HEAD`，在此狀態也可以進行 commit 提交，但要注意在將 HEAD 切換為分支時，此 commit 紀錄會被隱藏掉，如果堅持保留這一個 commit 紀錄，可以在這一個 commit 紀錄上開立分支，這樣就不會被隱藏了。
 
 ## 章節 Git 指令回顧
-
