@@ -339,13 +339,13 @@ git branch ex 070af85
 ## Git 指令回顧
 
 - 查看目前所有分支：`git branch`
-- 建立分支：`git branch <branch name>`
-- 切換至指定分支：`git checkout <branch name>`
-- 建立並切換到指定分支：`git checkout -b <branch name>`
-- 合併分支：`git merge <branch name>`
-- 合併分支 (使用 non-fast-forward)：`git merge <branch name> --no-ff`
-- 更改分支名稱：`git branch -m <old branch name> <new branch name>`
-- 刪除分支 (分支以合併)：`git branch -d <branch name>`
-- 強制刪除分支 (分支未合併)：`git branch -D <branch name>`
-- 在指定節點添加分支：`git branch <branch name> <SHA-1>`
+- 建立分支：`git branch <branch_name>`
+- 切換至指定分支：`git checkout <branch_name>`
+- 建立並切換到指定分支：`git checkout -b <branch_name>`
+- 合併分支：`git merge <branch_name>`
+- 合併分支 (使用 non-fast-forward)：`git merge <branch_name> --no-ff`
+- 更改分支名稱：`git branch -m <old branch_name> <new branch_name>`
+- 刪除分支 (分支以合併)：`git branch -d <branch_name>`
+- 強制刪除分支 (分支未合併)：`git branch -D <branch_name>`
+- 在指定節點添加分支：`git branch <branch_name> <SHA-1>`
 - 切換到指定 commit 節點：`git checkout <SHA-1>`
