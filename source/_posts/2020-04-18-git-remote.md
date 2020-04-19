@@ -20,6 +20,7 @@ updated: 2020-04-19 00:46:56
 - 設定 GitHub SSH 金鑰
 - 將本地數據庫 Push 至 GitHub
 - 將遠端數據庫 Clone 到本地
+- 使用 Fetch 從遠端更新本地數據庫資料
 
 ## 在 GitHub 開一個遠端數據庫
 
@@ -119,12 +120,30 @@ git remote add origin git@github.com:awdr74100/git-remote-demo.git
 - `git@github.com:xxx`：遠端數據庫位置 (SSH 方式)
 - `https://github.com/xxx`：遠端數據庫位置 (HTTPS 方式)
 
-遠端數據庫位置可在 Repository 頁面找到，前面的圖片就有照到。當我們輸入以上指令時，也可以到 `/.git/config` 專案配置檔中檢查是否成功添加遠端數據庫位置：
+遠端數據庫位置可在 Repository 頁面找到，前面的圖片就有照到。當我們輸入以上指令時，可以到 `/.git/config` 專案配置檔中檢查是否成功添加遠端數據庫位置：
 
 ```plain
 [remote "origin"]
     url = git@github.com:awdr74100/git-remote-demo.git
     fetch = +refs/heads/*:refs/remotes/origin/*
+```
+
+或是使用 `git remote -v` 查看目前遠端數據庫的詳細情況：
+
+![git remote -v](https://i.imgur.com/qjBsgX7.png)
+
+當出現以上畫面即代表遠端數據庫位置已被成功添加，一個本地數據庫可以擁有無數個遠端數據庫位置，當然我們也可以針對以添加的遠端數據庫做修改：
+
+- 修改已存在的遠端數據庫位置：
+
+```bash
+git remote set-url <遠端數據庫名稱> <新的位置>
+```
+
+- 刪除遠端數據庫 (就只是移除參照而已)
+
+```bash
+git remote remove <遠端數據庫名稱>
 ```
 
 簡單來講呢，你可以把它想像成宣告了 `origin` 這一個變數，並且賦予了遠端數據庫的位置，變數名稱可以自由的命名，但一般主要的遠端數據庫我們都會把它命名為 `origin`，其他特殊作用的遠端數據庫才會刻意命名，後面的操作就都會是以這一個變數名稱為主，接下來執行以下命令：
@@ -223,3 +242,135 @@ git push -u origin develop
 ![push 新分支](https://i.imgur.com/dCYbWTC.png)
 
 記得將頁面預設呈現的 `master` 分支切換到 `develop` 分支，從上面結果可以得知，我們的本地端數據庫已成功同步到遠端數據庫，接下來換本地該如何拉取遠端數據庫的部分：
+
+## 將遠端數據庫 Clone 到本地
+
+我們已經完成將本地數據庫推送至遠端的目的了，將下來示範如何將遠端數據庫複製到本地端：
+
+先確認目前有哪些分支：
+
+```bash
+git branch -a
+```
+
+你也可以使用 `-r`，但我習慣使用 `-a` 直接查看不管是本地還是遠端的分支，結果如下：
+
+![git branch -a](https://i.imgur.com/iOltleD.png)
+
+結果如同預期，因為我們已經分別將 `master`、`develop` 分支推至遠端了，所以遠端也存在同名的分支，接下來執行已下命令：
+
+```bash
+git clone git@github.com:awdr74100/git-remote-demo.git gh-demo
+```
+
+剛剛在 Push 時是使用 SSH 方式驗證，在 Clone 這邊我們也一樣使用 SSH 方式連結，事實上，你想要改成 HTTPS 方式也沒差，後面的 `gh-demo` 代表的是遠端數據庫要放在本地端的哪個資料夾，如果不存在即建立，如果不寫放置資料夾，預設會在當下命令路徑生成遠端數據庫名稱
+
+![git clone](https://i.imgur.com/HaPt1Jc.png)
+
+切換並查看剛剛 Clone 下來的數據庫：
+
+![git clone 分支缺少](https://i.imgur.com/9BYZTBO.png)
+
+到這邊我們已經成功將遠端數據庫 Clone 下來了，但在這邊還有一個問題，從上圖可以發現，這一個數據庫缺少了 `develop` 分支，預設情況下，使用 `git clone` 命令只會將 `master` 分支給複製下來，可能會有人想，我可以直接 `git checkout origin/develop` 就好了啊，但這樣的作法是無法在本地端工作的，正確的做法應該是將遠端數據庫的分支一併給同步下來，可以使用以下指令：
+
+```bash
+git checkout -t origin/develop
+```
+
+再次查看所有分支：
+
+![git checkout -t](https://i.imgur.com/EMfHFPi.png)
+
+`-t` 全名為 `--track` 主要是用以追蹤遠端的數據庫，並在本地端新增一個同名的分支，此時我們的 `gh-demo` 數據庫就會與最之前的 `project` 數據庫一模一樣囉，在這邊補充一個指令：
+
+- 從遠端分支複製並切換到本地分支：
+
+```bash
+git checkout -b develop origin/develop
+```
+
+這道指令與使用 `git checkout -t origin/develop` 結果一模一樣，差別在於可以改名。
+
+到這邊我們已經成功將遠端數據庫 Clone 至本地端囉，以後只要在有 Git 環境的電腦中，都可以達到異地開發的效果，再也不需要使用 USB 囉。
+
+## 使用 Fetch 從遠端更新本地數據庫資料
+
+到這邊還有一個情境是假設本地端已將數據庫推至遠端，在異地開發時，我們也從遠端複製一份到本地端並提交了數次 commit，最後 Push 到遠端，那一開始已存在本地端檔案但資料落後於遠端的這個人該怎麼辦？讓我們來模擬這個狀況：
+
+```bash
+$ cd project
+
+$ git checkout develop
+
+$ echo '' > all.js
+
+$ git add .
+
+$ git commit -m '新增 all.js'
+
+$ git checkout master
+
+$ git merge develop --no-ff
+```
+
+查看日誌：
+
+![查看 commit 紀錄-1](https://i.imgur.com/tYT26fr.png)
+
+你會發現我們本地端的兩個分支已經超前遠端分支的紀錄，接下來進行 Push：
+
+```bash
+git push --all origin
+```
+
+在我們前面都是介紹單個分支的推送，事實上，你也可以添加 `--all` 用以推送本地端所有分支的更新，而 `origin` 就是之前介紹的主機名稱，再看一次日誌：
+
+![查看 commit 紀錄-2](https://i.imgur.com/tfJx30q.png)
+
+看起來我們的本地端內容已經被同步到遠端數據庫了，接著換剛剛 Clone 下來的數據庫：
+
+```bash
+cd gh-demo
+```
+
+執行以下命令：
+
+```bash
+git fetch
+```
+
+查看日誌：
+
+![查看 commit 紀錄-3](https://i.imgur.com/HjhElq0.png)
+
+你會發現本地端的遠端分支已被更新，這也就是 `git fetch` 的功用，它會將遠端數據庫的所有分支進行更新，接著執行合併動作：
+
+- 在 `master` 分支：
+
+```bash
+git merge origin/master
+```
+
+- 在 `develop` 分支：
+
+```bash
+git merge origin/develop
+```
+
+查看日誌：
+
+![查看 commit 紀錄-4](https://i.imgur.com/4k9SaRb.png)
+
+大功告成！我們最初的本地端數據庫也被同步完成囉！我們可以針對上面 `git fetch` 指令做點修改：
+
+```bash
+git fetch origin master:temp
+```
+
+查看日誌：
+
+![查看 commit 紀錄-5](https://i.imgur.com/ysGyR5H.png)
+
+預設情況下，`git fetch` 會把所有的遠端分支拉下來，而上面這到命令的意思就如同前面所講到的 `master:master`，只拉取遠端的 `master` 分支並同步到本地端的 `temp` 分支，不存在即創建，之後我們一樣透過 `git merge temp` 就可以拿到最新內容了。
+
+讓我們做一個總結，使用 `git fetch` 能夠在不影響本地分支的狀態下獲取遠端分支的內容，我們可以視情況看是否要合併這一個分支，通常在多人開發時，有很大的機率這一個遠端分支與本地分支合併時會發生衝突，這點在以後會介紹，而使用 `git fetch` 的好處就在於可以先透過 `git diff` 比對差異，將衝突內容做修改，合併時才不會發生意外，你可能看過有些人是使用 `git pull` 來獲取遠端內容，事實上，`git pull` 就等同於 `git fetch + git merge`，拉下來的同時就直接幫我們做合併了，此時如果內容發生衝突，就會直接跳出警告，等著我們慢慢去修，我不太喜歡這樣的做法，各位自己試試看。
