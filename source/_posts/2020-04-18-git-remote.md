@@ -129,7 +129,7 @@ git remote add origin git@github.com:awdr74100/git-remote-demo.git
     fetch = +refs/heads/*:refs/remotes/origin/*
 ```
 
-或是使用 `git remote -v` 查看目前遠端數據庫的詳細情況：
+或是直接使用 `git remote -v` 查看所有遠端數據庫資訊：
 
 ![git remote -v](https://i.imgur.com/qjBsgX7.png)
 
@@ -377,3 +377,25 @@ git fetch origin master:temp
 讓我們做一個總結，使用 `git fetch` 能夠在不影響本地分支的狀態下獲取遠端分支的內容，我們可以視情況看是否要合併這一個分支，通常在多人開發時，有很大的機率這一個遠端分支與本地分支合併時會發生衝突，這點在以後會介紹，而使用 `git fetch` 的好處就在於可以先透過 `git diff` 比對差異，將衝突內容做修改，合併時才不會發生意外，你可能看過有些人是使用 `git pull` 來獲取遠端內容，事實上，`git pull` 就等同於 `git fetch + git merge`，拉下來的同時就直接幫我們做合併了，此時如果內容發生衝突，就會直接跳出警告，等著我們慢慢去修，我不太喜歡這樣的做法，各位自己試試看。
 
 ## Git 指令回顧
+
+- 新增遠端數據庫：`git remote add <遠端數據庫名稱> <遠端數據庫>`
+- 查看所有遠端數據庫資訊：`git remote -v`
+- 修改遠端數據庫位置：`git remote set-url <遠端數據庫名稱> <新的位置>`
+- 刪除遠端數據庫：`git remote remove <遠端數據庫名稱>`
+- 上傳至遠端數據庫 (設定 upstream)：`git push -u <遠端數據庫名稱> <本地分支>`
+- 上傳至遠端數據庫 (修改遠端分支名稱)：`git push <遠端數據庫名稱> <本地分支>:<遠端分支>`
+- 上傳至遠端數據庫 (基本)：`git push <遠端數據庫名稱> <本地分支>`
+- 移除 `upstream` 設定：`git branch --unset-upstream <本地分支>`
+- 設定 `upstream` 存在即覆蓋：`git branch -u <遠端數據庫名稱>/<遠端分支> <本地分支>`
+- 檢查本地與遠端存在那些分支：`gti branch -a`
+- 克隆遠端數據庫至本地：`git clone <遠端數據庫位置> <本地資料夾>`
+- 從遠端分支複製並切換到本地分支：`git checkout -t <遠端數據庫名稱>/<遠端分支>`
+- 從遠端分支複製並切換到本地分支 (可更改名稱)：`git checkout -b <本地分支> <遠端數據庫名稱>/<遠端分支>`
+- 上傳至遠端數據庫 (全部分支)：`git push --all <遠端數據庫名稱>`
+- 下載遠端數據庫資料 (全部分支)：`git fetch`
+- 合併遠端數據庫資料 (同名本地分支)：`git merge <遠端數據庫名稱>/<遠端名稱>`
+- 下載遠端數據庫資料 (單個分支)：`git fetch <遠端數據庫名稱> <遠端分支>`
+- 下載遠端數據庫資料 (指定分支)：`git fetch <遠端數據庫名稱> <遠端分支>:<本地分支>`
+- 下載遠端數據庫資料 (直接合併)：`git pull`
+
+
