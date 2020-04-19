@@ -21,7 +21,7 @@ updated: 2020-04-18 22:51:20
 - 重命名指定分支
 - 刪除指定分支
 - HEAD 作用以及何謂 detached HEAD
-- 章節 Git 指令回顧
+- Git 指令回顧
 
 ## 分支的建立與合併
 
@@ -336,16 +336,16 @@ git branch ex 070af85
 
 讓我們做點複習，`HEAD` 主要用來指向我們目前所在的 commit 紀錄上，方便我們四處查看，當我們使用 `checkout` 切換到沒有分支的 commit 紀錄上時，此狀態稱之為斷頭 `detached HEAD`，在此狀態也可以進行 commit 提交，但要注意在將 HEAD 切換為分支時，此 commit 紀錄會被隱藏掉，如果堅持保留這一個 commit 紀錄，可以在這一個 commit 紀錄上開立分支，這樣就不會被隱藏了。
 
-## 章節 Git 指令回顧
+## Git 指令回顧
 
 - 查看目前所有分支：`git branch`
-- 建立分支：`git branch <branch>`
-- 切換至指定分支：`git checkout <branch>`
-- 建立並切換到指定分支：`git checkout -b <branch>`
-- 合併分支：`git merge <branch>`
-- 合併分支 (使用 non-fast-forward)：`git merge <branch> --no-ff`
-- 更改分支名稱：`git branch -m <old branch> <new branch>`
-- 刪除分支 (分支以合併)：`git branch -d <branch>`
-- 強制刪除分支 (分支未合併)：`git branch -D <branch>`
-- 在指定節點添加分支：`git branch <new branch> <SHA-1>`
+- 建立分支：`git branch <branch name>`
+- 切換至指定分支：`git checkout <branch name>`
+- 建立並切換到指定分支：`git checkout -b <branch name>`
+- 合併分支：`git merge <branch name>`
+- 合併分支 (使用 non-fast-forward)：`git merge <branch name> --no-ff`
+- 更改分支名稱：`git branch -m <old branch name> <new branch name>`
+- 刪除分支 (分支以合併)：`git branch -d <branch name>`
+- 強制刪除分支 (分支未合併)：`git branch -D <branch name>`
+- 在指定節點添加分支：`git branch <branch name> <SHA-1>`
 - 切換到指定 commit 節點：`git checkout <SHA-1>`

@@ -21,7 +21,8 @@ Git 是一個分散式的版本控制系統，可針對專案的不同版本進�
 - 使用者設定 / 全域與區域差別
 - 初始化 Git Repository
 - Git 基本指令
-- 章節 Git 指令回顧
+- 設定 Git 指令的縮寫
+- Git 指令回顧
 
 ## 為什麼需要使用 Git？
 
@@ -229,32 +230,58 @@ git config --global core.editor 'code --wait'
 git log
 ```
 
-在使用 `git log` 指令時，如果加上額外參數，可以看到不一樣的輸出格式，例如加上 `--oneline` 或 `--graph`，各位可以自己試看看，以下為一般輸出結果：
+在使用 `git log` 指令時，如果加上額外參數，可以看到不一樣的輸出格式，例如加上 `--oneline` 或 `--graph` 或 `--all`，各位可以自己試看看，以下為一般輸出結果：
 
 ![git log](https://i.imgur.com/mMaJ7rN.png)
 
 如果你認為內建的日誌看起來很痛苦，你也可以使用 VSCode 中的 [Git History](https://marketplace.visualstudio.com/items?itemName=donjayamanne.githistory) 插件或像是 [Sourcetree](https://www.sourcetreeapp.com/) 等 GUI 圖形介面軟體，尤其是 Sourcetree 的部分，有關這一個軟體會在之後的文章單獨做介紹。
 
-到了這邊，我們已經成功提交了第一個 commit 記錄了，你可以嘗試提交多一點的紀錄，以加深整個流程的印象，可能會有人問，那上面那張圖的第四個部分呢？怎沒有講到？事實上，本地端的 Git 操作，就只包含前三個部分，所謂的遠端數據庫就是指像是 GitHub、GitLab、Bitbucket 等平台，這些的本體都是屬於 Git 伺服器，我們一樣可透過 Git 指令將指定目錄推上去，達到遠端存取的作用，但在學習遠端操作前，我們必須先了解 Git 一個相當重要的操作，也就是分支 (branch) 的部分，了解了分支的正確用法，在來使用遠端操作，吸收才會扎實。關於分支的部分，將在下一篇文章做介紹。
+到了這邊，我們已經成功提交了第一個 commit 記錄了，你可以嘗試提交多一點的紀錄，以加深整個流程的印象，可能會有人問，那上面那張圖的第四個部分呢？怎沒有講到？事實上，本地端的 Git 操作就只包含前三個部分，所謂的遠端數據庫就是指像是 GitHub、GitLab、Bitbucket 等平台，這些的本體都是屬於 Git 伺服器，我們一樣可透過 Git 指令將指定目錄推上去，達到遠端存取的作用，但在學習遠端操作前，我們必須先了解 Git 一個相當重要的操作，也就是分支 (branch) 的部分，了解了分支的正確用法，在來使用遠端操作，吸收才會扎實。關於分支的部分，將在下一篇文章做介紹。
 
-## 章節 Git 指令回顧
+## 設定 Git 指令的縮寫
+
+我們在上面有提到關於 `git log` 可以加的參數，最後呈現的效果也會不同，但有一個最大的問題是，要打很多字阿！我們可以設定縮寫解決這一個問題：
+
+```bash
+git config --global alias.s status
+```
+
+此時輸入 `git s` 就會有 `git status` 的效果，是不是很方便？如果要增加參數，必須以字串形式設定：
+
+```bash
+git config --global alias.l 'log --oneline --graph --all'
+```
+
+同樣可至 `C:\Users\${USER}\.gitconfig` 檢查：
+
+```plain
+[alias]
+    s = status
+    l = log --oneline --graph --all
+```
+
+## Git 指令回顧
 
 - 檢查 Git 版本：`git --version`
-- 新增全域使用者 (姓名)：`git config --global user.name "姓名"`
-- 新增全域使用者 (信箱)：`git config --global user.email "信箱"`
-- 新增區域使用者 (姓名)：`git config --local user.name "姓名"`
-- 新增區域使用者 (信箱)：`git config --local user.email "信箱"`
+- 新增全域使用者 (姓名)：`git config --global user.name "name"`
+- 新增全域使用者 (信箱)：`git config --global user.email "email"`
+- 新增區域使用者 (姓名)：`git config --local user.name "name"`
+- 新增區域使用者 (信箱)：`git config --local user.email "email"`
 - 檢查使用者設定：`git config --list`
 - 全域 Git 設定檔：`C:\Users\${USER}\.gitconfig`
 - 專案 Git 設定檔：`/.git/config`
 - 初始化 Git Repositroy：`git init`
 - 查看當前目錄狀態：`git status`
-- 將工作目錄檔案提交至索引區 (指定檔案)：`git add <提交檔案>`
+- 將工作目錄檔案提交至索引區 (指定檔案)：`git add <file name>`
 - 將工作目錄檔案提交至索引區 (全部檔案)：`git add .`
 - 將工作目錄檔案提交至索引區 (在 Git 2.x 之後，效果如同 `git add .`)：`git add --all`
-- 將索引區檔案提交至本地數據庫：`git commit -m '訊息'`
+- 將索引區檔案提交至本地數據庫：`git commit -m "message"`
 - 將索引區檔案提交至本地數據庫 (開啟預設編輯器)：`git commit`
 - 將預設的 Vim 編輯器改為 VSCode：`git config --global core.editor "code --wait"`
 - 查看目錄日誌：`git log`
 - 查看目錄日誌 (精簡化)：`git log --oneline`
-- 查看目錄日誌 (線路圖)：`git log --oneline --graph`
+- 查看目前日誌 (線路圖)：`git log --graph`
+- 查看目前日誌 (所有分支)：`git log --all`
+- 查看目錄日誌 (推薦)：`git log --oneline --graph --all`
+- 全域設定縮寫：`git config --global alias.s status`
+- 全域設定縮寫 (添加參數)：`git config --global alias.l "log --oneline --graph --all"`
