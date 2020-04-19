@@ -21,6 +21,7 @@ updated: 2020-04-19 22:02:07
 - 將本地數據庫 Push 至 GitHub
 - 將遠端數據庫 Clone 到本地
 - 使用 Fetch 獲取遠端數據庫修改內容
+- 刪除遠端分支
 - Git 指令回顧
 
 ## 在 GitHub 開一個遠端數據庫
@@ -81,7 +82,7 @@ ssh-keygen
 
 到這邊就已經完成 GitHub SSH 金鑰設定的部分，下面我們就可以透過 SSH 方式與遠端數據庫交流囉。
 
-## 將本地數據庫推送至 GitHub
+## 將本地數據庫 Push 至 GitHub
 
 讓我們先開一個專案資料夾並 commit 兩次紀錄：
 
@@ -382,6 +383,20 @@ git fetch origin master:temp
 
 讓我們做一個總結，使用 `git fetch` 能夠在不影響本地分支的狀態下獲取遠端分支的內容，我們可以視情況看是否要合併這一個分支，通常在多人開發時，有很大的機率這一個遠端分支與本地分支合併時會發生衝突，這點在以後會介紹，而使用 `git fetch` 的好處就在於可以先透過 `git diff` 比對差異，將衝突內容做修改，合併時才不會發生意外，你可能看過有些人是使用 `git pull` 來獲取遠端內容，事實上，`git pull` 就等同於 `git fetch + git merge`，拉下來的同時就直接幫我們做合併了，此時如果內容發生衝突，就會直接跳出警告，等著我們慢慢去修，我不太喜歡這樣的做法，各位自己試試看。
 
+## 刪除遠端分支
+
+在這邊我們補充一下如何刪除遠端的分支，其實原理如同我們前面所提到的 `master:master` 概念，如果你今天想要移除任何的遠端分支，只需要 Push 一個空的分支即可：
+
+```bash
+git push origin :develop
+```
+
+顯示遠端分支已被刪除：
+
+![刪除遠端分支](https://i.imgur.com/jUhYkHE.png)
+
+此時一樣可以使用 `git log` 查看日誌，你會發現遠端的分支被我們刪除囉。
+
 ## Git 指令回顧
 
 - 新增遠端數據庫：`git remote add <repo_name> <url>`
@@ -405,3 +420,4 @@ git fetch origin master:temp
 - 下載遠端數據庫資料 (單個分支)：`git fetch <repo_name> <remote_branch>`
 - 下載遠端數據庫資料 (指定分支)：`git fetch <repo_name> <remote_branch>:<local_branch>`
 - 下載遠端數據庫資料 (直接合併)：`git pull`
+- 刪除遠端分支 (推一個空分支)：`git push :<remote_branch>`
