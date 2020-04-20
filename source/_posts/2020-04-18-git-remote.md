@@ -84,10 +84,12 @@ ssh-keygen
 
 ## 將本地數據庫 Push 至 GitHub
 
-讓我們先開一個專案資料夾並 commit 兩次紀錄：
+讓我們先開一個專案資料夾並提交兩次 commit 紀錄：
 
 ```bash
 $ mkdir project
+
+$ cd project
 
 $ git init
 Initialized empty Git repository in C:/Users/a7894/Desktop/project/.git/
