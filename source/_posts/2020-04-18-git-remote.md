@@ -406,20 +406,26 @@ git push origin :develop
 - 修改已註冊遠端數據庫位址：`git remote set-url <repo_name> <new url>`
 - 修改已註冊遠端數據庫名稱：`git remote rename <old repo_name> <new repo_name>`
 - 刪除已註冊遠端數據庫：`git remote remove <repo_name>`
-- 指定分支上傳至遠端數據庫 (同時設定 upstream)：`git push -u <repo_name> <local_branch>`
-- 指定分支上傳至遠端數據庫 (修改遠端分支名稱)：`git push <repo_name> <local_branch>:<remote_branch>`
-- 指定分支上傳至遠端數據庫 (基本)：`git push <repo_name> <local_branch>`
+- 指定分支上傳至遠端數據庫 (同時設定 upstream)：
+  - `git push -u <repo_name> <local_branch>`
+- 指定分支上傳至遠端數據庫 (修改遠端分支名稱)：
+  - `git push <repo_name> <local_branch>:<remote_branch>`
+- 指定分支上傳至遠端數據庫 (基本)：
+  - `git push <repo_name> <local_branch>`
 - 分支移除 `upstream` 設定：`git branch --unset-upstream <local_branch>`
-- 分支設定 `upstream` 存在即覆蓋：`git branch -u <repo_name>/<remote_branch> <local_branch>`
+- 分支設定 `upstream` 存在即覆蓋：
+  - `git branch -u <repo_name>/<remote_branch> <local_branch>`
 - 查看遠端分支：`git branch -r`
 - 查看所有分支 (包含遠端與本地)：`git branch -a`
 - 克隆遠端數據庫至本地：`git clone <url> <folder>`
 - 從遠端分支複製並切換到本地分支：`git checkout -t <repo_name>/<remote_branch>`
-- 從遠端分支複製並切換到本地分支 (可更改名稱)：`git checkout -b <local_branch> <repo_name>/<remote_branch>`
+- 從遠端分支複製並切換到本地分支 (可更改名稱)：
+  - `git checkout -b <local_branch> <repo_name>/<remote_branch>`
 - 上傳至遠端數據庫 (全部分支)：`git push --all <repo_name>`
 - 下載遠端數據庫資料 (全部分支)：`git fetch`
 - 合併遠端數據庫資料 (同名本地分支)：`git merge <repo_name>/<remote_branch>`
 - 下載遠端數據庫資料 (單個分支)：`git fetch <repo_name> <remote_branch>`
-- 下載遠端數據庫資料 (指定分支)：`git fetch <repo_name> <remote_branch>:<local_branch>`
+- 下載遠端數據庫資料 (指定分支)：
+  - `git fetch <repo_name> <remote_branch>:<local_branch>`
 - 下載遠端數據庫資料 (直接合併)：`git pull`
 - 刪除遠端分支 (推一個空分支)：`git push :<remote_branch>`
