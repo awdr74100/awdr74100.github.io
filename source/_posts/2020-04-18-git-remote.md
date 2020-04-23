@@ -422,6 +422,7 @@ git push origin :develop
 - 從遠端分支複製並切換到本地分支 (可更改名稱)：
   - `git checkout -b <local_branch> <repo_name>/<remote_branch>`
 - 上傳至遠端數據庫 (全部分支)：`git push --all <repo_name>`
+- 上傳至遠端數據庫 (全部分支，同時設定 upstream)：`git push -u <repo_name> --all`
 - 下載遠端數據庫資料 (全部分支)：`git fetch`
 - 合併遠端數據庫資料 (同名本地分支)：`git merge <repo_name>/<remote_branch>`
 - 下載遠端數據庫資料 (單個分支)：`git fetch <repo_name> <remote_branch>`
