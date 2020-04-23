@@ -26,16 +26,16 @@ updated: 2020-04-23 18:40:02
 讓我們先來模擬衝突發生的情境：
 
 ```bash
-$ mkdir project
+mkdir project
 
-$ git init
+git init
 Initialized empty Git repository in C:/Users/a7894/Desktop/project/.git/
 
-$ echo index.html
+echo index.html
 
-$ git add .
+git add .
 
-$ git commit -m 'add index.html'
+git commit -m 'add index.html'
 ```
 
 修改 `index.html` 檔案：
@@ -55,21 +55,21 @@ $ git commit -m 'add index.html'
 再次提交 commit：
 
 ```bash
-$ git add .
+git add .
 
-$ git commit -m 'update index.html'
+git commit -m 'update index.html'
 ```
 
 到這邊已經完成初始化的動作了，假設目前有一位工程人員開了一個分支並提交了一次 commit 紀錄：
 
 ```bash
-$ git checkout -b dog
+git checkout -b dog
 
-$ echo '' > all.css
+echo '' > all.css
 
-$ git add .
+git add .
 
-$ git commit -m 'add all.css'
+git commit -m 'add all.css'
 ```
 
 此時他發現原本的 `index.html` 檔案標題打錯了，進行了修改：
@@ -89,23 +89,23 @@ $ git commit -m 'add all.css'
 並提交了 commit 紀錄：
 
 ```bash
-$ git add .
+git add .
 
-$ git commit -m 'edit index.html title'
+git commit -m 'edit index.html title'
 ```
 
 假設又有一位工程人員開了一個分支並修復 title 這個問題：
 
 ```bash
-$ git checkout master
+git checkout master
 
-$ git checkout -b cat
+git checkout -b cat
 
-$ ... edit index.html title
+... edit index.html title
 
-$ git add .
+git add .
 
-$ git commit -m 'edit index.html title'
+git commit -m 'edit index.html title'
 ```
 
 讓我們來看目前的日誌：
@@ -115,9 +115,9 @@ $ git commit -m 'edit index.html title'
 你會發現在 `dog` 分支與 `cat` 分支同時修改了 `index.html` 檔案的標題，這邊要注意，並不是修改同一份檔案就會發生衝突，而是修改同一份檔案的同一行代碼才會發生衝突，基本上 Git 有自己判定的標準，讓我們繼續來看衝突是如何發生的：
 
 ```bash
-$ git checkout cat
+git checkout cat
 
-$ git merge dog
+git merge dog
 ```
 
 此時會跳出合併發生衝突的警告：
@@ -201,9 +201,9 @@ git commit
 請先在 GitHub 隨便開一個遠端數據庫，並將本地端內容推上去：
 
 ```bash
-$ git remote add origin git@github.com:awdr74100/conflict-demo.git
+git remote add origin git@github.com:awdr74100/conflict-demo.git
 
-$ git push -u origin --all
+git push -u origin --all
 ```
 
 此時的日誌應該為：

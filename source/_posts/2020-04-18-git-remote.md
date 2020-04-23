@@ -87,24 +87,24 @@ ssh-keygen
 讓我們先開一個專案資料夾並提交兩次 commit 紀錄：
 
 ```bash
-$ mkdir project
+mkdir project
 
-$ cd project
+cd project
 
-$ git init
+git init
 Initialized empty Git repository in C:/Users/a7894/Desktop/project/.git/
 
-$ echo '' > index.html
+echo '' > index.html
 
-$ git add .
+git add .
 
-$ git commit -m '新增 index.html'
+git commit -m '新增 index.html'
 
-$ echo '' > all.css
+echo '' > all.css
 
-$ git add .
+git add .
 
-$ git commit -m '新增 all.css'
+git commit -m '新增 all.css'
 ```
 
 輸入 `git log` 查看目前 commit 紀錄：
@@ -226,13 +226,13 @@ git branch -u origin/master master
 你會發現我們的本地數據庫已成功推至遠端數據庫了，且分支名稱為 `master`，假設你在推送時只有寫 `master` 單個本地分支名稱，遠端分支的名稱就會直接採用這一個本地端分支的名稱，讓我們在練習一次：
 
 ```bash
-$ git checkout -b develop
+git checkout -b develop
 
-$ echo '' > db.json
+echo '' > db.json
 
-$ git add .
+git add .
 
-$ git commit -m '增加 db.json'
+git commit -m '增加 db.json'
 ```
 
 這一次我們在本地端開了一個名為 `develop` 的分支，執行以下命令進行推送：
@@ -308,19 +308,19 @@ git checkout -b develop origin/develop
 到這邊還有一個情境是假設本地端已將數據庫推至遠端，在異地開發時，我們也從遠端複製一份到本地端並提交了數次 commit，最後 Push 到遠端，那一開始已存在本地端檔案但資料落後於遠端的這個人該怎麼辦？讓我們來模擬這個狀況：
 
 ```bash
-$ cd project
+cd project
 
-$ git checkout develop
+git checkout develop
 
-$ echo '' > all.js
+echo '' > all.js
 
-$ git add .
+git add .
 
-$ git commit -m '新增 all.js'
+git commit -m '新增 all.js'
 
-$ git checkout master
+git checkout master
 
-$ git merge develop --no-ff
+git merge develop --no-ff
 ```
 
 查看日誌：

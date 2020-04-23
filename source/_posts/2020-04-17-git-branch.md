@@ -28,24 +28,24 @@ updated: 2020-04-18 22:51:20
 讓我們先新增一個專案並提交兩次 commit 紀錄：
 
 ```bash
-$ mkdir project
+mkdir project
 
-$ cd project
+cd project
 
-$ git init
+git init
 Initialized empty Git repository in C:/Users/a7894/Desktop/project/.git/
 
-$ echo '' > index.html
+echo '' > index.html
 
-$ git add .
+git add .
 
-$ git commit -m '新增 index.html'
+git commit -m '新增 index.html'
 
-$ echo '' > all.css
+echo '' > all.css
 
-$ git add .
+git add .
 
-$ git commit -m '新增 all.css'
+git commit -m '新增 all.css'
 ```
 
 使用 `git log` 查看目前 commit 紀錄：
@@ -85,9 +85,9 @@ git checkout dev
 假設我們要在 `dev` 分支做某些事情：
 
 ```bash
-$ echo '' > db.json
+echo '' > db.json
 
-$ git add .
+git add .
 
 git commit -m '新增 db.json'
 ```
@@ -131,20 +131,20 @@ git merge dev
 讓我們在次使用 `dev` 分支並提交兩次 commit 紀錄：
 
 ```bash
-$ git checkout dev
+git checkout dev
 Switched to branch 'dev'
 
-$ echo '' > bugfix.txt
+echo '' > bugfix.txt
 
-$ git add .
+git add .
 
-$ git commit -m '修復 bug'
+git commit -m '修復 bug'
 
-$ echo '' > edit.txt
+echo '' > edit.txt
 
-$ git add .
+git add .
 
-$ git commit -m '編輯文本'
+git commit -m '編輯文本'
 ```
 
 使用 `git log --oneline --graph` 查看：
@@ -179,21 +179,21 @@ git merge dev --no-ff
 你可能會想，那假設我在 `dev` 分支提交 commit 紀錄後，又回到 `master` 分支提交 commit 呢？我們直接來模擬這一個狀況：
 
 ```bash
-$ git checkout dev
+git checkout dev
 
-$ echo '' > all.js
+echo '' > all.js
 
-$ git add .
+git add .
 
-$ git commit -m '新增 all.js'
+git commit -m '新增 all.js'
 
-$ git checkout master
+git checkout master
 
-$ echo '' > all.scss
+echo '' > all.scss
 
-$ git add .
+git add .
 
-$ git commit -m '新增 all.scss'
+git commit -m '新增 all.scss'
 ```
 
 這邊必須使用 `git log --oneline --graph --all` 檢查所有分支狀況：
@@ -301,11 +301,11 @@ git checkout 3c28751
 與切換分支的結果相同，專案進度回復到了當時的 `3c28751` 節點紀錄上，可能會有人問，那我可以在 detached HEAD 狀態下提交 commit 紀錄嗎？嘗試不就知道了：
 
 ```bash
-$ echo '' > test.txt
+echo '' > test.txt
 
-$ git add .
+git add .
 
-$ git commit -m '新增 test.txt'
+git commit -m '新增 test.txt'
 ```
 
 查看日誌：
