@@ -281,7 +281,7 @@ git clone git@github.com:awdr74100/git-remote-demo.git gh-demo
 
 ![git clone 分支缺少](https://i.imgur.com/9BYZTBO.png)
 
-到這邊我們已經成功將遠端數據庫 Clone 下來了，但在這邊還有一個問題，從上圖可以發現，這一個數據庫缺少了 `develop` 分支，預設情況下，使用 `git clone` 命令只會將 `master` 分支給複製下來，可能會有人想，我可以直接 `git checkout origin/develop` 就好了啊，但這樣的作法是無法在本地端工作的，正確的做法應該是將遠端數據庫的分支一併給同步下來，可以使用以下指令：
+到這邊我們已經成功將遠端數據庫 Clone 下來了，但在這邊還有一個問題，從上圖可以發現，這一個數據庫缺少了 `develop` 分支，預設情況下，使用 `git clone` 命令只會將 `master` (Default branch) 分支給複製下來，可能會有人想，我可以直接 `git checkout origin/develop` 就好了啊，但這樣的作法是無法在本地端工作的，正確的做法應該是將遠端數據庫的分支一併給同步下來，可以使用以下指令：
 
 ```bash
 git checkout -t origin/develop
@@ -291,15 +291,23 @@ git checkout -t origin/develop
 
 ![git checkout -t](https://i.imgur.com/EMfHFPi.png)
 
-`-t` 全名為 `--track` 主要是用以追蹤遠端數據庫分支並在本地創建同名的分支，此時我們的 `gh-demo` 數據庫就會與最之前的 `project` 數據庫一模一樣囉，在這邊補充一個指令：
+`-t` 全名為 `--track` 主要是用以追蹤遠端數據庫分支並在本地創建同名的分支，此時我們的 `gh-demo` 數據庫就會與最之前的 `project` 數據庫一模一樣囉，在這邊補充幾個指令：
 
-- 從遠端分支複製並切換到本地分支：
+- 從遠端分支複製並切換到本地分支 (自定義名稱)：
 
 ```bash
 git checkout -b develop origin/develop
 ```
 
-這道指令與使用 `git checkout -t origin/develop` 結果一模一樣，差別在於可以改名。
+這道指令與使用 `git checkout -t origin/develop` 結果相同，差別在於可自定義名稱。
+
+- 從遠端分支複製並切換到本地分支 (自動檢查)：
+
+```bash
+git checkout develop
+```
+
+這道命令與使用 `git checkout -t origin/develop` 結果相同，Git 會檢查這一個分支是否洽好存在同名遠端分支，如果存在，即在本地創建這一個分支並追蹤遠端分支。
 
 到這邊我們已經成功將遠端數據庫克隆至本地囉，以後只要在有 Git 環境的電腦中，都可以達到異地開發的效果，再也不需要使用 USB 囉。
 
@@ -419,8 +427,9 @@ git push origin :develop
 - 查看所有分支 (包含遠端與本地)：`git branch -a`
 - 克隆遠端數據庫至本地：`git clone <url> <folder>`
 - 從遠端分支複製並切換到本地分支：`git checkout -t <repo_name>/<remote_branch>`
-- 從遠端分支複製並切換到本地分支 (可更改名稱)：
+- 從遠端分支複製並切換到本地分支 (自定義名稱)：
   - `git checkout -b <local_branch> <repo_name>/<remote_branch>`
+- 從遠端分支複製並切換到本地分支 (自動檢查)：`git checkout <remote_branch>`
 - 上傳至遠端數據庫 (全部分支)：`git push --all <repo_name>`
 - 上傳至遠端數據庫 (全部分支，同時設定 upstream)：`git push -u <repo_name> --all`
 - 下載遠端數據庫資料 (全部分支)：`git fetch`
