@@ -7,7 +7,7 @@ description:
 categories: [Git]
 tags: [Git]
 date: 2020-04-22 14:47:31
-updated: 2020-04-22 14:47:31
+updated: 2020-04-23 18:40:02
 ---
 
 ## 前言
@@ -19,6 +19,7 @@ updated: 2020-04-22 14:47:31
 - 本地分支合併衝突
 - 遠端分支合併衝突
 - GitHub 保護機制
+- Git 指令回顧
 
 ## 本地分支合併衝突
 
@@ -272,3 +273,9 @@ git push -f
 ![保護機制-3](https://i.imgur.com/E9tVpfv.png)
 
 這樣就完成囉，根據你挑選的保護選項，在每次推送前都會觸發，避免可能發生的可怕後果。
+
+## Git 指令回顧
+
+- 還原至合併前狀態：`git merge --abort`
+- 修改最後一次 commit 訊息：`git commit --amend -m 'message'`
+- 強制更新遠端分支：`git push -f`
