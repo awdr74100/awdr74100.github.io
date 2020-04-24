@@ -28,6 +28,8 @@ updated: 2020-04-23 18:40:02
 ```bash
 mkdir project
 
+cd project
+
 git init
 Initialized empty Git repository in C:/Users/a7894/Desktop/project/.git/
 
@@ -208,7 +210,7 @@ git push -u origin --all
 
 此時的日誌應該為：
 
-![查看目前 commit 紀錄](https://i.imgur.com/Yf6Rges.png)
+![查看目前 commit 紀錄-2](https://i.imgur.com/Yf6Rges.png)
 
 在這邊補充一個指令：
 
@@ -218,7 +220,7 @@ git commit --amend -m 'merge dog branch'
 
 這個指令主要可用來修改最後一次提交的 commit 訊息，假設你不小心在提交 commit 時打錯字，這個指令就很用好，但可能會有些副作用：
 
-![查看目前 commit 紀錄](https://i.imgur.com/S92Miyb.png)
+![查看目前 commit 紀錄-3](https://i.imgur.com/S92Miyb.png)
 
 你會發現原本的 `992ae1d` 節點目前只剩遠端的 `cat` 分支指著，本地的 `cat` 分支反而指向了一個全新的 commit 紀錄，事實上，修改訊息對於 Git 來說也算是一次全新的 commit ，這才導致生成了一個全新 (但本質不是) 的 commit 紀錄。
 
