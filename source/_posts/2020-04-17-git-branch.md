@@ -52,7 +52,7 @@ git commit -m '新增 all.css'
 
 ![git log](https://i.imgur.com/Bv2uj5G.png)
 
-如果有看過上一篇文章的人，應該對上面流程很熟悉了才對，接下來進入重頭戲的部分，讓我們先來看目前存在那些分支：
+如果有看過上一篇文章的人，應該對上面流程很熟悉了才對，接下來進入重頭戲的部分，讓我們先來看目前本地存在那些分支：
 
 ```bash
 git branch
@@ -338,14 +338,37 @@ git branch ex 070af85
 
 ## Git 指令回顧
 
-- 查看目前所有分支：`git branch`
-- 建立分支：`git branch <branch_name>`
-- 切換至指定分支：`git checkout <branch_name>`
-- 建立並切換到指定分支：`git checkout -b <branch_name>`
-- 合併分支：`git merge <branch_name>`
-- 合併分支 (使用 non-fast-forward)：`git merge <branch_name> --no-ff`
-- 更改分支名稱：`git branch -m <old branch_name> <new branch_name>`
-- 刪除分支 (分支以合併)：`git branch -d <branch_name>`
-- 強制刪除分支 (分支未合併)：`git branch -D <branch_name>`
-- 在指定節點添加分支：`git branch <branch_name> <SHA-1>`
-- 切換到指定 commit 節點：`git checkout <SHA-1>`
+```bash
+# 查看本地所有分支
+git branch
+
+# 建立分支
+git branch <branch_name>
+
+# 切換至指定分支
+git checkout <branch_name>
+
+# 建立並切換到指定分支
+git checkout -b <branch_name>
+
+# 合併分支
+git merge <branch_name>
+
+# 合併分支 (採用 non-fast-forward)
+git merge <branch_name> --no-ff
+
+# 更改分支名稱
+git branch -m <old_branch_name> <new_branch_name>
+
+# 刪除分支 (分支以合併)
+git branch -d <branch_name>
+
+# 強制刪除分支 (分支未合併)
+git branch -D <branch_name>
+
+# 在指定節點添加分支
+git branch <branch_name> <SHA-1>
+
+# 切換到指定 commit 節點
+git checkout <SHA-1>
+```
