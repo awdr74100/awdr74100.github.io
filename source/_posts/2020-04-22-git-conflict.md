@@ -278,6 +278,13 @@ git push -f
 
 ## Git 指令回顧
 
-- 還原至合併前狀態：`git merge --abort`
-- 修改最後一次 commit 訊息：`git commit --amend -m 'message'`
-- 強制更新遠端分支：`git push -f`
+```bash
+# 還原至合併前狀態
+git merge --abort
+
+# 修改最後一次 commit 訊息
+git commit --amend -m 'message'
+
+# 強制推送遠端分之
+git push -f
+```
