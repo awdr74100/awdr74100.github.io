@@ -175,7 +175,7 @@ git push -u origin master
 git push --set-upstream origin master:master
 ```
 
-首先是 `-u` 的部分，等同於 `--set-upstream`，可以使 `master` 這一個指定的分支開始追蹤遠端的分支，只要做過一次 `git push -u <remote> <branch name>`，並且成功 Push 出去，本地的 `master` 分支就會被設定去追蹤遠端的 `<remote> <branch name>` 分支，往後再 `master` 分支直接使用 `git push` 命令就會推向當時設定的 `<remote> <branch name>` 分支，反之，如果沒有設定 `-u` 就使用 `git push`，就會導致以下錯誤：
+首先是 `-u` 的部分，等同於 `--set-upstream`，可以使 `master` 這一個指定的分支開始追蹤遠端的分支，只要做過一次 `git push -u origin master`，並且成功 Push 出去，本地的 `master` 分支就會被設定去追蹤遠端的 `origin/master` 分支，往後再 `master` 分支直接使用 `git push` 命令就會推向當時設定的 `origin/master` 分支，反之，如果沒有設定 `-u` 就使用 `git push`，就會導致以下錯誤：
 
 ![git 尚未設置上游](https://i.imgur.com/OUCX1Hl.png)
 
@@ -291,17 +291,17 @@ git checkout -t origin/develop
 
 ![git checkout -t](https://i.imgur.com/EMfHFPi.png)
 
-`-t` 全名為 `--track` 主要是用以追蹤遠端數據庫分支並在本地創建同名的分支，此時我們的 `gh-demo` 數據庫就會與最之前的 `project` 數據庫一模一樣囉，在這邊補充幾個指令：
+`-t` 全名為 `--track`，此道命令可將遠端分支建立至本地並追蹤 (即設置 upstream)，此時我們的 `gh-demo` 數據庫就會與最之前的 `project` 數據庫一模一樣囉，在這邊補充幾個指令：
 
-- 從遠端分支複製並切換到本地分支 (自定義名稱)：
+- 將遠端分支建立至本地並追蹤 (自定義名稱)：
 
 ```bash
 git checkout -b develop origin/develop
 ```
 
-這道指令與使用 `git checkout -t origin/develop` 結果相同，差別在於可自定義名稱。
+這道指令與 `git checkout -t origin/develop` 結果相同，差別在於可自定義名稱。
 
-- 從遠端分支複製並切換到本地分支 (自動檢查)：
+- 將遠端分支建立至本地並追蹤 (最簡單)：
 
 ```bash
 git checkout develop
@@ -309,7 +309,7 @@ git checkout develop
 
 這道命令與使用 `git checkout -t origin/develop` 結果相同，Git 會檢查這一個分支是否洽好存在同名遠端分支，如果存在，即在本地創建這一個分支並追蹤遠端分支。
 
-到這邊我們已經成功將遠端數據庫克隆至本地囉，以後只要在有 Git 環境的電腦中，都可以達到異地開發的效果，再也不需要使用 USB 囉。
+以上幾道命令結果都一樣，看你認為哪一個比較好記。到這邊我們已經成功將遠端數據庫克隆至本地，以後只要在有 Git 環境的電腦中，都可以達到異地開發的效果，再也不需要使用 USB 囉。
 
 ## 使用 Fetch 獲取遠端數據庫修改內容
 
@@ -361,7 +361,7 @@ git fetch
 
 ![查看 commit 紀錄-3](https://i.imgur.com/HjhElq0.png)
 
-你會發現本地參照的遠端分支已被更新，這也就是 `git fetch` 的功用，它會將遠端數據庫的所有分支進行更新，接著執行合併動作：
+你會發現本地參照的遠端分支已被更新，這也就是 `git fetch` 的功用，它會將本地存在的分支從遠端給一併拉下來，接著執行合併動作：
 
 - 在 `master` 分支：
 
@@ -391,7 +391,15 @@ git fetch origin master:temp
 
 預設情況下，`git fetch` 會把所有的遠端分支拉下來，而上面這到命令的意思就如同前面所講到的 `master:master`，只拉取遠端的 `master` 分支並同步到本地端的 `temp` 分支，不存在即創建，之後我們一樣透過 `git merge temp` 就可以拿到最新內容了。
 
-讓我們做一個總結，使用 `git fetch` 能夠在不影響本地分支的狀態下獲取遠端分支的內容，我們可以視情況看是否要合併這一個分支，通常在多人開發時，有很大的機率這一個遠端分支與本地分支合併時會發生衝突，這點在以後會介紹，而使用 `git fetch` 的好處就在於可以先透過 `git diff` 比對差異，將衝突內容做修改，合併時才不會發生意外，你可能看過有些人是使用 `git pull` 來獲取遠端內容，事實上，`git pull` 就等同於 `git fetch + git merge`，拉下來的同時就直接幫我們做合併了，此時如果內容發生衝突，就會直接跳出警告，等著我們慢慢去修，我不太喜歡這樣的做法，各位自己試試看。
+這邊我們再補充一個指令：
+
+```bash
+git pull
+```
+
+`git pull` 與 `git fetch` 同樣都是用來將遠端數據庫給拉下來，不同的地方在於 `git pull` 會直接將遠端分支合併至本地分支，你可以把它想成 `git fetch` 與 `git merge` 的組合技，你就不需要親自合併分支了，方便了不少。
+
+我個人比較偏好 `git fetch` 的方式獲取遠端內容，通常在多人開發時，有很大的機率這一個遠端分支與本地分支合併時會發生衝突，使用 `git fetch` 就可先透過 `git diff` 比對差異，將衝突內容作修改，避免合併時可能出現的問題，而 `git pull` 確實比較方便，但如果遠端與本地分支發生衝突，就會直接跳出警告，等著我們慢慢去修，我不太喜歡這樣的做法，各位可以自行試試。
 
 ## 刪除遠端分支
 
@@ -409,33 +417,76 @@ git push origin :develop
 
 ## Git 指令回顧
 
-- 新增遠端數據庫：`git remote add <repo_name> <url>`
-- 查看所有以添加的遠端數據庫資訊：`git remote -v`
-- 修改已註冊遠端數據庫位址：`git remote set-url <repo_name> <new url>`
-- 修改已註冊遠端數據庫名稱：`git remote rename <old repo_name> <new repo_name>`
-- 刪除已註冊遠端數據庫：`git remote remove <repo_name>`
-- 指定分支上傳至遠端數據庫 (同時設定 upstream)：
-  - `git push -u <repo_name> <local_branch>`
-- 指定分支上傳至遠端數據庫 (修改遠端分支名稱)：
-  - `git push <repo_name> <local_branch>:<remote_branch>`
-- 指定分支上傳至遠端數據庫 (基本)：
-  - `git push <repo_name> <local_branch>`
-- 分支移除 `upstream` 設定：`git branch --unset-upstream <local_branch>`
-- 分支設定 `upstream` 存在即覆蓋：
-  - `git branch -u <repo_name>/<remote_branch> <local_branch>`
-- 查看遠端分支：`git branch -r`
-- 查看所有分支 (包含遠端與本地)：`git branch -a`
-- 克隆遠端數據庫至本地：`git clone <url> <folder>`
-- 從遠端分支複製並切換到本地分支：`git checkout -t <repo_name>/<remote_branch>`
-- 從遠端分支複製並切換到本地分支 (自定義名稱)：
-  - `git checkout -b <local_branch> <repo_name>/<remote_branch>`
-- 從遠端分支複製並切換到本地分支 (自動檢查)：`git checkout <remote_branch>`
-- 上傳至遠端數據庫 (全部分支)：`git push --all <repo_name>`
-- 上傳至遠端數據庫 (全部分支，同時設定 upstream)：`git push -u <repo_name> --all`
-- 下載遠端數據庫資料 (全部分支)：`git fetch`
-- 合併遠端數據庫資料 (同名本地分支)：`git merge <repo_name>/<remote_branch>`
-- 下載遠端數據庫資料 (單個分支)：`git fetch <repo_name> <remote_branch>`
-- 下載遠端數據庫資料 (指定分支)：
-  - `git fetch <repo_name> <remote_branch>:<local_branch>`
-- 下載遠端數據庫資料 (直接合併)：`git pull`
-- 刪除遠端分支 (推一個空分支)：`git push :<remote_branch>`
+```bash
+# 新增遠端數據庫
+git remote add <repo_name> <url>
+
+# 查看所有以添加的遠端數據庫資訊
+git remote -v
+
+# 修改已註冊遠端數據庫位址
+git remote set-url <repo_name> <new url>
+
+# 修改已註冊遠端數據庫名稱
+git remote rename <old_repo_name> <new_repo_name>
+
+# 刪除已註冊遠端數據庫
+git remote remove <repo_name>
+
+# 指定分支上傳至遠端數據庫 (同時設定 upstream)
+git push -u <repo_name> <local_branch>
+
+# 指定分支上傳至遠端數據庫 (指定不同名稱)
+git push <repo_name> <local_branch>:<remote_branch>
+
+# 指定分支上傳至遠端數據庫
+git push <repo_name> <local_branch>
+
+# 分支移除 `upstream`
+git branch --unset-upstream <local_branch>
+
+# 分支設定 `upstream` 存在即覆蓋
+git branch -u <repo_name>/<remote_branch> <local_branch>
+
+# 查看遠端分支
+git branch -r
+
+# 查看所有分支 (包含遠端與本地)
+git branch -a
+
+# 克隆遠端數據庫至本地
+git clone <url> <folder>
+
+# 將遠端分支建立至本地並追蹤
+git checkout -t <repo_name>/<remote_branch>
+
+# 將遠端分支建立至本地並追蹤 (可自訂名稱)
+git checkout -b <local_branch> <repo_name>/<remote_branch>
+
+# 將遠端分支建立至本地並追蹤
+git checkout <remote_branch>
+
+# 上傳至遠端數據庫 (全部分支)
+git push --all <repo_name>
+
+# 上傳至遠端數據庫 (全部分支，同時設定 upstream)
+git push -u <repo_name> --all
+
+# 下載遠端數據庫 (所有本地存在分支)
+git fetch
+
+# 合併遠端分支 (將本地分支更新為最新狀態)
+git merge <repo_name>/<remote_branch>
+
+# 下載遠端數據庫 (指定分支)
+git fetch <repo_name> <remote_branch>
+
+# 下載遠端數據庫 (放至指定分支，不存在及建立)
+git fetch <repo_name> <remote_branch>:<local_branch>
+
+# 下載遠端數據庫 (等同於 git fetch + git merge)
+git pull
+
+# 刪除遠端分支
+git push :<remote_branch>
+```
