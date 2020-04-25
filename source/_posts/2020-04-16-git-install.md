@@ -262,26 +262,70 @@ git config --global alias.l 'log --oneline --graph --all'
 
 ## Git 指令回顧
 
-- 檢查 Git 版本：`git --version`
-- 新增全域使用者 (姓名)：`git config --global user.name "name"`
-- 新增全域使用者 (信箱)：`git config --global user.email "email"`
-- 新增區域使用者 (姓名)：`git config --local user.name "name"`
-- 新增區域使用者 (信箱)：`git config --local user.email "email"`
-- 檢查使用者設定：`git config --list`
-- 全域 Git 設定檔：`C:\Users\${USER}\.gitconfig`
-- 專案 Git 設定檔：`/.git/config`
-- 初始化 Git Repositroy：`git init`
-- 查看當前目錄狀態：`git status`
-- 將工作目錄檔案提交至索引區 (指定檔案)：`git add <file name>`
-- 將工作目錄檔案提交至索引區 (全部檔案)：`git add .`
-- 將工作目錄檔案提交至索引區 (在 Git 2.x 之後，效果如同 `git add .`)：`git add --all`
-- 將索引區檔案提交至本地數據庫：`git commit -m "message"`
-- 將索引區檔案提交至本地數據庫 (開啟預設編輯器)：`git commit`
-- 將預設的 Vim 編輯器改為 VSCode：`git config --global core.editor "code --wait"`
-- 查看目錄日誌：`git log`
-- 查看目錄日誌 (精簡化)：`git log --oneline`
-- 查看目前日誌 (線路圖)：`git log --graph`
-- 查看目前日誌 (所有分支)：`git log --all`
-- 查看目錄日誌 (推薦)：`git log --oneline --graph --all`
-- 全域設定縮寫：`git config --global alias.s status`
-- 全域設定縮寫 (添加參數)：`git config --global alias.l "log --oneline --graph --all"`
+```bash
+# 檢查 Git 版本
+git --version
+
+# 新增全域使用者 (姓名)
+git config --global user.name 'name'
+
+# 新增全域使用者 (信箱)
+git config --global user.email 'email'
+
+# 新增區域使用者 (姓名)
+git config --local user.name 'name'
+
+# 新增區域使用者 (信箱)
+git config --local user.email 'email'
+
+# 檢查使用者設定
+git config --list
+
+# 全域 Git 設定檔
+C:\Users\${USER}\.gitconfig
+
+# 專案 Git 設定檔
+/.git/config
+
+# 初始化 Git Repositroy
+git init
+
+# 查看當前目錄狀態
+git status
+
+# 將工作目錄檔案提交至索引區 (指定檔案)
+git add <file>
+
+# 將工作目錄檔案提交至索引區 (全部檔案)
+git add .
+
+# 將工作目錄檔案提交至索引區 (在 Git 2.x 之後，效果如同 git add .)
+git add --all
+
+# 將索引區檔案提交至本地數據庫
+git commit -m 'message'
+
+# 將索引區檔案提交至本地數據庫 (開啟預設編輯器)
+git commit
+
+# 將預設的 Vim 編輯器改為 VSCode
+git config --global core.editor 'code --wait'
+
+# 查看目錄日誌
+git log
+
+# 查看目錄日誌 (精簡化)
+git log --oneline
+
+# 查看目前日誌 (所有分支)
+git log --all
+
+# 查看目錄日誌 (常用配置)
+git log --oneline --graph --all
+
+# 全域設定縮寫
+git config --global alias.s status
+
+# 全域設定縮寫 (添加參數)
+git config --global alias.l 'log --oneline --graph --all'
+```
