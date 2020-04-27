@@ -33,7 +33,7 @@ cd project
 git init
 Initialized empty Git repository in C:/Users/a7894/Desktop/project/.git/
 
-echo index.html
+echo '' > index.html
 
 git add .
 
@@ -93,7 +93,7 @@ git commit -m 'add all.css'
 ```bash
 git add .
 
-git commit -m 'edit index.html title'
+git commit -m 'edit index.html > title'
 ```
 
 假設又有一位工程人員開了一個分支並修復 title 這個問題：
@@ -107,12 +107,12 @@ git checkout -b cat
 
 git add .
 
-git commit -m 'edit index.html title'
+git commit -m 'edit index.html > title'
 ```
 
 讓我們來看目前的日誌：
 
-![查看目前 commit 紀錄-1](https://i.imgur.com/nlEUA90.png)
+![查看目前 commit 紀錄-1](https://i.imgur.com/Qzr8J69.png)
 
 你會發現在 `dog` 分支與 `cat` 分支同時修改了 `index.html` 檔案的標題，這邊要注意，並不是修改同一份檔案就會發生衝突，而是修改同一份檔案的同一行代碼才會發生衝突，基本上 Git 有自己判定的標準，讓我們繼續來看衝突是如何發生的：
 
@@ -124,11 +124,11 @@ git merge dog
 
 此時會跳出合併發生衝突的警告：
 
-![git 合併衝突](https://i.imgur.com/S3fuCDg.png)
+![git 合併衝突](https://i.imgur.com/s66X0qE.png)
 
 此時千萬不要慌張，讓我們先用 `git status` 壓壓驚：
 
-![查看檔案狀態-1](https://i.imgur.com/28Xdtpt.png)
+![查看檔案狀態-1](https://i.imgur.com/qHOftjW.png)
 
 從上面可以得知，目前 `all.css` 已經被提交至索引區，代表這一個檔案沒有發生衝突，而 `index.html` 這個檔案就不一樣了，出現了 `Unmerged path` 的狀態，且提示 `both modified` 字樣，代表兩個分支同時修改到了同份檔案的同行代碼，這時候 Git 推薦要不就執行以下命令還原到未合併前的狀態：
 
@@ -182,7 +182,7 @@ git add .
 
 這時我們來看狀態長什麼樣子：
 
-![查看檔案狀態-2](https://i.imgur.com/52KjPlj.png)
+![查看檔案狀態-2](https://i.imgur.com/j2bzdhV.png)
 
 你會發現提示改變了，告訴我們所有衝突都已被修復，但還處於合併中，因為我們還沒有提交至數據庫阿！輸入以下命令：
 
@@ -192,7 +192,7 @@ git commit
 
 這時你可能會想，為什麼沒有加 `-m` 參數呢？事實上，在這種情況下，我習慣使用預設的訊息，如果你跟我一樣單純使用 `git commit`，此時會跳出 Vim 請你輸入訊息內容，而分支衝突本身就有預設的訊息內容了，也就代表直接關閉視窗即可，但如果你想要自訂訊息內容，那就照往常的加入 `-m ''` 即可，這時候讓我們來看究竟合併成功了沒：
 
-![查看檔案狀態-3](https://i.imgur.com/FC99OCg.png)
+![查看檔案狀態-3](https://i.imgur.com/CtrV3OY.png)
 
 大功告成！分支已被成功合併，事實上，本地分支發生衝突的機率確實是挺高的，但只要跑過一次流程，就沒什麼好害怕的了，接下來進入到遠端分支合併衝突的部分。
 
@@ -210,7 +210,7 @@ git push -u origin --all
 
 此時的日誌應該為：
 
-![查看目前 commit 紀錄-2](https://i.imgur.com/Yf6Rges.png)
+![查看目前 commit 紀錄-2](https://i.imgur.com/OO9EQwX.png)
 
 在這邊補充一個指令：
 
@@ -220,7 +220,7 @@ git commit --amend -m 'merge dog branch'
 
 這個指令主要可用來修改最後一次提交的 commit 訊息，假設你不小心在提交 commit 時打錯字，這個指令就很用好，但可能會有些副作用：
 
-![查看目前 commit 紀錄-3](https://i.imgur.com/S92Miyb.png)
+![查看目前 commit 紀錄-3](https://i.imgur.com/lQLCEcW.png)
 
 你會發現原本的 `992ae1d` 節點目前只剩遠端的 `cat` 分支指著，本地的 `cat` 分支反而指向了一個全新的 commit 紀錄，事實上，修改訊息對於 Git 來說也算是一次全新的 commit ，這才導致生成了一個全新 (但本質不是) 的 commit 紀錄。
 
