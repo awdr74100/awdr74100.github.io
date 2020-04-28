@@ -409,6 +409,12 @@ git pull
 git push origin :develop
 ```
 
+在 Git v1.7 之後的版本可以使用 `--delete` 參數：
+
+```bash
+git push --delete origin develop
+```
+
 顯示遠端分支已被刪除：
 
 ![刪除遠端分支](https://i.imgur.com/jUhYkHE.png)
@@ -489,4 +495,7 @@ git pull
 
 # 刪除遠端分支
 git push :<remote_branch>
+
+# 刪除遠端分支 (v1.7 以後版本可使用)
+git push --delete <repo_name> <remote_branch>
 ```
