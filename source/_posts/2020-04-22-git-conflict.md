@@ -33,7 +33,7 @@ cd project
 git init
 Initialized empty Git repository in C:/Users/a7894/Desktop/project/.git/
 
-echo '' > index.html
+touch index.html
 
 git add .
 
@@ -67,7 +67,7 @@ git commit -m 'update index.html'
 ```bash
 git checkout -b dog
 
-echo '' > all.css
+touch all.css
 
 git add .
 
@@ -287,6 +287,6 @@ git merge --abort
 # 修改最後一次 commit 訊息
 git commit --amend -m 'message'
 
-# 強制推送遠端分之
+# 強制推送遠端分支
 git push -f
 ```

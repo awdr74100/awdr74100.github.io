@@ -94,13 +94,13 @@ cd project
 git init
 Initialized empty Git repository in C:/Users/a7894/Desktop/project/.git/
 
-echo '' > index.html
+touch index.html
 
 git add .
 
 git commit -m '新增 index.html'
 
-echo '' > all.css
+touch all.css
 
 git add .
 
@@ -228,7 +228,7 @@ git branch -u origin/master master
 ```bash
 git checkout -b develop
 
-echo '' > db.json
+touch db.json
 
 git add .
 
@@ -320,7 +320,7 @@ cd project
 
 git checkout develop
 
-echo '' > all.js
+touch all.js
 
 git add .
 

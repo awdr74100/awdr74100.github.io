@@ -35,13 +35,13 @@ cd project
 git init
 Initialized empty Git repository in C:/Users/a7894/Desktop/project/.git/
 
-echo '' > index.html
+touch index.html
 
 git add .
 
 git commit -m '新增 index.html'
 
-echo '' > all.css
+touch all.css
 
 git add .
 
@@ -85,7 +85,7 @@ git checkout dev
 假設我們要在 `dev` 分支做某些事情：
 
 ```bash
-echo '' > db.json
+touch db.json
 
 git add .
 
@@ -134,13 +134,13 @@ git merge dev
 git checkout dev
 Switched to branch 'dev'
 
-echo '' > bugfix.txt
+touch bugfix.txt
 
 git add .
 
 git commit -m '修復 bug'
 
-echo '' > edit.txt
+touch edit.txt
 
 git add .
 
@@ -181,7 +181,7 @@ git merge dev --no-ff
 ```bash
 git checkout dev
 
-echo '' > all.js
+touch all.js
 
 git add .
 
@@ -189,7 +189,7 @@ git commit -m '新增 all.js'
 
 git checkout master
 
-echo '' > all.scss
+touch all.scss
 
 git add .
 
@@ -301,7 +301,7 @@ git checkout 3c28751
 與切換分支的結果相同，專案進度回復到了當時的 `3c28751` 節點紀錄上，可能會有人問，那我可以在 detached HEAD 狀態下提交 commit 紀錄嗎？嘗試不就知道了：
 
 ```bash
-echo '' > test.txt
+touch test.txt
 
 git add .
 
