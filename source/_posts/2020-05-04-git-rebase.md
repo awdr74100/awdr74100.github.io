@@ -20,6 +20,7 @@ updated: 2020-05-05 00:03:12
 - rebase 衝突發生並解決
 - rebase 互動模式 - 修改歷史訊息
 - rebase 互動模式 - 合併或拆分 commit 紀錄
+- rebase 互動模式 - 刪除或調整 commit 紀錄
 
 ## rebase 分支合併與處理方式
 
@@ -282,4 +283,52 @@ git rebase -i b3c71bc
 
 ![查看目前 commit 紀錄-13](https://i.imgur.com/o46DLNT.png)
 
-原有的 `06380be` 與 `e98f2b8` 以被合併成 `b9fec18`，且由於父子關係改變，導致後面所有的 commit 都經過重新計算並生成了新的 commit 紀錄。
+原有的 `06380be` 與 `e98f2b8` 以被合併成 `b9fec18`，且由於父子關係改變，後面所有的 commit 都經過重新計算生成了新的 commit 紀錄。
+
+你可能會問，既然 commit 可以合併，是不是也能夠拆分呢？沒錯！還真的可以，執行以下命令已啟動互動模式：
+
+```bash
+git rebase -i b3c71bc
+```
+
+假設我們要把剛剛合併完成的 `b9fec18` 拆分成原來的兩個 commit，在需拆分的 commit 設置 `edit` 模式：
+
+![修改為 edit 選項](https://i.imgur.com/5I1qfZi.png)
+
+`edit` 模式可讓我們編輯指定的 commit 節點，你不用把它想得太複雜，先讓我們開啟線路圖狀態：
+
+![查看目前 commit 紀錄-14](https://i.imgur.com/hRPVAuq.png)
+
+你會發現 rebase 卡在了 `b9fec18` 節點，這才導致 `HEAD` 指向了這一個節點，拆分 commit 非常的簡單，還記得 `reset` 指令嗎？把檔案丟回工作目錄重新跑一次流程不就達到目的了？執行以下命令：
+
+```bash
+git reset HEAD^ --mixed
+```
+
+`--mixed` 是 `reset` 的預設模式，可加可不加，這邊千萬不要用 `--hard` 模式啊！你的檔案會被徹底丟掉，讓我們來看目前狀態：
+
+![查看檔案狀態-3](https://i.imgur.com/26fTkBx.png)
+
+原本 `b9fec18` 的檔案都被丟回工作目錄了，接下來就只需要各別提交 commit 即可完成目的：
+
+```bash
+git add all.js
+
+git commit -m 'add all.js'
+
+git add db.json
+
+git commit -m 'add db.json'
+```
+
+這時候還沒有結束喔！目前我們還是處於 rebase 的狀態，執行以下指令跳到下個進程：
+
+```bash
+git rebase --continue
+```
+
+大功告成！此時的線路圖狀態為：
+
+![查看目前 commit 紀錄-15](https://i.imgur.com/h3yg00e.png)
+
+`b9fec18` 已被拆分成 `74b2f71` 與 `d54d71d`，跑過一次上面流程，你會發現 `edit` 模式可以做非常多的事情，你可以嘗試在指定的節點新增 commit 紀錄看看，這邊就不做示範了，差別只在於 `HEAD` 狀態下想要做什麼動作而已。
