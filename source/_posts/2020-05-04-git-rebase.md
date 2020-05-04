@@ -1,5 +1,5 @@
 ---
-title: Git 版本控制系統 - Rebase 進階合併方法與互動模式
+title: Git 版本控制系統 - rebase 合併分支與 pull --rebase 同步提交
 description:
   [
     之前我們已經介紹過如何使用 merge 合併分支，這次來介紹更為進階的 rebase 方法合併分支。一般的 merge 方法就只是單純的將兩個分支進行合併，而 rebase 方法可以在不額外生成新 commit 的狀況下進行合併，達到精簡化的目的，且還提供了互動模式，針對時不時 commit 的人特別有用，能夠將零碎的 commit 紀錄依造自己需求做修改，以保證最後分享給夥伴的內容是有條理的。此篇將介紹如何使用 rebase 合併分支，過程也會提到衝突的解決辦法，最後說明何謂 rebase 互動模式。,
@@ -7,7 +7,7 @@ description:
 categories: [Git]
 tags: [Git, w3HexSchool]
 date: 2020-05-04 00:10:32
-updated: 2020-05-05 00:03:12
+updated: 2020-05-05 02:06:12
 ---
 
 ## 前言
@@ -21,6 +21,7 @@ updated: 2020-05-05 00:03:12
 - rebase 互動模式 - 修改歷史訊息
 - rebase 互動模式 - 合併或拆分 commit 紀錄
 - rebase 互動模式 - 刪除或調整 commit 紀錄
+- 使用 git pull <span>-</span><span>-</span>rebase 處理遠端提交
 - Git 指令回顧
 
 ## rebase 分支合併與處理方式
@@ -378,6 +379,162 @@ git rebase -i b3c71bc
 
 上面針對 rebase 的操作都是屬於合理的範圍內，何謂合理呢？就是指在不發生衝突的狀態下完成目的，那何謂不合理呢？我們拿上面最後這張流程圖來做說明，假設我們把 `449ff41` 移到 `e91dee5` 之後，此時就會跳出衝突等待我們處理，一般來說不建議這樣做，rebase 雖然可達到重整的作用，但還是必須考慮到相依性的問題，像是剛剛提到的範例，我們都還沒有新增 `all.css` 何來修改 `all.css` 呢？這邊要特別的注意。
 
+## 使用 git pull <span>-</span><span>-</span>rebase 處理遠端提交
+
+事實上，rebase 主要都是被用在尚未提交至遠端的 commit，達到重整的作用，以及多人協作時在同一條分支上的開發，避免產生多餘的 commit 紀錄，在這邊我們來模擬多人協作時的狀況：
+
+> 這邊以資料夾名稱辨認當前的用戶
+
+A 夥伴進行初始化專案動作：
+
+```bash
+mkdir a-repository
+
+git init
+
+touch index.html
+
+git add .
+
+git commit -m 'add index.html'
+
+... edit index.html
+
+git commit -am 'change index.html'
+
+git remote add origin git@github.com:awdr74100/pull-rebase-demo.git
+
+git push -u origin master
+```
+
+B 夥伴克隆回本地並提交一個 commit：
+
+```bash
+git clone git@github.com:awdr74100/pull-rebase-demo.git b-repository
+
+touch all.css
+
+git add .
+
+git commit -m 'add all.css'
+```
+
+A 夥伴與 B 夥伴屬共同開發，A 夥伴此時提交了一個 commit：
+
+```bash
+touch all.js
+
+git add .
+
+git commit -m 'add all.js'
+
+git push
+```
+
+B 夥伴上傳時肯定會跳出衝突：
+
+```bash
+git push
+```
+
+衝突內容如下：
+
+![git push 發生衝突](https://i.imgur.com/dBeRFmk.png)
+
+理由很簡單，Git 發現遠端分支有新的 commit 尚未同步到本地，導致無法推送，這些在介紹分支的章節都有提到，解決方法如下：
+
+> 這邊也可以使用 git pull，預設是使用 merge 方式合併分支
+
+```bash
+git fetch
+
+git merge origin/master
+
+# 此時會跳出輸入 commit 訊息的視窗
+```
+
+此時的線路圖狀態如下：
+
+![查看目前 commit 紀錄-18](https://i.imgur.com/bRNHacH.png)
+
+發現問題了嗎？明明 A 夥伴與 B 夥伴都是在 `master` 這條分支進行開發，這樣子的處理方式會導致產生額外的 `9dba8b9` 這個節點，如果頻繁的操作，豈不是會增加一堆類似的節點？整個線路圖變得非常不易閱讀，此時就是 rebase 出馬的時候了，先讓我們回復到尚未 merge 的狀態：
+
+```bash
+git reset HEAD^ --hard
+```
+
+目前的線路圖狀態為：
+
+![查看目前 commit 紀錄-19](https://i.imgur.com/VeKksd3.png)
+
+改使用 rebase 合併遠端提交：
+
+```bash
+git rebase origin/master
+```
+
+此時的線路圖狀態為：
+
+![查看目前 commit 紀錄-20](https://i.imgur.com/dTr5OTw.png)
+
+是不是變得乾淨且合理許多？同樣的結果，我們也可以使用 `git pull` 來完成，請先將 B 夥伴內容推至遠端：
+
+```bash
+git push
+```
+
+A 夥伴與遠端同步：
+
+```bash
+git fetch
+
+git merge origin/master
+```
+
+A 夥伴提交一個可能發生衝突的 commit 並推至遠端：
+
+```bash
+... edit index.html
+
+git commit -am 'change index.html > title'
+
+git push
+```
+
+B 夥伴也提交一個可能發生衝突的 commit：
+
+```bash
+... edit index.html
+
+git commit -am 'change index.html > title'
+```
+
+又回到了剛剛的情境，B 夥伴的數據庫有尚未同步的分支，此時 Push 會發生衝突，剛剛的最完美解法是 `git fetch + git rebase`，這次我們換 `git pull`：
+
+```bash
+git pull --rebase
+```
+
+git pull 預設是使用 `merge` 來合併分支，我們可透過傳遞 `--rebase` 選項告知改使用 rebase 合併分支，此時就達到與 `git fetch + git rebase` 一樣的效用，不過在上面範例中，我們有刻意加入衝突的行為，此時會跳出需修復衝突的提示：
+
+![git pull --rebase 衝突](https://i.imgur.com/AJAYMnE.png)
+
+解決方法如同之前所介紹，這邊就不再做贅述，最後記得輸入 `git rebase --continue`：
+
+```bash
+... fix conflict
+
+git add .
+
+git rebase --continue
+```
+
+此時的線路圖狀態為：
+
+![查看目前 commit 紀錄-21](https://i.imgur.com/sZ3QBLe.png)
+
+大功告成！如果硬要說 `git pull --rebase` 相比 `git pull` 有什麼令人困擾的地方，可能就是遇到衝突時會比較麻煩點，這其實也是 rebase 的通病，merge 如果發生衝突，你只需要解決衝突一次，之後 coomit 出去就完事了，而 rebase 的衝突你可能要修復數次，畢竟他是以依序的方式進行處理，有利也有弊，判斷當下情境去做選擇是才是上策。
+
 ## Git 指令回顧
 
 ```bash
@@ -408,18 +565,13 @@ git rebase -i <SHA-1>
 # 在指定範圍啟動 rebase 互動模式 (同上)
 git rebase --interactive
 
-# 互動模式 => 保留這次 commit，不做任何修改
-> pick <SHA-1>
+# 互動可選模式：
+# pick <commit> = 保留這次 commit，不做任何修改
+# reword <commit> = 修改 commit 訊息內容
+# squash <commit> = 合併 commit (合併至前一個節點)
+# edit <commit> = 編輯 commit (停留在指定 commit，可做新增、修改的操作)
+# drop <commit> = 刪除 commit (與移除整行提示同結果)
 
-# 互動模式 => 修改 commit 訊息內容
-> reword <SHA-1>
-
-# 互動模式 => 合併 commit (合併至前一個節點)
-> squash <SHA-1>
-
-# 互動模式 => 編輯 commit (停留在指定 commit，可做新增、修改的操作)
-> edit <SHA-1>
-
-# 互動模式 => 刪除 commit (可直接刪除整行紀錄)
-> drop <SHA-1>
+# 將遠端分支合併至本地 (使用 rebase 合併)
+git pull --rebase
 ```
