@@ -2,7 +2,7 @@
 title: Git 版本控制系統 - Rebase 進階合併方法與互動模式
 description:
   [
-    之前我們已經介紹過如何使用 merge 合併分支，這次來介紹更為進階的 rebase 方法合併分支。一般的 merge 方法就只是單純的將兩個分支進行合併，而 rebase 方法可以在合併的同時整理你的 commit 紀錄，達到最佳化的目的，且還提供了互動模式，針對時不時 commit 的人特別有用，能夠將零碎的 commit 紀錄依造自己需求做修改，以保證最後分享給夥伴的內容是有條理的。此篇將介紹如何使用 rebase 合併分支，過程也會提到衝突的解決辦法，最後說明何謂 rebase 互動模式。,
+    之前我們已經介紹過如何使用 merge 合併分支，這次來介紹更為進階的 rebase 方法合併分支。一般的 merge 方法就只是單純的將兩個分支進行合併，而 rebase 方法可以在不額外生成新 commit 的狀況下進行合併，達到精簡化的目的，且還提供了互動模式，針對時不時 commit 的人特別有用，能夠將零碎的 commit 紀錄依造自己需求做修改，以保證最後分享給夥伴的內容是有條理的。此篇將介紹如何使用 rebase 合併分支，過程也會提到衝突的解決辦法，最後說明何謂 rebase 互動模式。,
   ]
 categories: [Git]
 tags: [Git, w3HexSchool]
@@ -12,7 +12,7 @@ updated: 2020-05-05 00:03:12
 
 ## 前言
 
-之前我們已經介紹過如何使用 merge 合併分支，這次來介紹更為進階的 rebase 方法合併分支。一般的 merge 方法就只是單純的將兩個分支進行合併，而 rebase 方法可以在合併的同時整理你的 commit 紀錄，達到最佳化的目的，且還提供了互動模式，針對時不時 commit 的人特別有用，能夠將零碎的 commit 紀錄依造自己需求做修改，以保證最後分享給夥伴的內容是有條理的。此篇將介紹如何使用 rebase 合併分支，過程也會提到衝突的解決辦法，最後說明何謂 rebase 互動模式。
+之前我們已經介紹過如何使用 merge 合併分支，這次來介紹更為進階的 rebase 方法合併分支。一般的 merge 方法就只是單純的將兩個分支進行合併，而 rebase 方法可以在不額外生成新 commit 的狀況下進行合併，達到精簡化的目的，且還提供了互動模式，針對時不時 commit 的人特別有用，能夠將零碎的 commit 紀錄依造自己需求做修改，以保證最後分享給夥伴的內容是有條理的。此篇將介紹如何使用 rebase 合併分支，過程也會提到衝突的解決辦法，最後說明何謂 rebase 互動模式。
 
 ## 筆記重點
 
@@ -174,7 +174,7 @@ git rebase master
 
 ![查看目前 commit 紀錄-8](https://i.imgur.com/rw5yW3d.png)
 
-一樣不用緊張，先用 `git status` 壓壓驚：
+不用緊張，先讓我們用 `git status` 壓壓驚：
 
 ![查看檔案狀態-1](https://i.imgur.com/LpHqBoj.png)
 
@@ -182,13 +182,21 @@ git rebase master
 
 ![Sourcetree](https://i.imgur.com/RPB0Mnd.png)
 
-從上面顯示可以得知，`2ca0999` 與 `3cc7339` 已被成功處理，但 `b1d9a97` 節點似乎發生衝突導致卡住，在前面的檔案狀態中，提示了可以使用以下指令回復到 rebase 前的狀態：
+從上面顯示可以得知，`2ca0999` 與 `3cc7339` 已被成功處理，但 `b1d9a97` 節點似乎發生衝突導致卡住，在前面的檔案狀態中，提示了可使用以下指令操作目前的 rebase 狀態：
+
+- 跳過當下 commit，並執行下一個 commit：
+
+```bash
+git rebase --skip
+```
+
+- 取消 rebase 操作，並回到 rebase 前的狀態：
 
 ```bash
 git rebase --abort
 ```
 
-我們怎麼可能半途而廢，遇到問題解決不就得了，解法與 `git merge` 差不多，打開狀態為 `both modified` 的檔案：
+這幾個指令看來都是逃避用的，都到這一步了，我們怎麼可能半途而廢，遇到問題解決不就得了，解法與 `git merge` 差不多，打開狀態為 `both modified` 的檔案：
 
 ![VSCode 衝突](https://i.imgur.com/KvONbC3.png)
 
@@ -379,8 +387,14 @@ git rebase <branch_name>
 # 還原 rebase 操作 (使用 ORIG_HEAD)
 git reset ORIG_HEAD --hard
 
-# 還原 rebase 操作 (使用 reflog)
+# 還原 rebase 操作 (從 reflog 查詢)
 git reset <SHA-1> --hard
+
+# 跳過當下 commit，並執行下一個 commit：
+git rebase --skip
+
+# 取消 rebase 操作，並回到 rebase 前的狀態：
+git rebase --abort
 
 # 取消 rebase 操作
 git rebase --abort

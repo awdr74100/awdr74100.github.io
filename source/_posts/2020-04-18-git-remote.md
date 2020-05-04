@@ -150,7 +150,7 @@ git remote set-url origin https://github.com/awdr74100/git-remote-demo.git
 git remote rename origin github
 ```
 
-- 刪除已註冊遠端數據庫
+- 刪除已註冊遠端數據庫：
 
 ```bash
 git remote remove origin
@@ -201,7 +201,7 @@ git push origin master
 git branch --unset-upstream
 ```
 
-- 移除 `upstream` 設定 (當前所在分支不是 `master` => 設定 `master` 分支)
+- 移除 `upstream` 設定 (當前所在分支不是 `master` => 設定 `master` 分支)：
 
 ```bash
 git branch --unset-upstream master
