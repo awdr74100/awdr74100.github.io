@@ -332,3 +332,39 @@ git rebase --continue
 ![查看目前 commit 紀錄-15](https://i.imgur.com/h3yg00e.png)
 
 `b9fec18` 已被拆分成 `74b2f71` 與 `d54d71d`，跑過一次上面流程，你會發現 `edit` 模式可以做非常多的事情，你可以嘗試在指定的節點新增 commit 紀錄看看，這邊就不做示範了，差別只在於 `HEAD` 狀態下想要做什麼動作而已。
+
+## rebase 互動模式 - 刪除或調整 commit 紀錄
+
+前面介紹了 rebase 各種的操作，應該夠你玩一陣子了，這邊來補充一些基本的操作，使用以下命令啟動互動模式：
+
+```bash
+git rebase -i b3c71bc
+```
+
+這次來介紹 `drop` 模式，此模式主要可用來刪除指定的 commit 紀錄，假設我們要刪除 `d54d71d` 這個 commit，將 `pick` 改為 `drop`：
+
+![選改為 deop 選項](https://i.imgur.com/EYHYH1z.png)
+
+你如果嫌 `drop` 模式還需要打字，你可以直接把想要刪除的 commit 整行刪除，你沒有看錯，就是整行刪除，這樣 rebase 就不會去處理那一個 commit，也就達到與 `drop` 相同的目的，讓我們來看 `:wq` 後的線路圖狀態：
+
+![查看目前 commit 紀錄-16](https://i.imgur.com/PZnfFOw.png)
+
+`d54d71d` 已經被我們刪除了，相比於上面的模式，`drop` 可能是最單純的一個模式。
+
+假設你覺得現在的 commit 流程有點怪怪的，你也可以任意調整 commit 的順序，老樣子，使用以下指令開啟互動模式：
+
+```bash
+git rebase -i b3c71bc
+```
+
+在這邊我們將 `74b2f71` 調整到最新的 commit 上，如下所示：
+
+![調整 commit 順序](https://i.imgur.com/TZNYGFB.png)
+
+其實就只要把 commit 移動到想要的位置就可以了，此時一樣 `:wq` 並查看線路圖狀態：
+
+![查看目前 commit 紀錄-17](https://i.imgur.com/pbVFJQd.png)
+
+`74b2f71` 就被我們移動到指定的位置上了。
+
+上面針對 rebase 的操作都是屬於合理的範圍內，何謂合理呢？就是指在不發生衝突的狀態下完成目的，那何謂不合理呢？我們拿上面最後這張流程圖來做說明，假設我們把 `449ff41` 移到 `e91dee5` 之後，此時就會跳出衝突等待我們處理，一般來說不建議這樣做，rebase 雖然可達到重整的作用，但還是必須考慮到相依性的問題，像是剛剛提到的範例，我們都還沒有新增 `all.css` 何來修改 `all.css` 呢？這邊要特別的注意！
