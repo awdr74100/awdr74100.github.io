@@ -21,6 +21,7 @@ updated: 2020-05-05 00:03:12
 - rebase 互動模式 - 修改歷史訊息
 - rebase 互動模式 - 合併或拆分 commit 紀錄
 - rebase 互動模式 - 刪除或調整 commit 紀錄
+- Git 指令回顧
 
 ## rebase 分支合併與處理方式
 
@@ -365,6 +366,46 @@ git rebase -i b3c71bc
 
 ![查看目前 commit 紀錄-17](https://i.imgur.com/pbVFJQd.png)
 
-`74b2f71` 就被我們移動到指定的位置上了。
+`74b2f71` 就被我們移動到指定的位置上了，在每次調整 commit 時，千萬要注意相依性的問題！
 
-上面針對 rebase 的操作都是屬於合理的範圍內，何謂合理呢？就是指在不發生衝突的狀態下完成目的，那何謂不合理呢？我們拿上面最後這張流程圖來做說明，假設我們把 `449ff41` 移到 `e91dee5` 之後，此時就會跳出衝突等待我們處理，一般來說不建議這樣做，rebase 雖然可達到重整的作用，但還是必須考慮到相依性的問題，像是剛剛提到的範例，我們都還沒有新增 `all.css` 何來修改 `all.css` 呢？這邊要特別的注意！
+上面針對 rebase 的操作都是屬於合理的範圍內，何謂合理呢？就是指在不發生衝突的狀態下完成目的，那何謂不合理呢？我們拿上面最後這張流程圖來做說明，假設我們把 `449ff41` 移到 `e91dee5` 之後，此時就會跳出衝突等待我們處理，一般來說不建議這樣做，rebase 雖然可達到重整的作用，但還是必須考慮到相依性的問題，像是剛剛提到的範例，我們都還沒有新增 `all.css` 何來修改 `all.css` 呢？這邊要特別的注意。
+
+## Git 指令回顧
+
+```bash
+# 合併分支 (使用 rebase 方式)
+git rebase <branch_name>
+
+# 還原 rebase 操作 (使用 ORIG_HEAD)
+git reset ORIG_HEAD --hard
+
+# 還原 rebase 操作 (使用 reflog)
+git reset <SHA-1> --hard
+
+# 取消 rebase 操作
+git rebase --abort
+
+# 進入下一個 rebase 進程
+git rebase --continue
+
+# 在指定範圍啟動 rebase 互動模式
+git rebase -i <SHA-1>
+
+# 在指定範圍啟動 rebase 互動模式 (同上)
+git rebase --interactive
+
+# 互動模式 => 保留這次 commit，不做任何修改
+> pick <SHA-1>
+
+# 互動模式 => 修改 commit 訊息內容
+> reword <SHA-1>
+
+# 互動模式 => 合併 commit (合併至前一個節點)
+> squash <SHA-1>
+
+# 互動模式 => 編輯 commit (停留在指定 commit，可做新增、修改的操作)
+> edit <SHA-1>
+
+# 互動模式 => 刪除 commit (可直接刪除整行紀錄)
+> drop <SHA-1>
+```
