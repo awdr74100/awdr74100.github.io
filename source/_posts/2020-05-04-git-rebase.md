@@ -533,7 +533,7 @@ git rebase --continue
 
 ![查看目前 commit 紀錄-21](https://i.imgur.com/sZ3QBLe.png)
 
-大功告成！如果硬要說 `git pull --rebase` 相比 `git pull` 有什麼令人困擾的地方，可能就是遇到衝突時會比較麻煩點，這其實也是 rebase 的通病，merge 如果發生衝突，你只需要解決衝突一次，之後 coomit 出去就完事了，而 rebase 的衝突你可能要修復數次，畢竟他是以依序的方式進行處理，有利也有弊，判斷當下情境去做選擇是才是上策。
+大功告成！如果硬要說 `git pull --rebase` 相比 `git pull` 有什麼令人困擾的地方，可能就是遇到衝突時會比較麻煩點，這其實也是 rebase 的通病，merge 如果發生衝突，你只需要解決衝突一次，之後 coomit 出去就完事了，而 rebase 的衝突你可能要修復數次，畢竟他是以依序的方式進行處理，有利也有弊，判斷當下情境去做選擇才是上策。
 
 ## Git 指令回顧
 
