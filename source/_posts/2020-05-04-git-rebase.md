@@ -191,7 +191,7 @@ git rebase master
 git rebase --skip
 ```
 
-- 取消 rebase 操作，並回到 rebase 前的狀態：
+- 取消 rebase 操作，回到 rebase 前狀態：
 
 ```bash
 git rebase --abort
@@ -550,10 +550,7 @@ git reset <SHA-1> --hard
 # 跳過當下 commit，並執行下一個 commit：
 git rebase --skip
 
-# 取消 rebase 操作，並回到 rebase 前的狀態：
-git rebase --abort
-
-# 取消 rebase 操作
+# 取消 rebase 操作，回到 rebase 前狀態：
 git rebase --abort
 
 # 進入下一個 rebase 進程
