@@ -560,7 +560,7 @@ git rebase --continue
 git rebase -i <SHA-1>
 
 # 在指定範圍啟動 rebase 互動模式 (同上)
-git rebase --interactive
+git rebase --interactive <SHA-1>
 
 # 互動可選模式：
 # pick <commit> = 保留這次 commit，不做任何修改
