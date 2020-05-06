@@ -33,7 +33,6 @@ mkdir project
 cd project
 
 git init
-Initialized empty Git repository in C:/Users/a7894/Desktop/project/.git/
 
 touch index.html
 

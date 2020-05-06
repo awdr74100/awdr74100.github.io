@@ -31,7 +31,6 @@ mkdir project
 cd project
 
 git init
-Initialized empty Git repository in C:/Users/a7894/Desktop/project/.git/
 
 touch index.html
 
@@ -289,4 +288,7 @@ git commit --amend -m 'message'
 
 # 強制推送遠端分支
 git push -f
+
+# 強制推送遠端分支 (同上)
+git push --force
 ```
