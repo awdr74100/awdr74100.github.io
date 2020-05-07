@@ -23,3 +23,11 @@ updated: 2020-05-07 16:32:16
 這邊我們來模擬推至遠端時所遇權限不足問題，假設我們的專案使用了 Vue 進行開發，但發現存在一處 Bug 須修復，我們可能會這樣做：
 
 ![Vue.js](https://i.imgur.com/mTLV1iZ.png)
+
+如同處理自己的遠端數據庫一般，可使用 HTTPS 或 SSH 方式克隆回本地：
+
+```bash
+git clone -b dev git@github.com:vuejs/vue.git vuejs
+
+cd vuejs
+```
