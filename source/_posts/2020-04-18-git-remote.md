@@ -7,7 +7,7 @@ description:
 categories: [Git]
 tags: [Git, GitHub]
 date: 2020-04-18 23:00:04
-updated: 2020-04-19 22:02:07
+updated: 2020-05-08 01:42:47
 ---
 
 ## 前言
@@ -268,11 +268,19 @@ git branch -a
 
 結果如同預期，因為我們已經分別將 `master`、`develop` 分支推至遠端了，所以遠端也存在同名的分支，接下來執行已下命令：
 
+- 克隆遠端數據庫的預設分支至本地：
+
 ```bash
 git clone git@github.com:awdr74100/git-remote-demo.git gh-demo
 ```
 
-剛剛在 Push 時是使用 SSH 方式驗證，在 Clone 這邊我們也一樣使用 SSH 方式連結，事實上，你想要改成 HTTPS 方式也沒差，後面的 `gh-demo` 代表的是遠端數據庫要放在本地端的哪個資料夾，如果不存在即建立，如果不寫放置資料夾，預設會在當下命令路徑生成遠端數據庫名稱
+- 克隆遠端數據庫的指定分支至本地：
+
+```bash
+git clone -b master git@github.com:awdr74100/git-remote-demo.git gh-demo
+```
+
+剛剛在 Push 時是使用 SSH 方式驗證，在 Clone 這邊我們也一樣使用 SSH 方式連結，事實上，你想要改成 HTTPS 方式也沒差，如果你想要克隆非 `master` (origin/HEAD) 的分支，可以加上 `-b` 參數，後面帶入想要克隆的分支，最後面的 `gh-demo` 代表的是遠端數據庫要放在本地端的哪個資料夾，如果不存在即建立，如果不寫放置資料夾，預設會在當下命令路徑生成遠端數據庫名稱
 
 ![git clone](https://i.imgur.com/HaPt1Jc.png)
 
@@ -280,7 +288,7 @@ git clone git@github.com:awdr74100/git-remote-demo.git gh-demo
 
 ![git clone 分支缺少](https://i.imgur.com/9BYZTBO.png)
 
-到這邊我們已經成功將遠端數據庫 Clone 下來了，但在這邊還有一個問題，從上圖可以發現，這一個數據庫缺少了 `develop` 分支，預設情況下，使用 `git clone` 命令只會將 `master` (Default branch) 分支給複製下來，可能會有人想，我可以直接 `git checkout origin/develop` 就好了啊，但這樣的作法是無法在本地端工作的，正確的做法應該是將遠端數據庫的分支一併給同步下來，可以使用以下指令：
+到這邊我們已經成功將遠端數據庫 Clone 下來了，但在這邊還有一個問題，從上圖可以發現，這一個數據庫缺少了 `develop` 分支，預設情況下，使用 `git clone` 命令只會將 `master` (origin/HEAD) 分支給複製下來，可能會有人想，我可以直接 `git checkout origin/develop` 就好了啊，但這樣的作法是無法在本地端工作的，正確的做法應該是將遠端數據庫的分支一併給同步下來，可以使用以下指令：
 
 ```bash
 git checkout -t origin/develop
@@ -459,8 +467,11 @@ git branch -r
 # 查看所有分支 (包含遠端與本地)
 git branch -a
 
-# 克隆遠端數據庫至本地
+# 克隆遠端數據庫的預設分支至本地
 git clone <url> <folder>
+
+# 克隆遠端數據庫的指定分支至本地
+git clone -b <remote_branch> <url> <folder>
 
 # 將遠端分支建立至本地並追蹤
 git checkout -t <repo_name>/<remote_branch>
