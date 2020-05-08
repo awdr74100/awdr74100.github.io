@@ -19,8 +19,9 @@ updated: 2020-05-07 16:32:16
 - 推至遠端時所遇權限不足問題
 - Fork 其他開發者專案
 - 發送 Pull Request 請求合併
-- 合併來自 Pull Request 的提交
-- 同步 Fork 專案進度
+- 處理 Pull Request 檢查是否合併
+- 同步 Pull Request 後的專案進度
+- Pull Request 衝突解決辦法
 
 ## 推至遠端時所遇權限不足問題
 
@@ -119,7 +120,7 @@ git commit -am 'edit all.css > b'
 
 當我們修復完成後，由於是自己帳號底下的數據庫，並不會造成所謂的 Push 無訪問權限問題：
 
-![查看目前 commit 紀錄-1](https://i.imgur.com/T1FnyUf.png)
+![-3-(https://i.imgur.com/sbp2WfH.png)1](https://i.imgur.com/T1FnyUf.png)
 
 目前 Bug 就已經被 awdr74100 修復了，但這邊所謂的修復是指在 awdr74100 拷貝的專案下進行修復，原作者的專案是不受任何影響的，如果要告知原作者 Bug 已被修復，可以使用 Pull Request 功能，直接進入下個章節。
 
@@ -145,7 +146,7 @@ git commit -am 'edit all.css > b'
 
 到這邊我們的 PR 就已經發送成功，你可以在下方繼續進行補充，接下來就等作者 (lanroya) 檢查並判斷是否接受合併囉。
 
-## 合併來自 Pull Request 的提交
+## 處理 Pull Request 檢查是否合併
 
 接著我們換原作者 (lanroya) 的部分，登入 lanroya 帳號後並切換到指定數據庫會看到以下畫面：
 
@@ -195,7 +196,7 @@ git merge origin/master
 
 以上就是整個發送 PR 的流程，是不是很有趣？發送 PR 不只可以應用在開源專案上，企業內部也很常使用此方式來處理夥伴間的提交，達到流程化的效果。
 
-## 同步 Fork 專案進度
+## 同步 Pull Request 後的專案進度
 
 這邊我們做一個補充，原作者要同步遠端數據庫的內容相對簡單，上面就已經有示範，但陌生開發者 (awdr74100) 可能就需要點技巧了，發送的 PR 就算已被原作者合併，fork 過來的專案也不會有任何變化，帳號底下的這個專案看起來雖然是個克隆體，但本質上與原作者的數據庫是完全不一樣的東西，如果想要完成同步，有以下方法可做選擇：
 
@@ -220,7 +221,7 @@ git fetch lanroya mastr
 
 此時的線路圖狀態為：
 
-![查看目前 commit 紀錄-2](https://i.imgur.com/W6c7Con.png)
+![-3-(https://i.imgur.com/sbp2WfH.png)2](https://i.imgur.com/W6c7Con.png)
 
 你會發現原作者的遠端數據庫就被我們拉下來了，接著直接合併即可完成同步動作：
 
@@ -229,3 +230,89 @@ git merge lanroya/master
 ```
 
 說真的這也沒多複雜，我比較推薦使用此方式來完成同步操作，某方面來講可能會比較簡單。
+
+## Pull Request 衝突解決辦法
+
+在上面我們有提到 PR 也是會發生衝突的，且機率還挺高的，我們來模擬這一狀況：。
+
+假設原作者 (lanroya) 更新的專案進度：
+
+```bash
+... edit all.css
+
+git commit -am 'edit all.css > .c'
+```
+
+很自然的將它推上遠端數據庫：
+
+```bash
+git push
+```
+
+此時陌生開發者 (awdr74100) 忘記先同步原作者專案就直接發 PR：
+
+```bash
+... edit all.css
+
+git commit -am 'edit all.css .c'
+
+git push
+```
+
+在這邊我們刻意模擬同步的衝突以及代碼的衝突，此時 PR 的畫面為：
+
+![PR 發生衝突](https://i.imgur.com/r7gkfAH.png)
+
+你會發現它顯示了 `Can't automatically merge` 字樣，代表此 PR 會發生合併衝突，雖然你還是能把此 PR 發出去，但我建議在未發送前就解決這個衝突，你現在不解決，最後原作者還是得解決，但它合併的意願可能就不大了，解決辦法很簡單，如同我們自己的遠端數據庫合併衝突辦法：
+
+```bash
+git fetch lanroya master
+```
+
+此時的線路圖狀態為：
+
+![查看目前 commit 紀錄-3](https://i.imgur.com/sbp2WfH.png)
+
+原來是未同步提交紀錄所發生的衝突阿，此時我們可以這樣做：
+
+```bash
+git rebase lanroya/master
+```
+
+或
+
+```bash
+git merge lanroya/master
+```
+
+由於我不想要提交額外的 commit 紀錄，這邊我使用 rebase 來合併分支，如果順利的話分支就會被合併，但剛剛我也刻意模仿代碼發生的衝突，此時也就會跳出衝突的錯誤：
+
+![rebase 發生衝突](https://i.imgur.com/mlQvYgH.png)
+
+關於 rebase 如何解決衝突，之前在 [rebase 文章](https://awdr74100.github.io/2020-05-04-git-rebase/) 就有完整的解說，有興趣的可以過去看看，這邊就快速帶過：
+
+```bash
+... reslove conflict
+
+git add .
+
+git rebase --continue
+```
+
+此時的線路圖狀態為：
+
+![查看目前 commit 紀錄-4](https://i.imgur.com/O3Lcd4S.png)
+
+這邊要注意，如果你是使用 merge 來合併分支，等等 Push 時就不會發生衝突，而如果你是使用 rebase 來合併分支，由於遠端指向的 `38a67a3` 提交已被拋棄 (隱藏)，本地改而指向剛剛 rebase 新生成的 `eddd006` 節點，歷史紀錄不同就會導致衝突，這邊很適合使用以下指令：
+
+```bash
+git push -f
+```
+
+你可能會想，不是盡量不要使用這個命令嗎？沒錯，但此提交也只有我一個人在運作，何況我們沒有修改到原作者的紀錄阿，這種情況就比較沒關係，讓我們來看目前發 PR 還會不會有衝突：
+
+![PR 衝突以解決](https://i.imgur.com/57BVALN.png)
+
+這一次的 PR 就不會有合併衝突囉，後面的流程就如同前面所介紹，各位可以自己跑一次看看。
+
+
