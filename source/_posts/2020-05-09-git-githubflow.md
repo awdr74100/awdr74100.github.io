@@ -105,7 +105,7 @@ git commit -m '建立環境'
 
 ![遠端數據庫成功建立](https://i.imgur.com/blOjpEv.png)
 
-新增組織的遠端數據庫位址：
+添加組織的遠端數據庫位址：
 
 ```bash
 git remote add origin https://github.com/roxog/express-project.git
