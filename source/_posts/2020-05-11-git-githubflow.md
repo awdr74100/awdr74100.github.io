@@ -5,9 +5,9 @@ description:
     隨著專案越來越大，協作人員越來越多，衝突發生的機率也越來越高，訂定良好的團隊規範就顯得更為重要，Workflow 因此而誕生，常見的對象有 Git Flow、GitHub Flow 或 GitLab flow 等，主要都是被用來解決團隊間無規範可遵循造成衝突的問題，透過共同遵循的處理流程，達到有條理的進行團隊協作開發。此篇將介紹目前主流的 GitHub Flow 核心概念，並透過實際演練說明它所能帶給團隊的好處。,
   ]
 categories: [Git]
-tags: [Git, GitHub]
-date: 2020-05-09 19:15:51
-updated: 2020-05-09 19:15:51
+tags: [Git, GitHub, GitHub Flow, w3HexSchool]
+date: 2020-05-11 00:36:48
+updated: 2020-05-12 00:12:37
 ---
 
 ## 前言
@@ -273,3 +273,7 @@ git push origin --all
 結果頁面：
 
 ![結果頁面](https://i.imgur.com/QPrM9cr.png)
+
+是不是很酷？我們就再也不需要手動 Push 至 heroku 了，事實上，類似的 PaaS 都有這個功能，比如說我自己非常喜歡的 [ZEIT Now](https://vercel.com/) 也有這個功能，之後有機會再做示範。
+
+到這邊我們的 Git 學習路程就告一段落囉。
