@@ -230,7 +230,7 @@ git config --global core.editor 'code --wait'
 git log
 ```
 
-在使用 `git log` 指令時，如果加上額外參數，可以看到不一樣的輸出格式，例如加上 `--oneline` 或 `--graph` 或 `--all`，各位可以自己試看看，以下為一般輸出結果：
+在使用 `git log` 指令時，如果加上額外參數，可以看到不一樣的輸出格式，例如加上 `--oneline` 或 `--graph` 或 `--all` 或 `-<number>`，可參考 [git-log Document](https://git-scm.com/docs/git-log) 自己慢慢玩，以下為一般輸出結果：
 
 ![git log](https://i.imgur.com/mMaJ7rN.png)
 
@@ -246,7 +246,7 @@ git log
 git config --global alias.s status
 ```
 
-此時輸入 `git s` 就會有 `git status` 的效果，是不是很方便？如果要增加參數，必須以字串形式設定：
+此時輸入 `git s` 就會有 `git status` 的效果，是不是很方便？如果要增加參數，則必須以字串形式設定：
 
 ```bash
 git config --global alias.l 'log --oneline --graph --all'
@@ -317,8 +317,14 @@ git log
 # 查看目錄日誌 (精簡化)
 git log --oneline
 
+# 查看目錄日誌 (線路圖)
+git log --graph
+
 # 查看目前日誌 (所有分支)
 git log --all
+
+# 查看目前日誌 (限制輸出的提交數目 => 新到舊 => 可被覆蓋)
+git log -<number>
 
 # 查看目錄日誌 (常用配置)
 git log --oneline --graph --all
