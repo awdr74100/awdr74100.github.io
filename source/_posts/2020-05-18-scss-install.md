@@ -7,7 +7,7 @@ description:
 categories: [SCSS]
 tags: [SCSS, w3HexSchool]
 date: 2020-05-18 20:56:33
-updated: 2020-05-18 20:56:33
+updated: 2020-05-20 18:53:04
 ---
 
 ## 前言
@@ -20,6 +20,8 @@ updated: 2020-05-18 20:56:33
 - Sass 和 SCSS 有什麼區別？
 - 編譯環境建立 - 使用官方 sass 套件
 - 編譯環境建立 - 使用 VSCode 的 Live Sass Compiler 套件
+- 編譯環境建立 - 使用 gulp-sass 套件
+- 編譯環境建立 - 使用 sass-loader 套件
 
 ## 什麼是 CSS 預處理器？
 
@@ -202,4 +204,163 @@ sass .\scss\all.scss .\css\all.css
 sass  --watch .\scss\all.scss .\css\all.css
 ```
 
-這樣它就會監聽指定的檔案，如有任何更動即自動編譯，有些人可能已經注意到 `.map` 檔案的生成了，沒錯，官方套件預設就會幫我們生成 SourceMap，方便除錯用，關於官方套件的說明，差不多就到這邊，你可以自己去玩看看它每個參數的作用，基本上它就只有將 Sass / SCSS 編譯成 CSS 的作用而已。
+這樣它就會監聽指定的檔案，如有任何更動即自動編譯，達到自動化的目的。
+
+預設的配置就會生成對應的 `.map` 檔，這個大家應該很熟悉了才對，你也可以開啟 `index.html` 檔案查看是否正確的映射原始的 SCSS 檔案。
+
+關於官方套件的說明，差不多就到這邊，你可以自己去玩看看它每個參數的作用，基本上它的作用就只有將 Sass /SCSS 編譯成 CSS 而已。
+
+## 編譯環境建立 - 使用 VSCode 的 Live Sass Compiler 套件
+
+如果你跟我一樣，覺得單純的編譯 Sass / SCSS 還要另外下載 npm 的套件並透過命令行方式進行很麻煩，在這邊推薦你另一個方法，但這只限定於你的 IDE 是 Visual Studio Code，別的 IDE 可能也有類似套件，這點大家可以自行 Google 看看，以下示範如何使用 Live Sass Compiler 進行編譯。
+
+安裝 Live Sass Compiler 延伸模組：
+
+![安裝 Live Sass Compiler](https://i.imgur.com/Fx83gRG.png)
+
+檔案 > 喜好設定 > 設定 > 開啟設定 (JSON)：
+
+```json
+{
+  "liveSassCompile.settings.formats": [
+    {
+      "format": "expanded",
+      "extensionName": ".css",
+      "savePath": null
+    }
+  ]
+}
+```
+
+上面是此模組的預設配置，在這邊我們先不管它，直接進行編譯看看：
+
+![Watch Sass](https://i.imgur.com/REtKY29.png)
+
+要啟用編譯很簡單，只需要點擊狀態列的 `Watch Sass` 或是 `F1` 搜尋 `Live Sass` 選擇 `Watch Sass` 也能達到同樣效果，編譯完成後會再 `*.scss` 的同層目錄生成相關的 CSS 檔案：
+
+```diff
+ project/
+ │
+ ├─── scss/
+ │   │
++│   ├─── all.css
++│   └─── all.css.map
+ │   └─── all.scss
+ │
+ └─── index.html
+```
+
+預設的生成路徑就是在同層目錄下，這顯然不是我們要的結果，我們想要把它放置在獨立的 CSS 資料夾內，此時可以更改 `savePath` 這個選項：
+
+```json
+{
+  "liveSassCompile.settings.formats": [
+    {
+      "format": "expanded",
+      "extensionName": ".css",
+      "savePath": "~/../css"
+    }
+  ]
+}
+```
+
+在 `savePath` 的選項中，有以下關鍵字可做使用：
+
+- `null`：在 `*.sass` / `*.scss` 同層的位置生成檔案
+- `/`：相對於根目錄
+- `~`：相對於每個 `*.sass` / `*.scss` 檔案的同層位置
+
+而我們上面這樣配置的意思是，在 `*.scss` 同層目錄的上層目錄名為 CSS 的資料夾生成檔案，這樣就可以達到預期的位置了，此時的編譯結果為：
+
+```diff
+ project/
+ │
++├─── css/
++│   │
++│   ├─── all.css
++│   └─── all.css.map
+ │
+ ├─── scss/
+ │   │
+ │   └─── all.scss
+ │
+ └─── index.html
+```
+
+這邊我們補充介紹 `format` 與 `extensionName` 這兩個選項，修改為以下配置：
+
+```json
+{
+  "liveSassCompile.settings.formats": [
+    {
+      "format": "expanded",
+      "extensionName": ".css",
+      "savePath": "~/../css"
+    },
+    {
+      "format": "compressed",
+      "extensionName": ".min.css",
+      "savePath": "~/../css"
+    }
+  ]
+}
+```
+
+`format` 代表的是輸出的格式 (樣式)，以下模式可做使用：
+
+- `expanded`：預設模式，即不做任何壓縮處理
+- `nested`：類似 `expanded` 模式，但會處理縮排
+- `compressed`：最小化處理，即常見的程式碼壓縮
+- `compact`：類似 `compressed` 模式，但不處理空白字元
+
+`extensionName` 代表的是附檔名的名稱，通常都會設為 `.css` 或 `.min.css`。每一個物件即代表生成一個檔案，上面的配置會生成兩個檔案，分別為 `expanded` 模式的 `*.css` 檔案，與 `compressed` 模式的 `*.min.css` 檔案：
+
+```diff
+ project/
+ │
++├─── css/
++│   │
++│   ├─── all.css
++│   ├─── all.css.map
++│   ├─── all.min.css
++│   └─── all.min.css.map
+ │
+ ├─── scss/
+ │   │
+ │   └─── all.scss
+ │
+ └─── index.html
+```
+
+是不是挺方便的？如果你有嘗試去觀察編譯的結果，你會發現它連同 Prefix 也幫我們加入了：
+
+```scss
+.text-primary {
+  color: blue;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+```
+
+就如同 PostCSS 使用 Autoprefixer 一般，以往我們都是使用 `.browserslist` 或 `"browserslist"` 去配置想要的版本，這邊一樣也可以，只不過得換在 `autoprefix` 做配置：
+
+```json
+{
+  "liveSassCompile.settings.autoprefix": ["last 1 version", "> 1%", "IE 10"]
+}
+```
+
+Live Sass Compiler 的配置差不多就這樣，還有其他比較冷門的配置，你可以到它的 [文檔](https://github.com/ritwickdey/vscode-live-sass-compiler/blob/master/docs/settings.md) 去做查看。
+
+## 編譯環境建立 - 使用 gulp-sass 套件
+
+由於篇幅較長，可至相關文章進行閱讀：
+
+- [Gulp 前端自動化 - 編譯 Sass/SCSS](https://awdr74100.github.io/2019-12-31-gulp-gulpsass/)
+
+## 編譯環境建立 - 使用 sass-loader 套件
+
+由於篇幅較長，可至相關文章進行閱讀：
+
+- [Webpack 前端打包工具 - 使用 sass-loader 編譯 Sass/SCSS 預處理器](https://awdr74100.github.io/2020-03-04-webpack-sassloader/)
