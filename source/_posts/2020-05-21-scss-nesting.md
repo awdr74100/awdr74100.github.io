@@ -38,7 +38,7 @@ updated: 2020-05-21 00:29:18
 }
 ```
 
-你不覺得這樣子很累嗎？不寫父元素又怕會汙染到其他樣式，且也不符合近年來推崇的 **DRY (Don’t Repeat Your CSS)** 與 **KISS (Keep It Simple Stupid)** 原則，何不我們嘗試使用 SCSS 來撰寫？改寫為如下：
+你不覺得這樣子很累嗎？不寫父元素又怕會汙染到其他樣式，且也不符合近年來推崇的 **DRY (Don’t Repeat Your CSS)** 與 **KISS (Keep It Simple Stupid)** 原則，何不我們嘗試使用 SCSS 來撰寫？改寫如下：
 
 ```scss
 .list {
@@ -172,4 +172,167 @@ updated: 2020-05-21 00:29:18
 }
 ```
 
-這樣的寫法也可以達到同樣的選染效果，前提是 `a` 元素的同層元素中並沒有 `span` 元素，在每次撰寫樣式時，盡量去思考撰寫對象真的存在必要的依賴關係嗎，避免樣式表存在不必要的優化及效能問題。
+這樣的寫法也可以達到同樣的選染效果，前提是 `a` 元素的同層元素中並沒有 `span` 元素，在每次撰寫樣式時，盡量去思考撰寫對象真的存在必要的依賴關係嗎，避免樣式表存在不必要的需優化及效能問題。
+
+## nesting properties 巢狀屬性
+
+在上面我們都是針對 CSS 選擇器做巢狀結構，這邊再補充一點，假如我們正在撰寫關於 `background` 或 `font` 的樣式：
+
+```scss
+.bg-cover {
+  background-image: url('..');
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.font-weight-bold {
+  font-size: 1em;
+  font-weight: bold;
+  font-family: Arial, Helvetica, sans-serif;
+}
+```
+
+這樣寫確實挺正常的，但假設你是個極度追求效率的人，懶得寫這麼多的重複字樣，可以改寫如下：
+
+```scss
+.bg-cover {
+  background: {
+    image: url('..');
+    position: center center;
+    repeat: no-repeat;
+    size: cover;
+  }
+}
+
+.font-weight-bold {
+  font: {
+    size: 1em;
+    weight: bold;
+    family: Arial, Helvetica, sans-serif;
+  }
+}
+```
+
+此時的編譯結果為：
+
+```css
+.bg-cover {
+  background-image: url('..');
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.font-weight-bold {
+  font-size: 1em;
+  font-weight: bold;
+  font-family: Arial, Helvetica, sans-serif;
+}
+```
+
+是不是很酷？我們就只需要寫一次 `background` 或 `font` 等字樣，後面在撰寫其相關屬性即可，這邊要記得加入冒號，以告知編譯器此為子屬性並不是子對象。
+
+雖然說這樣看似的確更方便了，但我一般不太會這樣寫，巢狀結構確實有其存在的必要，提高了其撰寫樣式表的效率，但巢狀屬性就見仁見智了，我認為可能會發生可閱讀性降低的問題，我自己是不太習慣，各位可以自己評估看看。
+
+## parent selector 父選擇器
+
+最後我們針對巢狀結構在做個補充，前面已經提到巢狀結構所帶來的好處了，主要解決父對象名稱大量重複的問題，但在某些情況下可能不會如你所願，如下範例：
+
+```scss
+.list {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  > li {
+    padding: 20px 0px;
+
+    a {
+      color: red;
+    }
+
+    a:hover {
+      color: blue;
+    }
+  }
+}
+```
+
+發現問題了嗎？`a` 元素還是發生名稱重複的問題了，你可能會想，這一個 `:hover` 偽類為何不寫在 `a` 元素的下個階層呢？這樣就會導致 `:hover` 被當成子對象編譯，形成 `a :hover` 的無意義宣告，我們要的是 `a:hover` 的結果阿！此時我們就可使用 Sass / SCSS 名為父選擇器的 `&` 符號解決此問題，如下範例：
+
+```scss
+.list {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  > li {
+    padding: 20px 0px;
+
+    a {
+      color: red;
+
+      &:hover {
+        color: blue;
+      }
+    }
+  }
+}
+```
+
+`&` 符號可把父對象連接在一起，類似字串相加的概念，被連接的對象編譯的階層就會與父對象同層，此時的編譯結果為：
+
+```css
+.list {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.list > li {
+  padding: 20px 0px;
+}
+
+.list > li a {
+  color: red;
+}
+
+.list > li a:hover {
+  color: blue;
+}
+```
+
+大功告成！看起來代碼的簡潔性又提升了不少，讓我們在試一次：
+
+```scss
+.list {
+  display: flex;
+
+  &__item {
+    color: red;
+
+    &--active {
+      color: blue;
+    }
+  }
+}
+```
+
+這是一個基本的 [BEM](http://getbem.com/) 結構，這邊先不用理解 BEM 是什麼，之後會有單獨的文章做介紹，此時的編譯結果為：
+
+```css
+.list {
+  display: flex;
+}
+
+.list__item {
+  color: red;
+}
+
+.list__item--active {
+  color: blue;
+}
+```
+
+由於 `&__item` 與 `&--active` 都使用了父選擇器，故最後的編譯結果都與 `.list` 同階層，這應該蠻好理解的，在實務中，我也很常使用此技法來撰寫樣式，可有效提升其可閱讀性。
