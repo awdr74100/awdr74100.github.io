@@ -17,6 +17,7 @@ updated: 2020-05-22 13:52:34
 ## 筆記重點
 
 - 變數的宣告與取用
+- 變數的作用範圍
 
 ## 變數的宣告與取用
 
@@ -41,7 +42,7 @@ $primary: #2050ec;
 }
 ```
 
-有關變數的取用應該是蠻好理解的，就只是將其宣告在上方並在指定位置進行取用而已，這邊要注意的是，SCSS 中的變數就如同 JavaScript 中的 `let` 宣告，這也代表著變數必定要在取用之前進行宣告，不然會跳出 `Undefined` 的錯誤，此時的編譯結果為：
+有關變數的取用應該是蠻好理解的，就只是將其宣告在上方並在指定位置進行取用而已，這邊要注意的是，**SCSS 中的變數就如同 JavaScript 用 let 宣告的變數**，這也代表著變數必定要在取用之前進行宣告，不然會跳出 `Undefined` 的錯誤，此時的編譯結果為：
 
 ```css
 .text-primary {
@@ -77,7 +78,9 @@ $sizes: 10px 20px 10px 20px;
 }
 ```
 
-`nth` 函式的第一個參數為作用的 List，第二個為取用的位置，這邊比較特殊的是，在 List 中，沒有像傳統 Array 有所謂的 `0` 位置，List 的最初值即為 `1`，以及所有的函式都是作用在 List 的副本，這代表原有的 List 不會受任何更動，除了 `nth` 之外，還有以下函式可使用：
+List 的初始值即為 1，並不像一般語言中的 Array 初始值為 0
+
+`nth` 函式的第一個參數為作用的 List，第二個為取用的位置，這邊比較特殊的是，**List 的初始值即為 1，並不像一般語言中的 Array 為 0**，以及所有的函式都是作用在 List 的副本，這代表原有的 List 不會受任何更動，除了 `nth` 之外，還有以下函式可使用：
 
 - `set-nth($list, $n, $value)`：修改 List 副本的指定項目並返回
 - `append($list, $value)`：在 List 副本最後位置新增項目並返回
@@ -92,7 +95,7 @@ $theme-color: (
 );
 
 .bg-primary {
-  color: $theme-color;
+  background-color: $theme-color;
 }
 ```
 
@@ -105,7 +108,7 @@ $theme-color: (
 );
 
 .bg-primary {
-  color: inspect($theme-color);
+  background-color: inspect($theme-color);
 }
 ```
 
@@ -113,7 +116,7 @@ $theme-color: (
 
 ```css
 .bg-primary {
-  color: (primary: blue, danger: red);
+  background-color: (primary: blue, danger: red);
 }
 ```
 
@@ -126,7 +129,7 @@ $theme-color: (
 );
 
 .bg-primary {
-  color: map-get($theme-color, primary);
+  background-color: map-get($theme-color, primary);
 }
 ```
 
@@ -134,7 +137,7 @@ $theme-color: (
 
 ```css
 .bg-primary {
-  color: blue;
+  background-color: blue;
 }
 ```
 
@@ -168,6 +171,100 @@ $theme-color: (
 }
 
 .text-danger {
+  color: red;
+}
+```
+
+## 變數的作用範圍
+
+SCSS 的變數與一般語言的變數同樣都有作用範圍之分，直接來看範例：
+
+```scss
+$primary: blue;
+$primary: red;
+
+.text-primary {
+  color: $primary;
+}
+```
+
+前面我們有提到 SCSS 的變數就如同 JavaScript 用 `let` 宣告的變數，與 `const` 宣告的常數不同，`let` 宣告的變數可以被重新賦值，此時的編譯結果為：
+
+```css
+.text-primary {
+  color: red;
+}
+```
+
+重複的變數宣告就如同重新賦值，這才導致此結果，只要記住 SCSS 是由上到下進行編譯就很好理解了，讓我們來看下個範例：
+
+```scss
+$primary: blue;
+$primary: red !default;
+
+.text-primary {
+  color: $primary;
+}
+```
+
+這次我們加入了 `!default` 關鍵字，此關鍵字可針對變數設定預設值，如變數前或後都沒有重新賦值的發生，即使用此預設值，此時的編譯結果為：
+
+<div class="note warning">補充：除非變數前的設定值為 null，不然預設值的權重必定是最小的，任何都能將其覆蓋</div>
+
+```css
+.text-primary {
+  color: blue;
+}
+```
+
+由於 `$primary` 發生了重新賦值的操作，故使用預設值除外的設定值，如果同時發生預設值之前之後都有設定值，此時會使用之後的設定值，因為 SCSS 是由上到下進行編譯的，讓我們來看下個範例：
+
+```scss
+.text-primary {
+  $primary: red;
+  color: $primary;
+}
+
+.bg-primary {
+  color: $primary;
+}
+```
+
+變數不只可以宣告在全域環境 (不在任何大括號內宣告之變數)，也可以宣告在區域環境 (大括號內所宣告之變數)，以上面範例來說，`.bg-primary` 是存取不到 `$primary` 這個區域變數的，此時會跳 `Undefined` 的提示，如果堅持要存取這個變數，可使用 `!global` 關鍵字：
+
+```scss
+.text-primary {
+  $primary: red !global;
+  color: $primary;
+}
+
+.bg-primary {
+  color: $primary;
+}
+```
+
+此時 `$primary` 變數就會被拉升到全域環境內，意即不再任何大括號宣告之變數，`.bg-primary` 自然就能夠取用這個變數，這邊再補充一個範例：
+
+```scss
+.list {
+  $primary: red;
+  color: $primary;
+
+  &__item {
+    $primary: blue !global;
+    color: $primary;
+  }
+}
+```
+
+如同 JavaScript 的作用域觀念，變數取用會先以當下區域進行尋找，如果找不到再往上層尋找，以上面的範例來說，`list__item` 宣告的 `$primary` 變數被拉升到了全域環境裡，表示區域已經不存在變數，故往上層尋找是否存在此變數，此時找到了值為 `red` 的 `$primary` 變數，最後的編譯結果為：
+
+```css
+.list {
+  color: red;
+}
+
+.list__item {
   color: red;
 }
 ```
