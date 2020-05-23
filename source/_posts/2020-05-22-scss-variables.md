@@ -1,5 +1,5 @@
 ---
-title: Sass / SCSS 預處理器 - Variables 變數宣告與取用方法
+title: Sass / SCSS 預處理器 - Variables 變數宣告與取用方式
 description:
   [
     先前我們就有提到 Sass / SCSS 真正意義上的將樣式表變為了一門程式語言，即 SassScript，而身為程式語言，想當然就會有所謂的變數可以使用，這也是我跳坑的其中一個原因，你能想像樣式表居然能夠使用變數做撰寫嗎？這指的變數與其他語言差不多，同樣有分為字串、陣列、物件等型態可做使用，大幅提高了代碼的重用性，以後如有更改的需求，也只需針對變數做處理即可，改善傳統樣式表不易維護問題。,
@@ -59,7 +59,7 @@ $sizes: 10px 20px 10px 20px;
 }
 ```
 
-List 是在 SCSS 中用來表達 CSS 樣式的方法，像是 `10px 20px 10px 20px` 或 `Helvetica, Arial` 等，並不像一般 Array 需用逗號隔開以辨識每一個項目，List 可由空格或逗號做區隔，如果要取用其中的項目，可使用內建的 `nth` 函式：
+List 是在 SCSS 中用來表達 CSS 樣式的方法，像是 `10px 20px 10px 20px` 或 `Helvetica, Arial` 等，並不一定要像一般 Array 需用逗號隔開以辨識每一個項目，在 List 你也可以使用空格做區隔，如果要取用其中的項目，可使用內建的 `nth` 函式：
 
 ```scss
 $sizes: 10px 20px 10px 20px;
@@ -77,10 +77,97 @@ $sizes: 10px 20px 10px 20px;
 }
 ```
 
-`nth` 函式的第一個參數為作用的 List，第二個為取用的位置，這邊比較特殊的是，在 List 中，沒有像傳統 Array 有所謂的 `0` 位置，List 的最初值即為 `1`，以及所有的函式都是作用在 List 的副本，這代表原有的 List 不會受任何更動，除了 `nth`，還有以下函式可使用：
+`nth` 函式的第一個參數為作用的 List，第二個為取用的位置，這邊比較特殊的是，在 List 中，沒有像傳統 Array 有所謂的 `0` 位置，List 的最初值即為 `1`，以及所有的函式都是作用在 List 的副本，這代表原有的 List 不會受任何更動，除了 `nth` 之外，還有以下函式可使用：
 
-- `set-nth($list, $n, $value)`：修改 List 副本的指定項目並取用
-- `append($list, $value)`：在 List 副本最後位置新增項目並取用
-- `join($list1, $list2)`：將 List 副本進行合併並取用
+- `set-nth($list, $n, $value)`：修改 List 副本的指定項目並返回
+- `append($list, $value)`：在 List 副本最後位置新增項目並返回
+- `join($list1, $list2)`：將 List 副本進行合併並返回
 
-這邊只列出幾個比較常用到的函式，其它函式可在至 [Built-In Modules](https://sass-lang.com/documentation/modules/list) 進行查看，
+這邊只列出幾個比較常用到的函式，其它函式可在至官方的 [Built-In Modules](https://sass-lang.com/documentation/modules/list) 文檔進行查看，接著讓我們來看 Maps 型態：
+
+```scss
+$theme-color: (
+  primary: blue,
+  danger: red,
+);
+
+.bg-primary {
+  color: $theme-color;
+}
+```
+
+Maps 就如同 JavaScript 的 Object，只不過須將其 `{}` 更改為 `()`，且 Maps 無法直接進行取用，像是上面這樣子的寫法就是錯誤的，沒有任何一個 CSS 屬性有這樣子的格式，故編譯時即會跳錯，如果你想讓編譯器堅持輸出 Maps 的內容，可使用 `inspect` 函式：
+
+```scss
+$theme-color: (
+  primary: blue,
+  danger: red,
+);
+
+.bg-primary {
+  color: inspect($theme-color);
+}
+```
+
+`inspect` 就類似 JavaScript 中的 `console.log`，主要都是用於輸出指定的對象，方便我們測試用，此時的編譯結果為：
+
+```css
+.bg-primary {
+  color: (primary: blue, danger: red);
+}
+```
+
+如同我們前面所說，沒有半個 CSS 屬性格式是長這樣，正確的做法應該是讀取其鍵以取用其值才對，此時可使用 `map-get` 函式：
+
+```scss
+$theme-color: (
+  primary: blue,
+  danger: red,
+);
+
+.bg-primary {
+  color: map-get($theme-color, primary);
+}
+```
+
+`map-get` 主要用來取用 Maps 的內容，第一個參數為作用的 Maps，第二個參數為須取用值的鍵，此時的編譯結果為：
+
+```css
+.bg-primary {
+  color: blue;
+}
+```
+
+這樣就能完成像是一般語言取用物件的目的，除了 `map-get` 之外，還有以下函式可使用：
+
+- `map-merge($map1, $map2)`：將 map 副本進行合併並返回 (如有重複項，後者將覆蓋前者)
+- `map-remove($map, $key1, $key2...)`：刪除 map 副本中的指定項目並返回
+- `map-keys($map)`：將 map 中的鍵以 List 型式返回
+- `map-values($map)`：將 map 中的值以 List 型式返回
+
+這時你可能會想，List 與 Maps 實用性看起來好像不高？光是取個值就得大費周章，那是因為我們還沒提到迴圈的使用，這兩個型別通常都是與迴圈共同使用才能發揮其強大，在下一篇文章會有詳細的介紹，這邊先寫個簡單的範例：
+
+```scss
+$theme-color: (
+  primary: blue,
+  danger: red,
+);
+
+@each $key, $value in $theme-color {
+  .text-#{$key} {
+    color: $value;
+  }
+}
+```
+
+此時的編譯結果為：
+
+```css
+.text-primary {
+  color: blue;
+}
+
+.text-danger {
+  color: red;
+}
+```
