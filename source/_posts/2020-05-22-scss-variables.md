@@ -18,10 +18,11 @@ updated: 2020-05-22 13:52:34
 
 - 變數的宣告與取用
 - 變數的作用範圍
+- 數值的加減乘除
 
 ## 變數的宣告與取用
 
-Sass / SCSS 變數的宣告主要依靠 `$` 關鍵字，並且依造屬性聲明來做撰寫，可選的資料型態有：
+Sass / SCSS 變數的宣告主要依靠 `$` 關鍵字，並且依造屬性聲明來做撰寫，其中的資料型態有：
 
 - 數值 (Number)：`12`、`100px` (可能有或沒有單位)
 - 字串 (String)：`Microsoft JhengHei` (可能有或沒有引號)
@@ -268,3 +269,35 @@ $primary: red !default;
   color: red;
 }
 ```
+
+## 變數的加減乘除
+
+傳統的 CSS 需要依靠其 `calc()` 函式才能完成數值加減乘除的目的，在 Sass / SCSS 中，一切似乎變得更容易了，讓我們直接來看範例：
+
+```scss
+$gutter-width: 30px;
+$grid-sum: 12;
+
+.container {
+  position: relative;
+  max-width: 1140px;
+  margin: 0 auto;
+  padding-left: $gutter-width / 2;
+  padding-right: $gutter-width / 2;
+}
+
+.row {
+  display: flex;
+  margin-left: $gutter-width / -2;
+  margin-right: $gutter-width / -2;
+}
+
+.col-4 {
+  position: relative;
+  max-width: 100% * (4 / $grid-sum);
+  flex: 0 0 (100% * (4 / $grid-sum));
+}
+```
+
+如同我們之前所強調，Sass / SCSS 讓 CSS 真正意義上的成為了一門程式語言，而程式語言理所當然就會有數值計算的功能，不管是哪種運算方式都難不倒它，你不需要特別使用函式，如同一般語言撰寫其算式即可
+
