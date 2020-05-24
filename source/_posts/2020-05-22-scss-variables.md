@@ -18,7 +18,7 @@ updated: 2020-05-22 13:52:34
 
 - 變數的宣告與取用
 - 變數的作用範圍
-- 數值的加減乘除
+- 變數與屬性的加減乘除
 
 ## 變數的宣告與取用
 
@@ -270,7 +270,7 @@ $primary: red !default;
 }
 ```
 
-## 變數的加減乘除
+## 變數與屬性的加減乘除
 
 傳統的 CSS 需要依靠其 `calc()` 函式才能完成數值加減乘除的目的，在 Sass / SCSS 中，一切似乎變得更容易了，讓我們直接來看範例：
 
@@ -278,26 +278,79 @@ $primary: red !default;
 $gutter-width: 30px;
 $grid-sum: 12;
 
-.container {
-  position: relative;
-  max-width: 1140px;
-  margin: 0 auto;
-  padding-left: $gutter-width / 2;
-  padding-right: $gutter-width / 2;
-}
-
-.row {
-  display: flex;
-  margin-left: $gutter-width / -2;
-  margin-right: $gutter-width / -2;
-}
-
 .col-4 {
   position: relative;
+  padding-left: $gutter-width / 2;
+  padding-right: $gutter-width / 2;
   max-width: 100% * (4 / $grid-sum);
   flex: 0 0 (100% * (4 / $grid-sum));
 }
 ```
 
-如同我們之前所強調，Sass / SCSS 讓 CSS 真正意義上的成為了一門程式語言，而程式語言理所當然就會有數值計算的功能，不管是哪種運算方式都難不倒它，你不需要特別使用函式，如同一般語言撰寫其算式即可
+如同我們之前所強調，Sass / SCSS 讓 CSS 真正意義上的成為了一門程式語言，而程式語言理所當然就會有數值計算的功能，不管是哪種運算方式都難不倒它，你不需要特別使用函式，如同一般語言撰寫其算式即可，此時的編譯結果為：
 
+```scss
+.col-4 {
+  position: relative;
+  padding-left: 15px;
+  padding-right: 15px;
+  max-width: 33.33333%;
+  flex: 0 0 33.33333%;
+}
+```
+
+除了基本的加減乘除外，取餘數也難不倒它，最扯的是連顏色都可以計算：
+
+```scss
+$base: 16px;
+
+.content {
+  letter-spacing: $base % 6;
+  background-color: #ff0000 + #002fff;
+}
+```
+
+此時的編譯結果為：
+
+```css
+.content {
+  letter-spacing: 4px;
+  background-color: #ff2fff;
+}
+```
+
+這邊須注意 Sass / SCSS 是無法處理不同單位間計算的：
+
+```scss
+.section {
+  height: 100% - 100px;
+}
+```
+
+像這樣不同單位間的計算就會跳出 `Incompatible units` 的提示，導致編譯失敗，Sass / SCSS 是屬於 CSS 的預處理器，它無法像 `calc()` 函式得知當下的數值並加以計算，盡量在撰寫時都是以同單位做計算，`px` 就對 `px`，`em` 就對 `em`，如果真的有不同單位間的計算需求，可以使用 CSS3 的 calc 函式：
+
+```scss
+.section {
+  height: calc(100% - 100px);
+}
+```
+
+並沒有說使用 Sass / SCSS 就無法撰寫 CSS 的函式，畢竟底層就是 CSS，也就不存在兼容的問題，這邊再做個補充：
+
+```scss
+$base: 100%;
+
+.section {
+  height: calc($base - 100px);
+}
+```
+
+你可能會想，這不就是個基本的變數取用嗎？還需要特別介紹？這你就錯了，讓我們先來看編譯結果：
+
+```scss
+.section {
+  height: calc($base - 100px);
+}
+```
+
+雖然編譯是成功了，但其變數並沒有成功被解析出來，此時就會導致 CSS 無法辨認其值進而產生錯誤，這也是我特別要提的點，**這某些情況下，SCSS 無法辨認其值是屬於需解析的變數還是預設的屬性值**，
