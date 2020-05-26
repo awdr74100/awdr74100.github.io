@@ -7,7 +7,7 @@ description:
 categories: [SCSS]
 tags: [SCSS]
 date: 2020-05-25 00:32:34
-updated: 2020-05-26 06:52:34
+updated: 2020-05-26 19:38:49
 ---
 
 ## 前言
@@ -18,8 +18,8 @@ updated: 2020-05-26 06:52:34
 
 - 變數的宣告與取用
 - 變數的作用範圍
-- 變數與屬性的加減乘除
-- 變數的輔助函式
+- Sass 的計算功能
+- Sass 的內建函式
 
 ## 變數的宣告與取用
 
@@ -271,7 +271,7 @@ $primary: red !default;
 }
 ```
 
-## 變數與屬性的加減乘除
+## Sass 的計算功能
 
 傳統的 CSS 需要依靠其 `calc()` 函式才能完成數值加減乘除的目的，在 Sass / SCSS 中，一切似乎變得更容易了，讓我們直接來看範例：
 
@@ -374,5 +374,46 @@ $base: 100%;
 
 最後的編譯結果就會如同預期，這時你可能會問，那是否所有屬性有帶入變數的地方都使用 `#{}` 比較安全？答案是否定的，這樣會顯得代碼很雜亂，有需要再使用就好了，畢竟此問題發生的機率真的非常低。
 
-## 變數的輔助函式
+## Sass 的內建函式
 
+Sass 提供了許多內建函式，這些函式可以更快速的讓我們達到某些目的，其中包含的種類有：
+
+- [sass:math](https://sass-lang.com/documentation/modules/math)：提供對數值進行運算的功能
+- [sass:string](https://sass-lang.com/documentation/modules/string)：使組合、搜索或拆分變的更加容易
+- [sass:color](https://sass-lang.com/documentation/modules/color)：根據現有顏色生成新顏色，從而輕鬆構建主題顏色
+- [sass:list](https://sass-lang.com/documentation/modules/list)：使你可以訪問和修改列表中的值
+- [sass:map](https://sass-lang.com/documentation/modules/map)：可以查找、編輯地圖中指定鍵匹配的值
+- [sass:selector](https://sass-lang.com/documentation/modules/selector)：提供對 Sass 強大選擇器引擎的訪問
+- [sass:meta](https://sass-lang.com/documentation/modules/meta)：公開了 Sass 內部工作的細節
+
+像是之前介紹的 `nth`、`append` 這些就屬於 list 的內建函式，這邊補充關於顏色的內建函式：
+
+- `darken($color, $amount)`：暗化指定顏色並返回
+- `lighten($color, $amount)`：亮化指定顏色並返回
+- `invert($color)`：反轉指定顏色並返回
+- `fade-in($color, $amount)`：使指定顏色更加不透明並返回 (限 0 到 1 的 Alpha 值)
+- `fade_out($color, $amount)`：使指定顏色更加透明並返回 (限 0 到 1 的 Alpha 值)
+
+以下為範例：
+
+```scss
+$primary: #0084ff;
+
+.btn-primary {
+  color: #fff;
+  background-color: $primary;
+  border-color: $primary;
+
+  &:hover {
+    background-color: darken($primary, 10%);
+    border-color: darken($primary, 10%);
+  }
+
+  &:active {
+    background-color: lighten($primary, 10%);
+    border: lighten($primary, 10%);
+  }
+}
+```
+
+是不是挺方便的？我們就不需要自己慢慢的調整，通通透過其內建函式即可自動完成處理，相關的函式還有很多，由於篇幅問題，這邊就不再一一介紹。
