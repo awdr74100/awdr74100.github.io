@@ -416,4 +416,24 @@ $primary: #0084ff;
 }
 ```
 
-是不是挺方便的？我們就不需要自己慢慢的調整，通通透過其內建函式即可自動完成處理，相關的函式還有很多，由於篇幅問題，這邊就不再一一介紹。
+此時的編譯結果為：
+
+```css
+.btn-primary {
+  color: #fff;
+  background-color: #0084ff;
+  border-color: #0084ff;
+}
+
+.btn-primary:hover {
+  background-color: #006acc;
+  border-color: #006acc;
+}
+
+.btn-primary:active {
+  background-color: #339dff;
+  border: #339dff;
+}
+```
+
+是不是挺方便的？我們就不需要自己慢慢的調整，通通透過內建函式即可自動判斷其目標的顏色，相關的函式還有很多，由於篇幅問題，這邊就不做一一介紹，相關連結可參考上面。
