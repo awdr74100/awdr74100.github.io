@@ -87,6 +87,7 @@ List 的初始值即為 1，並不像一般語言中的 Array 初始值為 0
 - `set-nth($list, $n, $value)`：修改 List 副本的指定項目並返回
 - `append($list, $value)`：在 List 副本最後位置新增項目並返回
 - `join($list1, $list2)`：將 List 副本進行合併並返回
+- `length($list)`：計算 List 長度並返回
 
 這邊只列出幾個比較常用到的函式，其它函式可在至官方的 [Built-In Modules](https://sass-lang.com/documentation/modules/list) 文檔進行查看，接著讓我們來看 Maps 型態：
 
