@@ -132,7 +132,7 @@ updated: 2020-05-30 13:11:11
 }
 ```
 
-與一般語言中的函式類似，函式名稱旁都有個小括號可帶入參數，這邊你可以直接把 mixin 理解為函式的宣告手法，但實際上 SCSS 有更為貼近的 `@function` 語法，這點之後再做討論，以下為 mixin 添加參數的範例：
+與一般語言中的函式類似，函式名稱旁都有個小括號可帶入參數，這邊你可以先把 mixin 理解為一般語言中的函式，但不要直接把他認知成函式，雖然這樣講有點矛盾，因為 SCSS 確實還有另個 `@function` 方法更貼近於函式，這點以後再做討論，直接來看 mixin 添加指定參數的範例：
 
 ```scss
 @mixin size($num1, $num2) {
@@ -158,7 +158,7 @@ updated: 2020-05-30 13:11:11
 
 ## 添加並傳入其餘參數
 
-每當我們要傳入參數時，mixin 就必須要有對應的變數已接收此參數，這樣不是很麻煩嗎？有沒有辦法是直接在 mixin 定義一個能接收全部參數的變數呢？答案是有的，原理如同 JavaScript 中的 [其餘參數](https://developer.mozilla.org/zh-TW/docs/Web/JavaScript/Reference/Functions/rest_parameters)，直接來看範例：
+每當我們要傳入參數時，mixin 就必須要有對應的變數已接收此參數，這樣不是很麻煩嗎？有沒有辦法是直接在 mixin 定義一個能接收全部參數的變數呢？答案是有的，概念如同 JavaScript 中的 [其餘參數](https://developer.mozilla.org/zh-TW/docs/Web/JavaScript/Reference/Functions/rest_parameters)，直接來看範例：
 
 ```scss
 @mixin size($num1, $num...) {
@@ -258,7 +258,7 @@ updated: 2020-05-30 13:11:11
   flex: 0 0 100%;
 }
 
-@media screen and(min-width:767px) {
+@media screen and(min-width:768px) {
   .col-4 {
     flex: 0 0 (100% * 4/12);
   }
@@ -268,4 +268,109 @@ updated: 2020-05-30 13:11:11
 }
 ```
 
-這是一個基本的 RWD (Responsive Web Design) 操作，但你仔細想想
+這是一個基本的 RWD (Responsive Web Design) 範例，我習慣將 RWD 的代碼撰寫在所有程式碼的最下方，以方便做管理，但這有一個問題是，假如我們的代碼量很龐大呢？豈不是要在每次撰寫時都得一直滑一直滑？且之前就有提到 SCSS 主要解決我們重工的問題，如果其他的 [Partials](https://sass-lang.com/guide#topic-4) 也要使用的話不就又造成重工的問題了嗎？此時我們可將 `@media` 包裝成 `@mixin`：
+
+```scss
+@mixin pad($col) {
+  @media screen and (min-width: 768px) {
+    flex: 0 0 (100% * $col/12);
+  }
+}
+
+.col-4 {
+  flex: 0 0 100%;
+  @include pad(4);
+}
+
+.col-6 {
+  flex: 0 0 100%;
+  @include pad(6);
+}
+```
+
+此時的編譯結果為：
+
+```css
+.col-4 {
+  flex: 0 0 100%;
+}
+
+@media screen and (min-width: 768px) {
+  .col-4 {
+    flex: 0 0 33.33333%;
+  }
+}
+
+.col-6 {
+  flex: 0 0 100%;
+}
+
+@media screen and (min-width: 768px) {
+  .col-6 {
+    flex: 0 0 50%;
+  }
+}
+/*# sourceMappingURL=all.css.map */
+```
+
+此時你可能會對 `@mixin` 與 `@media` 的結合感到困惑，為何 `@media` 會自動跳脫到外層呢？當時的我也感到困惑，後來看到 [官方文檔](https://sass-lang.com/documentation/at-rules/css) 發現這其實是 SCSS 其中一種處理方式，你可以嘗試編譯下面範例看看：
+
+```scss
+.print-only {
+  display: none;
+
+  @media print {
+    display: block;
+  }
+}
+```
+
+編譯器對 `@media` 的巢狀結構處理是將其跳脫到外層去，畢竟沒有人 CSS 會寫做 `.print-only @media` 吧？最後也就形成了這樣子的結果，這也是前面 RWD 能夠結合 mixin 的關鍵，是不是覺得這樣子方便許多？但在這邊還有一個小問題是，目前都是依靠參數去做響應變化，參數一多容易造成可讀性低落問題，更好的做法是使用 `@content` 才對：
+
+```scss
+@mixin pad {
+  @media screen and (min-width: 768px) {
+    @content;
+  }
+}
+
+.col-4 {
+  flex: 0 0 100%;
+  @include pad {
+    flex: 0 0 (100% * 4/12);
+  }
+}
+
+.col-6 {
+  flex: 0 0 100%;
+  @include pad {
+    flex: 0 0 (100% * 6/12);
+  }
+}
+```
+
+此時的編譯結果為：
+
+```css
+.col-4 {
+  flex: 0 0 100%;
+}
+
+@media screen and (min-width: 768px) {
+  .col-4 {
+    flex: 0 0 33.33333%;
+  }
+}
+
+.col-6 {
+  flex: 0 0 100%;
+}
+
+@media screen and (min-width: 768px) {
+  .col-6 {
+    flex: 0 0 50%;
+  }
+}
+```
+
+與前面使用參數傳遞的結果相同，但靈活度卻提高了不少，事實上 `@include` 還可以透過大括號進行傳遞，而 `@mixin` 則是透過 `@content` 接收，我自己是蠻常使用此方式撰寫 RWD，不覺得這樣直覺多了嗎？雖然說編譯後會產生多餘的代碼，但以開發體驗來說，我認為完全是不同等級的。
