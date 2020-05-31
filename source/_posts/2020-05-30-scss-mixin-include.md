@@ -7,7 +7,7 @@ description:
 categories: [SCSS]
 tags: [SCSS]
 date: 2020-05-30 13:11:11
-updated: 2020-05-30 13:11:11
+updated: 2020-05-31 16:20:36
 ---
 
 ## 前言
@@ -250,25 +250,25 @@ updated: 2020-05-30 13:11:11
 
 ## 結合 @content 構建 RWD 混入
 
-如果你認為前面的 mixin 不夠吸引你使用它，那我保證接下來的功能一定會讓你愛上它，直接來看範例：
+`@mixin` 最常被用來包裝 RWD (Responsive Web Design) 的 `@media` 以解決 media queries 重複撰寫問題，先來看傳統上我們是怎麼撰寫 RWD 的：
 
 ```scss
-.col-4,
-.col-6 {
+.col-md-4,
+.col-md-6 {
   flex: 0 0 100%;
 }
 
-@media screen and(min-width:768px) {
-  .col-4 {
+@media screen and (min-width: 768px) {
+  .col-md-4 {
     flex: 0 0 (100% * 4/12);
   }
-  .col-6 {
+  .col-md-6 {
     flex: 0 0 (100% * 6/12);
   }
 }
 ```
 
-這是一個基本的 RWD (Responsive Web Design) 範例，我習慣將 RWD 的代碼撰寫在所有程式碼的最下方，以方便做管理，但這有一個問題是，假如我們的代碼量很龐大呢？豈不是要在每次撰寫時都得一直滑一直滑？且之前就有提到 SCSS 主要解決我們重工的問題，如果其他的 [Partials](https://sass-lang.com/guide#topic-4) 也要使用的話不就又造成重工的問題了嗎？此時我們可將 `@media` 包裝成 `@mixin`：
+我習慣將 RWD 代碼撰寫在樣式表的尾端以方便做管理，但這有一個問題是，假如我們的代碼量很龐大呢？豈不是要在每次撰寫時都得滑個老半天？且之前就有提到 SCSS 主要解決我們重工的問題，如果其他的 [Partials](https://sass-lang.com/guide#topic-4) 也要使用的話不就又造成重工的問題了嗎？這時我們可利用前面學到的 `@mixin` 將 `@media` 包裝起來：
 
 ```scss
 @mixin pad($col) {
@@ -277,12 +277,12 @@ updated: 2020-05-30 13:11:11
   }
 }
 
-.col-4 {
+.col-md-4 {
   flex: 0 0 100%;
   @include pad(4);
 }
 
-.col-6 {
+.col-md-6 {
   flex: 0 0 100%;
   @include pad(6);
 }
@@ -291,29 +291,28 @@ updated: 2020-05-30 13:11:11
 此時的編譯結果為：
 
 ```css
-.col-4 {
+.col-md-4 {
   flex: 0 0 100%;
 }
 
 @media screen and (min-width: 768px) {
-  .col-4 {
+  .col-md-4 {
     flex: 0 0 33.33333%;
   }
 }
 
-.col-6 {
+.col-md-6 {
   flex: 0 0 100%;
 }
 
 @media screen and (min-width: 768px) {
-  .col-6 {
+  .col-md-6 {
     flex: 0 0 50%;
   }
 }
-/*# sourceMappingURL=all.css.map */
 ```
 
-此時你可能會對 `@mixin` 與 `@media` 的結合感到困惑，為何 `@media` 會自動跳脫到外層呢？當時的我也感到困惑，後來看到 [官方文檔](https://sass-lang.com/documentation/at-rules/css) 發現這其實是 SCSS 其中一種處理方式，你可以嘗試編譯下面範例看看：
+這邊你可能會對 `@mixin` 與 `@media` 的結合感到困惑，為何 `@media` 會自動跳脫到外層呢？當時的我也感到困惑，後來看到官方的 [CSS At-Rules](https://sass-lang.com/documentation/at-rules/css) 發現這其實是 SCSS 其中一種處理方式，你可以嘗試編譯下面範例看看：
 
 ```scss
 .print-only {
@@ -325,7 +324,7 @@ updated: 2020-05-30 13:11:11
 }
 ```
 
-編譯器對 `@media` 的巢狀結構處理是將其跳脫到外層去，畢竟沒有人 CSS 會寫做 `.print-only @media` 吧？最後也就形成了這樣子的結果，這也是前面 RWD 能夠結合 mixin 的關鍵，是不是覺得這樣子方便許多？但在這邊還有一個小問題是，目前都是依靠參數去做響應變化，參數一多容易造成可讀性低落問題，更好的做法是使用 `@content` 才對：
+**編譯器對 @media 的巢狀結構處理是將其跳脫到外層去**，畢竟沒有人會將 CSS 寫做 `.print-only @media`，這才導致這樣子的結果，這也是前面 RWD 能夠結合 `@mixin` 的關鍵，是不是覺得這樣子清楚許多？但在這邊還有一個小問題是，目前都是依靠參數去做響應變化，參數一多容易造成可讀性低落問題，比較好的做法是使用 `@content` 才對：
 
 ```scss
 @mixin pad {
@@ -334,14 +333,14 @@ updated: 2020-05-30 13:11:11
   }
 }
 
-.col-4 {
+.col-md-4 {
   flex: 0 0 100%;
   @include pad {
     flex: 0 0 (100% * 4/12);
   }
 }
 
-.col-6 {
+.col-md-6 {
   flex: 0 0 100%;
   @include pad {
     flex: 0 0 (100% * 6/12);
@@ -352,25 +351,42 @@ updated: 2020-05-30 13:11:11
 此時的編譯結果為：
 
 ```css
-.col-4 {
+.col-md-4 {
   flex: 0 0 100%;
 }
 
 @media screen and (min-width: 768px) {
-  .col-4 {
+  .col-md-4 {
     flex: 0 0 33.33333%;
   }
 }
 
-.col-6 {
+.col-md-6 {
   flex: 0 0 100%;
 }
 
 @media screen and (min-width: 768px) {
-  .col-6 {
+  .col-md-6 {
     flex: 0 0 50%;
   }
 }
 ```
 
-與前面使用參數傳遞的結果相同，但靈活度卻提高了不少，事實上 `@include` 還可以透過大括號進行傳遞，而 `@mixin` 則是透過 `@content` 接收，我自己是蠻常使用此方式撰寫 RWD，不覺得這樣直覺多了嗎？雖然說編譯後會產生多餘的代碼，但以開發體驗來說，我認為完全是不同等級的。
+與前面使用參數傳遞的結果相同，但靈活度卻提高了不少，事實上 `@include` 還可以透過大括號進行傳遞，而 `@mixin` 則是透過 `@content` 接收，我自己是蠻常使用此方式撰寫 RWD，不覺得這樣直覺多了嗎？雖然說編譯後會產生多餘的代碼，但以開發體驗來說，我認為完全是不同等級的，這邊做個最後的補充：
+
+```scss
+@mixin hamburger {
+  .open & {
+    @content;
+  }
+}
+
+.menu {
+  max-height: 0px;
+  @include hamburger {
+    max-height: 300px;
+  }
+}
+```
+
+還記得之前介紹的 `&` 父選擇器搭配 hamburger menu 範例嗎？我們同樣可把它包裝成 `@mixin` 並搭配 `@content` 使之更具靈活度，可以參考上面範例。
