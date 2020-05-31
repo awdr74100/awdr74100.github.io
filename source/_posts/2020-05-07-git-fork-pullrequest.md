@@ -292,7 +292,7 @@ git merge lanroya/master
 關於 rebase 如何解決衝突，之前在 [rebase 文章](https://awdr74100.github.io/2020-05-04-git-rebase/) 就有完整的解說，有興趣的可以過去看看，這邊就快速帶過：
 
 ```bash
-... reslove conflict
+... resolve conflict
 
 git add .
 
