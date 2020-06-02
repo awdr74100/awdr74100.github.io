@@ -7,7 +7,7 @@ description:
 categories: [SCSS]
 tags: [SCSS, w3HexSchool]
 date: 2020-06-01 12:30:43
-updated: 2020-06-01 12:30:43
+updated: 2020-06-02 17:50:04
 ---
 
 ## 前言
@@ -19,6 +19,7 @@ updated: 2020-06-01 12:30:43
 - 建立函式與返回結果
 - 添加並傳入其餘參數
 - 添加並傳入可選參數
+- 添加並傳入關鍵字參數
 
 ## 建立函式與返回結果
 
@@ -38,7 +39,15 @@ updated: 2020-06-01 12:30:43
 }
 ```
 
-在 SCSS 宣告函式可使用 `@function` 關鍵字，當產生結果時可使用 `@return` 將其返回給呼叫的對象，其實與一般語言的函式沒啥兩樣，讓我們再來看個例子：
+在 SCSS 宣告函式可使用 `@function` 關鍵字，當產生結果時可使用 `@return` 將其返回給呼叫的對象，其實與一般語言的函式沒啥兩樣，以下為編譯結果：
+
+```css
+.section {
+  z-index: 1024px;
+}
+```
+
+如果你是 JavaScript 的開發者，可能會嘗試使用 ES7 的指數運算符 `**` 來完成任務，在 SCSS 你不能這樣做，因為本身並沒有相關的運算符可做使用，只能依靠自己將其效果手刻出來，讓我們再來看個例子：
 
 ```scss
 // _variables.scss
@@ -68,16 +77,17 @@ $theme-colors: map-merge(
 與 `@mixin` 處理手法相同，`@function` 同樣也可添加類似於 JavaScript 中的 [Rest parameter](https://developer.mozilla.org/zh-TW/docs/Web/JavaScript/Reference/Functions/rest_parameters)，直接來看範例：
 
 ```scss
-@function sum($numbers...) {
-  $sum: 0;
-  @each $number in $numbers {
-    $sum: $sum + $number;
+@function px-to-rem($sizes...) {
+  $result: ();
+  @each $value in nth($sizes, 1) {
+    $result: append($result, ($value / 16px) * 1rem);
   }
-  @return $sum;
+  @return $result;
 }
 
-.micro {
-  width: sum(50, 30, 100) * 1px;
+.header {
+  font-size: px-to-rem(20px);
+  padding: px-to-rem(20px 16px);
 }
 ```
 
@@ -85,3 +95,61 @@ $theme-colors: map-merge(
 
 ## 添加並傳入可選參數
 
+所謂的可選參數其實就是預設參數的意思，代表應該被接收的變數就算不傳入還是可直接向預設參數取值進而避免處理時發生錯誤，直接來看例子：
+
+```scss
+@function getUrl($fileName, $ext: 'png') {
+  $baseUrl: '/src/assets/img/';
+  @return $baseUrl + $fileName + '.' + $ext;
+}
+
+.logo {
+  background-image: url(getUrl('logo'));
+}
+
+.icon {
+  background-image: url(getUrl('facebook', 'svg'));
+}
+```
+
+SCSS 預設參數賦值是使用 `:` 關鍵字，就如同宣告變數一般，與一般語言中使用 `=` 關鍵字有所不同，這邊要多加留意，以下為編譯結果：
+
+```css
+.logo {
+  background-image: url('/src/assets/img/logo.png');
+}
+
+.icon {
+  background-image: url('/src/assets/img/facebook.svg');
+}
+```
+
+## 添加並傳入關鍵字參數
+
+除了基本依造順序將參數傳遞進去以外，我們也可透過關鍵字，這指接收參數的變數名稱，將參數傳遞給指定的變數，如下範例：
+
+```scss
+@function sqrt($str: 'undefined', $num: 10) {
+  $x0: 1;
+  $x1: $x0;
+  @for $i from 1 through 10 {
+    $x1: $x0 - ($x0 * $x0 - abs($num)) / (2 * $x0);
+    $x0: $x1;
+  }
+  @return $x1;
+}
+
+.footer {
+  font-size: sqrt($num: 100) * 1px;
+}
+```
+
+是不是蠻新奇的？以往參數都必須依照順序傳入以保證對象如預期被接收，在 SCSS 你可以不必這樣做，直接以關鍵字方式傳入參數值即可，此時的編譯結果為：
+
+```css
+.footer {
+  font-size: 10px;
+}
+```
+
+雖然說方便度提高了不少，但我認為這樣子的寫法可能存在可讀性低落的問題，你沒辦法立即得知那些參數未傳入那些參數已傳入，最後可能就會跳出錯誤。
