@@ -7,7 +7,7 @@ description:
 categories: [SCSS]
 tags: [SCSS]
 date: 2020-06-03 00:00:55
-updated: 2020-06-04 19:24:31
+updated: 2020-06-04 23:49:09
 ---
 
 ## 前言
@@ -18,6 +18,7 @@ updated: 2020-06-04 19:24:31
 
 - 繼承樣式
 - 佔位符選擇器
+- @extend 與 @mixin 使用時機和差異
 
 ## 繼承樣式
 
@@ -234,7 +235,7 @@ updated: 2020-06-04 19:24:31
 }
 ```
 
-將原本利用 `class` 選擇器宣告的對象更改為 `%` 宣告，同時 `@extend` 此對象，最後編譯的結果為：
+將原本利用 `class` 選擇器宣告的對象更改為 `%` 宣告，同時 `@extend` 此對象，最後的編譯結果為：
 
 <!-- prettier-ignore-start -->
 ```css
@@ -258,4 +259,93 @@ updated: 2020-06-04 19:24:31
 ```
 <!-- prettier-ignore-end -->
 
-大功告成！事實上佔位符選擇器的功用就僅此而已，畢竟它不會被實體編譯出來，除了被 `@extend` 所繼承外，實在找不到它還有什麼作用。
+大功告成！編譯結果與當初設定目標一模一樣，佔位符選擇器的應用範圍可能也只有供予 `@extend` 繼承用，畢竟它不會被實體編譯出來，在多的延伸也沒有其意義。
+
+## @extend 與 @mixin 使用時機和差異
+
+如果你對 `@extend` 與 `@mixin` 的使用時機和差異感到困惑，可以從以下兩點去做思考：
+
+- 是否需要傳遞參數？
+- 是否在意樣式表大小？
+
+傳遞參數這點沒啥好說的，你只能使用 `@mixin` 來完成任務，因為 `@extend` 是無法傳遞任何參數的，而 `@mixin` 與 `@function` 相同，都可傳入任意的參數做使用，可參考以下範例：
+
+```scss
+@mixin size($num1, $num2) {
+  width: $num1;
+  height: $num2;
+}
+
+.box {
+  @include size(200px, 200px);
+}
+```
+
+`@extend` 自然是無法完成上面任務的，畢竟它沒辦法傳遞任何參數，還有另外一個判斷的依據為是否在意樣式表大小，可參考以下範例：
+
+```scss
+%col {
+  position: relative;
+  width: 100%;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+@for $var from 1 through 12 {
+  .col-#{$var} {
+    @extend %col;
+  }
+}
+```
+
+上面使用了 `@extend` 來完成任務，將所有相關的樣式進行合併以減少樣式表大小，同樣道理，你也可以使用 `@mixin` 來完成，參考以下範例：
+
+```scss
+@mixin col {
+  position: relative;
+  width: 100%;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+@for $var from 1 through 12 {
+  .col-#{$var} {
+    @include col;
+  }
+}
+```
+
+此時的編譯結果為：
+
+```css
+.col-1 {
+  position: relative;
+  width: 100%;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+/* 省略 .col-2 ~ .col-11 */
+
+.col-12 {
+  position: relative;
+  width: 100%;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+```
+
+發現問題了嗎？明明所有對象都是套用相同的樣式，使用 `@mixin` 就硬生生的生成了全部實體樣式，像在這種情況就推薦使用 `@extend` 來完成，其編譯結果為：
+
+<!-- prettier-ignore-start -->
+```css
+.col-1, .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9, .col-10, .col-11, .col-12 {
+  position: relative;
+  width: 100%;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+```
+<!-- prettier-ignore-end -->
+
+這樣不是好多了嗎？所有對象都被合併到了 `%col` 對象內，如果你並不在意樣式表的大小，大可使用 `@mixin` 來完成任務，但我個人推薦使用 `@extend` 就是了。
