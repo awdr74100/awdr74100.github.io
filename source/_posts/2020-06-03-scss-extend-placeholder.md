@@ -71,10 +71,10 @@ updated: 2020-06-03 00:00:55
 }
 ```
 
-雖然說編譯後的檔案我們通常不會有太多的關注，但在某些情況下，我們確實需要做些改善以符合當前專案的規範，比如說樣式表的檔案大小，從上面結果你會發現 `@mixin` 形成了許多重複樣式，也因為這些重複樣式造成樣式表異常的肥大，建議的做法是將發生重用的樣式以合併的方式存在，如下所示：
+雖然說編譯後的檔案我們通常不會有太多的關注，但在某些情況下，我們確實需要做些改善以符合當前專案的規範，比如說樣式表的檔案大小，從上面結果你會發現 `@mixin` 形成了許多重複樣式，也因為這些重複樣式造成樣式表異常的肥大，建議的做法是將發生重用的樣式以合併的方式進行處理，如下所示：
 
 <!-- prettier-ignore-start -->
-```scss
+```css
 .header, .section, .footer {
   display: flex;
   justify-content: center;
@@ -95,7 +95,7 @@ updated: 2020-06-03 00:00:55
 ```
 <!-- prettier-ignore-end -->
 
-合併樣式的目的在於保持代碼的精簡性，以不發生重複代碼為原則，依然保持樣式作用於對象，為了滿足合併樣式的目的，此時就是 `@extend` 出馬的時候了，直接來看範例：
+合併樣式的目的在於保持代碼的精簡性，以不發生重複代碼為原則，依然保持樣式作用於對象，為了滿足合併樣式的目的，我們可改使用 `@extend` 方法，直接來看範例：
 
 ```scss
 .flex-center {
@@ -119,3 +119,143 @@ updated: 2020-06-03 00:00:55
   background-color: green;
 }
 ```
+
+`@extend` 的目的在於繼承其指定樣式，呼叫 `@extend` 的對象會被合併到指定的對象上，相較於 `@mixin` 的處理方式，此方法既能減少重複樣式的撰寫也能達到編譯後 CSS 精簡化的目的，此時的編譯結果為：
+
+<!-- prettier-ignore-start -->
+```css
+.flex-center, .header, .section, .footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.header {
+  background-color: red;
+}
+
+.section {
+  background-color: blue;
+}
+
+.footer {
+  background-color: green;
+}
+```
+<!-- prettier-ignore-end -->
+
+這不就是我們要的結果嗎？相關的樣式都被合併到了指定樣式上，讓我們再來看個範例：
+
+```scss
+.font-base {
+  color: #1d1d1d;
+  padding: 15px 0px;
+}
+
+.header {
+  background-color: red;
+  h1 {
+    font-size: 1.5em;
+    @extend .font-base;
+  }
+}
+
+.footer {
+  background-color: green;
+  h1 {
+    font-size: 1.25em;
+    @extend .font-base;
+  }
+}
+```
+
+如同我們前面所說，呼叫 `@extend` 的對象會被合併到指定對象上，這邊所指的對象為 `.header h1` 與 `.footer h1`，並不是指單純的 `h1` 對象，最後的編譯結果為：
+
+<!-- prettier-ignore-start -->
+
+```css
+.font-base, .header h1, .footer h1 {
+  color: #1d1d1d;
+  padding: 15px 0px;
+}
+
+.header {
+  background-color: red;
+}
+
+.header h1 {
+  font-size: 1.5em;
+}
+
+.footer {
+  background-color: green;
+}
+
+.footer h1 {
+  font-size: 1.25em;
+}
+```
+<!-- prettier-ignore-end -->
+
+## 佔位符選擇器
+
+在前面範例中，我們必定是要宣告個對象用以讓其他對象 `@extend`，這不就會導致產生無意義的樣式對象了嗎？如之前的 `.flex-center`、`.font-base` 等，如果繼承的對象沒有任何作用，我們可改使用 SCSS 獨特的佔位符選擇器將其宣告，這樣就不會有實體的樣式對象了，如下範例：
+
+```scss
+%flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+```
+
+佔位符選擇器顧名思義就是使用 `%` 符號將其宣告，與傳統 `class`、`id` 選擇器較不同的地方在於它不會產生實體的對象，你可以嘗試編譯上面範例，最後並不會有任何的樣式被編譯出來，利用此特性我們可針對之前範例做個改寫：
+
+```scss
+%flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.header {
+  @extend %flex-center;
+  background-color: red;
+}
+
+.section {
+  @extend %flex-center;
+  background-color: blue;
+}
+
+.footer {
+  @extend %flex-center;
+  background-color: green;
+}
+```
+
+將原本利用 `class` 選擇器宣告的對象更改為 `%` 宣告，同時 `@extend` 此對象，最後編譯的結果為：
+
+<!-- prettier-ignore-start -->
+```css
+.header, .section, .footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.header {
+  background-color: red;
+}
+
+.section {
+  background-color: blue;
+}
+
+.footer {
+  background-color: green;
+}
+```
+<!-- prettier-ignore-end -->
+
+大功告成！事實上佔位符選擇器的功用就僅此而已，畢竟它不會被實體編譯出來，除了被 `@extend` 所繼承外，實在找不到它還有什麼作用。
