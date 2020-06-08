@@ -18,7 +18,6 @@ updated: 2020-06-05 14:28:02
 
 - 建立部分模組
 - 載入模組
-- 與 CSS 中 @import 區別
 
 ## 建立部分模組
 
@@ -174,4 +173,4 @@ $theme-color: (
 @import './helpers/text';
 ```
 
-這樣是不是整潔許多？在 `@import` 時需要注意其依賴性，只需要保持一個原則就是 SCSS 是由上到下進行編譯，你總不可能把 `_variables.scss` 放在 `_text.scss` 下面吧？這樣可能就會發生 `Undefined` 的錯誤。
+這樣是不是整潔許多？在 `@import` 時需要注意其依賴性，只需要保持一個原則就是 SCSS 是由上到下進行編譯，你總不可能把 `_variables.scss` 放在 `_text.scss` 下面吧？這樣肯定會發生 `Undefined` 的錯誤。
