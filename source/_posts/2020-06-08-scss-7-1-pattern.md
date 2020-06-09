@@ -7,7 +7,7 @@ description:
 categories: [SCSS]
 tags: [SCSS, CSS Methodologies, w3HexSchool]
 date: 2020-06-08 18:08:59
-updated: 2020-06-08 18:08:59
+updated: 2020-06-10 00:44:50
 ---
 
 ## 前言
@@ -119,7 +119,7 @@ scss/
 
 **Pages 資料夾**
 
-`pages/` 資料夾存放每一個網頁特定且零碎的樣式檔案，通常 `layout/` 與 `components` 除外的頁面樣式就包含在此類，建議將檔案名稱取做與頁面同個名稱：
+`pages/` 資料夾存放每一個網頁特定且零碎的樣式檔案，通常 `layout/` 與 `components` 除外的頁面樣式就包含在此類，建議將檔案名稱取做與頁面同樣名稱：
 
 - `_home.scss`
 - `_contact.scss`
@@ -133,12 +133,12 @@ scss/
 
 **Vendors 資料夾**
 
-`vendors` 資料夾主要放置由外部庫或框架使用的第三方代碼，如果你必須覆蓋任何 `vendors` 的某個樣式，建議另外新增同名的檔案並放入名為 `vendors-extensions/` 的第 8 個資料夾，以下參考：
+`vendors` 資料夾主要放置由外部庫或框架使用的第三方代碼，如果你必須覆蓋任何 `vendors` 的某個樣式，建議另外新增同名的檔案並放入名為 `vendors-extensions/` 的第 8 個新增資料夾，以下參考：
 
 - `_bootstrap.scss`
 - `_jquery-ui`
 
-以上就是各資料夾專門放置的檔案對象，接著就是將這些檔案彙整到 `all.scss` 中，為了保持可讀性，主文件應遵守以下準則：
+以上就是各資料夾專門放置的檔案對象，接著就是將這些檔案彙整到 `all.scss` 中，為了保持可讀性，主文件不該存在任何 `@import` 以外的代碼，且必須遵守以下規則：
 
 - 每個 `@import` 引用一個文件
 - 每個 `@import` 單獨一行
@@ -146,7 +146,7 @@ scss/
 - 從不同資料夾引入的檔案之間需用空行分隔
 - 忽略文件擴展名與 `_` 前綴
 
-Sass Guidelines 中有建議的 `@import` 順序，你可以依造他的順序，或者是自行排序，只要記住 SCSS 是由上到下進行編譯即可，最後他看起來應該像這個樣子：
+Sass Guidelines 中有建議的 `@import` 順序，你可以依造他的順序，或者是自行排序，只要記住 SCSS 是由上到下進行編譯代表需注意其模組依賴性即可，最後他看起來應該像這個樣子：
 
 ```scss
 @import './base/reset';
@@ -184,6 +184,10 @@ Sass Guidelines 中有建議的 `@import` 順序，你可以依造他的順序�
 <!-- prettier-ignore-start -->
 ```scss
 @import
+    './base/reset',
+    './base/typography';
+
+@import
     './helpers/variables',
     './helpers/functions',
     './helpers/mixins',
@@ -192,6 +196,44 @@ Sass Guidelines 中有建議的 `@import` 順序，你可以依造他的順序�
 ```
 <!-- prettier-ignore-end -->
 
-這邊要強調，所謂的 7-1 模式只是提供參考用，具體上要怎麼搭，最好按項目大小來決定，如果項目規模較小，用 7-1 模式就顯得有點大材小用了，7-1 模式最重要的是它拆分模組的概念，如果了解其概念，往後在處理各種專案的樣式表時，我想應該都沒什麼問題才對。
+這邊要強調，所謂的 7-1 模式只是提供參考用，具體上要怎麼搭，最好按項目大小來決定，如果項目規模較小，用 7-1 模式就顯得有點大材小用了，7-1 模式最重要的是它拆分模組的概念，如果了解其概念，往後在處理各種規模的樣式表都能勢如破竹。
 
 ## Sass 7-1 Pattern 實際案例
+
+如果你還是對 7-1 模式感到困惑，不妨可參考下面提供的實際案例：
+
+```scss
+@import './base/reset';
+
+@import './helpers/variables';
+@import './helpers/spacing';
+
+@import './layout/grid';
+@import './layout/footer';
+@import './layout/header';
+
+@import './components/banner';
+@import './components/button';
+@import './components/card';
+@import './components/formLogin';
+@import './components/formRegister';
+@import './components/formCard';
+@import './components/navbar';
+@import './components/ribbon';
+@import './components/search';
+
+@import './pages/home';
+@import './pages/login';
+@import './pages/register';
+@import './pages/cart';
+
+@import './vendors/pure';
+```
+
+從 Sass 的主文件可以得知這個網站總共有 4 個頁面，分別為 `home`、`login`、`register`、`cart`，在樣式表的開頭使用了 CSS Reset 將畫面樣式做重整，內部使用了 Grid System 與 Spacing 來完成基本的佈局，網站充滿了大量可重複使用的元件，比如說 `button`、`card` 等，最後在 `vendors/` 資料夾載入了 [Pure.css](https://purecss.io/) 框架。
+
+有沒有發現我少建立 `themes/` 資料夾？如果你的網站沒有主題顏色自然也就沒有建立的必要，這也是我們之前提到的 7-1 模式只是提供參考用，具體上該怎麼做還是得依專案而定。
+
+跑過了一次實際案例相信你對 7-1 模式的模組拆分技巧有更深入的了解，你也可以參考 [Sass Guidelines](https://sass-guidelin.es/) 作者 [Hugo Giraudel](https://hugogiraudel.com/) 使用 [Hugo](https://hugogiraudel.com/) 所創建的 Blog 原始碼，裏頭 Sass 拆分的方式就是依造 7-1 模式，以下為連結：
+
+- [Source Code](https://github.com/HugoGiraudel/hugogiraudel.com/tree/master/assets/sass)
