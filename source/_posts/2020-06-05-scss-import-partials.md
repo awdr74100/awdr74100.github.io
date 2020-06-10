@@ -100,7 +100,7 @@ project/
 `./scss/helpers/_variables.scss` 檔案內容：
 
 ```scss
-$theme-color: (
+$theme-colors: (
   primary: blue,
   success: green,
 );
@@ -121,7 +121,7 @@ $theme-color: (
 @import './helpers/mixins';
 
 // 測試輸出
-@each $key, $value in $theme-color {
+@each $key, $value in $theme-colors {
   .text-#{$key} {
     color: $value;
     @include bg-invert($value);
@@ -132,7 +132,7 @@ $theme-color: (
 `@import` 語句可用來載入其他模組，並且不需要撰寫 `_` 與 `.scss` 字樣，SCSS 能夠自動辨認其模組，上面範例就等同於將全部代碼撰寫在 `all.scss` 中，如下所示：
 
 ```scss
-$theme-color: (
+$theme-colors: (
   primary: blue,
   success: green,
 );
@@ -142,7 +142,7 @@ $theme-color: (
 }
 
 // 測試輸出
-@each $key, $value in $theme-color {
+@each $key, $value in $theme-colors {
   .text-#{$key} {
     color: $value;
     @include bg-invert($value);
@@ -157,7 +157,7 @@ $theme-color: (
 新增 `./scss/helpers/_text.scss`：
 
 ```scss
-@each $key, $value in $theme-color {
+@each $key, $value in $theme-colors {
   .text-#{$key} {
     color: $value;
     @include bg-invert($value);
