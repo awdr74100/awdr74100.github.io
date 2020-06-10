@@ -202,4 +202,18 @@ $theme-colors: (
 }
 ```
 
-一個對象可能同時身兼容器與內容的角色，對於 `.col-4` 來說，`.card` 就屬於內容，而對於 `.card-body` 來說，`.card` 就屬於容器，你可能會想，怎不把 `.card-body` 做分離呢？不是說容器必須與內容作分離嗎？這邊的 `.card-body` 如果獨立存在本身是沒有任何意義的，需與 `.card` 搭配才會有意義，在這種情況下 `.card-body` 屬於 `.card` 的繼承，就無須將其分離出來，與前面的 `.btn` 不同，`.btn` 獨立存在是可重複使用在其他區塊上的。
+一個對象可能同時身兼容器與內容的角色，對於 `.col-4` 對象來說，`.card` 就屬於內容，而對於 `.card-body` 對象來說，`.card` 就屬於容器，你可能會想，怎不把 `.card-body` 做分離呢？不是說容器必須與內容作分離嗎？這邊的 `.card-body` 如果獨立存在本身是沒有任何意義的，需與 `.card` 搭配才會有意義，在這種情況下 `.card-body` 屬於 `.card` 的繼承，就無須將其分離出來，與前面的 `.btn` 不同，`.btn` 獨立存在是可重複使用在其他區塊上的。
+
+跑過一次上面的範例你大概就能了解 OOCSS 該怎麼使用了，是不是其語法結構跟某框架很相似阿？沒錯！Bootstrap 便是根據 OOCSS 規範寫的，我們可以隨便拿個範例來看：
+
+```html
+<nav class="navbar navbar-light bg-light">
+  <a class="navbar-brand">Navbar</a>
+  <form class="form-inline">
+    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" />
+    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+  </form>
+</nav>
+```
+
+其中有 `.navbar`、`.navbar-light` 等 class，這些就屬於 OOCSS 中的結構與樣式分離，而 `.form-inline`、`.btn` 等 class，這些就屬於容器與內容分離，如果你想更深入的學習 OOCSS 概念，不妨參考下 Bootstrsp 的原始碼，其處理的細膩度可說是將 OOCSS 發揮的淋漓盡致。
