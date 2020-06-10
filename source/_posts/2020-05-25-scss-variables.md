@@ -92,26 +92,26 @@ List 的初始值即為 1，並不像一般語言中的 Array 初始值為 0
 這邊只列出幾個比較常用到的函式，其它函式可在至官方的 [Built-In Modules](https://sass-lang.com/documentation/modules/list) 文檔進行查看，接著讓我們來看 Maps 型態：
 
 ```scss
-$theme-color: (
+$theme-colors: (
   primary: blue,
   danger: red,
 );
 
 .bg-primary {
-  background-color: $theme-color;
+  background-color: $theme-colors;
 }
 ```
 
 Maps 就如同 JavaScript 的 Object，只不過須將其 `{}` 更改為 `()`，且 Maps 無法直接進行取用，像是上面這樣子的寫法就是錯誤的，沒有任何一個 CSS 屬性有這樣子的格式，故編譯時即會跳錯，如果你想讓編譯器堅持輸出 Maps 的內容，可使用 `inspect` 函式：
 
 ```scss
-$theme-color: (
+$theme-colors: (
   primary: blue,
   danger: red,
 );
 
 .bg-primary {
-  background-color: inspect($theme-color);
+  background-color: inspect($theme-colors);
 }
 ```
 
@@ -126,13 +126,13 @@ $theme-color: (
 如同我們前面所說，沒有半個 CSS 屬性格式是長這樣，正確的做法應該是讀取其鍵以取用其值才對，此時可使用 `map-get` 函式：
 
 ```scss
-$theme-color: (
+$theme-colors: (
   primary: blue,
   danger: red,
 );
 
 .bg-primary {
-  background-color: map-get($theme-color, primary);
+  background-color: map-get($theme-colors, primary);
 }
 ```
 
@@ -154,12 +154,12 @@ $theme-color: (
 這時你可能會想，List 與 Maps 實用性看起來好像不高？光是取個值就得大費周章，那是因為我們還沒提到迴圈的使用，這兩個型別通常都是與迴圈共同使用才能發揮其強大，在下一篇文章會有詳細的介紹，這邊先寫個簡單的範例：
 
 ```scss
-$theme-color: (
+$theme-colors: (
   primary: blue,
   danger: red,
 );
 
-@each $key, $value in $theme-color {
+@each $key, $value in $theme-colors {
   .text-#{$key} {
     color: $value;
   }
