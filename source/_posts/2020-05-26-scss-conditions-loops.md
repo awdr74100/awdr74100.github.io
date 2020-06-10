@@ -150,7 +150,7 @@ $list: red blue black;
 一般我們不會取作像 `.text-blue` 這樣的 class 名稱，如果其樣式顏色做了更改，這會導致名稱與內容不相符的狀況，搞的很詭異，盡量都是以工具性質去做命名，不要以語意化方式命名，這時就是 `maps` 出場的時候了：
 
 ```scss
-$theme-color: (
+$theme-colors: (
   primary: #0000ff,
   success: #008000,
   warning: #ffff00,
@@ -161,7 +161,7 @@ $theme-color: (
 `maps` 型態就如同一般語言的 Object，關於 `maps` 的介紹可參考上一篇文章，一般語言如果要遍歷 Object 可使用 `for in` 語句，但 SCSS 並沒有 `for in` 語句，取而代之的是 `@each` 語句，如下範例：
 
 ```scss
-@each $key, $value in $theme-color {
+@each $key, $value in $theme-colors {
   .text-#{$key} {
     color: $value;
   }
