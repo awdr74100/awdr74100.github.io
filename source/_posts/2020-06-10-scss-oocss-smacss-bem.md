@@ -29,6 +29,11 @@ updated: 2020-06-10 13:45:55
 - Separate container and content：容器與內容分離
   - 例子：`.container`、`.col-4`
 
+OOCSS 提倡的理念是樣式可重用性，在撰寫時也需符合以下規則：
+
+- 應盡量避免使用後代選擇器 (`.navbar ul`) 或 id 選擇器 (`#list`)
+- 應盡量避免樣式依賴於結構 (低耦合概念)，嘗試使用 class 替代 htlm tag
+
 ### 結構與樣式分離
 
 所謂的結構與樣式分離就如同 `.btn` 與 `.btn-primary` 之間的關係，讓我們先從一般在撰寫樣式的習慣開始說起：
@@ -71,7 +76,7 @@ $theme-colors: (
 }
 ```
 
-發現問題了嗎？我們又浪費時間在撰寫相同的樣式，在每次增加一個色系時，我們都必須整組做設定，這樣豈不是很浪費時間嗎？此時我們就可使用 OOCSS 中的結構與樣式分離技巧，如下範例：
+發現問題了嗎？我們又浪費時間在撰寫相同的樣式了，在每次增加一個色系時，我們都必須整組做設定，這樣豈不是很浪費時間嗎？OOCSS 中的結構與樣式分離主要就是在改善這個問題，先將以上針對 OOCSS 的規範做個改寫：
 
 ```scss
 .btn {
@@ -101,7 +106,7 @@ $theme-colors: (
 <button class="btn btn-primary">Primary</button>
 ```
 
-是不是直覺很多？且往後要新增不同色系的按鈕時，我們也不需要重寫 `.btn` 的樣式，只需要撰寫相關色系的樣式即可，同時搭配 Sass 中的 `@each` 效果更為驚人，以下範例：
+是不是直覺很多？我們可以很明確的知道此對象的結構與樣式，往後如果要增加不同色系，這指 skin，也只需要撰寫像是 `.btn-success`、`.btn-danger` 的樣式即可，如果你想要更高效的做法，可以搭配 Sass 中的 `@each` 使結構更具可讀性：
 
 ```scss
 $theme-colors: (
@@ -136,11 +141,11 @@ $theme-colors: (
 <button class="btn btn-danger">Danger</button>
 ```
 
-相信透過上面的範例你就能了解何謂結構與樣式分離了，如果以 OOCSS 中的 OO (Object Oriented) 做描述的話，這邊的結構 (Structure) 就是所指的對象，以上面範例來說，我們將 `<button>` 對象給封裝了，往後如果要使用 `<button>` 直接用 `.btn` 這個 `.class` 就可以了。
+相信透過上面的範例你就能了解何謂結構與樣式分離了，如果以 OOCSS 中的 OO (Object Oriented) 做描述的話，這邊的結構 (Structure) 就是所指的對象，以上面範例來說，我們封裝了 `<button>` 對象，往後如果要使用 `<button>`的話，只需要撰寫 `.btn` 結構樣式名稱與對應的 skin 即可。
 
 ### 容器與內容分離
 
-介紹完了何謂結構與樣式分離，接下來換容器與內容該如何分離，之間就如同 `.card` 與 `.btn` 的關係，直接來看範例：
+介紹完了何謂結構與樣式分離，接下來換容器與內容該如何分離，它們之間就如同 `.card` 與 `.btn` 的關係，直接來看範例：
 
 ```scss
 .card {
@@ -157,7 +162,7 @@ $theme-colors: (
 }
 ```
 
-通常我們在撰寫 CSS 時，很長根據 HTML 結構來撰寫其樣式，從上面可以看出 `.card` 裏頭似乎有個 `button`，這樣子的寫法毫無靈活度可言，`button` 完全被綁死在了 `.card` 裏頭，OOCSS 中的容器與內容分離主要就是在優化這個問題，先讓我們針對容器與內容分離做個改寫：
+通常我們在撰寫 CSS 時，很長根據 HTML 結構來撰寫其樣式，從上面可以看出 `.card` 裏頭似乎有個 `button`，這樣子的寫法毫無靈活度可言，`button` 完全被綁死在了 `.card` 裏頭，OOCSS 中的容器與內容分離主要就是在改善這個問題，先將以上針對 OOCSS 的規範做個改寫：
 
 ```scss
 .card {
@@ -217,3 +222,7 @@ $theme-colors: (
 ```
 
 其中有 `.navbar`、`.navbar-light` 等 class，這些就屬於 OOCSS 中的結構與樣式分離，而 `.form-inline`、`.btn` 等 class，這些就屬於容器與內容分離，如果你想更深入的學習 OOCSS 概念，不妨參考下 Bootstrsp 的原始碼，其處理的細膩度可說是將 OOCSS 發揮的淋漓盡致。
+
+## SMACSS (Scalable and Moduler Architecture fro CSS)
+
+[SMACSS](http://smacss.com/) 主要由 [Jonathan Snook](https://snook.ca/) 提出
