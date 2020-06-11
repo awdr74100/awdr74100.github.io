@@ -32,7 +32,7 @@ updated: 2020-06-10 13:45:55
 OOCSS 提倡的理念是樣式可重用性，在撰寫時也需符合以下規則：
 
 - 應盡量避免使用後代選擇器 (`.navbar ul`) 或 id 選擇器 (`#list`)
-- 應盡量避免樣式依賴於結構 (低耦合概念)，嘗試使用 class 替代 htlm tag
+- 應盡量避免樣式依賴於結構 (低耦合概念)，嘗試使用 class 替代 element 選擇器
 
 ### 結構與樣式分離
 
@@ -225,4 +225,44 @@ $theme-colors: (
 
 ## SMACSS (Scalable and Moduler Architecture fro CSS)
 
-[SMACSS](http://smacss.com/) 主要由 [Jonathan Snook](https://snook.ca/) 提出
+[SMACSS](http://smacss.com/) 主要由 [Jonathan Snook](https://snook.ca/) 提出，從名稱上的 Architecture 字樣可以得知他是以專案整體的結構來做考量，除了擁有與 OOCSS 類似的 HTML 與 CSS 分離概念，還有其最具特色的結構化命名概念，所謂的結構化命名是指將對象做結構分類並將其限制命名，藉此達到容易擴展及模組化目的，SMACSS 相比於 OOCSS 更偏向整個專案結構的分類及模組化你的 CSS，其中結構的分類有：
+
+- Base
+- Layout
+- Module
+- State
+- Theme
+
+<!-- 除此之外，OOCSS 還有其最小化深度 (Minimizing the Depth) 原則，其實他的概念就類似於 OOCSS 中的應避免使用後代選擇器，可參考以下範例： -->
+
+### Base 規則
+
+Base 主要設置某些對象的基本及預設樣式，比如 [meyerweb](https://meyerweb.com/eric/tools/css/reset/) 或 [normalize](https://necolas.github.io/normalize.css/8.0.1/normalize.css) 版本的重製文件，或者是一些全域型的樣式設定，在撰寫時須遵守以下原則：
+
+- 可使用元素選擇器、後代選擇器、子選擇器以及任何偽類將基本樣式應用於元素
+- 設定元素預設樣式，不應該出現任何 class、id 選擇器
+- 設定元素預設樣式，不應該出現任何 `@important` 字樣 (權重過高，無法覆蓋)
+
+可參考以下：
+
+<!-- prettier-ignore-start -->
+```scss
+html, form {
+  margin: 0;
+  padding: 0;
+}
+
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+```
+<!-- prettier-ignore-end -->
+
+### Layout 規則
+
+Layout
