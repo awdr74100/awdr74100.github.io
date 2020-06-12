@@ -7,7 +7,7 @@ description:
 categories: [Git]
 tags: [Git, GitHub]
 date: 2020-04-18 23:00:04
-updated: 2020-05-08 01:42:47
+updated: 2020-06-13 03:06:37
 ---
 
 ## 前言
@@ -308,7 +308,7 @@ git checkout -b develop origin/develop
 
 這道指令與 `git checkout -t origin/develop` 結果相同，差別在於可自定義名稱。
 
-- 將遠端分支建立至本地並追蹤 (最簡單)：
+- 將遠端分支建立至本地並追蹤 (自動辨識遠端是否存在同名分支)：
 
 ```bash
 git checkout develop
@@ -479,7 +479,7 @@ git checkout -t <repo_name>/<remote_branch>
 # 將遠端分支建立至本地並追蹤 (可自訂名稱)
 git checkout -b <local_branch> <repo_name>/<remote_branch>
 
-# 將遠端分支建立至本地並追蹤
+# 將遠端分支建立至本地並追蹤 (自動辨識遠端是否存在同名分支)
 git checkout <remote_branch>
 
 # 上傳至遠端數據庫 (全部分支)
