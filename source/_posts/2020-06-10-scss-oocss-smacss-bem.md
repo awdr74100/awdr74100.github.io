@@ -233,15 +233,26 @@ $theme-colors: (
 - State
 - Theme
 
-<!-- 除此之外，OOCSS 還有其最小化深度 (Minimizing the Depth) 原則，其實他的概念就類似於 OOCSS 中的應避免使用後代選擇器，可參考以下範例： -->
+結構分類的目的在於將 CSS 做有效的區隔，你可以把它想成像 7-1 模式的概念，並且結合了其命名限制概念，這邊先做個重點整理，參考以下：
+
+- Base：不須特別提供前綴，且不會使用到 class、id 選擇器，目前在於設定元素基本樣式
+  - 例子：`html`、`*:before`、`img`
+- Layout：使用 `l-` 或 `layout-` 為佈局次要樣式提供前綴，目的在於將佈局樣式與其他樣式做區隔
+  - 例子：`.l-header`、`.l-sidebar`、`.l-grid`
+- Module：使用模組本身命名為模組樣式提供前綴，目的在於快速了解其相關性
+  - 例子：`.card`、`.card-header`、`.card-body`
+- State：使用 `is-` 為狀態樣式提供前綴，目的在於快速辨識當前狀態
+  - 例子：`.is-active`、`.is-hidden`、`.is-collapsed`
+- Theme：不須特別提供前綴，目的在於更改對象原來的主題樣式
+  - 例子：`.modal-dark`、`.badge-white`
 
 ### Base 規則
 
-Base 主要設置某些對象的基本及預設樣式，比如 [meyerweb](https://meyerweb.com/eric/tools/css/reset/) 或 [normalize](https://necolas.github.io/normalize.css/8.0.1/normalize.css) 版本的重製文件，或者是一些全域型的樣式設定，在撰寫時須遵守以下原則：
+Base 主要面相某些對象的基本及預設樣式，比如 [meyerweb](https://meyerweb.com/eric/tools/css/reset/) 或 [normalize](https://necolas.github.io/normalize.css/8.0.1/normalize.css) 版本的重製文件，或者是一些全域型的樣式設定，在撰寫時可參照以下規則：
 
 - 可使用元素選擇器、後代選擇器、子選擇器以及任何偽類將基本樣式應用於元素
-- 設定元素預設樣式，不應該出現任何 class、id 選擇器
-- 設定元素預設樣式，不應該出現任何 `@important` 字樣 (權重過高，無法覆蓋)
+- 不應該使用任何 class、id 選擇器設定元素預設樣式
+- 不應該使用 `@important` 設定元素預設樣式 (權重過高，無法覆蓋)
 
 可參考以下：
 
@@ -265,4 +276,100 @@ img {
 
 ### Layout 規則
 
-Layout
+Layout 主要面向一些網站中的大型區塊樣式，你可以把它想像成 7-1 模式中的 Layout，所處理的對象大同小異，較特別的是 SMACSS 中的 Layout 有針對重用性劃分出主要樣式和次要樣式，主要樣式是指畫面不發生重用的對象，而次要樣式自然就是指會發生重用的對象，在撰寫時可參照以下規則：
+
+- 主要對象通常使用 id 選擇器設置樣式
+- 次要對象通常使用 class 選擇器設置樣式
+- 次要對象可提供 `l-` 或 `layout-` 前綴用以將佈局樣式與基本樣式做區隔
+
+可參考以下：
+
+<!-- prettier-ignore-start -->
+```scss
+#header, #article, #footer {
+  width: 960px;
+  margin: auto;
+}
+
+#article {
+  border: solid #CCC;
+  border-width: 1px 0 0;
+}
+```
+<!-- prettier-ignore-end -->
+
+有違於一般寫網頁的習慣，再 SMACSS 定義的主要樣式中是可以使用 id 選擇器的，當然這僅限於畫面不重複的對象，如果你需要根據用戶的喜好使用不同的佈局，可另外搭配 Layout 使用 class 定義的次要樣式：
+
+```scss
+#article {
+  float: left;
+}
+
+#sidebar {
+  float: right;
+}
+
+.l-flipped #article {
+  float: right;
+}
+
+.l-flipped #sidebar {
+  float: left;
+}
+```
+
+藉由 CSS 疊層的特性，應用到更高層的 Layout。作者有提到不要把 **"認為"** 的區塊都當成主要樣式，也就是使用 id 選擇器撰寫樣式，你可以參考下面這個範例：
+
+```html
+<div id="featured">
+  <h2>Featured</h2>
+  <ul>
+    <li><a href="…">…</a></li>
+    <li><a href="…">…</a></li>
+    …
+  </ul>
+</div>
+```
+
+如果不考慮 SMACSS 推薦的作法，我們會傾向於向 `featured` 周圍的 div 添加 id，之後針對內容進行樣式設定：
+
+```scss
+div#featured ul {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+div#featured li {
+  float: left;
+  height: 100px;
+  margin-left: 10px;
+}
+```
+
+這樣子撰寫的問題在於等同於綁定了目標對象，這邊指 `#featured` 只能套用在 `div` 標籤上，且由於使用了 id 選擇器，代表同個頁面中只能存在單個套用對象，最後個問題是 `#featured` 內所有的 `li` 都會吃到 `float: left` 樣式，這都有違 SMACSS 的設計原則，作者建議可以改成這樣：
+
+```scss
+.l-grid {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+.l-grid > li {
+  display: inline-block;
+  margin: 0 0 10px 10px;
+
+  /* IE7 hack to mimic inline-block on block elements */
+  *display: inline;
+  *zoom: 1;
+}
+```
+
+沒錯，就如同 OOCSS 中的容器與內容分離概念，並且增加了 `l-` 前綴用以快速辨識對象的相關性，這邊使用了 `>` 子對象選擇器避免有例外的 `li` 對象套用到樣式。
+
+在這邊作者想強調的是，不要把自己局限在只能使用主要樣式，也就是使用 id 選擇器撰寫樣式，id 選擇器與 class 選擇器之間的效能並不會差異太大，且使用 id 選擇器無疑是增加撰寫樣式表的複雜性，所以 id 選擇器也並非必須。
+
+### Module 規則
+
+Module 主要面向
