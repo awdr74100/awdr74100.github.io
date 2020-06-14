@@ -7,7 +7,7 @@ description:
 categories: [SCSS]
 tags: [SCSS, CSS, CSS Methodologies]
 date: 2020-06-10 13:45:55
-updated: 2020-06-10 13:45:55
+updated: 2020-06-14 17:14:46
 ---
 
 ## 前言
@@ -22,7 +22,9 @@ updated: 2020-06-10 13:45:55
 
 ## OOCSS（Object Oriented CSS）
 
-[OOCSS](http://oocss.org/) 是所有 CSS 方法論最早提出的一個，主要由 [Nicole Sullivan](https://github.com/stubbornella) 提出，你可以參考作者撰寫的 [WiKi](https://github.com/stubbornella/oocss/wiki)，OOCSS 就如同字面上的意思，主要依造 Object Oriented (物件導向) 方式來撰寫目標，這邊你可以把它理解為將 CSS 物件化、模組化，其主要原則有以下兩點：
+<img src="https://i2.wp.com/css-tricks.com/wp-content/uploads/2018/05/bem-sio.jpg?ssl=1" width="80%">
+
+[OOCSS](http://oocss.org/) 是所有 CSS 方法論最早提出的一個，主要由 [Nicole Sullivan](https://github.com/stubbornella) 提出，你可以參考作者撰寫的 [WiKi](https://github.com/stubbornella/oocss/wiki)，OOCSS 就如同字面上的意思，主要依造物件導向 (Object-Oriented Programming, OOP) 方式來撰寫目標，這邊你可以把它理解為將 CSS 物件化、模組化，其主要原則有以下兩點：
 
 - Separate structure and skin：結構與樣式分離
   - 例子：`.btn-primary`、`.rounded-top`
@@ -32,7 +34,7 @@ updated: 2020-06-10 13:45:55
 OOCSS 提倡的理念是樣式可重用性，在撰寫時也需符合以下規則：
 
 - 應盡量避免使用後代選擇器 (`.navbar ul`) 或 id 選擇器 (`#list`)
-- 應盡量避免樣式依賴於結構 (低耦合概念)，嘗試使用 class 替代 element 選擇器
+- 應盡量避免樣式依賴於結構 (低耦合概念)，嘗試使用 class 替代 tag 選擇器
 
 ### 結構與樣式分離
 
@@ -100,7 +102,7 @@ $theme-colors: (
 - 樣式 (skin)：`color`、`background-color`、`border-color`
 - 結構 (structure)：`display`、`box-sizing`、`padding` (通為樣式，但這控制其結構，故屬結構)
 
-這應該蠻好理解的，凡是顏色、邊框樣式、陰影這些都屬於 OOCSS 中所說的 skin，而像 `display` 這種或封裝對象本身就該擁有的屬性，這指 `padding`，就是所稱的 structure，你可能會問這樣的用意是什麼？直接來看 `<button>` 是如何使用這些樣式的：
+這應該蠻好理解的，凡是顏色、邊框樣式、陰影這些都屬於 OOCSS 中所說的 skin，而像 `display` 這種或封裝對象本身就該擁有的屬性，這指 `padding`，就是所稱的 structure，你可能會問這樣的用意是什麼？直接來看 `button` 是如何使用這些樣式的：
 
 ```html
 <button class="btn btn-primary">Primary</button>
@@ -141,7 +143,7 @@ $theme-colors: (
 <button class="btn btn-danger">Danger</button>
 ```
 
-相信透過上面的範例你就能了解何謂結構與樣式分離了，如果以 OOCSS 中的 OO (Object Oriented) 做描述的話，這邊的結構 (Structure) 就是所指的對象，以上面範例來說，我們封裝了 `<button>` 對象，往後如果要使用 `<button>`的話，只需要撰寫 `.btn` 結構樣式名稱與對應的 skin 即可。
+相信透過上面的範例你就能了解何謂結構與樣式分離了，如果以 OOCSS 中的 OO (Object Oriented) 做描述的話，這邊的結構 (Structure) 就是所指的對象，以上面範例來說，我們封裝了 `button` 對象，往後如果要使用 `button`的話，只需要撰寫 `.btn` 結構樣式名稱與對應的 skin 即可。
 
 ### 容器與內容分離
 
@@ -225,6 +227,8 @@ $theme-colors: (
 
 ## SMACSS (Scalable and Moduler Architecture fro CSS)
 
+<img src="https://cythilya.github.io/assets/css/smacss-example.png" width="80%">
+
 [SMACSS](http://smacss.com/) 主要由 [Jonathan Snook](https://snook.ca/) 提出，從名稱上的 Architecture 字樣可以得知他是以專案整體的結構來做考量，除了擁有與 OOCSS 類似的 HTML 與 CSS 分離概念，還有其最具特色的結構化命名概念，所謂的結構化命名是指將對象做結構分類並將其限制命名，藉此達到容易擴展及模組化目的，SMACSS 相比於 OOCSS 更偏向整個專案結構的分類及模組化你的 CSS，其中結構的分類有：
 
 - Base
@@ -243,8 +247,8 @@ $theme-colors: (
   - 例子：`.card`、`.card-header`、`.card-body`
 - State：使用 `is-` 為狀態樣式提供前綴，透過語意化方式了解當前狀態
   - 例子：`.is-active`、`.is-hidden`、`.is-collapsed`
-- Theme：不須特別提供前綴，目的在於更改對象原本的主題樣式
-  - 例子：`.modal-dark`、`.badge-white`
+- Theme：不須特別提供前綴，使用對象本身的名稱覆蓋其原先的主題樣式
+  - 例子：`.l-header-dark`、`.card-dark`
 
 ### Base 規則
 
@@ -363,7 +367,7 @@ div#featured li {
 }
 ```
 
-其實 SMACSS 中的次要佈局樣式道理就如同 OOCSS 的容器與內容分離，目的都是將其依賴性降到最低，從上面範例來看，`l-grid` 目前可應用於任何容器以創建浮動樣式的佈局了，同時我們也將選擇器修改為 `>` 子對象選擇器避免有例外的樣式套用到對象，還有將高度給拿掉讓對象能夠自適應，關於次要佈局樣式的實作，你就把它當成在 OOCSS 的基礎下加上其命名限制中的 `-l` 前綴就可以了。
+其實 SMACSS 中的次要佈局樣式道理就如同 OOCSS 的容器與內容分離，目的都是將其依賴性降到最低，從上面範例來看，`l-grid` 目前已可應用於任何容器以創建浮動樣式的佈局了，同時我們也將選擇器修改為 `>` 子對象選擇器避免有例外的樣式套用到對象，還有將高度給拿掉讓對象能夠自適應，關於次要佈局樣式的實作，你就把它當成在 OOCSS 的基礎下加上其命名限制中的 `-l` 前綴就可以了。
 
 ### Module 規則
 
@@ -391,7 +395,7 @@ Module 主要面向一些網站中的可重用元件樣式，與 Layout 不同�
 }
 ```
 
-這樣的問題在於 `.card` 底下第一層 `div` 都被綁死了，如果我們今天要針對不同 `div` 撰寫效果，勢必要做出改變，在 SMACSS 中的 Module 建議通通使用 class 選擇器撰寫樣式：
+這樣的問題在於 `.card` 底下第一層 `div` 都被綁死了，如果我們今天要針對不同 `div` 撰寫效果，勢必要做些調整，在 SMACSS 中的 Module 建議通通使用 class 選擇器撰寫樣式：
 
 ```scss
 .card-header {
@@ -433,13 +437,13 @@ Module 主要面向一些網站中的可重用元件樣式，與 Layout 不同�
 }
 ```
 
-此時可以直接套用子模組樣式：
+接著在指定對象添加模組與子模組的 class 名稱：
 
 ```html
 <div class="pod pod-constrained">...</div>
 ```
 
-其實他的概念就如同 OOCSS 中的結構與樣式分離，只不過在這稱其為子類化模組，透過將基底樣式抽離出來，往後在不同區域使用模組時，只需添加基底樣式名稱與子模組名稱即可達到效果
+其實他的概念就如同 OOCSS 中的結構與樣式分離，只不過在這稱其為子類化 (Subclassing)，透過將基底樣式抽離出來，往後在不同區域使用模組時，只需添加模組名稱與子類化模組名稱即可達到效果
 
 ### State 規則
 
@@ -488,7 +492,7 @@ Theme 主要面向網站主視覺而定義的 Layout 或 Module 樣式，你可�
 }
 ```
 
-這邊要注意，你不需要以獨立的 class 去添加主題樣式，在 Theme 的規則中是建議使用與原先 Layout 或 Module 同樣的樣式名稱，而 `themeA.css` 這隻檔案必定是在 `all.css` 之後才載入，這樣就可達到覆蓋樣式的目的，如果網站有很多的主題樣式，也只需要新增像是 `themeB.css` 的檔案並撰寫如下：
+這邊要注意，你不需要以獨立的 class 去添加主題樣式，在 Theme 的規則中是建議使用與原先 Layout 或 Module 同樣的樣式名稱，而 `themeA.css` 這隻檔案務必得在 `all.css` 之後才載入，這樣就可達到覆蓋樣式的目的，如果網站有很多的主題樣式，也只需要新增像是 `themeB.css` 的檔案並撰寫如下：
 
 ```scss
 .mod {
@@ -497,3 +501,320 @@ Theme 主要面向網站主視覺而定義的 Layout 或 Module 樣式，你可�
 ```
 
 之後改載入 `all.css` 與 `themeB.css` 檔案，這樣就能達到更改不同主題顏色的目的。
+
+### 改變狀態
+
+SMACSS 連同對象的狀態如何改變也有做說明，主要透過以下三種方式：
+
+- 透過 JavaScript 改變對象狀態
+- 透過 pseudo-class 改變對象狀態
+- 透過 media query 改變對象狀態
+
+#### 透過 JavaScript 改變對象狀態
+
+在大多數情況下，使用 JavaScript 更改對象狀態可能是最直接的方式，參考以下範例：
+
+```js
+$('.btn-close').click(function () {
+  $(this).parents('.dialog').addClass('is-hidden');
+});
+```
+
+這應該蠻好理解的，這邊運用了 State 所定義的樣式來更改父層對象狀態，你可能會想，我是否可以透過 Module 所定義的子類別模組來更改對象狀態呢？如下所示：
+
+```js
+$('.btn-close').click(function () {
+  $(this).parents('.dialog').addClass('dialog-hidden');
+});
+```
+
+除了直接以 class 來操作對象狀態外，也可以利用 `data-*` 屬性來完成同樣目的，以下範例：
+
+```scss
+.btn[data-state='default'] {
+  color: #333;
+}
+.btn[data-state='pressed'] {
+  color: #000;
+}
+.btn[data-state='disabled'] {
+  opacity: 0.5;
+  pointer-events: none;
+}
+```
+
+```html
+<button class="btn" data-state="disabled">Disabled</button>
+```
+
+`data-*` 屬性是 HTML5 新增的語法，我們通常使用它來塞入一些抽象的 Primary Key，在資料庫操作時特別好用，同樣道理，我們也可塞入屬性的關鍵字，你可以參考上面範例，接著使用 JavaScript 將其更改以切換對象狀態：
+
+```js
+$('.btn').bind('click', function () {
+  $(this).attr('data-state', 'pressed');
+});
+```
+
+#### 透過 pseudo-class 改變對象狀態
+
+在 SMACSS 有提到請不要過度的使用 State 去控制對象的狀態，像是一些基本的轉換效果使用 CSS 中的 `:hover`、`:focus` 偽類可能是更好的選擇，如下範例：
+
+<!-- prettier-ignore-start -->
+```scss
+.btn { /* ... */ }
+.btn:hover { /* ... */ }
+.btn:focus { /* ... */ }
+
+.btn-default { /* ... */ }
+.btn-default:hover { /* ... */ }
+
+.btn.is-pressed { /* ... */ }
+.btn.is-pressed:hover { /* ... */ }
+
+.btn-default.is-pressed { /* ... */ }
+.btn-default.is-pressed:hover { /* ... */ }
+```
+<!-- prettier-ignore-end -->
+
+#### 透過 media query 改變對象狀態
+
+除了透過 class 與偽類更改對象狀態以外，我們也可使用 media query 來完成同樣目的，以下範例：
+
+```scss
+.nav > li {
+  float: left;
+}
+
+@media screen and (max-width: 400px) {
+  .nav > li {
+    float: none;
+  }
+}
+
+.sidebar {
+  float: right;
+  width: 25%;
+}
+
+@media screen and (max-width: 400px) {
+  .sidebar {
+    float: none;
+    width: auto;
+  }
+}
+```
+
+以往我們會習慣把 `@media` 放在所有程式碼的最下方統一做管理，但在 SMACSS 的建議中，反而是希望把 `@media` 放在相關的程式碼下方，就像上面範例這樣，當然你可能會想，這樣不是會造成 `@media` 語句重複被撰寫嗎？比起程式碼大小，網頁中載入的靜態資源，比如圖片，這些才是真正會影響性能的關鍵，不然你看怎麼一般人都喜歡使用 `@mixin` 搭配 `@content` 來撰寫 RWD 內容？
+
+## BEM (Block Element Modifier)
+
+<img src="https://miro.medium.com/max/1400/1*5VGR1kwb_1KJOhhhCPeL-A.png" width="80%">
+
+[BEM](http://getbem.com/) 主要由 [Yandex](https://tech.yandex.com/bem/) 公司所推出，其概念為透過命名方式將網頁獨立的區塊包裝成元件，有別於 OOCSS 或 SMACSS 需了解其中的組件化思維才能動作，BEM 透過最簡單且最直接的方式將原本抽象的組件化過程實踐在網頁裡頭，該方法論是基於三個要點所組成，分別為：
+
+- Block：盡量以工具性質來命名對象
+  - 例子：`.list`、`.card`、`.navbar`
+- Element：使用 `__` 兩個下劃線 (underline) 連接 Block 對象
+  - 例子：`.list__item`、`.card__img`、`.navbar__brand`
+- Modifier：使用 `--` 兩個連字符 (hyphen) 連結 Block 或 Element 對象
+  - 例子：`.list__item--active`、`.card__img--rounded`、`.navbar--dark`
+
+在 BEM 並沒有那些抽象的規則，任意對象都能透過其命名包裝成元件，且 BEM 是基於功能導向 (Function-Oriented Programming, FOP) 而設計的，不存在像是 `.pl-5` 這種難以理解的 class 名稱，為了保證 BEM 能夠合理的將對象模組化，請務必遵守以下規則：
+
+- 嚴禁使用 class 除外的選擇器撰寫樣式
+- 不要過度模組化，應適當拿捏對象的模組化深度
+
+### Block 區塊
+
+所謂的 Block 是指網頁中可獨立存在的對象，你可以把它想像成 SMACSS 中的 Layout 或 Module，這邊稱其為區塊，參考以下範例：
+
+- Block 名稱需能清楚的表達其用途、功能、意義，且具有唯一性
+- Block 可以放置在頁面上的任何位置，也可以互相嵌套
+- 單詞之間可採小駝峰式或使用 `-` 將其分隔
+
+<!-- prettier-ignore-start -->
+```scss
+.list { /* ... */ }
+
+.card { /* ... */ }
+
+.navbar { /* ... */ }
+
+.header { /* ... */ }
+```
+<!-- prettier-ignore-end -->
+
+還記得我們之前在 OOCSS 提到的結構與樣式分離嗎？這邊的 Block 就是指結構，Block 相比於 Element、Modifier，本身可獨立存在，不須依賴於任何對象。
+
+### Element 元素
+
+如果把區塊描述成元件，所謂的 Element 就是指依賴於此元件的子元件，參考以下範例：
+
+- Element 名稱需能清楚的表達存在於元件的用途及意義性
+- Element 和 Element 之間可以彼此嵌套
+- Element 與 Block 之間使用 `__` 兩個下劃線 (underline) 連接
+- 單詞之間可採小駝峰式或使用 `-` 將其分隔
+
+<!-- prettier-ignore-start -->
+```scss
+.list__item { /* ... */ }
+
+.card__img { /* ... */ }
+
+.navbar__brand { /* ... */ }
+
+.header__title { /* ... */ }
+```
+<!-- prettier-ignore-end -->
+
+這邊要注意，Element 無法獨立於 Block 之外，其存在的目的為子元件，元件既不存在何來的子元件？如果你使用的是 SCSS，可以改透過 `&` 父選擇器來撰寫：
+
+```scss
+.list {
+  display: flex;
+
+  &__item {
+    flex: 0 0 25%;
+  }
+}
+```
+
+這樣是不是快很多？且可讀性增加了不少，接著將樣式套用的 HTML 對象上：
+
+```html
+<ul class="list">
+  <li class="list__item"></li>
+  <li class="list__item"></li>
+  <li class="list__item"></li>
+  <li class="list__item"></li>
+</ul>
+```
+
+有沒有逐漸感受到 BEM 的魅力阿？我們不需要去背像是 SMACSS 這麼複雜的結構概念，成效也未必來的比較好，不覺得使用 BEM 輕鬆許多嗎？且能夠直接從 class 名稱就能得知其元件的結構性，這也是 BEM 相比於 SMACSS、OOCSS 更多人使用的原因。
+
+---
+
+這邊補充關於 Element 彼此嵌套的案例：
+
+```html
+<ul class="list">
+  <li class="list__item">
+    <a href="list__item__link"></a>
+  </li>
+  <li class="list__item">
+    <a href="list__item__link"></a>
+  </li>
+</ul>
+```
+
+一個元件不太可能只有兩層結構，通常都具有三層以上的結構，此時如果使用 BEM 來撰寫，可能就會長的像上面這個樣子，但問題是這樣子的組件化處理會造成嵌套越來越深，導致 HTML 代碼相對醜陋，如果存在多級嵌套，可嘗試做以下修改：
+
+```html
+<ul class="list">
+  <li class="list__item">
+    <a href="list__link"></a>
+  </li>
+  <li class="list__item">
+    <a href="list__link"></a>
+  </li>
+</ul>
+```
+
+這意謂著所有的子元素都僅僅會被 `.list` 影響，`link` 不會被綁死在 `item` 下，代表 `link` 可自由放置在 `list` 的任何位置。
+
+### Modifier 修飾子
+
+Modifier 就如同 OOCSS 中的 Skin 與 SMACSS 中的 State，主要用來表述 Block 或 Element 的行為及外觀，參考以下範例：
+
+- Modifier 名稱需能清楚表達對象外觀、狀態或行為
+- Modifier 與 Block 或 Element 之間使用 `--` 兩個連字符 (hyphen)
+- 單詞之間可採小駝峰式或使用 `-` 將其分隔
+
+<!-- prettier-ignore-start -->
+```scss
+.list__item--active { /* ... */ }
+
+.card__img--rounded { /* ... */ }
+
+.navbar--dark { /* ... */ }
+
+.header__title--size-s { /* ... */ }
+```
+<!-- prettier-ignore-end -->
+
+Modifier 無法單獨存在，畢竟 Modifier 的出現必定是作用於某個對象，這邊所指的對象有可能為 Block 或 Element，如果你使用的是 SCSS，可以改透過 `&` 父選擇器來撰寫：
+
+```scss
+.list {
+  display: flex;
+
+  &__item {
+    flex: 0 0 25%;
+
+    &--active {
+      color: #fffc3d;
+    }
+  }
+
+  &--dark {
+    color: #fff;
+    background-color: #272727;
+  }
+}
+```
+
+通常我們在使用 BEM 時，都會與 SCSS 搭配做使用，不管是效率還是可讀性都提升了不少，接著套用到 HTML 對象上
+
+```html
+<ul class="list list--dark">
+  <li class="list__item"></li>
+  <li class="list__item list__item--active"></li>
+  <li class="list__item"></li>
+  <li class="list__item"></li>
+</ul>
+```
+
+從結果可以很明顯看出其關聯性，在多人合作時，新接手這個項目的人也可以很容易從 class 名稱來分辨對象的元件結構，那些是 Block，那些是 Element，那些是 Modifier，並進一步推斷出哪部分的 HTML 可以獨立使用，這也就是 BEM 當初設立的初衷，你不需要花費很多的時間去了解像是 SMACSS、OOCSS 那種抽象的規則，BEM 用最直接的方式告訴你似乎一切不需要這麼複雜。
+
+### Mix 混入
+
+Mix 並不是什麼 BEM 的概念，他算是一種處理方式，直接來看範例：
+
+```html
+<nav class="menu">
+  <ul class="menu__list">
+    <li class="menu__item">
+      <a href="menu__link"></a>
+    </li>
+  </ul>
+  <button class="btn btn--primary"></button>
+</nav>
+```
+
+就像我們前面講的，Block 之間是可以互相嵌套的，這邊放置了由 `.btn` 與 `.btn--primary` 組成的按鈕，很明顯的 `.btn` 就是所指的 Block，假設我們想在這一個按鈕新增像是圓角的樣式，依照 Mix 會這樣處理：
+
+```html
+<nav class="menu">
+  <ul class="menu__list">
+    <li class="menu__item">
+      <a href="menu__link"></a>
+    </li>
+  </ul>
+  <button class="btn btn--primary menu__btn"></button>
+</nav>
+```
+
+之後在針對 `menu__btn` 撰寫圓角的樣式即可，Mix 想要表達的是在保持 Block 獨立存在的同時，也可以針對不同嵌套的 Block 做樣式的混入，但在這邊又一個問題是，`.menu__btn` 必須寫在 `.btn` 之前才能將其覆蓋並作用，如果依照 OOCSS 的概念，結構與樣式應該要徹底分離才對，此時可以這樣做：
+
+```html
+<nav class="menu">
+  <ul class="menu__list">
+    <li class="menu__item">
+      <a href="menu__link"></a>
+    </li>
+  </ul>
+  <button class="btn btn--primary btn--rounded"></button>
+</nav>
+```
+
+沒錯，就是直接在 `.btn` 新增一個 Modifier 樣式，這樣也就能確保 `.menu` 與 `.btn` 彼此沒有關連性，且依然能有其目的效果，雖然你的 Modifier 可能會隨著項目而增加，但不覺得這樣子的處理相比於 Mix 要來的更好嗎？各位可以自行參考看看。
