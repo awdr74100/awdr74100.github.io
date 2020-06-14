@@ -22,16 +22,16 @@ updated: 2020-06-14 17:14:46
 
 ## OOCSS（Object Oriented CSS）
 
-<img src="https://i2.wp.com/css-tricks.com/wp-content/uploads/2018/05/bem-sio.jpg?ssl=1" width="80%">
+<img src="https://i.imgur.com/qbPyQwF.jpg" width="80%">
 
-[OOCSS](http://oocss.org/) 是所有 CSS 方法論最早提出的一個，主要由 [Nicole Sullivan](https://github.com/stubbornella) 提出，你可以參考作者撰寫的 [WiKi](https://github.com/stubbornella/oocss/wiki)，OOCSS 就如同字面上的意思，主要依造物件導向 (Object-Oriented Programming, OOP) 方式來撰寫目標，這邊你可以把它理解為將 CSS 物件化、模組化，其主要原則有以下兩點：
+[OOCSS](http://oocss.org/) 是所有 CSS 方法論最早提出的一個，主要由 [Nicole Sullivan](https://github.com/stubbornella) 提出，你可以參考作者撰寫的 [WiKi](https://github.com/stubbornella/oocss/wiki)，OOCSS 就如同字面上的意思，主要依造物件導向 (Object-Oriented Programming, OOP) 方式來撰寫目標，這邊你可以把它理解為將 CSS 物件化、模組化，其主要概念為以下兩點：
 
 - Separate structure and skin：結構與樣式分離
   - 例子：`.btn-primary`、`.rounded-top`
 - Separate container and content：容器與內容分離
   - 例子：`.container`、`.col-4`
 
-OOCSS 提倡的理念是樣式可重用性，在撰寫時也需符合以下規則：
+OOCSS 提倡的理念是樣式可重用性，在撰寫時需符合以下規則：
 
 - 應盡量避免使用後代選擇器 (`.navbar ul`) 或 id 選擇器 (`#list`)
 - 應盡量避免樣式依賴於結構 (低耦合概念)，嘗試使用 class 替代 tag 選擇器
@@ -227,7 +227,7 @@ $theme-colors: (
 
 ## SMACSS (Scalable and Moduler Architecture fro CSS)
 
-<img src="https://cythilya.github.io/assets/css/smacss-example.png" width="80%">
+<img src="https://i.imgur.com/w1b2SQf.png" width="80%">
 
 [SMACSS](http://smacss.com/) 主要由 [Jonathan Snook](https://snook.ca/) 提出，從名稱上的 Architecture 字樣可以得知他是以專案整體的結構來做考量，除了擁有與 OOCSS 類似的 HTML 與 CSS 分離概念，還有其最具特色的結構化命名概念，所謂的結構化命名是指將對象做結構分類並將其限制命名，藉此達到容易擴展及模組化目的，SMACSS 相比於 OOCSS 更偏向整個專案結構的分類及模組化你的 CSS，其中結構的分類有：
 
@@ -557,7 +557,7 @@ $('.btn').bind('click', function () {
 
 #### 透過 pseudo-class 改變對象狀態
 
-在 SMACSS 有提到請不要過度的使用 State 去控制對象的狀態，像是一些基本的轉換效果使用 CSS 中的 `:hover`、`:focus` 偽類可能是更好的選擇，如下範例：
+在 SMACSS 有提到請不要過度的使用 JavaScript 去控制對象的狀態，像是一些基本的轉換效果使用 CSS 中的 `:hover`、`:focus` 偽類可能是更好的選擇，如下範例：
 
 <!-- prettier-ignore-start -->
 ```scss
@@ -608,7 +608,7 @@ $('.btn').bind('click', function () {
 
 ## BEM (Block Element Modifier)
 
-<img src="https://miro.medium.com/max/1400/1*5VGR1kwb_1KJOhhhCPeL-A.png" width="80%">
+<img src="https://i.imgur.com/VXNptuL.png" width="80%">
 
 [BEM](http://getbem.com/) 主要由 [Yandex](https://tech.yandex.com/bem/) 公司所推出，其概念為透過命名方式將網頁獨立的區塊包裝成元件，有別於 OOCSS 或 SMACSS 需了解其中的組件化思維才能動作，BEM 透過最簡單且最直接的方式將原本抽象的組件化過程實踐在網頁裡頭，該方法論是基於三個要點所組成，分別為：
 
