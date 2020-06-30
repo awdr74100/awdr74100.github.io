@@ -225,7 +225,7 @@ webpack-demo/
 module.exports = {
   plugins: [
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': '<當前環境>',
+      'process.env.NODE_ENV': JSON.stringify('<當前環境>'),
     }),
   ],
 };
