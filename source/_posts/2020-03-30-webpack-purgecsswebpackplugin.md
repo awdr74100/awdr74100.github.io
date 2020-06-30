@@ -158,7 +158,7 @@ module.exports = {
 };
 ```
 
-事實上，Webpack 的 Plugin 配置方式都大同小異，purgecss-webpack-plugin 也不例外，這邊比較特別的是 `path` 這個可傳遞選項，此選項主要用於傳入需分析的檔案路徑，為了方便，這邊我們使用 glob 套件來匹配檔案路徑，我們可以嘗試開一個檔案並且引入 glob 模組試試看：
+事實上，Webpack 的 Plugin 配置方式都大同小異，purgecss-webpack-plugin 也不例外，這邊比較特別的是 `paths` 這個可傳遞選項，此選項主要用於傳入需分析的檔案路徑，為了方便，這邊我們使用 glob 套件來匹配檔案路徑，我們可以嘗試開一個檔案並且引入 glob 模組試試看：
 
 ```js
 const glob = require('glob');
@@ -178,7 +178,7 @@ console.log(result);
 */
 ```
 
-從上面結果可以得知，glob 套件主要用於獲取指定匹配的檔案路徑，如果你有使用過 Gulp，因該很熟悉才對，因為 Gulp 的底層就是使用 glob 來獲取所要處理的檔案。當我們拿到所要分析的檔案路徑，就可以把這個路徑陣列丟給 `path` 選項去做分析，這就是我們上面在做的事情。
+從上面結果可以得知，glob 套件主要用於獲取指定匹配的檔案路徑，如果你有使用過 Gulp，因該很熟悉才對，因為 Gulp 的底層就是使用 glob 來獲取所要處理的檔案。當我們拿到所要分析的檔案路徑，就可以把這個路徑陣列丟給 `paths` 選項去做分析，這就是我們上面在做的事情。
 
 至 `./src/index.html` 撰寫 HTML 模板範例：
 
@@ -196,7 +196,7 @@ console.log(result);
 </html>
 ```
 
-請注意，我們的 HTML 模板只有使用到 `.text-primary` 這個 class 樣式，並沒有使用到其他的 CSS 樣式。
+請注意，我們的 HTML 模板只有使用到 `.text-primary` 這個 class 樣式，並沒有使用到其他的 CSS 樣式，以合理的角度來說，這些沒有使用到的 CSS 都應該被 purgecss-webpack-plugin 移除掉才對。
 
 entry 入口處 (`src/main.js`) 引入 SCSS 檔案：
 
