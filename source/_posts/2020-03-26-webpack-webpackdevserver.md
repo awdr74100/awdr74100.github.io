@@ -20,6 +20,7 @@ updated: 2020-03-27 22:00:10
 - webpack-dev-server 基本使用
 - webpack-dev-server 可傳遞選項
 - 補充：webpack-dev-server 開啟 HMR 支持
+- 補充：webpack-dev-server 允許本地網路下設備進行訪問
 
 ## webpack-dev-server 安裝
 
@@ -293,15 +294,23 @@ module.exports = {
 - stats：`none` | `errors-only` | `minimal` | `normal` | `verbose` | `Object`
   精準控制要顯示的 bundle 訊息，可使用集成配置或自訂配置，可參考 [stats 文檔](https://webpack.js.org/configuration/stats/)，默認為 `normal`
 
+- host：`String`
+  指定要使用的主機，默認為 `localhost`
+
+- useLocalIp：`Boolean`
+  使用本地 IP 打開瀏覽器，默認為 `false`
+
 範例：
 
 ```js
 module.exports = {
   devServer: {
-    clientLogLevel: 'warn',
+    clientLogLevel: 'silent',
     compress: true,
     overlay: true,
     stats: 'errors-only',
+    host: '0.0.0.0', // 允許本地網路下設備進行訪問
+    useLocalIp: true, // 直接以本地 IP 打開瀏覽器
   },
 };
 ```
@@ -382,3 +391,62 @@ module.expores = {
 ```
 
 前面有講解到關於 `contentBase` 的使用技巧，而 `watchContentBase` 這一個選項就是用來更改 `contentBase` 作用的，當你開啟這一個選項，它會幫你監控指定目錄或檔案是否有更動，如果有，即刷新頁面。當然如果你使用的是像 vue-loader 等方式進行畫面渲染的話，就沒有這一個問題，因為都會通過 entry 入口處，而 html-webpack-plugin 是以抓取模板的方式進行處理，並不會通過 entry，這也導致了無法支援 HMR，說實在的，真的很可惜阿。
+
+## 補充：webpack-dev-server 允許本地網路下設備進行訪問
+
+這邊補充關於同個網路下的設備如何訪問 webpack-dev-server，這是一個我蠻常使用的技巧，好讓網站在正式上線前能夠透過不同裝置查看是否符合預期效果，在開始介紹之前，**請確保你想訪問的設備與當前 webpack-dev-server 執行的設備在同個區網下**，讓我們先從配置開始說明：
+
+```js
+module.expores = {
+  devServer: {
+    host: '0.0.0.0',
+  },
+};
+```
+
+將 `host` 設置為 `0.0.0.0` 的目的在於監聽本機所有能訪問的 IP 地址，這邊你可以把它理解為將本機中的 `IPv4` 位址設為外部可訪問，此時開啟伺服器會跳出以下畫面：
+
+![將 host 設為 0.0.0.0](https://i.imgur.com/X79xFMt.png)
+
+到這邊我們就已經成功一半了，剩下的一半為透過 `IPv4` 位址訪問伺服器，這邊我們可輸入 `ipconfig` 查詢 `IPv4` 位址：
+
+![查詢 IPv4 位址](https://i.imgur.com/BdC2CuW.png)
+
+接著輸入 `IPv4` 位址與端口號碼即可訪問到伺服器：
+
+![成功訪問到伺服器](https://i.imgur.com/saCnIPI.png)
+
+在同個網路下的設備也是透過這個 `IPv4` 位址與端口號碼訪問伺服器，如果你嫌上面步驟麻煩，也可設置 `useLocalIp` 選項：
+
+```js
+module.expores = {
+  devServer: {
+    host: '0.0.0.0',
+    useLocalIp: true,
+  },
+};
+```
+
+這樣它預設就會運行在本機中的 `IPv4` 位址，你也不需要特地去找 `IPv4` 位址，前面只是在告訴你如何尋找 `IPv4` 位址而已，通常我也是直接使用這一個選項，真正達到懶人的境界。
+
+這邊補充關於前端在串接 API 時，同個網路下的設備可能發生的問題：
+
+```plain
+http://localhost:3000/login
+```
+
+通常我們前端在開發時所串接的 API 都是跑在本地端的，雖然說直接以 deploy 上去的伺服器來串接會比較方便，但可能有耗損流量的問題，我自己是習慣跑在 `localhost` 就對了，這時候就得注意區網下設備是無法訪問到 `localhost` 的，因為 `localhost` 預設是指向 `127.0.0.1`，代表只有本機可以訪問，我們所要做的就是將 API 的位址更改為外部可訪問的位址，即前面的 `host` 設置：
+
+```js
+app.listen(port, '0.0.0.0', () => {
+  console.log(`開啟 port 為 ${port} 的 localhost`);
+});
+```
+
+這邊拿 Express 來說明，上面是一個很基本的開啟 localhost 方法，第一個參數為 `port`，第二個參數為 `host`，將 `host` 設置為 `0.0.0.0` 即可與 webpack-dev-server 有同樣的效果，其實在 Express 不需要特別去做設置，因為預設的 `host` 就是 `0.0.0.0`，這邊只是要強調如何更改 `host` 選項而已，接著前端的 API 可改由以下訪問：
+
+```plain
+http://192.168.1.107:3000/login
+```
+
+這邊就能避免本機可訪問 API，區網下設備無法訪問 API 的問題
