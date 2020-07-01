@@ -7,7 +7,7 @@ description:
 categories: [Gulp]
 tags: [Gulp 4, Node.js]
 date: 2020-01-20 02:01:36
-updated: 2020-02-08 01:59:02
+updated: 2020-07-02 02:45:46
 ---
 
 ## 前言
@@ -72,15 +72,15 @@ $ gulp imagemin
 
 生成 `./public/img/IMG.JPG` 圖檔，觀察已壓縮與未壓縮檔案大小差異：
 
-未壓縮圖片資訊：
+原圖：
 
 <img src="https://i.imgur.com/grzZrmK.png" alt="未壓縮圖片資訊">
 
-以壓縮圖片資訊：
+經過壓縮：
 
 <img src="https://i.imgur.com/EiWGpcr.png" alt="以壓縮圖片資訊">
 
-在不破壞原有圖檔畫質的情況下，gulp-imagemin 幫助我們壓縮了整整 50% 的大小，從原有的 144.7KB 變成 65.1KB，可以說是相當的有感，除此之外，我們還可以針對壓縮處理做細部設定，下面會再進行補充。
+可以發現壓縮後的圖檔幾乎看不出有任何失真的狀況，而圖檔大小卻整整縮小了 50% 之多，從原有的 144.7KB 縮減為 65.1KB，可以說是相當的有感，以後就再也不需要去使用像 [tinypng](https://tinypng.com/) 等類似的服務囉。
 
 ## gulp-imagemin 可傳遞選項
 
