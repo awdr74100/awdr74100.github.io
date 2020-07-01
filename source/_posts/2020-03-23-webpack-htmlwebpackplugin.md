@@ -7,7 +7,7 @@ description:
 categories: [Webpack]
 tags: [Webpack, Node.js, w3HexSchool]
 date: 2020-03-23 12:20:45
-updated: 2020-03-24 20:39:45
+updated: 2020-07-01 18:27:32
 ---
 
 ## 前言
@@ -21,6 +21,7 @@ updated: 2020-03-24 20:39:45
 - html-webpack-plugin 可傳遞選項
 - 補充：使用自帶的 lodash.template 進行撰寫
 - 補充：依照 chunk 載入不同檔案
+- 補充：壓縮並優化 HTML
 
 ## html-webpack-plugin 安裝
 
@@ -231,6 +232,9 @@ module.exports = {
 - favicon：`String`
   添加 favicon 圖示至 HTML，默認為 `""`
 
+- minify：`Boolean | Object`
+  將 HTML 進行壓縮，根據當前環境選擇是否啟用，即 `mode` 選項
+
 範例：
 
 ```js
@@ -239,12 +243,11 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
-      template: './src/index.html',
-      filename: 'index.html',
       meta: {
         viewport: 'width=device-width, initial-scale=1.0',
       },
       favicon: './src/img/favicon.ico',
+      minify: true, // 下方有更詳細的說明
     }),
   ],
 };
@@ -534,3 +537,60 @@ module.exports = {
   ],
 };
 ```
+
+## 補充：壓縮並優化 HTML
+
+Webpack 在 `mode` 為 `production` 時預設會使用 [TerserWebpackPlugin](https://webpack.js.org/plugins/terser-webpack-plugin/) 將 JavaScript 做壓縮處理，其餘包含像是 CSS、HTML 之類的資源都不會有任何的動作，這些我們都得自己處理，HTML 相比 CSS 需額外安裝套件進行壓縮來的較為方便，所有的操作在 html-webpack-plugin 就都能夠完成，參考以下：
+
+```js
+module.exports = {
+  plugins: [
+    new HtmlWebpackPlugin({
+      minify: true,
+    }),
+  ],
+};
+```
+
+不要懷疑就是這麼簡單，但通常我們不會直接將 `minify` 設為 `true`，這樣會導致在開發時增加除錯的困難度，較推薦的作法為 `development` 環境時不啟用壓縮，而 `production` 環境時啟用，參考以下：
+
+```js
+module.exports = {
+  plugins: [
+    new HtmlWebpackPlugin({
+      minify: process.env.NODE_ENV == 'development' ? false : true,
+    }),
+  ],
+};
+```
+
+事實上這正好也是 html-webpack-plugin 預設的配置，以一般的情況來說，我們不太需要碰到 `minify` 這個屬性，除非有自定義壓縮的需求，參考以下：
+
+```js
+module.exports = {
+  plugins: [
+    new HtmlWebpackPlugin({
+      collapseWhitespace: true,
+      removeComments: true,
+      removeRedundantAttributes: true,
+      removeScriptTypeAttributes: true,
+      removeStyleLinkTypeAttributes: true,
+      useShortDoctype: true,
+    }),
+  ],
+};
+```
+
+html-webpack-plugin 內部是使用 [html-minifier-terser](https://github.com/DanielRuf/html-minifier-terser#options-quick-reference) 進行壓縮處理，上面是 `minify` 設為 `true` 時預設所設置的處理，還有更多的細項可供設置，詳細可參考上方連結，這邊示範將 HTML 中的 `<script>` 代碼塊內容進行壓縮：
+
+```js
+module.exports = {
+  plugins: [
+    new HtmlWebpackPlugin({
+      minifyJS: true,
+    }),
+  ],
+};
+```
+
+這邊補充一點，如何使用了自定義方式進行設置，原先的屬性並不會被合併掉，如果你真的不想要預設的那些設置，可以針對各項將其設為 `false`。
