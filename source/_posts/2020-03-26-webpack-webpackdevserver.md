@@ -7,7 +7,7 @@ description:
 categories: [Webpack]
 tags: [Webpack, Node.js]
 date: 2020-03-26 00:20:08
-updated: 2020-03-27 22:00:10
+updated: 2020-07-01 16:56:38
 ---
 
 ## 前言
@@ -19,8 +19,8 @@ updated: 2020-03-27 22:00:10
 - webpack-dev-server 安裝
 - webpack-dev-server 基本使用
 - webpack-dev-server 可傳遞選項
-- 補充：webpack-dev-server 開啟 HMR 支持
-- 補充：webpack-dev-server 允許本地網路下設備進行訪問
+- 補充：開啟 HMR 支持
+- 補充：允許本地網路下設備進行訪問
 
 ## webpack-dev-server 安裝
 
@@ -315,7 +315,7 @@ module.exports = {
 };
 ```
 
-## 補充：webpack-dev-server 開啟 HMR 支持
+## 補充：開啟 HMR 支持
 
 在上面所有的操作中，我們都是以 Live Reload 方式進行，所謂的 Live Reload 就是只說在刷新瀏覽器時注入修改過後的代碼，達到即時更新的目的，雖然說已經很好用了，但是在某些情況下還是有點小抱怨，比如說 Live Reload 並不能夠保存應用的狀態 (states)，當刷新頁面後，應用之前的狀態也會丟失，因為它是以重新載入的方式處理修改過後的代碼，這在於某些情況下，真的很不方便，開發體驗也較差，你可以把它想像成傳統頁面與 SPA 頁面之間的差異。
 
@@ -392,7 +392,7 @@ module.expores = {
 
 前面有講解到關於 `contentBase` 的使用技巧，而 `watchContentBase` 這一個選項就是用來更改 `contentBase` 作用的，當你開啟這一個選項，它會幫你監控指定目錄或檔案是否有更動，如果有，即刷新頁面。當然如果你使用的是像 vue-loader 等方式進行畫面渲染的話，就沒有這一個問題，因為都會通過 entry 入口處，而 html-webpack-plugin 是以抓取模板的方式進行處理，並不會通過 entry，這也導致了無法支援 HMR，說實在的，真的很可惜阿。
 
-## 補充：webpack-dev-server 允許本地網路下設備進行訪問
+## 補充：允許本地網路下設備進行訪問
 
 這邊補充關於同個網路下的設備如何訪問 webpack-dev-server，這是一個我蠻常使用的技巧，好讓網站在正式上線前能夠透過不同裝置查看是否符合預期效果，在開始介紹之前，**請確保你想訪問的設備與當前 webpack-dev-server 執行的設備在同個區網下**，讓我們先從配置開始說明：
 
