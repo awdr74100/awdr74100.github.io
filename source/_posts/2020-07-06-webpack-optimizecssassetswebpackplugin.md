@@ -137,7 +137,7 @@ import './css/all.css'; // 使用 ESM 方式引入
 ```json
 {
   "scripts": {
-    "build": "webpack --mode production"
+    "build": "webpack --mode development"
   }
 }
 ```
@@ -368,9 +368,17 @@ module.exports = {
 };
 ```
 
-這邊我們可把與 optimize-css-assets-webpack-plugin 相關的代碼都給拿掉，我們不需要它了，同時也將 `devtool` 設為 `source-map`，代表生成實體的 `.map` 檔案，這邊我們不選擇在 `webpack.config.js` 撰寫 PostCSS 的設置，而是在獨立的 `postcss.config.js` 進行撰寫
+這邊我們可把與 optimize-css-assets-webpack-plugin 相關的代碼都給拿掉，我們不需要它了，我個人是偏好在獨立的 `postcss.config.js` 檔案內撰寫 PostCSS 設定，你也可以在 postcss-loader 中的 `options` 下進行撰寫，隨看個人喜好，參考以下：
 
-新增 `postcss.config.js` 並撰寫以下內容：
+在 `./` 根目錄新增名為 `postcss.config.js` 的檔案：
+
+```diff
+ webpack-demo/
+ │
++└─── postcss.config.js
+```
+
+將相關 plugin 載入進來：
 
 ```js
 module.exports = {
@@ -378,7 +386,7 @@ module.exports = {
 };
 ```
 
-後方可直接傳入 plugin 選項：
+有關 plugin 的傳遞選項可由後方帶入：
 
 ```js
 module.exports = {
@@ -390,7 +398,7 @@ module.exports = {
 };
 ```
 
-是不是與配置 autoprefixer 很像？cssnano 與 autoprefixer 都屬 PostCSS 的 Plugin，方法自然就很像，接著直接進行編譯動作：
+如果你配置過 autoprefixer，那你應該對上面過程很熟悉才對，兩者都屬於 PostCSS 中的 Plugin，配置方法自然也就都差不多，接著直接進行編譯：
 
 ```bash
 npm run build
@@ -442,4 +450,4 @@ module.exports = {
 };
 ```
 
-關於 `default` 與 `advanced` 的差異，詳細可參考 [這邊](https://cssnano.co/optimisations/)，簡單來講就是啟用更深層的優化方法，但可能會有更改原代碼的後果。請斟酌使用。
+關於 `default` 與 `advanced` 的差異，詳細可參考 [這邊](https://cssnano.co/optimisations/)，簡單來講就是啟用更深層的優化，但可能會有更改原始代碼的情況發生。請斟酌使用。
