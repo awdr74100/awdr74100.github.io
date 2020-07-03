@@ -5,9 +5,9 @@ description:
     之前我們有提到如何使用 html-webpack-plugin 內建的 minify 選項壓縮 HTML，而 JavaScript 則是依靠 Webpack 本身內建的 TerserWebpackPlugin 進行壓縮，唯獨少了 CSS 的方法，這次就來介紹如何使用 optimize-css-assets-webpack-plugin 壓縮我們的 CSS，其內部預設是使用 cssnano 作為編譯器，cssnano 是建立在 PostCSS 生態系統上的工具，代表我們也可使用 postcss-loader 搭配 cssnano 來達到同樣的目的及效果，如果專案本身已導入 PostCSS，建議直接搭配 cssnano 可更快的完成壓縮目的。,
   ]
 categories: [Webpack]
-tags: [Webpack, Node.js, w3HexSchool]
-date: 2020-07-02 20:38:26
-updated: 2020-07-03 00:12:53
+tags: [Webpack, Node.js, CSS, PostCSS, w3HexSchool]
+date: 2020-07-06 00:54:26
+updated: 2020-07-07 00:12:53
 ---
 
 ## 前言
@@ -315,7 +315,7 @@ module.exports = {
 
 `cheap-module-eval-source-map` 為內聯模式，代表我們須將 `inline` 設為 `true`，這時你可能就有疑問了，`true` 不是默認選項嗎？我們還需要設置？答案是沒錯，[官方文檔](https://github.com/postcss/postcss/blob/master/docs/source-maps.md#options) 有提到如果以前的 source-map 類型為外部地圖，而不是內聯地圖，則即使你未設置 `inline` 選項，PostCSS 也不會嵌入地圖，你可以把它理解為使用 mini-css-extract-plugin 生成實體 CSS 檔案，就是必須告訴她 `inline` 要為 `true`，不然會導致失敗，如果你使用的是 style-loader，就都沒這些問題，因為 style-loader 始終都為內聯地圖，並不會有 `.css` 實體檔案的產生。
 
-## 使用 postcss-loader 搭配 cssnano 進行壓縮
+## 補充：使用 postcss-loader 搭配 cssnano 進行壓縮
 
 如果當前專案本身就已經導入 PostCSS，那我推薦你直接使用 cssnano 來完成壓縮，過程也不會像 optimize-css-assets-webpack-plugin 這麼多陷阱，請先將 postcss-loader 與 cssnano 安裝進來：
 
