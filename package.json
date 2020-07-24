@@ -4,14 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "hexo s -o",
-    "clean": "gulp"
+    "clean": "node clean.js"
   },
   "hexo": {
     "version": "4.2.1"
   },
   "dependencies": {
     "del": "^5.1.0",
-    "gulp": "^4.0.2",
     "hexo": "^4.2.1",
     "hexo-autonofollow": "^1.0.1",
     "hexo-browsersync": "^0.3.0",
