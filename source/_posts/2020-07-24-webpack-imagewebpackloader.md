@@ -5,9 +5,9 @@ description:
     在 Gulp 可使用 gulp-imagemin 套件來壓縮 PNG、JPG 等類型圖片，想當然的在 Webpack 也有類似的套件可使用，名為 image-webpack-loader，一樣都是基於 imagemin 所設計，兩者在使用上幾乎沒有差別，一般人可能聽過的是 imagemin-webpack-plugin，這是屬於 Plugin 類型的套件，代表是在生成資源時才進行壓縮，無法像 image-webpack-loader 一樣後續再交由 url-loader 進行處理，我自己是比較喜歡 image-webpack-loader 就是了。此篇將介紹如何使用 image-webpack-loader 壓縮各種類型的圖片。,
   ]
 categories: [Webpack]
-tags: [Webpack, Node.js]
-date: 2020-07-01 16:04:33
-updated: 2020-07-02 02:55:07
+tags: [Webpack, Node.js, w3HexSchool]
+date: 2020-07-24 00:13:27
+updated: 2020-07-25 00:01:39
 ---
 
 ## 前言
