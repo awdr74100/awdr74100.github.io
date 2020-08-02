@@ -1,13 +1,13 @@
 ---
 title: 導入 ESLint 控管程式碼品質
-date: 2019-11-11 13:35:53
 description:
   [
     初期在寫 JavaScript 代碼時，都是以學習心態去完成目標，程式碼的品質較為不穩定，但到了業界，通常需要配合團隊開發專案規範，其中也包含了代碼規範，ESLint 就是 JavaScript 的代碼規範工具，他可以讓你維持一定的程式碼品質，敲代碼的同時也可以進行觀念的修正。,
   ]
 categories: [Tools]
-tags: [JavaScript, ESLint]
-updated: 2020-01-12 13:56:00
+tags: [JavaScript, ESLint, w3HexSchool]
+date: 2020-08-01 12:36:42
+updated: 2020-08-02 22:13:03
 ---
 
 ## 前言
