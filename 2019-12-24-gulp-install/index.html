@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon-128.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png?v=7.4.2">
+  <link rel="mask-icon" href="/images/favicon-none.svg?v=7.4.2" color="#222">
+  <link rel="alternate" href="/atom.xml" title="Roya's Blog" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"default"},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '複製',
+      copy_success: '複製成功',
+      copy_failure: '複製失敗'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="相信大多數人多少都有聽過 Gulp 這個工具，但卻沒有實際的去使用過它，Gulp 是一個自動化工具，基於串流(Stream)的方式來完成所設立的任務(Task)，擁有豐富的套件可供使用，可滿足前端開發者大部分的需求。此篇將介紹 Gulp 的環境要如何安裝以及建立第一個 Task，關於套件的部分將會獨立在做介紹。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Gulp 前端自動化 - 環境安裝與執行">
+<meta property="og:url" content="https://awdr74100.github.io/2019-12-24-gulp-install/index.html">
+<meta property="og:site_name" content="Roya&#39;s Blog">
+<meta property="og:description" content="相信大多數人多少都有聽過 Gulp 這個工具，但卻沒有實際的去使用過它，Gulp 是一個自動化工具，基於串流(Stream)的方式來完成所設立的任務(Task)，擁有豐富的套件可供使用，可滿足前端開發者大部分的需求。此篇將介紹 Gulp 的環境要如何安裝以及建立第一個 Task，關於套件的部分將會獨立在做介紹。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/h4dIXip.png">
+<meta property="og:image" content="https://i.imgur.com/gVhAOaV.jpg">
+<meta property="og:image" content="https://i.imgur.com/zG66E9x.jpg">
+<meta property="og:image" content="https://i.imgur.com/7q8lF8h.jpg">
+<meta property="article:published_time" content="2019-12-24T11:30:32.000Z">
+<meta property="article:modified_time" content="2020-02-11T05:04:31.000Z">
+<meta property="article:author" content="Roya">
+<meta property="article:tag" content="Gulp 4">
+<meta property="article:tag" content="Node.js">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/h4dIXip.png">
+
+<link rel="canonical" href="https://awdr74100.github.io/2019-12-24-gulp-install/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Gulp 前端自動化 - 環境安裝與執行 | Roya's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-150715469-1"></script>
+    <script>
+      var host = window.location.hostname;
+      if (host !== "localhost" || !true) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-150715469-1');
+      }
+    </script>
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Roya's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">現代化 Web 開發技術學習分享</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>標籤<span class="badge">28</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分類<span class="badge">9</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>歸檔<span class="badge">69</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none" placeholder="搜尋..." spellcheck="false" type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://awdr74100.github.io/2019-12-24-gulp-install/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/userLogo.jpg">
+      <meta itemprop="name" content="Roya">
+      <meta itemprop="description" content="Front-End Web Developer<br>學會運用比學會使用還要來的有用">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Roya's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          Gulp 前端自動化 - 環境安裝與執行
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2019-12-24 19:30:32" itemprop="dateCreated datePublished" datetime="2019-12-24T19:30:32+08:00">2019-12-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-02-11 13:04:31" itemprop="dateModified" datetime="2020-02-11T13:04:31+08:00">2020-02-11</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Gulp/" itemprop="url" rel="index">
+                    <span itemprop="name">Gulp</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>相信大多數人多少都有聽過 Gulp 這個工具，但卻沒有實際的去使用過它，Gulp 是一個自動化工具，基於串流(Stream)的方式來完成所設立的任務(Task)，擁有豐富的套件可供使用，可滿足前端開發者大部分的需求。此篇將介紹 Gulp 的環境要如何安裝以及建立第一個 Task，關於套件的部分將會獨立在做介紹。</p>
+<h2 id="筆記重點"><a href="#筆記重點" class="headerlink" title="筆記重點"></a>筆記重點</h2><ul>
+<li>Gulp 簡介</li>
+<li>Gulp 安裝</li>
+<li>Gulp 初始化專案</li>
+<li>開發第一個 Gulp Task</li>
+</ul>
+<h2 id="Gulp-簡介"><a href="#Gulp-簡介" class="headerlink" title="Gulp 簡介"></a>Gulp 簡介</h2><img src="https://i.imgur.com/h4dIXip.png" alt="Gulp 介紹">
+
+<p>在之前為了加強對於網頁元素的應用，我很常去觀看各大網站的原始碼，但有時會發現某些網站的代碼全部都擠在一起，非常難以閱讀，當時的我以為他們是故意的，到了後來才發現這個應用叫做壓縮代碼，通常在將要正式上線的網站都會有壓縮代碼的步驟，原因很簡單，以網站效能來說，大小的控管是非常重要的，多餘的空間就足以造成整體效能的低落，而壓縮代碼這個服務就是依靠 Gulp、Webpack 等相關工具來完成的，在這邊我們不討論 Webpack，以後有時間再作介紹，Gulp 不只可以幫助我們完成壓縮代碼服務，其中也包含以下功能：</p>
+<ul>
+<li>編譯 Sass、Pug、CoffeeScript 等預處理器</li>
+<li>壓縮 HTML、CSS、JavaScript 代碼以及各類圖檔</li>
+<li>建立具有 Livereload 的 Web Server</li>
+<li>一鍵將專案部屬到 GitHub Page</li>
+<li>other…</li>
+</ul>
+<p>事實上，前面所提到的功能都是依靠 Gulp 的套件來完成，Gulp 更像是一個水管，當水龍頭打開時也就代表任務開始，而水管中流的水就是我們的原始檔，在水流經過管道的節點處，我們可以截獲水源並利用套件做一些處理，當水源從出口流出，同時也代表任務結束，如同上圖所示，讓我們先從安裝開始說起。</p>
+<h2 id="Gulp-安裝"><a href="#Gulp-安裝" class="headerlink" title="Gulp 安裝"></a>Gulp 安裝</h2><div class="note warning">本篇教學都是採用 Gulp 4，關於 Gulp 4 與 Gulp 3 的差異，之後將會再做介紹</div>
+
+<p>Gulp 依賴 Node.js 環境，需先進行安裝。推薦使用 LTS 版本：</p>
+<ul>
+<li>LTS：長期維護版(較穩定)</li>
+<li>Current：目前最新版(較為不穩定)</li>
+</ul>
+<p>安裝過程就不加以贅述，可使用以下指令查看是否正確安裝：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ node -v</span><br></pre></td></tr></table></figure>
+
+<img src="https://i.imgur.com/gVhAOaV.jpg" alt="node.js 查看是否正確安裝">
+
+<p>在 Gulp 3 版，需要再全域與區域環境分別安裝 Gulp，關於全域與區域環境的差別，可參考下面：</p>
+<ul>
+<li>Window：代表全域環境或是本機環境</li>
+<li>Local：代表區域環境或是專案環境</li>
+</ul>
+<p>通常需要再全域環境連同安裝的套件，都是打算使用套件在全域環境內的相關指令，如 Gulp、Vue、ESLint 等等。</p>
+<p>在 Gulp 4 版，一樣都需要分別在全域與區域環境安裝 Gulp，不同的地方在於，Gulp 4 版的全域套件名稱為 <code>gulp-cli</code>，相關指令如下：</p>
+<p>Gulp 3 版本，全域安裝指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install gulp -g</span><br></pre></td></tr></table></figure>
+
+<p>Gulp 4 版本，全域安裝指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install gulp-cli -g</span><br></pre></td></tr></table></figure>
+
+<p>在這邊我們使用 Gulp 4 為主要開發版本，當 Gulp 在全域環境安裝完成時，可以使用以下指令來檢查：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ gulp -v</span><br></pre></td></tr></table></figure>
+
+<img src="https://i.imgur.com/zG66E9x.jpg" alt="Gulp 查看是否正確安裝">
+
+<p>從上面可以發現，我們全域環境的 CLI 工具已經安裝完成，版本為 2.2.0，但專案環境的 Gulp 卻是顯示 Unknown，因為我們尚未在專案環境安裝 Gulp，關於專案環境的安裝步驟，我們從初始化專案段落開始做介紹。</p>
+<h2 id="Gulp-初始化專案"><a href="#Gulp-初始化專案" class="headerlink" title="Gulp 初始化專案"></a>Gulp 初始化專案</h2><p>接下來我們進行初始化專案的動作，使用以下指令生成 <code>package.json</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm init</span><br></pre></td></tr></table></figure>
+
+<p>剛剛有提到專案環境尚未安裝 Gulp，使用以下指令安裝：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install gulp</span><br></pre></td></tr></table></figure>
+
+<p>在 npm 5 版本 <code>--save</code> 已成為預設指令，這也代表上面這道指令等同於下面這道指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install gulp --save</span><br></pre></td></tr></table></figure>
+
+<p>使用前面所提到的 <code>gulp -v</code> 檢查 Gulp 是否正確安裝，此時專案結構如下：</p>
+<img src="https://i.imgur.com/7q8lF8h.jpg" alt="Gulp 目前狀態">
+
+<p>觀察專案環境下是否成功安裝 Gulp，如果有版本號的顯示，就代表成功安裝囉(當前版本為 4.0.2)。接下來開始編寫第一個 Gulp Task 吧！</p>
+<h2 id="開發第一個-Gulp-Task"><a href="#開發第一個-Gulp-Task" class="headerlink" title="開發第一個 Gulp Task"></a>開發第一個 Gulp Task</h2><p>接續上面範例，請先新增 <code>index.html</code> 與 <code>gulpfile.js</code> 這兩個檔案，此時專案結構如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">gulp-demo&#x2F;</span><br><span class="line">│</span><br><span class="line">├─── node_modules&#x2F;</span><br><span class="line">├─── index.html           # HTML 主檔案(複製用)</span><br><span class="line">├─── gulpfile.js          # Gulp 配置檔案</span><br><span class="line">├─── package-lock.json</span><br><span class="line">└─── package.json         # 安裝 gulp</span><br></pre></td></tr></table></figure>
+
+<p><code>gulpfile.js</code> 是 Gulp 專屬的配置檔案，所有的 Task 任務都是在這邊編寫完成，我們可以嘗試輸入以下內容到 <code>gulpfile.js</code> 檔案內：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// gulpDemo/gulpfile.js</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> gulp = <span class="built_in">require</span>(<span class="string">'gulp'</span>);</span><br><span class="line"></span><br><span class="line">gulp.task(<span class="string">'copyFile'</span>, () =&gt; &#123;</span><br><span class="line">  <span class="comment">// 'copyFile' 是任務名稱，可自行定義</span></span><br><span class="line">  <span class="keyword">return</span> gulp.src(<span class="string">'./index.html'</span>).pipe(gulp.dest(<span class="string">'./public'</span>));</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>在前面我們有講解到關於 Gulp 運行的概念，如果以上面程式做為參考，可做出以下統整：</p>
+<ul>
+<li><code>gulp.task()</code>：創建名為 copyFile 的任務(水管名稱)</li>
+<li><code>gulp.src()</code>：導入 index.html 這一個檔案(水的來源)</li>
+<li><code>.pipe()</code>：以 <code>gulp.src()</code> 導入的檔案需做的處理(截獲水源所做的處理)</li>
+<li><code>gulp.dest()</code>：檔案輸出的目錄(水該從何處流出)</li>
+</ul>
+<p>此時輸入以下指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ gulp copyFile</span><br></pre></td></tr></table></figure>
+
+<p>你會發現 Gulp 複製了 index.html 這一個檔案到新創建的 public 目錄裏頭，此時專案結構如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">gulp-demo&#x2F;</span><br><span class="line">│</span><br><span class="line">├─── node_modules&#x2F;</span><br><span class="line">├─── public&#x2F;</span><br><span class="line">│   │</span><br><span class="line">│   └─── index.html       # HTML 副本 (完成編譯)</span><br><span class="line">│</span><br><span class="line">├─── index.html           # HTML 主檔案(等待編譯)</span><br><span class="line">├─── gulpfile.js          # Gulp 配置檔案</span><br><span class="line">├─── package-lock.json</span><br><span class="line">└─── package.json         # 安裝 gulp</span><br></pre></td></tr></table></figure>
+
+<p>相信你們已經猜到上面這道指令的功能，在任何的 Gulp 任務名稱下，我們都可以使用 <code>gulp + 任務名稱</code> 執行指定的任務，就像剛剛這一個 copyFile 任務，我們使用 <code>gulp copyFile</code> 執行這一個任務，而這一個任務內容為，從<code>./index.html</code> 載入原始檔，當我們遇到第一個 <code>pipe()</code> 建構的節點，需要針對內容作處裡，剛好處理內容為使用 <code>gulp.dest()</code> 輸出到目錄，這也是 public/index.html 被創建得原因。</p>
+<p>恭喜你已經開發了第一個 Gulp Task，同時也學會開發 Gulp 大部分應用的能力，剩下的應用我們等到載入套件章節再做說明，基本上整個 Gulp 的流程差不多就是這個樣子，後面的教學都會以結合套件的方式作介紹，如果你等不及了，可以直接觀看下一篇文章。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Gulp-4/" rel="tag"># Gulp 4</a>
+              <a href="/tags/Node-js/" rel="tag"># Node.js</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2019-11-28-javascript-traverse/" rel="next" title="JavaScript 容易混淆的遍歷方法">
+                  <i class="fa fa-chevron-left"></i> JavaScript 容易混淆的遍歷方法
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2019-12-31-gulp-gulpsass/" rel="prev" title="Gulp 前端自動化 - 編譯 Sass/SCSS">
+                  Gulp 前端自動化 - 編譯 Sass/SCSS <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+          
+            
+              
+    <div class="comments" id="gitalk-container"></div>
+
+            
+          
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#筆記重點"><span class="nav-number">2.</span> <span class="nav-text">筆記重點</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Gulp-簡介"><span class="nav-number">3.</span> <span class="nav-text">Gulp 簡介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Gulp-安裝"><span class="nav-number">4.</span> <span class="nav-text">Gulp 安裝</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Gulp-初始化專案"><span class="nav-number">5.</span> <span class="nav-text">Gulp 初始化專案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#開發第一個-Gulp-Task"><span class="nav-number">6.</span> <span class="nav-text">開發第一個 Gulp Task</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Roya" src="/images/userLogo.jpg">
+  <p class="site-author-name" itemprop="name">Roya</p>
+  <div class="site-description" itemprop="description">Front-End Web Developer<br>學會運用比學會使用還要來的有用</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">69</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/awdr74100" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;awdr74100" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:a78945612385238@gmail.com" title="E-Mail &amp;rarr; mailto:a78945612385238@gmail.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Roya</span>
+</div>
+  <span class="post-meta-divider">轉載文章時請附上作者暱稱與原文連結</span>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+
+<script src="/js/utils.js?v=7.4.2.js"></script>
+
+
+<script src="/js/schemes/pisces.js?v=7.4.2.js"></script>
+
+
+<script src="/js/next-boot.js?v=7.4.2.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+  
+<script src="/js/local-search.js?v=7.4.2.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '7cdb0d531869e18caad8',
+      clientSecret: '0b6a38cef9c3ae1dcf0ea66e916ab68823dbab52',
+      repo: 'awdr74100.github.io',
+      owner: 'awdr74100',
+      admin: ['awdr74100'],
+      id: '202c0c300a3392a5971b7b324f2de4e6',
+        language: 'zh-TW',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+  
+
+
+</body>
+</html>

@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon-128.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png?v=7.4.2">
+  <link rel="mask-icon" href="/images/favicon-none.svg?v=7.4.2" color="#222">
+  <link rel="alternate" href="/atom.xml" title="Roya's Blog" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"default"},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '複製',
+      copy_success: '複製成功',
+      copy_failure: '複製失敗'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="非同步處理一直以來都是 JavaScript 開發者很常遇到的情境，在之前，我們很常使用 callback 去完成任務，當結構變得複雜時，容易形成所謂的 callback hell，造成程式碼難以維護；在 ES6 版本中，新增了 Promise 物件，它能夠將非同步流程包裝成簡潔的結構，並提供統一的錯誤處理機制，解決了傳統 callback hell 的問題。此篇將會解析 Promise 的處理流">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JavaScript - Promise 非同步物件使用方式及變體方法">
+<meta property="og:url" content="https://awdr74100.github.io/2020-08-14-javascript-promise/index.html">
+<meta property="og:site_name" content="Roya&#39;s Blog">
+<meta property="og:description" content="非同步處理一直以來都是 JavaScript 開發者很常遇到的情境，在之前，我們很常使用 callback 去完成任務，當結構變得複雜時，容易形成所謂的 callback hell，造成程式碼難以維護；在 ES6 版本中，新增了 Promise 物件，它能夠將非同步流程包裝成簡潔的結構，並提供統一的錯誤處理機制，解決了傳統 callback hell 的問題。此篇將會解析 Promise 的處理流">
+<meta property="og:locale" content="zh_TW">
+<meta property="article:published_time" content="2020-08-14T05:26:34.000Z">
+<meta property="article:modified_time" content="2020-08-16T14:30:19.000Z">
+<meta property="article:author" content="Roya">
+<meta property="article:tag" content="JavaScript">
+<meta property="article:tag" content="ES6">
+<meta property="article:tag" content="w3HexSchool">
+<meta property="article:tag" content="Promise">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://awdr74100.github.io/2020-08-14-javascript-promise/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>JavaScript - Promise 非同步物件使用方式及變體方法 | Roya's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-150715469-1"></script>
+    <script>
+      var host = window.location.hostname;
+      if (host !== "localhost" || !true) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-150715469-1');
+      }
+    </script>
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Roya's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">現代化 Web 開發技術學習分享</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>標籤<span class="badge">28</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分類<span class="badge">9</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>歸檔<span class="badge">69</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none" placeholder="搜尋..." spellcheck="false" type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://awdr74100.github.io/2020-08-14-javascript-promise/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/userLogo.jpg">
+      <meta itemprop="name" content="Roya">
+      <meta itemprop="description" content="Front-End Web Developer<br>學會運用比學會使用還要來的有用">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Roya's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          JavaScript - Promise 非同步物件使用方式及變體方法
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-08-14 13:26:34" itemprop="dateCreated datePublished" datetime="2020-08-14T13:26:34+08:00">2020-08-14</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-08-16 22:30:19" itemprop="dateModified" datetime="2020-08-16T22:30:19+08:00">2020-08-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JavaScript/" itemprop="url" rel="index">
+                    <span itemprop="name">JavaScript</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>非同步處理一直以來都是 JavaScript 開發者很常遇到的情境，在之前，我們很常使用 callback 去完成任務，當結構變得複雜時，容易形成所謂的 callback hell，造成程式碼難以維護；在 ES6 版本中，新增了 Promise 物件，它能夠將非同步流程包裝成簡潔的結構，並提供統一的錯誤處理機制，解決了傳統 callback hell 的問題。此篇將會解析 Promise 的處理流程與相關方法。</p>
+<h2 id="筆記重點"><a href="#筆記重點" class="headerlink" title="筆記重點"></a>筆記重點</h2><ul>
+<li>何謂 Callback 與 Callback hell ？</li>
+<li>Promise 物件建立與基本使用</li>
+<li>Promise 執行流程與錯誤處理</li>
+<li>Promise 靜態方法</li>
+<li>Promise 變體方法</li>
+<li>改寫 Callback 函式</li>
+</ul>
+<h2 id="何謂-Callback-與-Callback-hell-？"><a href="#何謂-Callback-與-Callback-hell-？" class="headerlink" title="何謂 Callback 與 Callback hell ？"></a>何謂 Callback 與 Callback hell ？</h2><p>Callback 是 JavaScript 很常使用的一種處理方式，以下是一個簡單的 callback 範例：</p>
+<div class="note warning">Callback：以參數型態傳入另一個函式的函式</div>
+
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">alertMsg</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'alertMsg trigger'</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">main</span>(<span class="params">callback</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'main start'</span>);</span><br><span class="line">  callback();</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'main end'</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">main(alertMsg);</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">  main start</span></span><br><span class="line"><span class="comment">  alertMsg trigger</span></span><br><span class="line"><span class="comment">  main end</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p>在一般開發中，我們很常需要使用非同步處理去完成任務，像是 <code>XMLHttpRequest</code>、<code>setTimeout</code> …之類的，以下使用 <code>setTimeout</code> 來模擬非同步事件：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">alertMsg</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 使用 setTimeout 模擬非同步事件，0s 無法改變它本質還是非同步事件</span></span><br><span class="line">  setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'alertMsg trigger'</span>);</span><br><span class="line">  &#125;, <span class="number">0</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">main</span>(<span class="params">callback</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'main start'</span>);</span><br><span class="line">  callback();</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'main end'</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">main(alertMsg);</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">  main start</span></span><br><span class="line"><span class="comment">  main end</span></span><br><span class="line"><span class="comment">  alertMsg trigger</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p>在 JavaScript 中，有 <code>event queue</code> 的特性，<strong>所有非同步事件都不會立即執行當下行為</strong>，而是將這些行為放到 <code>event queue</code> 中，等待事件觸發後再回來執行；從上面範例可得知，結果的順序改變了，如果我們要確保 <code>main end</code> 在最後觸發，只需將 <code>main end</code> 包裝成 function 並且當成 callback 傳進去就好了，如下範例：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">alertMsg</span>(<span class="params">callback2</span>) </span>&#123;</span><br><span class="line">  setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'alertMsg trigger'</span>);</span><br><span class="line">    callback2();</span><br><span class="line">  &#125;, <span class="number">0</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">main</span>(<span class="params">callback</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'main start'</span>);</span><br><span class="line">  callback(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'main end'</span>);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">main(alertMsg);</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">  main start</span></span><br><span class="line"><span class="comment">  alertMsg trigger</span></span><br><span class="line"><span class="comment">  main end</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p>使用 callback 解決了非同步事件引發的問題，但當結構變得複雜時，使用 callback 容易產生 callback hell，使得後期維護非常痛苦，閱讀性也變得非常差，如下範例：</p>
+<div class="note warning">Callback hell：簡稱回調地獄，通常發生在程式間需按照順序執行</div>
+
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> async_api1 = <span class="function">(<span class="params">callback2</span>) =&gt;</span> &#123;</span><br><span class="line">  setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'async_api1 end'</span>);</span><br><span class="line">    callback2();</span><br><span class="line">  &#125;, <span class="number">1000</span>);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> async_api2 = <span class="function">(<span class="params">callback3</span>) =&gt;</span> &#123;</span><br><span class="line">  setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'async_api2 end'</span>);</span><br><span class="line">    callback3();</span><br><span class="line">  &#125;, <span class="number">2000</span>);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> main = <span class="function">(<span class="params">callback</span>) =&gt;</span> &#123;</span><br><span class="line">  async_api1(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    async_api2(callback);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">main(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'main end'</span>);</span><br><span class="line">  &#125;, <span class="number">3000</span>);</span><br><span class="line">&#125;);</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">  --- delay 1s ---</span></span><br><span class="line"><span class="comment">  async_api1 end</span></span><br><span class="line"><span class="comment">  --- delay 2s ---</span></span><br><span class="line"><span class="comment">  async_api2 end</span></span><br><span class="line"><span class="comment">  --- delay 3s ---</span></span><br><span class="line"><span class="comment">  main end</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p>當你有許多的行為需要按照順序執行下去，此時你的程式碼就會變得非常混亂，如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">async_api1(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  async_api2(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    async_api3(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      async_api4(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>讓我們來看看 ES6 新推出的 Promise 物件是如何改善 callback hell 問題的。</p>
+<h2 id="Promise-物件建立與基本使用"><a href="#Promise-物件建立與基本使用" class="headerlink" title="Promise 物件建立與基本使用"></a>Promise 物件建立與基本使用</h2><h3 id="Promise-物件的建立"><a href="#Promise-物件的建立" class="headerlink" title="Promise 物件的建立"></a>Promise 物件的建立</h3><div class="note warning">ES6 Promise 的實作中，會確保 Promise 物件一實體化後就會固定住狀態，要不就是"以實現"，要不就是"已拒絕"</div>
+
+<p>一個簡單的 Promise 語法結構如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> async_api = <span class="function"><span class="params">()</span> =&gt;</span></span><br><span class="line">  <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// 成功時</span></span><br><span class="line">    resolve(<span class="string">'success'</span>);</span><br><span class="line">    <span class="comment">// 失敗時</span></span><br><span class="line">    reject(<span class="string">'error'</span>);</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">async_api()</span><br><span class="line">  .then(<span class="function">(<span class="params">response</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// on fulfillment (以實現時)</span></span><br><span class="line">    <span class="built_in">console</span>.log(response);</span><br><span class="line">  &#125;)</span><br><span class="line">  .catch(<span class="function">(<span class="params">error</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// on rejection (已拒絕時)</span></span><br><span class="line">    <span class="built_in">console</span>.log(error);</span><br><span class="line">  &#125;);</span><br></pre></td></tr></table></figure>
+
+<p>我們先來看 Promise 的建構函式，它的語法如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span>(<span class="params">resolve, reject</span>) </span>&#123; ... &#125;);</span><br></pre></td></tr></table></figure>
+
+<p>用箭頭函式簡化一下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123; ... &#125;);</span><br></pre></td></tr></table></figure>
+
+<p>建構函式的傳入參數需要一個函式，參數名稱可自由定義，但建議要符合使用上的命名，如果沒有其他需求，使用 reslove 與 reject 更能夠提高其閱讀性。</p>
+<h3 id="Promise-基本的使用"><a href="#Promise-基本的使用" class="headerlink" title="Promise 基本的使用"></a>Promise 基本的使用</h3><div class="note warning">then 方法是 Promise 的最核心方法，也是控制非同步事件最關鍵的因素</div>
+
+<p>在 Promise 中，我們可以使用 <code>then()</code> 與 <code>catch()</code> 來接收回傳的內容，接續 Promise 物件的建立中的範例：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">async_api()</span><br><span class="line">  .then(<span class="function">(<span class="params">response</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// on fulfillment (以實現時)</span></span><br><span class="line">    <span class="built_in">console</span>.log(response);</span><br><span class="line">  &#125;)</span><br><span class="line">  .catch(<span class="function">(<span class="params">error</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// on rejection (已拒絕時)</span></span><br><span class="line">    <span class="built_in">console</span>.log(error);</span><br><span class="line">  &#125;);</span><br></pre></td></tr></table></figure>
+
+<p>可能會有人看到的是下面這種寫法：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">async_api().then(</span><br><span class="line">  <span class="function"><span class="keyword">function</span> (<span class="params">response</span>) </span>&#123;</span><br><span class="line">    <span class="comment">// on fulfillment (以實現時)</span></span><br><span class="line">    <span class="built_in">console</span>.log(response);</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="function"><span class="keyword">function</span> (<span class="params">error</span>) </span>&#123;</span><br><span class="line">    <span class="comment">// on rejection (已拒絕時)</span></span><br><span class="line">    <span class="built_in">console</span>.log(error);</span><br><span class="line">  &#125;</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>事實上，兩者的結果是一樣的，<code>then</code> 方法接受兩個函式當作傳入參數，第一個函式為 Promise 物件狀態轉變成 <code>fulfillment</code> 所呼叫，有一個傳入參數值可用；第二個函式為 Promise 物件狀態改變成 <code>rejected</code> 所呼叫，也有一個傳入參數值可用。</p>
+<p>為什麼說它是一樣的結果呢？對於 <code>catch</code> 方法來說，相當於 <code>then(undefined, rejection)</code>，也就是 <code>then</code> 方法的第一個函式傳入參數沒有給定值的情況下，它算是個 <code>then</code> 方法的語法糖，這也代表著兩者在名稱的定義上有點不同，但意義其實是相近的。<strong>如果有 Promise Chain 的需求，盡量還是使用 <code>catch</code> 取代 <code>then</code> 的第二個函式</strong>，不然說實在的，對於結構性來講，會顯得非常混亂，下面是 <code>Promise Chain</code> 的例子：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">async_api()</span><br><span class="line">  .then(<span class="function">(<span class="params">response1</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(response1);</span><br><span class="line">    <span class="keyword">return</span> response1;</span><br><span class="line">  &#125;)</span><br><span class="line">  .then(<span class="function">(<span class="params">response2</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(response2);</span><br><span class="line">    <span class="keyword">return</span> response2;</span><br><span class="line">  &#125;)</span><br><span class="line">  .then(<span class="function">(<span class="params">response3</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(response3);</span><br><span class="line">  &#125;);</span><br></pre></td></tr></table></figure>
+
+<p>在 <code>then</code> 方法中的 <code>fulfillment</code> 函式，它是一個連鎖的結構，這也就代表著我們可以使用 <code>return</code> 語句來回傳值，這個值可以繼續往下面的 <code>then</code> 方法傳送，傳送過去的是一個<strong>新的</strong> Promise 物件；而 <code>rejected</code> 這一個函式，也有連鎖結構的特性，但由於它是使用在錯誤處理情況，除非你要用來修正錯誤之類的操作，不然這樣子的回傳操作，可能會造成結構異常混亂，這也是我上面提到的問題。</p>
+<div class="note warning">為了方便進行多個不同程式碼的連鎖，通常在只使用 then 方法時，都只寫第 1 個函式傳入參數。而錯誤處理通常交給另一個 catch 方法來做</div>
+
+<h2 id="Promise-執行流程與錯誤處理"><a href="#Promise-執行流程與錯誤處理" class="headerlink" title="Promise 執行流程與錯誤處理"></a>Promise 執行流程與錯誤處理</h2><h3 id="throw-與-reject"><a href="#throw-與-reject" class="headerlink" title="throw 與 reject"></a>throw 與 reject</h3><div class="note warning">Promise 中會隱藏 throw 例外的錯誤輸出，改用轉變狀態為 rejected(已拒絕)來做錯誤處理</div>
+
+<p>在 Promise 建構函式中，直接使用 throw 語句相當於 reject 方法的作用，範例如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> async_api = <span class="function"><span class="params">()</span> =&gt;</span></span><br><span class="line">  <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="string">'發生錯誤'</span>;</span><br><span class="line">    <span class="comment">// 如同使用下面語句</span></span><br><span class="line">    <span class="comment">// reject('發生錯誤');</span></span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">async_api()</span><br><span class="line">  .then(<span class="function">(<span class="params">response</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(response);</span><br><span class="line">  &#125;)</span><br><span class="line">  .catch(<span class="function">(<span class="params">error</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(error); <span class="comment">// 觸發：發生錯誤</span></span><br><span class="line">  &#125;);</span><br></pre></td></tr></table></figure>
+
+<p>我們知道 <code>throw</code> 主要用來使 JavaScript 停止執行並拋出錯誤，在 Promise 中按照規則，只要有丟出例外動作，當下狀態就會直接變成 <code>rejected</code> ，這也是使用 <code>throw</code> 能夠達到與 <code>reject()</code> 同樣效果的原因，但這僅限於同步的操作，我們以下面範例做補充：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> async_api = <span class="function"><span class="params">()</span> =&gt;</span></span><br><span class="line">  <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">    setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">throw</span> <span class="number">10</span>;</span><br><span class="line">    &#125;, <span class="number">100</span>);</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">async_api()</span><br><span class="line">  .then(<span class="function">(<span class="params">response</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(response);</span><br><span class="line">  &#125;)</span><br><span class="line">  .catch(<span class="function">(<span class="params">error</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(error);</span><br><span class="line">  &#125;);</span><br></pre></td></tr></table></figure>
+
+<p>上面這是一個使用 <code>setTimeout</code> 模擬非同步事件的範例，對於 <code>throw</code> 在一般程式使用中，會拋出錯誤並停止執行，在 Promise 的同步操作中，Promise 會隱藏錯誤並將當下狀態更改為 <code>rejected</code>，而在非同步操作中是無法隱藏錯誤的，這也代表 Promise 後續的連鎖都將出現錯誤，所以還是乖乖的使用 <code>reject</code> 方法就好，這才是正規操作 Promise 狀態的方法。</p>
+<h3 id="執行流程與錯誤處理"><a href="#執行流程與錯誤處理" class="headerlink" title="執行流程與錯誤處理"></a>執行流程與錯誤處理</h3><p>在前面我們有介紹到關於 Promise Chain 的相關操作，這次我們來探討關於執行流程與錯誤處理的相關內容，先來看一下範例：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> async_api = <span class="function"><span class="params">()</span> =&gt;</span></span><br><span class="line">  <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">    setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      reject(<span class="number">10</span>);</span><br><span class="line">    &#125;, <span class="number">0</span>);</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">async_api()</span><br><span class="line">  .then(<span class="function">(<span class="params">value</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'第一個'</span>);</span><br><span class="line">    <span class="keyword">return</span> value;</span><br><span class="line">  &#125;)</span><br><span class="line">  .then(<span class="function">(<span class="params">value</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'第二個'</span>);</span><br><span class="line">    <span class="keyword">return</span> value;</span><br><span class="line">  &#125;)</span><br><span class="line">  .catch(<span class="function">(<span class="params">error</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'第三個'</span>); <span class="comment">// 觸發 (第三個)</span></span><br><span class="line">    <span class="keyword">return</span> error;</span><br><span class="line">  &#125;)</span><br><span class="line">  .then(</span><br><span class="line">    <span class="function"><span class="keyword">function</span> (<span class="params">value</span>) </span>&#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">'第四個 - fulfillment'</span>); <span class="comment">// 觸發 (第四個 - fulfillment)</span></span><br><span class="line">      <span class="keyword">return</span> value;</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="function"><span class="keyword">function</span> (<span class="params">error</span>) </span>&#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">'第四個 - reject'</span>);</span><br><span class="line">      <span class="keyword">return</span> error;</span><br><span class="line">    &#125;</span><br><span class="line">  )</span><br><span class="line">  .catch(<span class="function">(<span class="params">error</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'第五個'</span>);</span><br><span class="line">    <span class="keyword">return</span> value;</span><br><span class="line">  &#125;)</span><br><span class="line">  .then(<span class="function">(<span class="params">value</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'第六個'</span>); <span class="comment">// 觸發 (第六個)</span></span><br><span class="line">  &#125;)</span><br><span class="line">  .catch(<span class="function">(<span class="params">error</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'第七個'</span>);</span><br><span class="line">  &#125;);</span><br></pre></td></tr></table></figure>
+
+<p>在 <code>then</code> 的第一個回傳條件下，會尋找相符合的第一個狀態，如同上面範例會觸發第三個 <code>catch</code>，接下來的回傳值都必須遵循下面的規範：</p>
+<ul>
+<li>回傳值不是函式或物件，直接將回傳值狀態用 <code>fulfilled</code> 實現，例：String、Number。</li>
+<li>回傳值是 Promise 物件，回傳 Promise 最後的操作結果，例：resolve 方法、reject 方法。</li>
+<li>回傳值是函式或物件，判斷是否為包裝的 Promise 物件，如果是，回傳 Promise 操作結果，如果不是，則直接將回傳值狀態用 <code>fulfilled</code> 實現，例：Object</li>
+</ul>
+<p>理解了上面三個規範，就能夠清楚的了解 <code>then</code> 的處理方式，如同上面這一個範例，雖然觸發了第三個 <code>catch</code>，但回傳值卻是 <code>Number</code>，這也就導致回傳值狀態用 <code>fulfilled</code> 實現，才會觸發第四個的 fulfilled 結果。</p>
+<h2 id="Promise-靜態方法"><a href="#Promise-靜態方法" class="headerlink" title="Promise 靜態方法"></a>Promise 靜態方法</h2><div class="note warning">Promise.resolve 或 Promise.reject 只用於單純的傳入物件、值或外部的 thenable 物件，轉換為 Promise 物件的場合</div>
+
+<p><code>Promise.resolve</code> 與 <code>Promise.reject</code> 是 Promise 的靜態方法，<code>Promise.resolve</code> 可直接產生 <code>fulfilled</code> 狀態的 Promise 物件，<code>Promise.reject</code> 則是 <code>rejected</code> 狀態的 Promise 物件，如下範例：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> promiseObject = <span class="built_in">Promise</span>.resolve(<span class="number">10</span>);</span><br><span class="line"></span><br><span class="line">promiseObject.then(<span class="function">(<span class="params">num</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(num);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p><code>Promise.resolve</code> 與 <code>Promise.reject</code> 與使用 Promise 建構式的方式相比，在使用上有很大的不同，以下面的例子說明：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 方式一： Promise 建構式</span></span><br><span class="line"><span class="keyword">const</span> initPromise_1 = <span class="function">(<span class="params">value</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (value % <span class="number">2</span> === <span class="number">0</span>) &#123;</span><br><span class="line">      resolve(value);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">throw</span> <span class="string">'發生錯誤'</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 方式二： Promise.resolve + Promise.reject</span></span><br><span class="line"><span class="keyword">const</span> initPromise_2 = <span class="function">(<span class="params">value</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (value % <span class="number">2</span> === <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">Promise</span>.resolve(value);</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">Promise</span>.reject(<span class="string">'發生錯誤'</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 方式三： Promise.resolve + throw</span></span><br><span class="line"><span class="keyword">const</span> initPromise_3 = <span class="function">(<span class="params">value</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (value % <span class="number">2</span> === <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">Promise</span>.resolve(value);</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="string">'發生錯誤'</span>; <span class="comment">// error</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">initPromise_3(<span class="number">7</span>)</span><br><span class="line">  .then(<span class="function">(<span class="params">value</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'success： '</span> + value);</span><br><span class="line">  &#125;)</span><br><span class="line">  .catch(<span class="function">(<span class="params">error</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'error： '</span> + error);</span><br><span class="line">  &#125;);</span><br></pre></td></tr></table></figure>
+
+<p>在上面的三種方法中，方法三會直接 <code>throw</code> 出意外，造成程式中斷，與 Promise 建構式相比，<strong>Promise 靜態方法對於錯誤的處理方式是不同的</strong>，如果你的函式處理較為複雜時，你在回傳 <code>Promise.reject</code> 或 <code>Promise.resolve</code> 前發生意外，是完全無法控制的。</p>
+<p>結論是 <code>Promise.reject</code> 或 <code>Promise.resolve</code> 只適用於單純的純入物件、值、或外部的 thenable 物件，如果你要把一整段程式碼或函式轉為 Promise 物件，不要使用這兩個靜態方法，要使用 Promise 建構式來產生物件才是正解。</p>
+<h2 id="Promise-變體方法"><a href="#Promise-變體方法" class="headerlink" title="Promise 變體方法"></a>Promise 變體方法</h2><div class="note warning">Promise.all 與 Promise.race 的參數值，通常使用陣列結構作為傳入參數，而陣列中要不就是一般的值，要不就是 Promise 物件</div>
+
+<p><code>Promise.all</code> 是<strong>並行運算</strong>使用的變體方法，它的語法如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Promise</span>.all([...]);</span><br></pre></td></tr></table></figure>
+
+<p><code>Promise.all</code> 方法會將陣列中的值並行運算，全部完成後才會接著下個 <code>thne</code> 方法，在執行時有以下幾種狀況：</p>
+<ul>
+<li>陣列中的索引值與執行順序無關，大家起跑線都一樣</li>
+<li>陣列中的值如果不是 Promise 物件，會自動使用 <code>Promise.resolve</code>方法來轉換</li>
+<li>執行過程時，陣列中只要有<strong>任何一個</strong> Promise 物件發生例外錯誤，或是有 reject 狀態的物件，會立即回傳一個 rejected 狀態的 Promise 物件。</li>
+<li>實現完成後，接下來的 then 方法會獲取到的值為陣列值</li>
+</ul>
+<p>下面為 <code>Promise.all</code> 的範例：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> a1 = <span class="built_in">Promise</span>.resolve(<span class="number">3</span>);</span><br><span class="line"><span class="keyword">const</span> a2 = <span class="number">98</span>;</span><br><span class="line"><span class="keyword">const</span> a3 = <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve</span>) =&gt;</span> &#123;</span><br><span class="line">  setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    resolve(<span class="number">13</span>);</span><br><span class="line">  &#125;, <span class="number">1000</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="built_in">Promise</span>.all([a1, a2, a3])</span><br><span class="line">  .then(<span class="function">(<span class="params">response</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(response);</span><br><span class="line">  &#125;)</span><br><span class="line">  .catch(<span class="function">(<span class="params">error</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(error);</span><br><span class="line">  &#125;);</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">  --- delay 1s ---</span></span><br><span class="line"><span class="comment">  [ 3, 98, 13 ]</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p><code>Promise.race</code> 也是一個變體方法，它的語法如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Promise</span>.race([...]);</span><br></pre></td></tr></table></figure>
+
+<p><code>Promise.race</code> 方法就如同 <code>Promise.all</code>，一樣都是並行運算的變體，差別在於 <code>Promise.all</code> 指的是<strong>所有的</strong> Promise 物件都要 resolve 完成才進行下一步，而 <code>Promise.race</code> 則是<strong>任何一個</strong> Promise 物件 resolve 完成就進行下一步。用 <strong>race(競賽)</strong>這個字詞是在比喻就像賽跑一樣，只要有任何一個參賽者到達終點就結束了，當然它的回傳值也只會是那個優勝者而已。</p>
+<p><code>Promise.race</code> 的規則與 <code>Promise.all</code> 相同，只不過實現的話，下一步的 <code>then</code> 方法只會獲取最快實現的那個值，範例如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> test = <span class="function">(<span class="params">name, timeout</span>) =&gt;</span></span><br><span class="line">  <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve</span>) =&gt;</span> &#123;</span><br><span class="line">    setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      resolve(<span class="string">'優勝者：'</span> + name + <span class="string">'  時間：'</span> + timeout / <span class="number">1000</span> + <span class="string">'s'</span>);</span><br><span class="line">    &#125;, timeout);</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line"><span class="built_in">Promise</span>.race([test(<span class="string">'大熊'</span>, <span class="number">2000</span>), test(<span class="string">'胖虎'</span>, <span class="number">3000</span>), test(<span class="string">'靜香'</span>, <span class="number">1000</span>)]).then(<span class="function">(<span class="params">response</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(response); <span class="comment">// 優勝者：靜香  時間：1s</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h2 id="改寫-Callback-函式"><a href="#改寫-Callback-函式" class="headerlink" title="改寫 Callback 函式"></a>改寫 Callback 函式</h2><p>在前面我們有強調使用 callback 容易造成 callback hell，這一次我們使用 Promise 來改寫 callback 的範例吧：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> async_api = <span class="function">(<span class="params">name, timeout</span>) =&gt;</span></span><br><span class="line">  <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (name || timeout === <span class="literal">undefined</span>) &#123;</span><br><span class="line">      setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> resolve(name + <span class="string">' end'</span>), timeout);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      reject(name + <span class="string">'error'</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">async_api(<span class="string">'async_api1'</span>, <span class="number">1000</span>)</span><br><span class="line">  .then(<span class="function">(<span class="params">response</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(response);</span><br><span class="line">    <span class="keyword">return</span> async_api(<span class="string">'async_api2'</span>, <span class="number">2000</span>);</span><br><span class="line">  &#125;)</span><br><span class="line">  .then(<span class="function">(<span class="params">response</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(response);</span><br><span class="line">    <span class="keyword">return</span> async_api(<span class="string">'async_api3'</span>, <span class="number">3000</span>);</span><br><span class="line">  &#125;)</span><br><span class="line">  .then(<span class="function">(<span class="params">response</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(response);</span><br><span class="line">  &#125;)</span><br><span class="line">  .catch(<span class="function">(<span class="params">error</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(error);</span><br><span class="line">  &#125;);</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">  --- delay 1s ---</span></span><br><span class="line"><span class="comment">  async_api1 end</span></span><br><span class="line"><span class="comment">  --- delay 2s ---</span></span><br><span class="line"><span class="comment">  async_api2 end</span></span><br><span class="line"><span class="comment">  --- delay 3s ---</span></span><br><span class="line"><span class="comment">  async_api3 end</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p>很明顯的，使用 Promise 大幅提高了結構的易讀性，且提供統一的流程管理，光是這幾點，就值得你花時間學習它了，Promise 的應用場景一定不只有這些，非同步對於 JavaScript 來說，幾乎是必備的條件，而 Promise 物件的出現，就是用來改善傳統非同步情境可能會發生的問題，好東西，不學嗎？</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+              <a href="/tags/ES6/" rel="tag"># ES6</a>
+              <a href="/tags/w3HexSchool/" rel="tag"># w3HexSchool</a>
+              <a href="/tags/Promise/" rel="tag"># Promise</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2020-08-08-webapis-fetch/" rel="next" title="Web APIs - 使用原生 Fetch API 獲取遠端資料">
+                  <i class="fa fa-chevron-left"></i> Web APIs - 使用原生 Fetch API 獲取遠端資料
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+          
+            
+              
+    <div class="comments" id="gitalk-container"></div>
+
+            
+          
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#筆記重點"><span class="nav-number">2.</span> <span class="nav-text">筆記重點</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#何謂-Callback-與-Callback-hell-？"><span class="nav-number">3.</span> <span class="nav-text">何謂 Callback 與 Callback hell ？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Promise-物件建立與基本使用"><span class="nav-number">4.</span> <span class="nav-text">Promise 物件建立與基本使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Promise-物件的建立"><span class="nav-number">4.1.</span> <span class="nav-text">Promise 物件的建立</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Promise-基本的使用"><span class="nav-number">4.2.</span> <span class="nav-text">Promise 基本的使用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Promise-執行流程與錯誤處理"><span class="nav-number">5.</span> <span class="nav-text">Promise 執行流程與錯誤處理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#throw-與-reject"><span class="nav-number">5.1.</span> <span class="nav-text">throw 與 reject</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#執行流程與錯誤處理"><span class="nav-number">5.2.</span> <span class="nav-text">執行流程與錯誤處理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Promise-靜態方法"><span class="nav-number">6.</span> <span class="nav-text">Promise 靜態方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Promise-變體方法"><span class="nav-number">7.</span> <span class="nav-text">Promise 變體方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#改寫-Callback-函式"><span class="nav-number">8.</span> <span class="nav-text">改寫 Callback 函式</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Roya" src="/images/userLogo.jpg">
+  <p class="site-author-name" itemprop="name">Roya</p>
+  <div class="site-description" itemprop="description">Front-End Web Developer<br>學會運用比學會使用還要來的有用</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">69</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/awdr74100" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;awdr74100" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:a78945612385238@gmail.com" title="E-Mail &amp;rarr; mailto:a78945612385238@gmail.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Roya</span>
+</div>
+  <span class="post-meta-divider">轉載文章時請附上作者暱稱與原文連結</span>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+
+<script src="/js/utils.js?v=7.4.2.js"></script>
+
+
+<script src="/js/schemes/pisces.js?v=7.4.2.js"></script>
+
+
+<script src="/js/next-boot.js?v=7.4.2.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+  
+<script src="/js/local-search.js?v=7.4.2.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '7cdb0d531869e18caad8',
+      clientSecret: '0b6a38cef9c3ae1dcf0ea66e916ab68823dbab52',
+      repo: 'awdr74100.github.io',
+      owner: 'awdr74100',
+      admin: ['awdr74100'],
+      id: 'd4077397c96bc7981a402b35105e9f10',
+        language: 'zh-TW',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+  
+
+
+</body>
+</html>

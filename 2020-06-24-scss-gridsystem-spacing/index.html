@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon-128.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png?v=7.4.2">
+  <link rel="mask-icon" href="/images/favicon-none.svg?v=7.4.2" color="#222">
+  <link rel="alternate" href="/atom.xml" title="Roya's Blog" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"default"},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '複製',
+      copy_success: '複製成功',
+      copy_failure: '複製失敗'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="Grid System 可說是近年來前端工程師必備的一項技能，傳統上我們都是針對特定對象撰寫 media query 以達到 RWD 的效果，但對於可維護性及結構性來說，似乎這不是個好的做法，現在我們都會直接導入像是 Bootstrap 或 Tailwind 等 CSS 框架，利用內建的 Grid System 更有效率的撰寫出網站基底的 RWD 樣式，但這樣的問題是，在不考慮使用 PurgeCS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Sass &#x2F; SCSS 預處理器 - 自建 CSS 框架中的 Grid System 與 Spacing">
+<meta property="og:url" content="https://awdr74100.github.io/2020-06-24-scss-gridsystem-spacing/index.html">
+<meta property="og:site_name" content="Roya&#39;s Blog">
+<meta property="og:description" content="Grid System 可說是近年來前端工程師必備的一項技能，傳統上我們都是針對特定對象撰寫 media query 以達到 RWD 的效果，但對於可維護性及結構性來說，似乎這不是個好的做法，現在我們都會直接導入像是 Bootstrap 或 Tailwind 等 CSS 框架，利用內建的 Grid System 更有效率的撰寫出網站基底的 RWD 樣式，但這樣的問題是，在不考慮使用 PurgeCS">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/amWAcCl.png">
+<meta property="og:image" content="https://i.imgur.com/Kopi695.png">
+<meta property="og:image" content="https://i.imgur.com/boHC2GN.png">
+<meta property="og:image" content="https://i.imgur.com/DRHX6Xo.png">
+<meta property="og:image" content="https://i.imgur.com/eRuqgrM.png">
+<meta property="og:image" content="https://i.imgur.com/WyeEJtt.png">
+<meta property="og:image" content="https://i.imgur.com/aWtG6wO.png">
+<meta property="article:published_time" content="2020-06-24T06:19:46.000Z">
+<meta property="article:modified_time" content="2020-06-25T12:58:03.000Z">
+<meta property="article:author" content="Roya">
+<meta property="article:tag" content="CSS">
+<meta property="article:tag" content="SCSS">
+<meta property="article:tag" content="Bootstrap">
+<meta property="article:tag" content="w3HexSchool">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/amWAcCl.png">
+
+<link rel="canonical" href="https://awdr74100.github.io/2020-06-24-scss-gridsystem-spacing/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Sass / SCSS 預處理器 - 自建 CSS 框架中的 Grid System 與 Spacing | Roya's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-150715469-1"></script>
+    <script>
+      var host = window.location.hostname;
+      if (host !== "localhost" || !true) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-150715469-1');
+      }
+    </script>
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Roya's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">現代化 Web 開發技術學習分享</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>標籤<span class="badge">28</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分類<span class="badge">9</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>歸檔<span class="badge">69</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none" placeholder="搜尋..." spellcheck="false" type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://awdr74100.github.io/2020-06-24-scss-gridsystem-spacing/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/userLogo.jpg">
+      <meta itemprop="name" content="Roya">
+      <meta itemprop="description" content="Front-End Web Developer<br>學會運用比學會使用還要來的有用">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Roya's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          Sass / SCSS 預處理器 - 自建 CSS 框架中的 Grid System 與 Spacing
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-06-24 14:19:46" itemprop="dateCreated datePublished" datetime="2020-06-24T14:19:46+08:00">2020-06-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-06-25 20:58:03" itemprop="dateModified" datetime="2020-06-25T20:58:03+08:00">2020-06-25</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/SCSS/" itemprop="url" rel="index">
+                    <span itemprop="name">SCSS</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Grid System 可說是近年來前端工程師必備的一項技能，傳統上我們都是針對特定對象撰寫 media query 以達到 RWD 的效果，但對於可維護性及結構性來說，似乎這不是個好的做法，現在我們都會直接導入像是 Bootstrap 或 Tailwind 等 CSS 框架，利用內建的 Grid System 更有效率的撰寫出網站基底的 RWD 樣式，但這樣的問題是，在不考慮使用 PurgeCSS 或針對原始碼做刪減的情況下，我們將整個框架導入進來就為了使用 Grid System 會不會有點小題大作？不如我們自己來開發 Grid System 吧！</p>
+<h2 id="筆記重點"><a href="#筆記重點" class="headerlink" title="筆記重點"></a>筆記重點</h2><ul>
+<li>Grid System 建立及原理說明</li>
+<li>Spacing 建立及原理說明</li>
+</ul>
+<h2 id="Grid-System-建立及原理說明"><a href="#Grid-System-建立及原理說明" class="headerlink" title="Grid System 建立及原理說明"></a>Grid System 建立及原理說明</h2><p>讓我們先來看 Bootstrap 4 中的 Grid System 是如何運作的：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"container"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"row"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"col-md-3 col-6"</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"box"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"col-md-3 col-6"</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"box"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"col-md-3 col-6"</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"box"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"col-md-3 col-6"</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"box"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"row no-gutters"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"col-6"</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"box"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"col-6"</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"box"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>Bootstrap 在 v3 版本是使用 LESS 進行開發，當時的 Grid System 是以 <code>float</code> 撰寫而成，有用過 <code>float</code> 排版的人應該都知道其中的缺陷有多嚴重，而到了 v4 版本則是使用 SCSS 進行開發，並且使用了 <code>flexbox</code> 進行排版，這邊 <code>.row</code> 其實就是指 <code>flexbox</code> 控制子項目的父容器，<code>.container</code> 主要用來解決 <code>.row</code> 溢出問題及限制容器大小，<code>.col-*</code> 就是前面所指的子項目，有玩過 Bootstrap 的人應該都很熟悉了才對，在正式進入到開發環節時，請先完成 CSS Reset 及 <code>box-sizing</code> 的設置：</p>
+<!-- prettier-ignore-start -->
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">html</span>, <span class="selector-tag">body</span> &#123;</span><br><span class="line">  <span class="attribute">margin</span>: <span class="number">0</span>;</span><br><span class="line">  <span class="attribute">padding</span>: <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">*, *:before, *:after &#123;</span><br><span class="line">  <span class="attribute">box-sizing</span>: border-box;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<!-- prettier-ignore-end -->
+
+<p>設置 <code>border-box</code> 的目的主要是讓我們在計算對象的大小時更為直覺，我想這應該是開發網站最基本的概念了，這邊就不多加以說明，接著我們來看 Grid System 是如何撰寫而成的：</p>
+<div class="note warning">以下都是先以 Bootstrap 預設的 12 欄式排版做設計</div>
+
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.container</span> &#123;</span><br><span class="line">  <span class="attribute">max-width</span>: <span class="number">1140px</span>;</span><br><span class="line">  <span class="attribute">margin-left</span>: auto;</span><br><span class="line">  <span class="attribute">margin-right</span>: auto;</span><br><span class="line">  <span class="attribute">padding-left</span>: <span class="number">15px</span>;</span><br><span class="line">  <span class="attribute">padding-right</span>: <span class="number">15px</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.row</span> &#123;</span><br><span class="line">  <span class="attribute">display</span>: flex;</span><br><span class="line">  <span class="attribute">flex-wrap</span>: wrap;</span><br><span class="line">  <span class="attribute">margin-left</span>: -<span class="number">15px</span>;</span><br><span class="line">  <span class="attribute">margin-right</span>: -<span class="number">15px</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.col-6</span> &#123;</span><br><span class="line">  <span class="attribute">position</span>: relative;</span><br><span class="line">  <span class="attribute">max-width</span>: <span class="number">50%</span>;</span><br><span class="line">  <span class="attribute">flex</span>: <span class="number">0</span> <span class="number">0</span> <span class="number">50%</span>;</span><br><span class="line">  <span class="attribute">padding-left</span>: <span class="number">15px</span>;</span><br><span class="line">  <span class="attribute">padding-right</span>: <span class="number">15px</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>製作 Grid System 最重要的就是 Gutter 的概念，所謂的 Gutter 就是指 <code>.col-*</code> 對象之間的間距，為了避免最左與最右邊的 Gutter 出現擠壓問題，我們必須在 <code>.row</code> 設置 <code>margin</code> 負值將容器給往外擴，這時會造成內容大小超出瀏覽器可視大小問題，進而導致 x 軸的產生，這對於 RWD 來說可是大忌，我們必須在 <code>.container</code> 設置 <code>padding</code> 將這一個負值補回，這就是我前面提到的 <code>.container</code> 不只可用來限制容器大小，還可用來將溢出的空間給補回，讓我們來看目前的效果如何：</p>
+<p><img src="https://i.imgur.com/amWAcCl.png" alt="格線系統範例 - 1"></p>
+<p>這邊我新增了 <code>.box</code> 樣式用以凸顯 Grid System 在畫面中呈現的感覺，你會發現與 Bootstrap 的結果是一模一樣的，目前我們只有撰寫 <code>.col-6</code> 樣式，代表只能完成兩欄式的排版，如果有其他欄式的要求，可分別在撰寫對應的樣式：</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.col-2</span> &#123;</span><br><span class="line">  <span class="attribute">position</span>: relative;</span><br><span class="line">  <span class="attribute">max-width</span>: <span class="number">16.66667%</span>;</span><br><span class="line">  <span class="attribute">flex</span>: <span class="number">0</span> <span class="number">0</span> <span class="number">16.66667%</span>;</span><br><span class="line">  <span class="attribute">padding-left</span>: <span class="number">15px</span>;</span><br><span class="line">  <span class="attribute">padding-right</span>: <span class="number">15px</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.col-3</span> &#123;</span><br><span class="line">  <span class="attribute">position</span>: relative;</span><br><span class="line">  <span class="attribute">max-width</span>: <span class="number">25%</span>;</span><br><span class="line">  <span class="attribute">flex</span>: <span class="number">0</span> <span class="number">0</span> <span class="number">25%</span>;</span><br><span class="line">  <span class="attribute">padding-left</span>: <span class="number">15px</span>;</span><br><span class="line">  <span class="attribute">padding-right</span>: <span class="number">15px</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面我們都是基於 CSS 撰寫而成，通常我在建立 Grid System 時都會搭配 CSS 預處理器做開發，原因很簡單，不覺得一個一個撰寫對應的樣式很慢嗎？而且寬度都還要自己計算，想想就累，如果你有看我之前寫的 Sass 系列文章，此時你應該知道怎麼做了才對，參考以下範例：</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$gutter-width</span>: <span class="number">30px</span>;</span><br><span class="line"><span class="variable">$grid-sum</span>: <span class="number">12</span>;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.container</span> &#123;</span><br><span class="line">  <span class="attribute">max-width</span>: <span class="number">1140px</span>;</span><br><span class="line">  <span class="attribute">margin-left</span>: auto;</span><br><span class="line">  <span class="attribute">margin-right</span>: auto;</span><br><span class="line">  <span class="attribute">padding-left</span>: <span class="variable">$gutter-width</span> / <span class="number">2</span>;</span><br><span class="line">  <span class="attribute">padding-right</span>: <span class="variable">$gutter-width</span> / <span class="number">2</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.row</span> &#123;</span><br><span class="line">  <span class="attribute">display</span>: flex;</span><br><span class="line">  <span class="attribute">flex-wrap</span>: wrap;</span><br><span class="line">  <span class="attribute">margin-left</span>: -(<span class="variable">$gutter-width</span> / <span class="number">2</span>);</span><br><span class="line">  <span class="attribute">margin-right</span>: -(<span class="variable">$gutter-width</span> / <span class="number">2</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@<span class="keyword">for</span> <span class="variable">$var</span> from 1 through <span class="variable">$grid-sum</span> &#123;</span><br><span class="line">  <span class="selector-class">.col-</span>#&#123;<span class="variable">$var</span>&#125; &#123;</span><br><span class="line">    <span class="attribute">position</span>: relative;</span><br><span class="line">    <span class="attribute">max-width</span>: <span class="number">100%</span> * (<span class="variable">$var</span> / <span class="variable">$grid-sum</span>);</span><br><span class="line">    <span class="attribute">flex</span>: <span class="number">0</span> <span class="number">0</span> (<span class="number">100%</span> * (<span class="variable">$var</span> / <span class="variable">$grid-sum</span>));</span><br><span class="line">    <span class="attribute">padding-left</span>: <span class="variable">$gutter-width</span> / <span class="number">2</span>;</span><br><span class="line">    <span class="attribute">padding-right</span>: <span class="variable">$gutter-width</span> / <span class="number">2</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>這邊我們順便把 Gutter 的寬度及 Grid 的總數設置成一個變數方便日後做更改，不覺得這樣快很多嗎？寬度我們也不需要自己計算，對應的 <code>.col-*</code> 樣式全靠 <code>@for</code> 迴圈來生成就好了，到這邊我們的 Grid System 就完成一半了，結果如下：</p>
+<p><img src="https://i.imgur.com/Kopi695.png" alt="格線系統範例 - 2"></p>
+<p>有時候我們不想要 <code>.row</code> 中的 <code>.col-*</code> 有任何的 Gutter，意思是 <code>.col-*</code> 樣式不必存在為了 Gutters 而設計的 <code>padding</code>，既然 <code>padding</code> 都被拿掉了，<code>.row</code> 中自然也就不必存在往外擴的 <code>margin</code>，讓我們來實作這段：</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.no-gutters</span> &#123;</span><br><span class="line">  <span class="attribute">margin-left</span>: <span class="number">0px</span>;</span><br><span class="line">  <span class="attribute">margin-right</span>: <span class="number">0px</span>;</span><br><span class="line"></span><br><span class="line">  &gt; <span class="selector-attr">[class*='col-']</span> &#123;</span><br><span class="line">    <span class="attribute">padding-left</span>: <span class="number">0px</span>;</span><br><span class="line">    <span class="attribute">padding-right</span>: <span class="number">0px</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>與 Bootstrap 的概念相同，往後只要在 <code>.row</code> 新增 <code>.no-gutters</code> 樣式，即可將 <code>.row</code> 本身的 <code>margin</code> 以及 <code>.row</code> 下一階層 class 名稱含有 <code>col-</code> 之對象 <code>padding</code> 通通給拿掉，這邊要注意屬性選擇器的寫法，我們採用了 <code>*=</code> 來匹配對象，到了後面我們會加上 <code>.col-md-6</code>、<code>.col-sm-4</code> 之類的具有 RWD 斷點的樣式名稱，利用 <code>*=</code> 能將所有字串帶有 <code>.col-</code> 之對象通通給包含進來，處理起來方便很多，接著再來看 <code>.container-fluid</code> 的部分：</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.container-fluid</span> &#123;</span><br><span class="line">  <span class="attribute">width</span>: <span class="number">100%</span>;</span><br><span class="line">  <span class="attribute">margin-left</span>: auto;</span><br><span class="line">  <span class="attribute">margin-right</span>: auto;</span><br><span class="line">  <span class="attribute">padding-left</span>: <span class="variable">$gutter-width</span> / <span class="number">2</span>;</span><br><span class="line">  <span class="attribute">padding-right</span>: <span class="variable">$gutter-width</span> / <span class="number">2</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>.container</code> 除了補償 <code>.row</code> 造成的多餘空間以外，還有將整個區塊置中的目的，主要依靠 <code>max-width</code> 與 <code>margin</code> 來達成，但有時候我們想要製作滿版的效果，這時候就不能使用 <code>.container</code> 了，取而代之的是 <code>.container-fluid</code> 樣式，其實就只是將 <code>max-width</code> 修改為 <code>wisth: 100%</code> 而已，詳細可參考上方，接下來進行 RWD 斷點的部分：</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$grid-breakpoints</span>: (</span><br><span class="line">  <span class="string">''</span>: false,</span><br><span class="line">  sm: <span class="number">576px</span>,</span><br><span class="line">  md: <span class="number">768px</span>,</span><br><span class="line">  lg: <span class="number">992px</span>,</span><br><span class="line">  xl: <span class="number">1200px</span>,</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line">@<span class="keyword">each</span> <span class="variable">$key</span>, <span class="variable">$value</span> in <span class="variable">$grid-breakpoints</span> &#123;</span><br><span class="line">  @<span class="keyword">for</span> <span class="variable">$var</span> from 1 through <span class="variable">$grid-sum</span> &#123;</span><br><span class="line">    @<span class="keyword">if</span> (not <span class="variable">$value</span>) &#123;</span><br><span class="line">      <span class="selector-class">.col-</span>#&#123;<span class="variable">$var</span>&#125; &#123;</span><br><span class="line">        <span class="attribute">position</span>: relative;</span><br><span class="line">        <span class="attribute">width</span>: <span class="number">100%</span>;</span><br><span class="line">        <span class="attribute">padding-left</span>: <span class="variable">$gutter-width</span> / <span class="number">2</span>;</span><br><span class="line">        <span class="attribute">padding-right</span>: <span class="variable">$gutter-width</span> / <span class="number">2</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; @<span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="selector-class">.col-</span>#&#123;<span class="variable">$key</span>&#125;-#&#123;<span class="variable">$var</span>&#125; &#123;</span><br><span class="line">        <span class="attribute">position</span>: relative;</span><br><span class="line">        <span class="attribute">width</span>: <span class="number">100%</span>;</span><br><span class="line">        <span class="attribute">padding-left</span>: <span class="variable">$gutter-width</span> / <span class="number">2</span>;</span><br><span class="line">        <span class="attribute">padding-right</span>: <span class="variable">$gutter-width</span> / <span class="number">2</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Bootstrap 主要以 Mobile First 而設計，我們可以參考她的思維進行打底的動作，所謂的打底其實就是指對象小於 <code>min-width</code> 所指定的數值時所呈現的樣貌，這邊我們宣告了 <code>$grid-breakpoints</code> 變數，並在下方利用 <code>@each</code> 與 <code>@for</code> 快速生成所有 <code>.col-*</code> 或 <code>.col-*-*</code> 對象，這樣子的處理方式會造成樣式大量重複的問題，進而造成樣式表異常肥大，這邊推薦改使用 <code>@extend</code> 與佔位符選擇器來處理：</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">%<span class="selector-tag">col</span> &#123;</span><br><span class="line">  <span class="attribute">position</span>: relative;</span><br><span class="line">  <span class="attribute">width</span>: <span class="number">100%</span>;</span><br><span class="line">  <span class="attribute">padding-left</span>: <span class="variable">$gutter-width</span> / <span class="number">2</span>;</span><br><span class="line">  <span class="attribute">padding-right</span>: <span class="variable">$gutter-width</span> / <span class="number">2</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@<span class="keyword">each</span> <span class="variable">$key</span>, <span class="variable">$value</span> in <span class="variable">$grid-breakpoints</span> &#123;</span><br><span class="line">  @<span class="keyword">for</span> <span class="variable">$var</span> from 1 through <span class="variable">$grid-sum</span> &#123;</span><br><span class="line">    @<span class="keyword">if</span> not <span class="variable">$value</span> &#123;</span><br><span class="line">      <span class="selector-class">.col-</span>#&#123;<span class="variable">$var</span>&#125; &#123;</span><br><span class="line">        @<span class="keyword">extend</span> %col;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; @<span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="selector-class">.col-</span>#&#123;<span class="variable">$key</span>&#125;-#&#123;<span class="variable">$var</span>&#125; &#123;</span><br><span class="line">        @<span class="keyword">extend</span> %col;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>此時生成的 CSS 會長的像這個樣子：</p>
+<!-- prettier-ignore-start -->
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.col-1</span>, <span class="selector-class">.col-2</span>, <span class="selector-class">.col-3</span>, <span class="selector-class">.col-4</span>, <span class="selector-class">.col-5</span>, <span class="selector-class">.col-6</span>, <span class="selector-class">.col-7</span>, <span class="selector-class">.col-8</span>, <span class="selector-class">.col-9</span>, <span class="selector-class">.col-10</span>, <span class="selector-class">.col-11</span>, <span class="selector-class">.col-12</span>, <span class="selector-class">.col-sm-1</span>, <span class="selector-class">.col-sm-2</span>, <span class="selector-class">.col-sm-3</span>, <span class="selector-class">.col-sm-4</span>, <span class="selector-class">.col-sm-5</span>, <span class="selector-class">.col-sm-6</span>, <span class="selector-class">.col-sm-7</span>, <span class="selector-class">.col-sm-8</span>, <span class="selector-class">.col-sm-9</span>, <span class="selector-class">.col-sm-10</span>, <span class="selector-class">.col-sm-11</span>, <span class="selector-class">.col-sm-12</span>, <span class="selector-class">.col-md-1</span>, <span class="selector-class">.col-md-2</span>, <span class="selector-class">.col-md-3</span>, <span class="selector-class">.col-md-4</span>, <span class="selector-class">.col-md-5</span>, <span class="selector-class">.col-md-6</span>, <span class="selector-class">.col-md-7</span>, <span class="selector-class">.col-md-8</span>, <span class="selector-class">.col-md-9</span>, <span class="selector-class">.col-md-10</span>, <span class="selector-class">.col-md-11</span>, <span class="selector-class">.col-md-12</span>, <span class="selector-class">.col-lg-1</span>, <span class="selector-class">.col-lg-2</span>, <span class="selector-class">.col-lg-3</span>, <span class="selector-class">.col-lg-4</span>, <span class="selector-class">.col-lg-5</span>, <span class="selector-class">.col-lg-6</span>, <span class="selector-class">.col-lg-7</span>, <span class="selector-class">.col-lg-8</span>, <span class="selector-class">.col-lg-9</span>, <span class="selector-class">.col-lg-10</span>, <span class="selector-class">.col-lg-11</span>, <span class="selector-class">.col-lg-12</span>, <span class="selector-class">.col-xl-1</span>, <span class="selector-class">.col-xl-2</span>, <span class="selector-class">.col-xl-3</span>, <span class="selector-class">.col-xl-4</span>, <span class="selector-class">.col-xl-5</span>, <span class="selector-class">.col-xl-6</span>, <span class="selector-class">.col-xl-7</span>, <span class="selector-class">.col-xl-8</span>, <span class="selector-class">.col-xl-9</span>, <span class="selector-class">.col-xl-10</span>, <span class="selector-class">.col-xl-11</span>, <span class="selector-class">.col-xl-12</span> &#123;</span><br><span class="line">  <span class="attribute">position</span>: relative;</span><br><span class="line">  <span class="attribute">width</span>: <span class="number">100%</span>;</span><br><span class="line">  <span class="attribute">padding-left</span>: <span class="number">15px</span>;</span><br><span class="line">  <span class="attribute">padding-right</span>: <span class="number">15px</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<!-- prettier-ignore-end -->
+
+<p>你可能會好奇為什麼是使用 <code>width</code> 而不是使用 <code>flex</code> 屬性指定大小，在 <code>flexbox</code> 中，如果你沒有撰寫 <code>flex</code> 屬性，優先會參考 <code>width</code> 指定的大小，如果同時撰寫 <code>width</code> 與 <code>flex</code> 屬性，此時會直接參考 <code>flex</code> 所撰寫的大小，代表 <code>flex</code> 權重是高於 <code>width</code> 屬性的，這邊你也可以寫成 <code>flex</code>，兩者在打底的動作是沒有任何差別的，接著進行斷點樣式的撰寫：</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">@<span class="keyword">each</span> <span class="variable">$key</span>, <span class="variable">$value</span> in <span class="variable">$grid-breakpoints</span> &#123;</span><br><span class="line">  @<span class="keyword">if</span> not <span class="variable">$value</span> &#123;</span><br><span class="line">    @<span class="keyword">for</span> <span class="variable">$var</span> from 1 to <span class="variable">$grid-sum</span> &#123;</span><br><span class="line">      <span class="selector-class">.col-</span>#&#123;<span class="variable">$var</span>&#125; &#123;</span><br><span class="line">        <span class="attribute">max-width</span>: <span class="number">100%</span> * (<span class="variable">$var</span> / <span class="variable">$grid-sum</span>);</span><br><span class="line">        <span class="attribute">flex</span>: <span class="number">0</span> <span class="number">0</span> (<span class="number">100%</span> * (<span class="variable">$var</span> / <span class="variable">$grid-sum</span>));</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; @<span class="keyword">else</span> &#123;</span><br><span class="line">    @<span class="keyword">media</span> screen and (min-width: <span class="variable">$value</span>) &#123;</span><br><span class="line">      @<span class="keyword">for</span> <span class="variable">$var</span> from 1 to <span class="variable">$grid-sum</span> &#123;</span><br><span class="line">        <span class="selector-class">.col-</span>#&#123;<span class="variable">$key</span>&#125;-#&#123;<span class="variable">$var</span>&#125; &#123;</span><br><span class="line">          <span class="attribute">max-width</span>: <span class="number">100%</span> * (<span class="variable">$var</span> / <span class="variable">$grid-sum</span>);</span><br><span class="line">          <span class="attribute">flex</span>: <span class="number">0</span> <span class="number">0</span> (<span class="number">100%</span> * (<span class="variable">$var</span> / <span class="variable">$grid-sum</span>));</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>這邊唯一要注意的是 <code>@media</code> 撰寫的位置，雖然說 Sass 會將 <code>@media</code> 額外給提取出來，但他提取的依據是以當前所在的位置去做參考，如果你把 <code>@media</code> 寫在 <code>@for</code> 迴圈內，他會重複生成 <code>@media</code> 語句，這樣就又造成樣式大量重複的問題了，這邊我是採用判斷的方式去做處理，這樣就不會有前面提到的問題了，還有一點要注意的是，這邊我們也連同不包含斷點的 <code>.col-*</code> 一併做處理了，代表最一開始那段 <code>@for</code> 迴圈可以拿掉了，最後我們的 Grid System 會長的像這個樣子：</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$gutter-width</span>: <span class="number">30px</span>;</span><br><span class="line"><span class="variable">$grid-sum</span>: <span class="number">12</span>;</span><br><span class="line"><span class="variable">$grid-breakpoints</span>: (</span><br><span class="line">  <span class="string">''</span>: false,</span><br><span class="line">  sm: <span class="number">576px</span>,</span><br><span class="line">  md: <span class="number">768px</span>,</span><br><span class="line">  lg: <span class="number">992px</span>,</span><br><span class="line">  xl: <span class="number">1200px</span>,</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.container</span> &#123;</span><br><span class="line">  <span class="attribute">max-width</span>: <span class="number">1140px</span>;</span><br><span class="line">  <span class="attribute">margin-left</span>: auto;</span><br><span class="line">  <span class="attribute">margin-right</span>: auto;</span><br><span class="line">  <span class="attribute">padding-left</span>: <span class="variable">$gutter-width</span> / <span class="number">2</span>;</span><br><span class="line">  <span class="attribute">padding-right</span>: <span class="variable">$gutter-width</span> / <span class="number">2</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.container-fluid</span> &#123;</span><br><span class="line">  <span class="attribute">width</span>: <span class="number">100%</span>;</span><br><span class="line">  <span class="attribute">margin-left</span>: auto;</span><br><span class="line">  <span class="attribute">margin-right</span>: auto;</span><br><span class="line">  <span class="attribute">padding-left</span>: <span class="variable">$gutter-width</span> / <span class="number">2</span>;</span><br><span class="line">  <span class="attribute">padding-right</span>: <span class="variable">$gutter-width</span> / <span class="number">2</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.row</span> &#123;</span><br><span class="line">  <span class="attribute">display</span>: flex;</span><br><span class="line">  <span class="attribute">flex-wrap</span>: wrap;</span><br><span class="line">  <span class="attribute">margin-left</span>: -(<span class="variable">$gutter-width</span> / <span class="number">2</span>);</span><br><span class="line">  <span class="attribute">margin-right</span>: -(<span class="variable">$gutter-width</span> / <span class="number">2</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.no-gutters</span> &#123;</span><br><span class="line">  <span class="attribute">margin-left</span>: <span class="number">0px</span>;</span><br><span class="line">  <span class="attribute">margin-right</span>: <span class="number">0px</span>;</span><br><span class="line"></span><br><span class="line">  &gt; <span class="selector-attr">[class*='col-']</span> &#123;</span><br><span class="line">    <span class="attribute">padding-left</span>: <span class="number">0px</span>;</span><br><span class="line">    <span class="attribute">padding-right</span>: <span class="number">0px</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">%<span class="selector-tag">col</span> &#123;</span><br><span class="line">  <span class="attribute">position</span>: relative;</span><br><span class="line">  <span class="attribute">width</span>: <span class="number">100%</span>;</span><br><span class="line">  <span class="attribute">padding-left</span>: <span class="variable">$gutter-width</span> / <span class="number">2</span>;</span><br><span class="line">  <span class="attribute">padding-right</span>: <span class="variable">$gutter-width</span> / <span class="number">2</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@<span class="keyword">each</span> <span class="variable">$key</span>, <span class="variable">$value</span> in <span class="variable">$grid-breakpoints</span> &#123;</span><br><span class="line">  @<span class="keyword">for</span> <span class="variable">$var</span> from 1 through <span class="variable">$grid-sum</span> &#123;</span><br><span class="line">    @<span class="keyword">if</span> not <span class="variable">$value</span> &#123;</span><br><span class="line">      <span class="selector-class">.col-</span>#&#123;<span class="variable">$var</span>&#125; &#123;</span><br><span class="line">        @<span class="keyword">extend</span> %col;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; @<span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="selector-class">.col-</span>#&#123;<span class="variable">$key</span>&#125;-#&#123;<span class="variable">$var</span>&#125; &#123;</span><br><span class="line">        @<span class="keyword">extend</span> %col;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@<span class="keyword">each</span> <span class="variable">$key</span>, <span class="variable">$value</span> in <span class="variable">$grid-breakpoints</span> &#123;</span><br><span class="line">  @<span class="keyword">if</span> not <span class="variable">$value</span> &#123;</span><br><span class="line">    @<span class="keyword">for</span> <span class="variable">$var</span> from 1 to <span class="variable">$grid-sum</span> &#123;</span><br><span class="line">      <span class="selector-class">.col-</span>#&#123;<span class="variable">$var</span>&#125; &#123;</span><br><span class="line">        <span class="attribute">max-width</span>: <span class="number">100%</span> * (<span class="variable">$var</span> / <span class="variable">$grid-sum</span>);</span><br><span class="line">        <span class="attribute">flex</span>: <span class="number">0</span> <span class="number">0</span> (<span class="number">100%</span> * (<span class="variable">$var</span> / <span class="variable">$grid-sum</span>));</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; @<span class="keyword">else</span> &#123;</span><br><span class="line">    @<span class="keyword">media</span> screen and (min-width: <span class="variable">$value</span>) &#123;</span><br><span class="line">      @<span class="keyword">for</span> <span class="variable">$var</span> from 1 to <span class="variable">$grid-sum</span> &#123;</span><br><span class="line">        <span class="selector-class">.col-</span>#&#123;<span class="variable">$key</span>&#125;-#&#123;<span class="variable">$var</span>&#125; &#123;</span><br><span class="line">          <span class="attribute">max-width</span>: <span class="number">100%</span> * (<span class="variable">$var</span> / <span class="variable">$grid-sum</span>);</span><br><span class="line">          <span class="attribute">flex</span>: <span class="number">0</span> <span class="number">0</span> (<span class="number">100%</span> * (<span class="variable">$var</span> / <span class="variable">$grid-sum</span>));</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>當然這其中可能還有能夠優化的地方，比如說你可以把 <code>max-width</code> 與 <code>flex</code> 包裝成 <code>@mixin</code> 之類的，這些就留給大家去嘗試了，到這邊我們的 Grid System 就完成了，與 Bootstrap 中的 Grid System 操作可以說是幾乎一樣，短短的幾行代碼我們就打造出自己的 Grid System 了，有時候我不想要導入框架就會直接複製這裡的內容，讓我們以最一開始 Bootstrap 示範的那段 HTML 看看是否運行成功：</p>
+<p><img src="https://i.imgur.com/boHC2GN.png" alt="格線系統範例 - 3"><br><img src="https://i.imgur.com/DRHX6Xo.png" alt="格線系統範例 - 4"></p>
+<h2 id="Spacing-建立及原理說明"><a href="#Spacing-建立及原理說明" class="headerlink" title="Spacing 建立及原理說明"></a>Spacing 建立及原理說明</h2><p>既然我們都手刻出 Grid System 了，那麼順便把 Spacing 也給完成吧！Spacing 在 Bootstrap 是歸類在 Utilities 裡頭，幾乎在每個 Component 都可以看到它的身影，Bootstrap 是依造 OOCSS 撰寫而成的，自然就會有像是 <code>p-5</code>、<code>mt-3</code>、<code>my-1</code> 之類的抽象式樣式，這些就是所謂 Spacing，有效的利用 Spacing 將樣式給抽離出來，可大幅的提升元件的擴展性，讓我們直接開始吧：</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$spacies</span>: (</span><br><span class="line">  <span class="string">'0'</span>: <span class="number">0px</span>,</span><br><span class="line">  <span class="string">'1'</span>: <span class="number">5px</span>,</span><br><span class="line">  <span class="string">'2'</span>: <span class="number">10px</span>,</span><br><span class="line">  <span class="string">'3'</span>: <span class="number">20px</span>,</span><br><span class="line">  <span class="string">'4'</span>: <span class="number">30px</span>,</span><br><span class="line">  <span class="string">'5'</span>: <span class="number">60px</span>,</span><br><span class="line">  <span class="string">'auto'</span>: auto,</span><br><span class="line">);</span><br><span class="line"><span class="variable">$property</span>: <span class="string">'m'</span>, <span class="string">'p'</span>;</span><br><span class="line"><span class="variable">$sides</span>: <span class="string">''</span>, <span class="string">'t'</span>, <span class="string">'b'</span>, <span class="string">'l'</span>, <span class="string">'r'</span>, <span class="string">'x'</span>, <span class="string">'y'</span>;</span><br></pre></td></tr></table></figure>
+
+<p>這邊我們先定義 <code>$spacing</code>、<code>$property</code>、<code>sides</code> 三個變數，<code>$spacing</code> 主要為間距的大小，你可以隨意新增或修改，<code>$property</code> 為作用的屬性，分別為 <code>margin</code> 與 <code>padding</code>，<code>sides</code> 為作用的方向，分別有 <code>top</code>、<code>bottom</code>、<code>left</code>、<code>right</code>、<code>left</code> and <code>right</code>、<code>top</code> and <code>bottom</code> 等，其中空白代表四周都需作用的意思，這點 Bootstrap 的玩家應該很熟悉了才對，接著定義 RWD 斷點：</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$grid-breakpoints</span>: (</span><br><span class="line">  <span class="string">''</span>: false,</span><br><span class="line">  sm: <span class="number">576px</span>,</span><br><span class="line">  md: <span class="number">768px</span>,</span><br><span class="line">  lg: <span class="number">992px</span>,</span><br><span class="line">  xl: <span class="number">1200px</span>,</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>你可以將所有的變數統一放置在 <code>_variables.scss</code> 做管理，這點在 7-1 模式中我們就曾經介紹過，接著開始撰寫 Spacing：</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">@<span class="keyword">each</span> <span class="variable">$key</span>, <span class="variable">$value</span> in <span class="variable">$grid-breakpoints</span> &#123;</span><br><span class="line">  @<span class="keyword">if</span> not <span class="variable">$value</span> &#123;</span><br><span class="line">    @<span class="keyword">each</span> <span class="variable">$pro</span> in <span class="variable">$property</span> &#123;</span><br><span class="line">      @<span class="keyword">each</span> <span class="variable">$side</span> in <span class="variable">$sides</span> &#123;</span><br><span class="line">        @<span class="keyword">each</span> <span class="variable">$spacKey</span>, <span class="variable">$spacValue</span> in <span class="variable">$spacies</span> &#123;</span><br><span class="line">          .#&#123;<span class="variable">$pro</span>&#125;#&#123;<span class="variable">$side</span>&#125;-#&#123;<span class="variable">$spacKey</span>&#125; &#123;</span><br><span class="line">            @<span class="keyword">include</span> generate(<span class="variable">$pro</span>, <span class="variable">$side</span>, <span class="variable">$spacValue</span>);</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; @<span class="keyword">else</span> &#123;</span><br><span class="line">    @<span class="keyword">media</span> screen and (min-width: <span class="variable">$value</span>) &#123;</span><br><span class="line">      @<span class="keyword">each</span> <span class="variable">$pro</span> in <span class="variable">$property</span> &#123;</span><br><span class="line">        @<span class="keyword">each</span> <span class="variable">$side</span> in <span class="variable">$sides</span> &#123;</span><br><span class="line">          @<span class="keyword">each</span> <span class="variable">$spacKey</span>, <span class="variable">$spacValue</span> in <span class="variable">$spacies</span> &#123;</span><br><span class="line">            .#&#123;<span class="variable">$pro</span>&#125;#&#123;<span class="variable">$side</span>&#125;-#&#123;<span class="variable">$key</span>&#125;-#&#123;<span class="variable">$spacKey</span>&#125; &#123;</span><br><span class="line">              @<span class="keyword">include</span> generate(<span class="variable">$pro</span>, <span class="variable">$side</span>, <span class="variable">$spacValue</span>);</span><br><span class="line">            &#125;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其實方法與建構 Grid System 大同小異，都是將 map 或 list 的值給讀取出來，之後再看要怎麼操作，為了避免重複樣式的產生，這邊我使用到了 <code>@mixin</code> 的技巧：</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line">@<span class="keyword">mixin</span> generate(<span class="variable">$pro</span>, <span class="variable">$side</span>, <span class="variable">$spacValue</span>) &#123;</span><br><span class="line">  @<span class="keyword">if</span> <span class="variable">$side</span> == <span class="string">''</span> &#123;</span><br><span class="line">    @<span class="keyword">if</span> <span class="variable">$pro</span> == <span class="string">'m'</span> &#123;</span><br><span class="line">      <span class="attribute">margin</span>: <span class="variable">$spacValue</span> <span class="meta">!important</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    @<span class="keyword">if</span> <span class="variable">$pro</span> == <span class="string">'p'</span> &#123;</span><br><span class="line">      <span class="attribute">padding</span>: <span class="variable">$spacValue</span> <span class="meta">!important</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  @<span class="keyword">if</span> <span class="variable">$side</span> == <span class="string">'t'</span> &#123;</span><br><span class="line">    @<span class="keyword">if</span> <span class="variable">$pro</span> == <span class="string">'m'</span> &#123;</span><br><span class="line">      <span class="attribute">margin-top</span>: <span class="variable">$spacValue</span> <span class="meta">!important</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    @<span class="keyword">if</span> <span class="variable">$pro</span> == <span class="string">'p'</span> &#123;</span><br><span class="line">      <span class="attribute">padding-top</span>: <span class="variable">$spacValue</span> <span class="meta">!important</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  @<span class="keyword">if</span> <span class="variable">$side</span> == <span class="string">'b'</span> &#123;</span><br><span class="line">    @<span class="keyword">if</span> <span class="variable">$pro</span> == <span class="string">'m'</span> &#123;</span><br><span class="line">      <span class="attribute">margin-bottom</span>: <span class="variable">$spacValue</span> <span class="meta">!important</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    @<span class="keyword">if</span> <span class="variable">$pro</span> == <span class="string">'p'</span> &#123;</span><br><span class="line">      <span class="attribute">padding-bottom</span>: <span class="variable">$spacValue</span> <span class="meta">!important</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  @<span class="keyword">if</span> <span class="variable">$side</span> == <span class="string">'l'</span> &#123;</span><br><span class="line">    @<span class="keyword">if</span> <span class="variable">$pro</span> == <span class="string">'m'</span> &#123;</span><br><span class="line">      <span class="attribute">margin-left</span>: <span class="variable">$spacValue</span> <span class="meta">!important</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    @<span class="keyword">if</span> <span class="variable">$pro</span> == <span class="string">'p'</span> &#123;</span><br><span class="line">      <span class="attribute">padding-left</span>: <span class="variable">$spacValue</span> <span class="meta">!important</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  @<span class="keyword">if</span> <span class="variable">$side</span> == <span class="string">'r'</span> &#123;</span><br><span class="line">    @<span class="keyword">if</span> <span class="variable">$pro</span> == <span class="string">'m'</span> &#123;</span><br><span class="line">      <span class="attribute">margin-right</span>: <span class="variable">$spacValue</span> <span class="meta">!important</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    @<span class="keyword">if</span> <span class="variable">$pro</span> == <span class="string">'p'</span> &#123;</span><br><span class="line">      <span class="attribute">padding-right</span>: <span class="variable">$spacValue</span> <span class="meta">!important</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  @<span class="keyword">if</span> <span class="variable">$side</span> == <span class="string">'x'</span> &#123;</span><br><span class="line">    @<span class="keyword">if</span> <span class="variable">$pro</span> == <span class="string">'m'</span> &#123;</span><br><span class="line">      <span class="attribute">margin-left</span>: <span class="variable">$spacValue</span> <span class="meta">!important</span>;</span><br><span class="line">      <span class="attribute">margin-right</span>: <span class="variable">$spacValue</span> <span class="meta">!important</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    @<span class="keyword">if</span> <span class="variable">$pro</span> == <span class="string">'p'</span> &#123;</span><br><span class="line">      <span class="attribute">padding-left</span>: <span class="variable">$spacValue</span> <span class="meta">!important</span>;</span><br><span class="line">      <span class="attribute">padding-right</span>: <span class="variable">$spacValue</span> <span class="meta">!important</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  @<span class="keyword">if</span> <span class="variable">$side</span> == <span class="string">'y'</span> &#123;</span><br><span class="line">    @<span class="keyword">if</span> <span class="variable">$pro</span> == <span class="string">'m'</span> &#123;</span><br><span class="line">      <span class="attribute">margin-top</span>: <span class="variable">$spacValue</span> <span class="meta">!important</span>;</span><br><span class="line">      <span class="attribute">margin-bottom</span>: <span class="variable">$spacValue</span> <span class="meta">!important</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    @<span class="keyword">if</span> <span class="variable">$pro</span> == <span class="string">'p'</span> &#123;</span><br><span class="line">      <span class="attribute">padding-top</span>: <span class="variable">$spacValue</span> <span class="meta">!important</span>;</span><br><span class="line">      <span class="attribute">padding-bottom</span>: <span class="variable">$spacValue</span> <span class="meta">!important</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我想應該還有更簡潔的寫法，這點一樣就留給大家去測試了，整體的 Spacing 長的會像這個樣子：</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$spacies</span>: (</span><br><span class="line">  <span class="string">'0'</span>: <span class="number">0px</span>,</span><br><span class="line">  <span class="string">'1'</span>: <span class="number">5px</span>,</span><br><span class="line">  <span class="string">'2'</span>: <span class="number">10px</span>,</span><br><span class="line">  <span class="string">'3'</span>: <span class="number">20px</span>,</span><br><span class="line">  <span class="string">'4'</span>: <span class="number">30px</span>,</span><br><span class="line">  <span class="string">'5'</span>: <span class="number">60px</span>,</span><br><span class="line">  <span class="string">'auto'</span>: auto,</span><br><span class="line">);</span><br><span class="line"><span class="variable">$grid-breakpoints</span>: (</span><br><span class="line">  <span class="string">''</span>: false,</span><br><span class="line">  sm: <span class="number">576px</span>,</span><br><span class="line">  md: <span class="number">768px</span>,</span><br><span class="line">  lg: <span class="number">992px</span>,</span><br><span class="line">  xl: <span class="number">1200px</span>,</span><br><span class="line">);</span><br><span class="line"><span class="variable">$property</span>: <span class="string">'m'</span>, <span class="string">'p'</span>;</span><br><span class="line"><span class="variable">$sides</span>: <span class="string">''</span>, <span class="string">'t'</span>, <span class="string">'b'</span>, <span class="string">'l'</span>, <span class="string">'r'</span>, <span class="string">'x'</span>, <span class="string">'y'</span>;</span><br><span class="line"></span><br><span class="line">@<span class="keyword">mixin</span> generate(<span class="variable">$pro</span>, <span class="variable">$side</span>, <span class="variable">$spacValue</span>) &#123;</span><br><span class="line">  @<span class="keyword">if</span> <span class="variable">$side</span> == <span class="string">''</span> &#123;</span><br><span class="line">    @<span class="keyword">if</span> <span class="variable">$pro</span> == <span class="string">'m'</span> &#123;</span><br><span class="line">      <span class="attribute">margin</span>: <span class="variable">$spacValue</span> <span class="meta">!important</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    @<span class="keyword">if</span> <span class="variable">$pro</span> == <span class="string">'p'</span> &#123;</span><br><span class="line">      <span class="attribute">padding</span>: <span class="variable">$spacValue</span> <span class="meta">!important</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  @<span class="keyword">if</span> <span class="variable">$side</span> == <span class="string">'t'</span> &#123;</span><br><span class="line">    @<span class="keyword">if</span> <span class="variable">$pro</span> == <span class="string">'m'</span> &#123;</span><br><span class="line">      <span class="attribute">margin-top</span>: <span class="variable">$spacValue</span> <span class="meta">!important</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    @<span class="keyword">if</span> <span class="variable">$pro</span> == <span class="string">'p'</span> &#123;</span><br><span class="line">      <span class="attribute">padding-top</span>: <span class="variable">$spacValue</span> <span class="meta">!important</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  @<span class="keyword">if</span> <span class="variable">$side</span> == <span class="string">'b'</span> &#123;</span><br><span class="line">    @<span class="keyword">if</span> <span class="variable">$pro</span> == <span class="string">'m'</span> &#123;</span><br><span class="line">      <span class="attribute">margin-bottom</span>: <span class="variable">$spacValue</span> <span class="meta">!important</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    @<span class="keyword">if</span> <span class="variable">$pro</span> == <span class="string">'p'</span> &#123;</span><br><span class="line">      <span class="attribute">padding-bottom</span>: <span class="variable">$spacValue</span> <span class="meta">!important</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  @<span class="keyword">if</span> <span class="variable">$side</span> == <span class="string">'l'</span> &#123;</span><br><span class="line">    @<span class="keyword">if</span> <span class="variable">$pro</span> == <span class="string">'m'</span> &#123;</span><br><span class="line">      <span class="attribute">margin-left</span>: <span class="variable">$spacValue</span> <span class="meta">!important</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    @<span class="keyword">if</span> <span class="variable">$pro</span> == <span class="string">'p'</span> &#123;</span><br><span class="line">      <span class="attribute">padding-left</span>: <span class="variable">$spacValue</span> <span class="meta">!important</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  @<span class="keyword">if</span> <span class="variable">$side</span> == <span class="string">'r'</span> &#123;</span><br><span class="line">    @<span class="keyword">if</span> <span class="variable">$pro</span> == <span class="string">'m'</span> &#123;</span><br><span class="line">      <span class="attribute">margin-right</span>: <span class="variable">$spacValue</span> <span class="meta">!important</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    @<span class="keyword">if</span> <span class="variable">$pro</span> == <span class="string">'p'</span> &#123;</span><br><span class="line">      <span class="attribute">padding-right</span>: <span class="variable">$spacValue</span> <span class="meta">!important</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  @<span class="keyword">if</span> <span class="variable">$side</span> == <span class="string">'x'</span> &#123;</span><br><span class="line">    @<span class="keyword">if</span> <span class="variable">$pro</span> == <span class="string">'m'</span> &#123;</span><br><span class="line">      <span class="attribute">margin-left</span>: <span class="variable">$spacValue</span> <span class="meta">!important</span>;</span><br><span class="line">      <span class="attribute">margin-right</span>: <span class="variable">$spacValue</span> <span class="meta">!important</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    @<span class="keyword">if</span> <span class="variable">$pro</span> == <span class="string">'p'</span> &#123;</span><br><span class="line">      <span class="attribute">padding-left</span>: <span class="variable">$spacValue</span> <span class="meta">!important</span>;</span><br><span class="line">      <span class="attribute">padding-right</span>: <span class="variable">$spacValue</span> <span class="meta">!important</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  @<span class="keyword">if</span> <span class="variable">$side</span> == <span class="string">'y'</span> &#123;</span><br><span class="line">    @<span class="keyword">if</span> <span class="variable">$pro</span> == <span class="string">'m'</span> &#123;</span><br><span class="line">      <span class="attribute">margin-top</span>: <span class="variable">$spacValue</span> <span class="meta">!important</span>;</span><br><span class="line">      <span class="attribute">margin-bottom</span>: <span class="variable">$spacValue</span> <span class="meta">!important</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    @<span class="keyword">if</span> <span class="variable">$pro</span> == <span class="string">'p'</span> &#123;</span><br><span class="line">      <span class="attribute">padding-top</span>: <span class="variable">$spacValue</span> <span class="meta">!important</span>;</span><br><span class="line">      <span class="attribute">padding-bottom</span>: <span class="variable">$spacValue</span> <span class="meta">!important</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@<span class="keyword">each</span> <span class="variable">$key</span>, <span class="variable">$value</span> in <span class="variable">$grid-breakpoints</span> &#123;</span><br><span class="line">  @<span class="keyword">if</span> not <span class="variable">$value</span> &#123;</span><br><span class="line">    @<span class="keyword">each</span> <span class="variable">$pro</span> in <span class="variable">$property</span> &#123;</span><br><span class="line">      @<span class="keyword">each</span> <span class="variable">$side</span> in <span class="variable">$sides</span> &#123;</span><br><span class="line">        @<span class="keyword">each</span> <span class="variable">$spacKey</span>, <span class="variable">$spacValue</span> in <span class="variable">$spacies</span> &#123;</span><br><span class="line">          .#&#123;<span class="variable">$pro</span>&#125;#&#123;<span class="variable">$side</span>&#125;-#&#123;<span class="variable">$spacKey</span>&#125; &#123;</span><br><span class="line">            @<span class="keyword">include</span> generate(<span class="variable">$pro</span>, <span class="variable">$side</span>, <span class="variable">$spacValue</span>);</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; @<span class="keyword">else</span> &#123;</span><br><span class="line">    @<span class="keyword">media</span> screen and (min-width: <span class="variable">$value</span>) &#123;</span><br><span class="line">      @<span class="keyword">each</span> <span class="variable">$pro</span> in <span class="variable">$property</span> &#123;</span><br><span class="line">        @<span class="keyword">each</span> <span class="variable">$side</span> in <span class="variable">$sides</span> &#123;</span><br><span class="line">          @<span class="keyword">each</span> <span class="variable">$spacKey</span>, <span class="variable">$spacValue</span> in <span class="variable">$spacies</span> &#123;</span><br><span class="line">            .#&#123;<span class="variable">$pro</span>&#125;#&#123;<span class="variable">$side</span>&#125;-#&#123;<span class="variable">$key</span>&#125;-#&#123;<span class="variable">$spacKey</span>&#125; &#123;</span><br><span class="line">              @<span class="keyword">include</span> generate(<span class="variable">$pro</span>, <span class="variable">$side</span>, <span class="variable">$spacValue</span>);</span><br><span class="line">            &#125;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>到這邊就完成我們的 Spacing 了，往後如果不需要某個特定斷點或者特定間距的 Spacing 時，也只需要註解調就可以了，簡直超方便，讓我們來看實際運行的狀況：</p>
+<p><img src="https://i.imgur.com/eRuqgrM.png" alt="Spacing 運行結果 - 1"><br><img src="https://i.imgur.com/WyeEJtt.png" alt="Spacing 運行結果 - 2"><br><img src="https://i.imgur.com/aWtG6wO.png" alt="Spacing 運行結果 - 3"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CSS/" rel="tag"># CSS</a>
+              <a href="/tags/SCSS/" rel="tag"># SCSS</a>
+              <a href="/tags/Bootstrap/" rel="tag"># Bootstrap</a>
+              <a href="/tags/w3HexSchool/" rel="tag"># w3HexSchool</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2020-06-19-scss-oocss-smacss-bem/" rel="next" title="Sass / SCSS 預處理器 - OOCSS、SMACSS、BEM 模組化方法論">
+                  <i class="fa fa-chevron-left"></i> Sass / SCSS 預處理器 - OOCSS、SMACSS、BEM 模組化方法論
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2020-06-29-webpack-dotenvwebpack/" rel="prev" title="Webpack 前端打包工具 - 使用 dotenv-webpack 設置全局變量">
+                  Webpack 前端打包工具 - 使用 dotenv-webpack 設置全局變量 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+          
+            
+              
+    <div class="comments" id="gitalk-container"></div>
+
+            
+          
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#筆記重點"><span class="nav-number">2.</span> <span class="nav-text">筆記重點</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Grid-System-建立及原理說明"><span class="nav-number">3.</span> <span class="nav-text">Grid System 建立及原理說明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Spacing-建立及原理說明"><span class="nav-number">4.</span> <span class="nav-text">Spacing 建立及原理說明</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Roya" src="/images/userLogo.jpg">
+  <p class="site-author-name" itemprop="name">Roya</p>
+  <div class="site-description" itemprop="description">Front-End Web Developer<br>學會運用比學會使用還要來的有用</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">69</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/awdr74100" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;awdr74100" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:a78945612385238@gmail.com" title="E-Mail &amp;rarr; mailto:a78945612385238@gmail.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Roya</span>
+</div>
+  <span class="post-meta-divider">轉載文章時請附上作者暱稱與原文連結</span>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+
+<script src="/js/utils.js?v=7.4.2.js"></script>
+
+
+<script src="/js/schemes/pisces.js?v=7.4.2.js"></script>
+
+
+<script src="/js/next-boot.js?v=7.4.2.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+  
+<script src="/js/local-search.js?v=7.4.2.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '7cdb0d531869e18caad8',
+      clientSecret: '0b6a38cef9c3ae1dcf0ea66e916ab68823dbab52',
+      repo: 'awdr74100.github.io',
+      owner: 'awdr74100',
+      admin: ['awdr74100'],
+      id: 'befa55b8d61deaf81c234274658272a2',
+        language: 'zh-TW',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+  
+
+
+</body>
+</html>

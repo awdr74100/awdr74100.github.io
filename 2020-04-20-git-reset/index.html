@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon-128.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png?v=7.4.2">
+  <link rel="mask-icon" href="/images/favicon-none.svg?v=7.4.2" color="#222">
+  <link rel="alternate" href="/atom.xml" title="Roya's Blog" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"default"},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '複製',
+      copy_success: '複製成功',
+      copy_failure: '複製失敗'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="接下來進入重頭戲的部分，那就是版控系統絕對必備的檔案還原功能，前面我們有提到如何切換數據庫版本以做檢查，但你以為只有檢查嗎？它還可以還原阿！假設你今天開發應用時玩壞了某個檔案，透過簡單指令即可將檔案回復成未更動狀態，你說神不神奇？又或者是你發現了一個 Bug，為了修復這個 Bug，想了想還是把剛才提交的 commit 給拆掉重做比較快，這也同樣沒問題，只要你的本地數據庫沒有被刪掉，你想怎麼切、怎麼">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Git 版本控制系統 - 檔案還原與重置提交">
+<meta property="og:url" content="https://awdr74100.github.io/2020-04-20-git-reset/index.html">
+<meta property="og:site_name" content="Roya&#39;s Blog">
+<meta property="og:description" content="接下來進入重頭戲的部分，那就是版控系統絕對必備的檔案還原功能，前面我們有提到如何切換數據庫版本以做檢查，但你以為只有檢查嗎？它還可以還原阿！假設你今天開發應用時玩壞了某個檔案，透過簡單指令即可將檔案回復成未更動狀態，你說神不神奇？又或者是你發現了一個 Bug，為了修復這個 Bug，想了想還是把剛才提交的 commit 給拆掉重做比較快，這也同樣沒問題，只要你的本地數據庫沒有被刪掉，你想怎麼切、怎麼">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://learngitwithme.files.wordpress.com/2016/02/8-1.jpg?w=600">
+<meta property="og:image" content="https://i.imgur.com/AVdGdH3.png">
+<meta property="og:image" content="https://i.imgur.com/LgKzuCs.png">
+<meta property="og:image" content="https://i.imgur.com/4KMKfMc.png">
+<meta property="og:image" content="https://i.imgur.com/JVUTgg4.png">
+<meta property="og:image" content="https://i.imgur.com/ZqW1A5p.png">
+<meta property="og:image" content="https://i.imgur.com/kpyNWsd.png">
+<meta property="og:image" content="https://i.imgur.com/xIzYxZB.png">
+<meta property="og:image" content="https://i.imgur.com/z5dTASE.png">
+<meta property="og:image" content="https://i.imgur.com/A5yCz0c.png">
+<meta property="og:image" content="https://i.imgur.com/N7gJ2cQ.png">
+<meta property="og:image" content="https://i.imgur.com/JEBzsFO.png">
+<meta property="og:image" content="https://i.imgur.com/mfgQpBd.png">
+<meta property="og:image" content="https://i.imgur.com/fpXvUJP.png">
+<meta property="og:image" content="https://i.imgur.com/GO7JN7W.png">
+<meta property="og:image" content="https://i.imgur.com/TuVrbvY.png">
+<meta property="og:image" content="https://i.imgur.com/KsSRh2f.png">
+<meta property="og:image" content="https://i.imgur.com/Dcdcf4o.png">
+<meta property="og:image" content="https://i.imgur.com/jXg9Ru5.png">
+<meta property="og:image" content="https://i.imgur.com/TuVrbvY.png">
+<meta property="og:image" content="https://i.imgur.com/Lr1yS2c.png">
+<meta property="og:image" content="https://i.imgur.com/V7jvQyn.png">
+<meta property="og:image" content="https://i.imgur.com/oLHZjLj.png">
+<meta property="article:published_time" content="2020-04-20T10:40:03.000Z">
+<meta property="article:modified_time" content="2020-04-21T18:14:36.000Z">
+<meta property="article:author" content="Roya">
+<meta property="article:tag" content="w3HexSchool">
+<meta property="article:tag" content="Git">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://learngitwithme.files.wordpress.com/2016/02/8-1.jpg?w=600">
+
+<link rel="canonical" href="https://awdr74100.github.io/2020-04-20-git-reset/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Git 版本控制系統 - 檔案還原與重置提交 | Roya's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-150715469-1"></script>
+    <script>
+      var host = window.location.hostname;
+      if (host !== "localhost" || !true) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-150715469-1');
+      }
+    </script>
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Roya's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">現代化 Web 開發技術學習分享</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>標籤<span class="badge">28</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分類<span class="badge">9</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>歸檔<span class="badge">69</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none" placeholder="搜尋..." spellcheck="false" type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://awdr74100.github.io/2020-04-20-git-reset/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/userLogo.jpg">
+      <meta itemprop="name" content="Roya">
+      <meta itemprop="description" content="Front-End Web Developer<br>學會運用比學會使用還要來的有用">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Roya's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          Git 版本控制系統 - 檔案還原與重置提交
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-04-20 18:40:03" itemprop="dateCreated datePublished" datetime="2020-04-20T18:40:03+08:00">2020-04-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-04-22 02:14:36" itemprop="dateModified" datetime="2020-04-22T02:14:36+08:00">2020-04-22</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Git/" itemprop="url" rel="index">
+                    <span itemprop="name">Git</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>接下來進入重頭戲的部分，那就是版控系統絕對必備的檔案還原功能，前面我們有提到如何切換數據庫版本以做檢查，但你以為只有檢查嗎？它還可以還原阿！假設你今天開發應用時玩壞了某個檔案，透過簡單指令即可將檔案回復成未更動狀態，你說神不神奇？又或者是你發現了一個 Bug，為了修復這個 Bug，想了想還是把剛才提交的 commit 給拆掉重做比較快，這也同樣沒問題，只要你的本地數據庫沒有被刪掉，你想怎麼切、怎麼換、怎麼還原，通通不是問題。</p>
+<h2 id="筆記重點"><a href="#筆記重點" class="headerlink" title="筆記重點"></a>筆記重點</h2><ul>
+<li>檔案狀態的生命週期</li>
+<li>工作目錄檔案還原</li>
+<li>索引區檔案還原</li>
+<li>還原至指定版本</li>
+<li>使用 Reflog 查看還原紀錄</li>
+<li>Git 指令回顧</li>
+</ul>
+<h2 id="檔案狀態的生命週期"><a href="#檔案狀態的生命週期" class="headerlink" title="檔案狀態的生命週期"></a>檔案狀態的生命週期</h2><p><img src="https://learngitwithme.files.wordpress.com/2016/02/8-1.jpg?w=600" alt="檔案狀態的生命週期"></p>
+<p>在我們正式進入到檔案還原章節之前，需先了解 Git 在各個工作流程所顯示的檔案狀態，請先開一個資料夾並新增 <code>index.html</code> 檔案：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mkdir project</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> project</span><br><span class="line"></span><br><span class="line">git init</span><br><span class="line"></span><br><span class="line">touch index.html</span><br></pre></td></tr></table></figure>
+
+<p>此時使用 <code>git status</code> 查看目前檔案狀態：</p>
+<p><img src="https://i.imgur.com/AVdGdH3.png" alt="查看檔案狀態-1"></p>
+<p>此時 <code>index.html</code> 檔案狀態為 <code>Untracked files</code>，代表此檔案從未加入過資料庫，且流程還處於工作目錄下，請先記錄下這一個狀態，接著繼續將這個檔案提交至索引區：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git add .</span><br></pre></td></tr></table></figure>
+
+<p>查看狀態：</p>
+<p><img src="https://i.imgur.com/LgKzuCs.png" alt="查看檔案狀態-2"></p>
+<p>此時的檔案狀態更改為了 <code>Changes to be committed</code>，代表此檔案以處於索引區，即將提交至本地數據庫，你可能會想，下方的 <code>new file</code> 字樣需要記嗎？此字樣是代表此檔案從未加入過數據庫，且以處於索引區內，在後面執行還原操作時，是以檔案狀態為依據並輸入指定命令進行還原，也就代表像是 <code>new file</code> 或 <code>modified</code> 字樣，可記可不記，它只是告訴你將要執行的操作而已，讓我們正式將這個檔案提交至本地數據庫：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git commit -m <span class="string">'新增 index.html'</span></span><br></pre></td></tr></table></figure>
+
+<p>此時 <code>index.html</code> 檔案已被加入至本地數據庫，這也是我們之前在講解 Git 基本工作流程時的操作，接下來請隨意更改已存在本地數據庫的 <code>index.html</code> 內容，並使用 <code>git status</code> 查看狀態：</p>
+<p><img src="https://i.imgur.com/4KMKfMc.png" alt="查看檔案狀態-3"></p>
+<p><strong>當已存在本地數據庫的檔案經過修改，此檔案就會回到工作目錄</strong>，須從跑一次 Git 工作流程，與從未存在本地數據庫的檔案差別在於檔案狀態為 <code>Changes not staged for commit</code>，即代表檔案經過更動但還未提交至索引區或本地數據庫，讓我們來看此檔案提交至索引區後狀態為何：</p>
+<p><img src="https://i.imgur.com/JVUTgg4.png" alt="查看檔案狀態-4"></p>
+<p>此時檔案狀態更改為了 <code>Changes to be committed</code>，與未曾提交至本地數據庫的檔案提交至索引區結果相同，差別在於操作動作更改為了 <code>modified</code> 字樣，代表修改的意思，讓我們先將此檔案提交至本地數據庫再來做總結：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git commit -m <span class="string">'修改 index.html'</span></span><br></pre></td></tr></table></figure>
+
+<p>跑過了上面的流程，可以做出以下總結：</p>
+<p>Git 將<strong>尚未被提交</strong>的檔案分成了三個區塊：</p>
+<ul>
+<li><code>Untracked files</code>：代表新創建的檔案從未加入至數據庫，所在區域為工作目錄</li>
+<li><code>Changes not staged for commit</code>：已存在數據庫的檔案經過修改回到工作目錄</li>
+<li><code>Changes to be committed</code>：從工作目錄提交至索引區的檔案</li>
+</ul>
+<p>這三大狀態是我們下面使用檔案還原的關鍵，你可能會問，那狀態下的將執行操作會影響下面的範例嗎？答案是不會的，這些都屬於其他操作的範圍，先記這三大檔案狀態就好，接下來讓我們正式進入到檔案還原章節吧！</p>
+<h2 id="工作目錄檔案還原"><a href="#工作目錄檔案還原" class="headerlink" title="工作目錄檔案還原"></a>工作目錄檔案還原</h2><p>經過了以上討論，代表存在工作目錄下的檔案只會有以下兩種狀態：</p>
+<ul>
+<li><code>Untracked files</code>：新建立的檔案，還未被 Git 追蹤</li>
+<li><code>Changes not staged for commit</code>：已被 Git 追蹤，但檔案經過修改回到了工作目錄</li>
+</ul>
+<p>針對以上兩種狀態，Git 分別提供不同指定以進行還原動作，讓我們先來看目前的日誌：</p>
+<p><img src="https://i.imgur.com/ZqW1A5p.png" alt="查看目前 commit 紀錄-1"></p>
+<p>這兩個 commit 紀錄就是我們上面範例所產生的，接下來讓我們隨意新增一個檔案並查看狀態：</p>
+<p><img src="https://i.imgur.com/kpyNWsd.png" alt="查看檔案狀態-5"></p>
+<p>從上面結果可以得知，我們新增了一個 <code>all.css</code> 檔案，此時的檔案狀態為 <code>Untracked files</code>，代表此檔案從未加入過數據庫，自然無法紀錄版本內容，那你可能會想，都還沒加入過數據庫，要如何進行檔案還原呢？是要還原什麼？事實上，處於這一狀態的檔案只能進行刪除動作，在這邊的還原就是指檔案還沒有被建立出來時候，讓我們先執行以下命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clean -n</span><br></pre></td></tr></table></figure>
+
+<p>此時會跳出以下訊息：</p>
+<p><img src="https://i.imgur.com/xIzYxZB.png" alt="git clean -n"></p>
+<p>這道命令的用意主要是讓我們得知那些檔案將被刪除，接著使用以下命令刪除檔案：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clean -f</span><br></pre></td></tr></table></figure>
+
+<p>此時會跳出已刪除檔案的訊息：</p>
+<p><img src="https://i.imgur.com/z5dTASE.png" alt="git clean -f"></p>
+<p>使用 <code>git clean</code> 主要可針對 <code>Untracked files</code> 的檔案進行還原 (刪除) 動作，你可以去檢查剛剛新增的檔案是否還存在，接下來介紹 <code>Changes not staged for commit</code> 狀態的檔案如何進行還原，請先修改已存在數據庫的 <code>index.html</code> 檔案並查看狀態：</p>
+<p><img src="https://i.imgur.com/A5yCz0c.png" alt="查看檔案狀態-6"></p>
+<p>前面有提到已存在數據庫但被修改過的檔案狀態為 <code>Changes not staged for commit</code>，此時如果你使用 <code>git clean</code> 是沒有任何效果的，<code>git clean</code> 只能作用在 <code>Untrakced files</code> 狀態下的檔案，針對此狀態，我們必須使用以下指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git checkout index.html</span><br></pre></td></tr></table></figure>
+
+<p>或：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git checkout .</span><br></pre></td></tr></table></figure>
+
+<p>此時會跳出以下訊息：</p>
+<p><img src="https://i.imgur.com/N7gJ2cQ.png" alt="git checkout index.html"></p>
+<p>你可以針對單一檔案或全部檔案進行還原，還原的結果就是檔案還未修改的狀態。</p>
+<p>以上就是針對存在於工作目錄階段的檔案如何進行還原的操作，可能會有人問，那假設我已經提交至索引區了呢？此時你就不能使用以上命令進行還原，必須使用 <code>reset</code> 命令才能還原，讓我們繼續看下去。</p>
+<h2 id="索引區檔案還原"><a href="#索引區檔案還原" class="headerlink" title="索引區檔案還原"></a>索引區檔案還原</h2><p>索引區的檔案還原就比較簡單了，因為它只有以下狀態：</p>
+<ul>
+<li><code>Changes to be committed</code>：從工作目錄提交至索引區的檔案</li>
+</ul>
+<p>讓我們先隨意新增一個檔案並提交至索引區：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">touch all.js</span><br><span class="line"></span><br><span class="line">git add .</span><br></pre></td></tr></table></figure>
+
+<p>查看狀態：</p>
+<p><img src="https://i.imgur.com/JEBzsFO.png" alt="查看檔案狀態-7"></p>
+<p>如同前面所說，無論檔案是否被追蹤，只要提交至索引區，狀態就是 <code>Changes to be committed</code>，此時可透過以下指令將此檔案還原至工作目錄：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git reset HEAD --mixed</span><br></pre></td></tr></table></figure>
+
+<p><code>--mixed</code> 為預設模式，在這邊可以省略，此模式會把暫存區的檔案丟掉，但不會動到工作目錄的檔案，也就是說還原的檔案會留在工作目錄，但不會留在暫存區；而 HEAD 代表我們所要還原到的 commit 紀錄上，你不用想的這麼複雜，讓我們以 Sourcetree 來說明：</p>
+<p><img src="https://i.imgur.com/mfgQpBd.png" alt="sourcetree"></p>
+<p>你會發現多出了一個 <code>Uncommitted</code> 節點，這一個節點即代表所有未經提交的紀錄，只要經過 <code>git commit</code> 此節點就會消失，進而生成一個有紀錄的 commit 節點，而上面的 <code>HEAD</code> 在這邊就是指 <code>master</code> 指向的這一個節點，之前我們有提到 <code>HEAD</code> 所代表的就是我們當下的狀態，所以上面命令你也可以寫成 <code>git reset master</code>，代表將檔案還原至這一個節點，讓我們來看此時的結果為何：</p>
+<p><img src="https://i.imgur.com/fpXvUJP.png" alt="查看檔案狀態-8"></p>
+<p>檔案被還原到工作目錄了，由於此檔案當初是以新增的方式進入到 Git 工作流程，所以還原後的狀態才為 <code>Untracked</code>，此時一樣可透過前面介紹的 <code>git clean -f</code> 將檔案進行還原 (刪除)，如果是 <code>Changes not staged for commit</code> 狀態，就必須使用 <code>git checkout .</code> 來進行還原，是不是很簡單？</p>
+<p>事實上，如果你想要一氣呵成將存在索引區的檔案直接還原到最初狀態，即 <code>git reset HEAD + git clean -f</code>，你可以使用 <code>reset</code> 的另外一個參數：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git reset HEAD --hard</span><br></pre></td></tr></table></figure>
+
+<p>在 <code>--hard</code> 模式下，不管是工作目錄還是索引區的檔案都會被丟掉，這個模式在某些情況下特別好用，下面會再做介紹，到這邊我們也完成索引區的檔案還原囉。</p>
+<h2 id="還原至指定版本"><a href="#還原至指定版本" class="headerlink" title="還原至指定版本"></a>還原至指定版本</h2><p>在前面我們都是將狀態還原至 HEAD，也就是所謂的最新版本，那如果我們要還原到指定版本呢？比如說最新版本的前三個版本通通都不要了，我要將版本還原至最新版本數起的第四個版本，這時候該怎麼做？此時一樣可透過 <code>reset</code> 指令來完成，讓我們來複習一下各模式的處理方式：</p>
+<ul>
+<li><code>--mixed</code>：預設的模式，還原後的檔案將丟回工作目錄</li>
+<li><code>--hard</code>：還原後的檔案將直接丟掉</li>
+<li><code>--soft</code>：還原後的檔案將丟回索引區</li>
+</ul>
+<p><code>--soft</code> 模式在之前沒有講到，我們在後面會再進行補充，讓我們先來看目前的日誌：</p>
+<p><img src="https://i.imgur.com/GO7JN7W.png" alt="查看 commit 紀錄-2"></p>
+<p>因為我們之前都是在做新增後還原的動作，所以 commit 記錄才會完全沒有改變，為了方便等等做版本還原的操作，請先隨意新增幾個 commit 紀錄：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">touch all.js</span><br><span class="line"></span><br><span class="line">git add .</span><br><span class="line"></span><br><span class="line">git commit -m <span class="string">'新增 all.js'</span></span><br><span class="line"></span><br><span class="line">touch db.json</span><br><span class="line"></span><br><span class="line">gti add .</span><br><span class="line"></span><br><span class="line">git commit -m <span class="string">'新增 db.json'</span></span><br></pre></td></tr></table></figure>
+
+<p>查看目前的日誌：</p>
+<p><img src="https://i.imgur.com/TuVrbvY.png" alt="查看 commit 紀錄-3"></p>
+<p>版本還原有分所謂的相對路徑與絕對路徑，讓我們先來看相對對路徑的部分，假設我們要還原 <code>HEAD</code> 的前一個版本，也就是 <code>8d8ee63</code> 這一個 commit，請執行以下命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git reset HEAD^</span><br></pre></td></tr></table></figure>
+
+<p>有沒有發現 <code>^</code> 這一個符號？此符號代表你要還原幾個版本，如果是還原兩個版本，可以寫成 <code>^^</code>，那如果是還原五個版本呢？可以寫成 <code>^^^^^</code>，但這樣的寫法太累了，可以改使用 <code>~</code> 符號代替，<code>~5</code> 代表還原五個版本，所以 <code>^</code> 與 <code>~1</code> 效果是相同的，讓我們來檢查日誌看是否還原成功：</p>
+<p><img src="https://i.imgur.com/KsSRh2f.png" alt="查看 commit 紀錄-4"></p>
+<p>此時你會發現當初的 <code>e1e9db8</code> 紀錄不見了，也就代表版本還原成功，你可能會好奇，那與 <code>e1e9db8</code> 有關的檔案呢？同樣也不見了嗎？讓我們來看看目前檔案狀態：</p>
+<p><img src="https://i.imgur.com/Dcdcf4o.png" alt="查看檔案狀態-9"></p>
+<p>還記得之前 <code>--mixed</code> 模式的處理方式嗎？沒有錯，因為我們在使用 <code>reset</code> 指令時，並沒有加入任何的參數，預設就是使用 <code>--mixed</code> 模式，他把還原後的相關檔案全部丟到了工作目錄下，這才導致 <code>e1e9db8</code> 紀錄有關的檔案都存在於工作目錄下，此時一樣可透過 <code>git clean -f</code> 或 <code>git checkout .</code> 將檔案給還原到初始狀態。</p>
+<p>你可能會問，我都已經還原到指定版本了，還需要一個一個看是什麼狀態並使用相對應的指令進行還原，這樣會不會太麻煩？還記得之前介紹地的 <code>--hard</code> 模式嗎？此模式可以把有關的檔案全部進行還原，就是全部丟掉的意思啦，假設我們以剛才的情況來說，回復到 <code>HEAD</code> 的前一個版本並使用 <code>--hard</code> 模式將有關的檔案全部丟掉，此時的狀態就會變為：</p>
+<p><img src="https://i.imgur.com/jXg9Ru5.png" alt="查看 commit 紀錄-4"></p>
+<p>與 <code>e1e9db8</code> 有關的檔案就都被我們丟掉了，講解完了 <code>--mixed</code> 與 <code>--hard</code> 模式，大家應該就都知道 <code>--soft</code> 的用法了，沒錯，就是把有關的檔案全部都丟到索引區內，在這邊就不進行示範了，各位可以自己試試看。</p>
+<p>上面是以相對路徑方式還原版本，你也可以使用絕對路徑的方式進行還原，先讓我們使用 <code>git reflog</code> 查看並還原到最一開始的狀態：</p>
+<p><img src="https://i.imgur.com/TuVrbvY.png" alt="查看 commit 紀錄-5"></p>
+<p>關於 <code>Reflog</code> 的使用方式，下面會再做介紹，先讓我們回到主題，目前的 commit 紀錄就是我們最一開始的狀態，假設我們要還原到 <code>3c85d93</code> 這一個節點，相對路徑寫法是 <code>git reset HEAD~2</code>，而絕對路徑是寫成：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gti reset 3c85d93 --hard</span><br></pre></td></tr></table></figure>
+
+<p>不要懷疑，就是這麼簡單，只需要撰寫節點的 SHA-1 編碼即可，此時的檔案狀態為：</p>
+<p><img src="https://i.imgur.com/Lr1yS2c.png" alt="查看檔案狀態-10"></p>
+<p>因為我們使用了 <code>--hard</code> 模式，所以與之相關的檔案都被我們丟掉了，是不是很方便阿？</p>
+<h2 id="使用-Reflog-查看還原紀錄"><a href="#使用-Reflog-查看還原紀錄" class="headerlink" title="使用 Reflog 查看還原紀錄"></a>使用 Reflog 查看還原紀錄</h2><p>在前面我們有偷偷透過 <code>git reflog</code> 查看我們還原紀錄並還原，你可能會好奇，難道 reset 後的檔案可以 reset 回來？沒有錯，確實是可以的，我們拿前面的範例來看：</p>
+<p><img src="https://i.imgur.com/V7jvQyn.png" alt="查看 commit 紀錄-6"></p>
+<p>這是我們剛剛還原的結果，那假設我後悔了，我想要還原到剛剛還原前的狀態呢？此時一定有人會去查看剛剛還原前的最新 commit 紀錄，並且使用以下指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git reset e1e9db8</span><br></pre></td></tr></table></figure>
+
+<p>沒錯！這樣子就可以還原到尚未使用還原指令前的狀態，但假如說你沒有記下那一個狀態的 SHA-1 值呢？是不是就不能還原了？當然還是可以啊！但必須透過 <code>git reflog</code> 找回這一個 SHA-1 標號：</p>
+<p><img src="https://i.imgur.com/oLHZjLj.png" alt="查看 commit 紀錄-7"></p>
+<p>當 <code>HEAD</code> 有移動時 (例如切換分支或還原版本)，Git 就會在 Reflog 裡記上一筆，代表如果你做了任何傻事，都可以到這邊查找並進行復原，是不是很棒？這也是為什麼只要你曾將檔案加入過數據庫，絕大部份資料都可以找得回來的原因。</p>
+<p>這樣子看起來，就算我們把 Git 給玩壞了，一樣可以使用 Reflog 還原到最初的狀態，但這邊要注意，Reflog 也是有保存時間的，預設來說 Git 會幫你保存這些歷史紀錄 90 天，如果這些紀錄中已經有些 commit 物件不在分支線上，則預設保留 30 天。但這些時間都是可以更改的，假如說你的硬碟無限大，永遠不想刪除紀錄，可以考慮設定如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config --global gc.reflogExpire <span class="string">'never'</span></span><br><span class="line">git config --global gc.reflogExpireUnreachable <span class="string">'never'</span></span><br></pre></td></tr></table></figure>
+
+<p>在這邊補充一點，如果你想要查看 <code>Reflog</code> 內紀錄的時間，可以使用以下指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git reflog --date=iso</span><br></pre></td></tr></table></figure>
+
+<h2 id="Git-指令回顧"><a href="#Git-指令回顧" class="headerlink" title="Git 指令回顧"></a>Git 指令回顧</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看將被 git clean -f 還原的對象</span></span><br><span class="line">git clean -n</span><br><span class="line"></span><br><span class="line"><span class="comment"># 還原全部工作目錄檔案 (未追蹤)</span></span><br><span class="line">git clean -f</span><br><span class="line"></span><br><span class="line"><span class="comment"># 還原指定工作目錄檔案 (以追蹤)</span></span><br><span class="line">git checkout &lt;file&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 還原全部工作目錄檔案 (以追蹤)</span></span><br><span class="line">git checkout .</span><br><span class="line"></span><br><span class="line"><span class="comment"># 還原索引區檔案 (丟回工作目錄)</span></span><br><span class="line">git reset HEAD</span><br><span class="line"></span><br><span class="line"><span class="comment"># 還原索引區檔案 (同上，預設選項)</span></span><br><span class="line">git reset HEAD --mixed</span><br><span class="line"></span><br><span class="line"><span class="comment"># 還原索引區檔案 (全部丟掉)</span></span><br><span class="line">git reset HEAD --hard</span><br><span class="line"></span><br><span class="line"><span class="comment"># 還原至前兩個版本 (丟回工作目錄)</span></span><br><span class="line">git reset HEAD^^ --mixed</span><br><span class="line"></span><br><span class="line"><span class="comment"># 還原至前三個版本 (丟回索引區)</span></span><br><span class="line">git reset HEAD~3 --soft</span><br><span class="line"></span><br><span class="line"><span class="comment"># 還原至指定版本 (使用絕對路徑，全部丟掉)</span></span><br><span class="line">git reset &lt;SHA-1&gt; --hard</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看還原紀錄</span></span><br><span class="line">git reflog</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看還原紀錄 (顯示時間)</span></span><br><span class="line">git reflog --date=iso</span><br><span class="line"></span><br><span class="line"><span class="comment"># 修改 reflog 保存時間 (存在分支線上，預設 90 天改為無限)</span></span><br><span class="line">git config --global gc.reflogExpire <span class="string">'never'</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 修改 reflog 保存時間 (不存在分支線上，預設 30 天改為無限)</span></span><br><span class="line">git config --global gc.reflogExpireUnreachable <span class="string">'never'</span></span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/w3HexSchool/" rel="tag"># w3HexSchool</a>
+              <a href="/tags/Git/" rel="tag"># Git</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2020-04-18-git-remote/" rel="next" title="Git 版本控制系統 - 遠端數據庫託管與操作">
+                  <i class="fa fa-chevron-left"></i> Git 版本控制系統 - 遠端數據庫託管與操作
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2020-04-22-git-conflict/" rel="prev" title="Git 版本控制系統 - 分支合併衝突與解決辦法">
+                  Git 版本控制系統 - 分支合併衝突與解決辦法 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+          
+            
+              
+    <div class="comments" id="gitalk-container"></div>
+
+            
+          
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#筆記重點"><span class="nav-number">2.</span> <span class="nav-text">筆記重點</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#檔案狀態的生命週期"><span class="nav-number">3.</span> <span class="nav-text">檔案狀態的生命週期</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#工作目錄檔案還原"><span class="nav-number">4.</span> <span class="nav-text">工作目錄檔案還原</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#索引區檔案還原"><span class="nav-number">5.</span> <span class="nav-text">索引區檔案還原</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#還原至指定版本"><span class="nav-number">6.</span> <span class="nav-text">還原至指定版本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用-Reflog-查看還原紀錄"><span class="nav-number">7.</span> <span class="nav-text">使用 Reflog 查看還原紀錄</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Git-指令回顧"><span class="nav-number">8.</span> <span class="nav-text">Git 指令回顧</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Roya" src="/images/userLogo.jpg">
+  <p class="site-author-name" itemprop="name">Roya</p>
+  <div class="site-description" itemprop="description">Front-End Web Developer<br>學會運用比學會使用還要來的有用</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">69</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/awdr74100" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;awdr74100" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:a78945612385238@gmail.com" title="E-Mail &amp;rarr; mailto:a78945612385238@gmail.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Roya</span>
+</div>
+  <span class="post-meta-divider">轉載文章時請附上作者暱稱與原文連結</span>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+
+<script src="/js/utils.js?v=7.4.2.js"></script>
+
+
+<script src="/js/schemes/pisces.js?v=7.4.2.js"></script>
+
+
+<script src="/js/next-boot.js?v=7.4.2.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+  
+<script src="/js/local-search.js?v=7.4.2.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '7cdb0d531869e18caad8',
+      clientSecret: '0b6a38cef9c3ae1dcf0ea66e916ab68823dbab52',
+      repo: 'awdr74100.github.io',
+      owner: 'awdr74100',
+      admin: ['awdr74100'],
+      id: '3f78d97d299efc242263556576095917',
+        language: 'zh-TW',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+  
+
+
+</body>
+</html>

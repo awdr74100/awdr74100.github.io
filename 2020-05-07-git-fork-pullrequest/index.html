@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon-128.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png?v=7.4.2">
+  <link rel="mask-icon" href="/images/favicon-none.svg?v=7.4.2" color="#222">
+  <link rel="alternate" href="/atom.xml" title="Roya's Blog" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"default"},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '複製',
+      copy_success: '複製成功',
+      copy_failure: '複製失敗'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="目前我們都是在自己的遠端數據庫做操作，由於是自己的並不會遇到所謂的權限問題，但假如我們也想操作其他開發者的遠端數據庫呢？比如你正在使用的套件存在 Bug，而你剛好有能力修復，將專案克隆並修復後，你想把最新提交推至原作的遠端數據庫，這時就會遇到權限不足的問題，你可能透過 Email 請作者開權限給你，但你覺得他會理你嗎？通常這個過程我們都會使用 Fork 與 Pull Request 來完成，先將原">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Git 版本控制系統 - Fork 複製倉庫與 Pull Request 請求合併">
+<meta property="og:url" content="https://awdr74100.github.io/2020-05-07-git-fork-pullrequest/index.html">
+<meta property="og:site_name" content="Roya&#39;s Blog">
+<meta property="og:description" content="目前我們都是在自己的遠端數據庫做操作，由於是自己的並不會遇到所謂的權限問題，但假如我們也想操作其他開發者的遠端數據庫呢？比如你正在使用的套件存在 Bug，而你剛好有能力修復，將專案克隆並修復後，你想把最新提交推至原作的遠端數據庫，這時就會遇到權限不足的問題，你可能透過 Email 請作者開權限給你，但你覺得他會理你嗎？通常這個過程我們都會使用 Fork 與 Pull Request 來完成，先將原">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/mTLV1iZ.png">
+<meta property="og:image" content="https://i.imgur.com/aV3GRpO.png">
+<meta property="og:image" content="https://i.imgur.com/cm8V25n.png">
+<meta property="og:image" content="https://i.imgur.com/6JPxfh8.png">
+<meta property="og:image" content="https://i.imgur.com/CT2AO0V.png">
+<meta property="og:image" content="https://i.imgur.com/uUvMGAc.png">
+<meta property="og:image" content="https://i.imgur.com/T1FnyUf.png">
+<meta property="og:image" content="https://i.imgur.com/yyrLP8m.png">
+<meta property="og:image" content="https://i.imgur.com/Q8QKJUz.png">
+<meta property="og:image" content="https://i.imgur.com/Bn1GUbB.png">
+<meta property="og:image" content="https://i.imgur.com/WMvvX3P.png">
+<meta property="og:image" content="https://i.imgur.com/Yx7XR6c.png">
+<meta property="og:image" content="https://i.imgur.com/uQvJqEE.png">
+<meta property="og:image" content="https://i.imgur.com/6qrEbrY.png">
+<meta property="og:image" content="https://i.imgur.com/6qrEbrY.png">
+<meta property="og:image" content="https://i.imgur.com/VbpUVlz.png">
+<meta property="og:image" content="https://i.imgur.com/Ug6kmvm.png">
+<meta property="og:image" content="https://i.imgur.com/SEFwBYP.png">
+<meta property="og:image" content="https://i.imgur.com/W6c7Con.png">
+<meta property="og:image" content="https://i.imgur.com/r7gkfAH.png">
+<meta property="og:image" content="https://i.imgur.com/sbp2WfH.png">
+<meta property="og:image" content="https://i.imgur.com/mlQvYgH.png">
+<meta property="og:image" content="https://i.imgur.com/O3Lcd4S.png">
+<meta property="og:image" content="https://i.imgur.com/57BVALN.png">
+<meta property="article:published_time" content="2020-05-07T08:32:16.000Z">
+<meta property="article:modified_time" content="2020-05-08T15:06:49.000Z">
+<meta property="article:author" content="Roya">
+<meta property="article:tag" content="Git">
+<meta property="article:tag" content="GitHub">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/mTLV1iZ.png">
+
+<link rel="canonical" href="https://awdr74100.github.io/2020-05-07-git-fork-pullrequest/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Git 版本控制系統 - Fork 複製倉庫與 Pull Request 請求合併 | Roya's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-150715469-1"></script>
+    <script>
+      var host = window.location.hostname;
+      if (host !== "localhost" || !true) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-150715469-1');
+      }
+    </script>
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Roya's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">現代化 Web 開發技術學習分享</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>標籤<span class="badge">28</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分類<span class="badge">9</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>歸檔<span class="badge">69</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none" placeholder="搜尋..." spellcheck="false" type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://awdr74100.github.io/2020-05-07-git-fork-pullrequest/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/userLogo.jpg">
+      <meta itemprop="name" content="Roya">
+      <meta itemprop="description" content="Front-End Web Developer<br>學會運用比學會使用還要來的有用">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Roya's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          Git 版本控制系統 - Fork 複製倉庫與 Pull Request 請求合併
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-05-07 16:32:16" itemprop="dateCreated datePublished" datetime="2020-05-07T16:32:16+08:00">2020-05-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-05-08 23:06:49" itemprop="dateModified" datetime="2020-05-08T23:06:49+08:00">2020-05-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Git/" itemprop="url" rel="index">
+                    <span itemprop="name">Git</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>目前我們都是在自己的遠端數據庫做操作，由於是自己的並不會遇到所謂的權限問題，但假如我們也想操作其他開發者的遠端數據庫呢？比如你正在使用的套件存在 Bug，而你剛好有能力修復，將專案克隆並修復後，你想把最新提交推至原作的遠端數據庫，這時就會遇到權限不足的問題，你可能透過 Email 請作者開權限給你，但你覺得他會理你嗎？通常這個過程我們都會使用 Fork 與 Pull Request 來完成，先將原作的數據庫 Fork 至帳號底下，待我們克隆並修復完成後，再透過 Pull Request 請求作者合併更新。</p>
+<h2 id="筆記重點"><a href="#筆記重點" class="headerlink" title="筆記重點"></a>筆記重點</h2><ul>
+<li>推至遠端時所遇權限不足問題</li>
+<li>Fork 其他開發者專案</li>
+<li>發送 Pull Request 請求合併</li>
+<li>處理 Pull Request 檢查是否合併</li>
+<li>同步 Pull Request 後的專案進度</li>
+<li>Pull Request 衝突解決辦法</li>
+</ul>
+<h2 id="推至遠端時所遇權限不足問題"><a href="#推至遠端時所遇權限不足問題" class="headerlink" title="推至遠端時所遇權限不足問題"></a>推至遠端時所遇權限不足問題</h2><p>這邊我們來模擬推至遠端時所遇權限不足問題，假設我們的專案使用了 Vue 進行開發，但發現存在一處 Bug 須修復，我們可能會這樣做：</p>
+<p><img src="https://i.imgur.com/mTLV1iZ.png" alt="Vue.js"></p>
+<p>如同處理自己的遠端數據庫一般，可使用 HTTPS 或 SSH 方式克隆回本地：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> -b dev git@github.com:vuejs/vue.git vue</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> vue</span><br></pre></td></tr></table></figure>
+
+<p>這邊要注意，並不是說操作其他開發者的遠端數據庫時，都會遇到身分驗證的提示，你想想看，我只是單純克隆別人的數據庫，為什麼需要身分驗證呢？如果你不想把數據庫給公開，你可以設置為 <code>Private</code> 屬性，此時陌生人就看不到你的遠端數據庫囉，上面提到的都是屬於克隆操作，那假設我們要進行推至遠端的動作呢？</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">touch test123.txt</span><br><span class="line"></span><br><span class="line">git add .</span><br><span class="line"></span><br><span class="line">git commit -m <span class="string">'add test123.txt'</span></span><br><span class="line"></span><br><span class="line">git push</span><br></pre></td></tr></table></figure>
+
+<p>此時會跳出無訪問權限的提示：</p>
+<p><img src="https://i.imgur.com/aV3GRpO.png" alt="git push 權限不足"></p>
+<p>這蠻合理的嗎，克隆並不會影響原作者的數據庫，但 Push 就會了，你敢想像自己的遠端數據庫突然被陌生人 <code>git push -f</code> 嗎？一般來說我們只能操作自己的遠端數據庫，並不能操作別人的數據庫，但可透過 Fork 與 PR (為 Pull Request 縮寫) 與原作者做交流，了解了原由，接下來讓我們進入到主要的章節吧！</p>
+<h2 id="Fork-其他開發者專案"><a href="#Fork-其他開發者專案" class="headerlink" title="Fork 其他開發者專案"></a>Fork 其他開發者專案</h2><p>為了示範原作者與陌生開發者各自的操作，這邊我開了兩支帳號來示範，角色如下：</p>
+<ul>
+<li>原作者：<a href="https://github.com/lanroya" target="_blank" rel="external nofollow noopener noreferrer">lanroya</a></li>
+<li>陌生開發者：<a href="https://github.com/awdr74100" target="_blank" rel="external nofollow noopener noreferrer">awdr74100</a></li>
+</ul>
+<p>目前我們登入的帳號是 lanroya，建立一個專案並提交兩次 commit 紀錄：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">mkdir pr-demo</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> pr-demo</span><br><span class="line"></span><br><span class="line">touch all.css</span><br><span class="line"></span><br><span class="line">git add .</span><br><span class="line"></span><br><span class="line">git commit -m <span class="string">'add all.css'</span></span><br><span class="line"></span><br><span class="line">... edit all.css</span><br><span class="line"></span><br><span class="line">git commit -am <span class="string">'edit all.css &gt; .a'</span></span><br></pre></td></tr></table></figure>
+
+<p>假設初步的操作已經完成，在 GitHub 新增一個遠端數據庫並 Push：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git remote add origin https://github.com/lanroya/pr-demo.git</span><br><span class="line"></span><br><span class="line">git push -u origin master</span><br></pre></td></tr></table></figure>
+
+<p>此時 lanroya 帳號底下就會有自己的 pr-demo 專案：</p>
+<p><img src="https://i.imgur.com/cm8V25n.png" alt="lanroya 帳號底下的專案"></p>
+<p>接著 awdr74100 開發者發現這個專案蠻有趣的但存在些 Bug，他想要幫忙修復，先執行 Fork：</p>
+<p><img src="https://i.imgur.com/6JPxfh8.png" alt="fork 專案"></p>
+<p>這邊要注意，fork 並不屬於 Git 的指令，它是 GitHub 等遠端伺服器相當特別的功能，主要能將指定專案複製一份到你的帳號底下，當你按下了 fork 按鈕，會跳出以下畫面：</p>
+<p><img src="https://i.imgur.com/CT2AO0V.png" alt="fork 轉場畫面"></p>
+<p>代表正在 fork 此專案到你的帳號底下，完成後會跳轉到你帳號底下的這個專案：</p>
+<p><img src="https://i.imgur.com/uUvMGAc.png" alt="fork 完成後跳轉"></p>
+<p>到這邊就已經完成 fork 的動作了，可以到帳號底下查看是否有這一個目標專案。</p>
+<p>你可能會好奇，這樣有什麼作用？還記得上面提到的權限不足問題嗎？當我們去存取帳號底下除外的專案時，會遇到 Push 操作無訪問權限的提示，而 fork 的用意就是將陌生專案拷貝一份到你的帳號底下，之後我們就可以如同帳號底下專案操作一般，針對此專案進行 Fetch、Pull、Push 的操作，接著我們來修復這個 Bug 吧：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/awdr74100/pr-demo.git pr-demo</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> pr-demo</span><br><span class="line"></span><br><span class="line">... edit all.css</span><br><span class="line"></span><br><span class="line">git commit -am <span class="string">'edit all.css &gt; b'</span></span><br></pre></td></tr></table></figure>
+
+<p>當我們修復完成後，由於是自己帳號底下的數據庫，並不會造成所謂的 Push 無訪問權限問題：</p>
+<p><img src="https://i.imgur.com/T1FnyUf.png" alt="-3-(https://i.imgur.com/sbp2WfH.png)1"></p>
+<p>目前 Bug 就已經被 awdr74100 修復了，但這邊所謂的修復是指在 awdr74100 拷貝的專案下進行修復，原作者的專案是不受任何影響的，如果要告知原作者 Bug 已被修復，可以使用 Pull Request 功能，直接進入下個章節。</p>
+<h2 id="發送-Pull-Request-請求合併"><a href="#發送-Pull-Request-請求合併" class="headerlink" title="發送 Pull Request 請求合併"></a>發送 Pull Request 請求合併</h2><p>目前 awdr74100 已經把 Bug 給修復完成了，但 lanroya 還不知道，這過程可透過 PR (Pull Request) 來完成：</p>
+<p><img src="https://i.imgur.com/yyrLP8m.png" alt="New Pull Request"></p>
+<p>在 awdr74100 拷貝的專案底下有 Pull request 的區塊可做選擇，點擊後的畫面如上圖，接者點擊 <code>New pull request</code> 按鈕，此時會跳出以下畫面：</p>
+<p><img src="https://i.imgur.com/Q8QKJUz.png" alt="發送 Pull Request"></p>
+<p>畫面跳轉到了 lanroya 的頁面，這邊我們就可選擇剛剛修復完成的分支進行請求合併，在之前的文章我們有說過 GitHub 等遠端伺服器是採用「合併」的方式來更新內容，Pull Request 你可以把它理解為將最新的 commit 提交丟給原作者，讓原作者判斷是否要合併這一個 commit 提交。</p>
+<p>這邊還有一個重點是關於 <code>Able to merge</code> 字樣，它能夠告訴你這一個 PR 如果作者接受的話是否會發生衝突，畢竟 PR 不太可能只有一個人發，如果你的專案很知名，像 React、Vue 等等，作者接受了第一個 PR，但要接受第二個 PR 時，就有可能發生錯誤，因為提交紀錄被改變了阿，從原本的兩個 commit，變成了三個 commit，假如你的 PR 還是處於兩個 commit 的狀態，就會跳衝突，這我們之後再說，確認 PR 沒問題後，就可以點擊 <code>Create pull request</code> 按鈕囉，此時會切換為以下畫面：</p>
+<p><img src="https://i.imgur.com/Bn1GUbB.png" alt="PR 訊息"></p>
+<p>預設的標題為當時提交的 commit 訊息，你可以隨意做修改，如果要進行補充，也可以寫在下方的空白區域內，此區域是支援 Markdown 語法的喔，確認沒問題就可以點擊 <code>Create pull request</code> 發送 PR 囉，結果畫面為：</p>
+<p><img src="https://i.imgur.com/WMvvX3P.png" alt="PR 發送成功"></p>
+<p>到這邊我們的 PR 就已經發送成功，你可以在下方繼續進行補充，接下來就等作者 (lanroya) 檢查並判斷是否接受合併囉。</p>
+<h2 id="處理-Pull-Request-檢查是否合併"><a href="#處理-Pull-Request-檢查是否合併" class="headerlink" title="處理 Pull Request 檢查是否合併"></a>處理 Pull Request 檢查是否合併</h2><p>接著我們換原作者 (lanroya) 的部分，登入 lanroya 帳號後並切換到指定數據庫會看到以下畫面：</p>
+<blockquote>
+<p>當有 PR 請求時，作者也會收到 Email 的通知</p>
+</blockquote>
+<p><img src="https://i.imgur.com/Yx7XR6c.png" alt="原作者 GitHub 畫面"></p>
+<p>有發現不一樣的地方嗎？沒錯，有人發送了 Pull Request 給我們，讓我們點擊進去看看：</p>
+<p><img src="https://i.imgur.com/uQvJqEE.png" alt="Pull Request 清單"></p>
+<p>在這邊你可以看到所有的 PR 紀錄，正好第一筆不就是剛剛 awdr74100 發送給我們的 PR 嗎？點擊進入：</p>
+<p><img src="https://i.imgur.com/6qrEbrY.png" alt="PR 詳細頁面"></p>
+<p>你可以看到有關這個 PR 的各種資訊，比如說提交幾次 commit 阿，代碼哪裡做了更動阿，這些都看的到，你也可以在下方的互動區塊與提交者 (awdr74100) 做互動，這邊最重要的是檢查此 PR 是否會發生衝突，你可以直接從它的提示去得知，如果確認都沒問題，就直接按下 <code>Merge pull request</code> 按鈕吧！</p>
+<p>此時會要求你輸入此次提交的 commit 紀錄訊息，就如同 <code>non-fast-forward</code> 處理一般，這邊我們採用預設訊息即可，按下 <code>Confirm merge</code> 確認合併吧！</p>
+<p><img src="https://i.imgur.com/6qrEbrY.png" alt="Confirm merge"></p>
+<p>此時 PR 狀態會從 <code>Open</code> 更改為 <code>Merged</code>，代表合併成功囉。</p>
+<p>那要怎麼確認 PR 是否真的合併成功呢？你可以切換到主頁面並點選 <code>commits</code> 查看所有提交紀錄：</p>
+<p><img src="https://i.imgur.com/VbpUVlz.png" alt="commits 查看所有提交紀錄"></p>
+<p>或是直接在 lanroya 的 bash 輸入以下指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">git fetch</span><br><span class="line"></span><br><span class="line"><span class="comment"># or</span></span><br><span class="line"></span><br><span class="line">git pull</span><br></pre></td></tr></table></figure>
+
+<p>因為遠端數據庫有了新的提交紀錄，我們可以把它 Fetch 回來並查看：</p>
+<p><img src="https://i.imgur.com/Ug6kmvm.png" alt="fetch PR 提交"></p>
+<p>看到我們剛剛 merge 的 PR 提交囉，此時一樣使用 merge 即可同步遠端的提交：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git merge origin/master</span><br></pre></td></tr></table></figure>
+
+<p>以上就是整個發送 PR 的流程，是不是很有趣？發送 PR 不只可以應用在開源專案上，企業內部也很常使用此方式來處理夥伴間的提交，達到流程化的效果。</p>
+<h2 id="同步-Pull-Request-後的專案進度"><a href="#同步-Pull-Request-後的專案進度" class="headerlink" title="同步 Pull Request 後的專案進度"></a>同步 Pull Request 後的專案進度</h2><p>這邊我們做一個補充，原作者要同步遠端數據庫的內容相對簡單，上面就已經有示範，但陌生開發者 (awdr74100) 可能就需要點技巧了，發送的 PR 就算已被原作者合併，fork 過來的專案也不會有任何變化，帳號底下的這個專案看起來雖然是個克隆體，但本質上與原作者的數據庫是完全不一樣的東西，如果想要完成同步，有以下方法可做選擇：</p>
+<ul>
+<li>把克隆專案改掉，重新 fork 專案</li>
+<li>新增原作遠端數據庫位址，並手動同步專案</li>
+</ul>
+<p>砍掉重練方法相對簡單，你不需要輸入任何指令，每次 fork 的狀態一定就是最新的，各位可自行試試，這邊就不做示範，我自己是比較習慣新增原作的遠端數據庫位址並手動同步專案，以下為示範：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git remote add lanroya https://github.com/lanroya/pr-demo.git</span><br></pre></td></tr></table></figure>
+
+<p>檢查是否成功新增遠端數據庫位址：</p>
+<p><img src="https://i.imgur.com/SEFwBYP.png" alt="新增遠端數據庫位址"></p>
+<p>在前面我們有提到使用 clone 或 fetch 等方式是不會跳出無訪問權限提示的，因為又不影響原作者的數據庫，這邊我們就可以用同樣方式來處理 PR 後的提交紀錄，上面新增了原作者的遠端數據庫位址，接下來進行 fetch 動作：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git fetch lanroya mastr</span><br></pre></td></tr></table></figure>
+
+<p>此時的線路圖狀態為：</p>
+<p><img src="https://i.imgur.com/W6c7Con.png" alt="-3-(https://i.imgur.com/sbp2WfH.png)2"></p>
+<p>你會發現原作者的遠端數據庫就被我們拉下來了，接著直接合併即可完成同步動作：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git merge lanroya/master</span><br></pre></td></tr></table></figure>
+
+<p>說真的這也沒多複雜，我比較推薦使用此方式來完成同步操作，某方面來講可能會比較簡單。</p>
+<h2 id="Pull-Request-衝突解決辦法"><a href="#Pull-Request-衝突解決辦法" class="headerlink" title="Pull Request 衝突解決辦法"></a>Pull Request 衝突解決辦法</h2><p>在上面我們有提到 PR 也是會發生衝突的，且機率還挺高的，我們來模擬這一狀況：。</p>
+<p>假設原作者 (lanroya) 更新的專案進度：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">... edit all.css</span><br><span class="line"></span><br><span class="line">git commit -am <span class="string">'edit all.css &gt; .c'</span></span><br></pre></td></tr></table></figure>
+
+<p>很自然的將它推上遠端數據庫：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push</span><br></pre></td></tr></table></figure>
+
+<p>此時陌生開發者 (awdr74100) 忘記先同步原作者專案就直接發 PR：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">... edit all.css</span><br><span class="line"></span><br><span class="line">git commit -am <span class="string">'edit all.css .c'</span></span><br><span class="line"></span><br><span class="line">git push</span><br></pre></td></tr></table></figure>
+
+<p>在這邊我們刻意模擬同步的衝突以及代碼的衝突，此時 PR 的畫面為：</p>
+<p><img src="https://i.imgur.com/r7gkfAH.png" alt="PR 發生衝突"></p>
+<p>你會發現它顯示了 <code>Can&#39;t automatically merge</code> 字樣，代表此 PR 會發生合併衝突，雖然你還是能把此 PR 發出去，但我建議在未發送前就解決這個衝突，你現在不解決，最後原作者還是得解決，但它合併的意願可能就不大了，解決辦法很簡單，如同我們自己的遠端數據庫合併衝突辦法：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git fetch lanroya master</span><br></pre></td></tr></table></figure>
+
+<p>此時的線路圖狀態為：</p>
+<p><img src="https://i.imgur.com/sbp2WfH.png" alt="查看目前 commit 紀錄-3"></p>
+<p>原來是未同步提交紀錄所發生的衝突阿，此時我們可以這樣做：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git rebase lanroya/master</span><br></pre></td></tr></table></figure>
+
+<p>或</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git merge lanroya/master</span><br></pre></td></tr></table></figure>
+
+<p>由於我不想要提交額外的 commit 紀錄，這邊我使用 rebase 來合併分支，如果順利的話分支就會被合併，但剛剛我也刻意模仿代碼發生的衝突，此時也就會跳出衝突的錯誤：</p>
+<p><img src="https://i.imgur.com/mlQvYgH.png" alt="rebase 發生衝突"></p>
+<p>關於 rebase 如何解決衝突，之前在 <a href="https://awdr74100.github.io/2020-05-04-git-rebase/">rebase 文章</a> 就有完整的解說，有興趣的可以過去看看，這邊就快速帶過：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">... resolve conflict</span><br><span class="line"></span><br><span class="line">git add .</span><br><span class="line"></span><br><span class="line">git rebase --<span class="built_in">continue</span></span><br></pre></td></tr></table></figure>
+
+<p>此時的線路圖狀態為：</p>
+<p><img src="https://i.imgur.com/O3Lcd4S.png" alt="查看目前 commit 紀錄-4"></p>
+<p>這邊要注意，如果你是使用 merge 來合併分支，等等 Push 時就不會發生衝突，而如果你是使用 rebase 來合併分支，由於遠端指向的 <code>38a67a3</code> 提交已被拋棄 (隱藏)，本地改而指向剛剛 rebase 新生成的 <code>eddd006</code> 節點，歷史紀錄不同就會導致衝突，這邊很適合使用以下指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push -f</span><br></pre></td></tr></table></figure>
+
+<p>你可能會想，不是盡量不要使用這個命令嗎？沒錯，但此提交也只有我一個人在運作，何況我們沒有修改到原作者的紀錄阿，這種情況就比較沒關係，讓我們來看目前發 PR 還會不會有衝突：</p>
+<p><img src="https://i.imgur.com/57BVALN.png" alt="PR 衝突以解決"></p>
+<p>這一次的 PR 就不會有合併衝突囉，後面的流程就如同前面所介紹，各位可以自己跑一次看看。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Git/" rel="tag"># Git</a>
+              <a href="/tags/GitHub/" rel="tag"># GitHub</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2020-05-06-git-stash/" rel="next" title="Git 版本控制系統 - stash 暫存修改內容">
+                  <i class="fa fa-chevron-left"></i> Git 版本控制系統 - stash 暫存修改內容
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2020-05-11-git-githubflow/" rel="prev" title="Git 版本控制系統 - GitHub Flow 工作流程與實際演練">
+                  Git 版本控制系統 - GitHub Flow 工作流程與實際演練 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+          
+            
+              
+    <div class="comments" id="gitalk-container"></div>
+
+            
+          
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#筆記重點"><span class="nav-number">2.</span> <span class="nav-text">筆記重點</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#推至遠端時所遇權限不足問題"><span class="nav-number">3.</span> <span class="nav-text">推至遠端時所遇權限不足問題</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Fork-其他開發者專案"><span class="nav-number">4.</span> <span class="nav-text">Fork 其他開發者專案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#發送-Pull-Request-請求合併"><span class="nav-number">5.</span> <span class="nav-text">發送 Pull Request 請求合併</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#處理-Pull-Request-檢查是否合併"><span class="nav-number">6.</span> <span class="nav-text">處理 Pull Request 檢查是否合併</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#同步-Pull-Request-後的專案進度"><span class="nav-number">7.</span> <span class="nav-text">同步 Pull Request 後的專案進度</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Pull-Request-衝突解決辦法"><span class="nav-number">8.</span> <span class="nav-text">Pull Request 衝突解決辦法</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Roya" src="/images/userLogo.jpg">
+  <p class="site-author-name" itemprop="name">Roya</p>
+  <div class="site-description" itemprop="description">Front-End Web Developer<br>學會運用比學會使用還要來的有用</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">69</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/awdr74100" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;awdr74100" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:a78945612385238@gmail.com" title="E-Mail &amp;rarr; mailto:a78945612385238@gmail.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Roya</span>
+</div>
+  <span class="post-meta-divider">轉載文章時請附上作者暱稱與原文連結</span>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+
+<script src="/js/utils.js?v=7.4.2.js"></script>
+
+
+<script src="/js/schemes/pisces.js?v=7.4.2.js"></script>
+
+
+<script src="/js/next-boot.js?v=7.4.2.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+  
+<script src="/js/local-search.js?v=7.4.2.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '7cdb0d531869e18caad8',
+      clientSecret: '0b6a38cef9c3ae1dcf0ea66e916ab68823dbab52',
+      repo: 'awdr74100.github.io',
+      owner: 'awdr74100',
+      admin: ['awdr74100'],
+      id: 'ce40ad720ee41549a99ebca5759158fa',
+        language: 'zh-TW',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+  
+
+
+</body>
+</html>

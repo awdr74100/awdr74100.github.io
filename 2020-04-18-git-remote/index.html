@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon-128.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png?v=7.4.2">
+  <link rel="mask-icon" href="/images/favicon-none.svg?v=7.4.2" color="#222">
+  <link rel="alternate" href="/atom.xml" title="Roya's Blog" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"default"},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '複製',
+      copy_success: '複製成功',
+      copy_failure: '複製失敗'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="本地數據庫的操作已經介紹的差不多了，這次來講如何將本地數據庫推至遠端數據庫，這其實也是整個 Git 流程最重要的步驟，當我們成功將本地專案推至像是 GitHub 或 Bitbucket 等平台時，也就代表我們已經可以異地操作這一個專案了，你是否曾遇到過開發到一半的專案需要到另外一台電腦繼續操作的情況？這時你可能會使用像是 USB 等儲存裝置，但你不覺得這樣效率很差嗎？何況如果你忘記帶 USB 呢？">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Git 版本控制系統 - 遠端數據庫託管與操作">
+<meta property="og:url" content="https://awdr74100.github.io/2020-04-18-git-remote/index.html">
+<meta property="og:site_name" content="Roya&#39;s Blog">
+<meta property="og:description" content="本地數據庫的操作已經介紹的差不多了，這次來講如何將本地數據庫推至遠端數據庫，這其實也是整個 Git 流程最重要的步驟，當我們成功將本地專案推至像是 GitHub 或 Bitbucket 等平台時，也就代表我們已經可以異地操作這一個專案了，你是否曾遇到過開發到一半的專案需要到另外一台電腦繼續操作的情況？這時你可能會使用像是 USB 等儲存裝置，但你不覺得這樣效率很差嗎？何況如果你忘記帶 USB 呢？">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/n0pIThT.png">
+<meta property="og:image" content="https://i.imgur.com/cGtent2.png">
+<meta property="og:image" content="https://i.imgur.com/q2mQFRg.png">
+<meta property="og:image" content="https://i.imgur.com/iPyCrV1.png">
+<meta property="og:image" content="https://i.imgur.com/5G0gngn.png">
+<meta property="og:image" content="https://i.imgur.com/0mX7Tb5.png">
+<meta property="og:image" content="https://i.imgur.com/NoCocJc.png">
+<meta property="og:image" content="https://i.imgur.com/2m89i24.png">
+<meta property="og:image" content="https://i.imgur.com/qjBsgX7.png">
+<meta property="og:image" content="https://i.imgur.com/OUCX1Hl.png">
+<meta property="og:image" content="https://i.imgur.com/p7h4b4r.png">
+<meta property="og:image" content="https://i.imgur.com/dCYbWTC.png">
+<meta property="og:image" content="https://i.imgur.com/iOltleD.png">
+<meta property="og:image" content="https://i.imgur.com/HaPt1Jc.png">
+<meta property="og:image" content="https://i.imgur.com/9BYZTBO.png">
+<meta property="og:image" content="https://i.imgur.com/EMfHFPi.png">
+<meta property="og:image" content="https://i.imgur.com/tYT26fr.png">
+<meta property="og:image" content="https://i.imgur.com/tfJx30q.png">
+<meta property="og:image" content="https://i.imgur.com/HjhElq0.png">
+<meta property="og:image" content="https://i.imgur.com/4k9SaRb.png">
+<meta property="og:image" content="https://i.imgur.com/ysGyR5H.png">
+<meta property="og:image" content="https://i.imgur.com/jUhYkHE.png">
+<meta property="article:published_time" content="2020-04-18T15:00:04.000Z">
+<meta property="article:modified_time" content="2020-06-12T19:06:37.000Z">
+<meta property="article:author" content="Roya">
+<meta property="article:tag" content="Git">
+<meta property="article:tag" content="GitHub">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/n0pIThT.png">
+
+<link rel="canonical" href="https://awdr74100.github.io/2020-04-18-git-remote/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Git 版本控制系統 - 遠端數據庫託管與操作 | Roya's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-150715469-1"></script>
+    <script>
+      var host = window.location.hostname;
+      if (host !== "localhost" || !true) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-150715469-1');
+      }
+    </script>
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Roya's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">現代化 Web 開發技術學習分享</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>標籤<span class="badge">28</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分類<span class="badge">9</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>歸檔<span class="badge">69</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none" placeholder="搜尋..." spellcheck="false" type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://awdr74100.github.io/2020-04-18-git-remote/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/userLogo.jpg">
+      <meta itemprop="name" content="Roya">
+      <meta itemprop="description" content="Front-End Web Developer<br>學會運用比學會使用還要來的有用">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Roya's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          Git 版本控制系統 - 遠端數據庫託管與操作
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-04-18 23:00:04" itemprop="dateCreated datePublished" datetime="2020-04-18T23:00:04+08:00">2020-04-18</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-06-13 03:06:37" itemprop="dateModified" datetime="2020-06-13T03:06:37+08:00">2020-06-13</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Git/" itemprop="url" rel="index">
+                    <span itemprop="name">Git</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>本地數據庫的操作已經介紹的差不多了，這次來講如何將本地數據庫推至遠端數據庫，這其實也是整個 Git 流程最重要的步驟，當我們成功將本地專案推至像是 GitHub 或 Bitbucket 等平台時，也就代表我們已經可以異地操作這一個專案了，你是否曾遇到過開發到一半的專案需要到另外一台電腦繼續操作的情況？這時你可能會使用像是 USB 等儲存裝置，但你不覺得這樣效率很差嗎？何況如果你忘記帶 USB 呢？只要你的專案已經存在遠端數據庫，且當前操作的電腦有安裝 Git，透過簡單指令即可將專案同步回本地。</p>
+<h2 id="筆記重點"><a href="#筆記重點" class="headerlink" title="筆記重點"></a>筆記重點</h2><ul>
+<li>在 GitHub 開一個遠端數據庫</li>
+<li>設定 GitHub SSH 金鑰</li>
+<li>將本地數據庫 Push 至 GitHub</li>
+<li>將遠端數據庫 Clone 到本地</li>
+<li>使用 Fetch 獲取遠端數據庫修改內容</li>
+<li>刪除遠端分支</li>
+<li>Git 指令回顧</li>
+</ul>
+<h2 id="在-GitHub-開一個遠端數據庫"><a href="#在-GitHub-開一個遠端數據庫" class="headerlink" title="在 GitHub 開一個遠端數據庫"></a>在 GitHub 開一個遠端數據庫</h2><p>首先我們當然要有一個遠端數據庫託管我們的專案，在這邊示範 GitHub 的流程。</p>
+<p>註冊 <a href="https://github.com/join?source=header-home" target="_blank" rel="external nofollow noopener noreferrer">GitHub</a> 帳號：</p>
+<p><img src="https://i.imgur.com/n0pIThT.png" alt="Register GitHub"></p>
+<p>點擊畫面左邊的 New 按鈕，新增一個 Repository：</p>
+<p><img src="https://i.imgur.com/cGtent2.png" alt="New Repository"></p>
+<p>此為 Repository 的各種設定，Name 為必要設定，其他都用預設值就好，反正後面還可以更改：</p>
+<p><img src="https://i.imgur.com/q2mQFRg.png" alt="Repository First Setting"></p>
+<p>成功顯示：</p>
+<p><img src="https://i.imgur.com/iPyCrV1.png" alt="Repository success"></p>
+<p>當你跑出以上畫面即代表遠端數據庫已成功被建立，你會看到一堆 Git 的指令，這些在下面都會做介紹，接下來進入本地數據庫連接遠端數據庫的部分。</p>
+<h2 id="設定-GitHub-SSH-金鑰"><a href="#設定-GitHub-SSH-金鑰" class="headerlink" title="設定 GitHub SSH 金鑰"></a>設定 GitHub SSH 金鑰</h2><p>在我們將本地數據庫連結遠端數據庫之前，有一個很重要的觀念是關於 SSH 與 HTTPS 的差異，GitHub 為了保證當前使用者就是此 Repository 的授權用戶，提供了兩種的驗證方式：</p>
+<ul>
+<li>SSH：已經將金鑰設定完成，與遠端數據庫交流時不需輸入帳密 (可針對私鑰使用設定密碼)</li>
+<li>HTTPS：與遠端數據庫交流時需輸入 GitHub 帳密，如果不需要輸入通常是帳密已存在電腦裡</li>
+</ul>
+<p>GitHub 本身是推薦使用 HTTPS，使用起來會比較安全，且對於初學者來說較友善，看到登入視窗直接輸入帳密就完成了；但我個人比較推薦使用 SSH 的方式，並針對私鑰設定使用密碼，這樣在每次與遠端數據庫交流時，都會跑出輸入密碼的提示，你可能會想，這樣不是很麻煩嗎？但換個角度去想，假設你在提交的途中後悔了呢？我是不是就可以避免此次的提交？類似 Git 要設立索引區的用意，下面將介紹 SSH 該如何設定並提交至 GitHub 上面。</p>
+<p>開啟終端機並輸入以下指令，用以生成 SSH Key：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Created directory：生成路徑 (採預設即可)</li>
+<li>Enter passphrase：私鑰密碼 (可為空值，但建議輸入，原因上面有提到)</li>
+<li>Enter same passphrase again：再次輸入密碼</li>
+<li>… 金鑰相關資訊</li>
+</ul>
+<p>成功生成 SSH Key：</p>
+<p><img src="https://i.imgur.com/5G0gngn.png" alt="ssh-keygen created"></p>
+<p>將 <code>C:\Users\${USER}\.ssh\id_rsa.pub</code> 公鑰內容提交至 GitHub 上：</p>
+<p>位置：GitHub &gt; Setting &gt; SSH and GPG keys</p>
+<p><img src="https://i.imgur.com/0mX7Tb5.png" alt="SSH Key push"></p>
+<p>點擊 New SSH Key 並將剛剛複製內容貼到 Key 欄位，最後按 Add SSH key 提交公鑰，完成圖如下：</p>
+<p><img src="https://i.imgur.com/NoCocJc.png" alt="SSH Key success"></p>
+<p>到這邊就已經完成 GitHub SSH 金鑰設定的部分，下面我們就可以透過 SSH 方式與遠端數據庫交流囉。</p>
+<h2 id="將本地數據庫-Push-至-GitHub"><a href="#將本地數據庫-Push-至-GitHub" class="headerlink" title="將本地數據庫 Push 至 GitHub"></a>將本地數據庫 Push 至 GitHub</h2><p>讓我們先開一個專案資料夾並提交兩次 commit 紀錄：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">mkdir project</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> project</span><br><span class="line"></span><br><span class="line">git init</span><br><span class="line"></span><br><span class="line">touch index.html</span><br><span class="line"></span><br><span class="line">git add .</span><br><span class="line"></span><br><span class="line">git commit -m <span class="string">'新增 index.html'</span></span><br><span class="line"></span><br><span class="line">touch all.css</span><br><span class="line"></span><br><span class="line">git add .</span><br><span class="line"></span><br><span class="line">git commit -m <span class="string">'新增 all.css'</span></span><br></pre></td></tr></table></figure>
+
+<p>輸入 <code>git log</code> 查看目前 commit 紀錄：</p>
+<p><img src="https://i.imgur.com/2m89i24.png" alt="git log"></p>
+<p>如果有看過前面文章的人，應該對這些流程非常熟悉了才對，將下來進入重頭戲的部分，輸入以下指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git remote add origin git@github.com:awdr74100/git-remote-demo.git</span><br></pre></td></tr></table></figure>
+
+<p>說明：</p>
+<ul>
+<li><code>git remote add</code>：添加一個遠端數據庫</li>
+<li><code>origin</code>：後面那段遠端數據庫位址的名稱 (可隨意設置)</li>
+<li><code>git@github.com:xxx</code>：遠端數據庫位址 (SSH 方式)</li>
+<li><code>https://github.com/xxx</code>：遠端數據庫位址 (HTTPS 方式)</li>
+</ul>
+<p>遠端數據庫位址可在 Repository 頁面找到，前面的圖片就有照到。當我們輸入以上指令時，可以到 <code>/.git/config</code> 專案配置檔中檢查是否成功添加遠端數據庫位址：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[remote &quot;origin&quot;]</span><br><span class="line">    url &#x3D; git@github.com:awdr74100&#x2F;git-remote-demo.git</span><br><span class="line">    fetch &#x3D; +refs&#x2F;heads&#x2F;*:refs&#x2F;remotes&#x2F;origin&#x2F;*</span><br></pre></td></tr></table></figure>
+
+<p>或是直接使用 <code>git remote -v</code> 查看所有以添加的遠端數據庫資訊：</p>
+<p><img src="https://i.imgur.com/qjBsgX7.png" alt="git remote -v"></p>
+<p>當出現以上畫面即代表遠端數據庫已被成功添加，一個本地數據庫可以添加無數個遠端數據庫，你也可以使用以下指令針對遠端數據庫做些修改：</p>
+<ul>
+<li>修改已註冊遠端數據庫位址：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git remote <span class="built_in">set</span>-url origin https://github.com/awdr74100/git-remote-demo.git</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>修改已註冊遠端數據庫名稱：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git remote rename origin github</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>刪除已註冊遠端數據庫：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git remote remove origin</span><br></pre></td></tr></table></figure>
+
+<p>簡單來講呢，你可以把它想像成宣告了 <code>origin</code> 這一個變數，並且賦予了遠端數據庫的位址，變數名稱可以自由的命名，但一般主要的遠端數據庫我們都會把它命名為 <code>origin</code>，其他特殊作用的遠端數據庫才會刻意命名，後面的操作就都會是以這一個變數名稱為主，接下來執行以下命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push -u origin master</span><br></pre></td></tr></table></figure>
+
+<p>說明：</p>
+<ul>
+<li><code>git push</code>：將本地指定分支推送至遠端數據庫</li>
+<li><code>-u</code>：同 <code>--set-upstream</code>，設定推送分支的上游</li>
+<li><code>origin</code>：要推向哪個遠端數據庫，寫名稱即可 (就是指前面說的 <code>origin</code>)</li>
+<li><code>master</code>：指定本地 <code>master</code> 分支進行推送，如果存在 <code>master</code> 分支即合併，不存在即新增</li>
+</ul>
+<p>這一段可能會比較不好理解，讓我們將上面這段命令完整的寫出來：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push --<span class="built_in">set</span>-upstream origin master:master</span><br></pre></td></tr></table></figure>
+
+<p>首先是 <code>-u</code> 的部分，等同於 <code>--set-upstream</code>，可以使 <code>master</code> 這一個指定的分支開始追蹤遠端的分支，只要做過一次 <code>git push -u origin master</code>，並且成功 Push 出去，本地的 <code>master</code> 分支就會被設定去追蹤遠端的 <code>origin/master</code> 分支，往後再 <code>master</code> 分支直接使用 <code>git push</code> 命令就會推向當時設定的 <code>origin/master</code> 分支，反之，如果沒有設定 <code>-u</code> 就使用 <code>git push</code>，就會導致以下錯誤：</p>
+<p><img src="https://i.imgur.com/OUCX1Hl.png" alt="git 尚未設置上游"></p>
+<p>可能有人會想，那我是否可以在不設定 <code>-u</code> 的情況下使用以下指令呢？</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push origin master</span><br></pre></td></tr></table></figure>
+
+<p>答案是可以的，我們為什麼要設定 <code>-u</code> 就是要方便往後在直接使用 <code>git push</code> 命令時，Git 能夠知道此命令該推向何處，上面這種寫法明確的定義推向何處，結果與 <code>git push -u origin master</code> 一樣，只是我們習慣在第一次推送時，在明確定義該推向何處時，同時也設置往後這個位置就是預設推向的位置，有關 <code>-u</code> 的設定一樣可以到 <code>/.git/config</code> 尋找：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[branch &quot;master&quot;]</span><br><span class="line">    remote &#x3D; origin</span><br><span class="line">    merge &#x3D; refs&#x2F;heads&#x2F;master</span><br></pre></td></tr></table></figure>
+
+<p>在這邊補充一點，如果你往後 <code>master</code> 這個以設定 <code>-u</code> 的分支，想要單純使用 <code>git push</code> 就推向其他的分支，你可以解除 <code>-u</code> 的設定或直接覆蓋掉 <code>-u</code> 的設定：</p>
+<ul>
+<li>移除 <code>upstream</code> 設定 (當前所在分支為 <code>master</code> =&gt; 設定 <code>master</code> 分支)：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git branch --<span class="built_in">unset</span>-upstream</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>移除 <code>upstream</code> 設定 (當前所在分支不是 <code>master</code> =&gt; 設定 <code>master</code> 分支)：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git branch --<span class="built_in">unset</span>-upstream master</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>設定 <code>upstream</code> 存在即覆蓋 (當前所在分支為 <code>master</code> =&gt; 設定 <code>master</code> 分支)：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git branch -u origin/master</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>設定 <code>upstream</code> 存在即覆蓋 (當前所在分支為 <code>master</code> =&gt; 設定 <code>master</code> 分支)：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git branch -u origin/master master</span><br></pre></td></tr></table></figure>
+
+<p>相信到這邊各位已經了解 <code>upstream</code> 的作用了，再來是前面提到的 <code>master:master</code> 部分，這個就比較簡單了，前面的 <code>master</code> 代表本地端的分支，後面的 <code>master</code> 代表遠端的分支，如果你把遠端的 <code>master</code> 改為 <code>develop</code>，那遠端的分支名稱就會是 <code>develop</code>，但內容還是本地端的 <code>master</code> 分支，就只是單純的改名子而已，接下來我們來看最初執行 <code>git push -u origin master</code> 後的 GitHub 頁面：</p>
+<p><img src="https://i.imgur.com/p7h4b4r.png" alt="git push 後的頁面"></p>
+<p>你會發現我們的本地數據庫已成功推至遠端數據庫了，且分支名稱為 <code>master</code>，假設你在推送時只有寫 <code>master</code> 單個本地分支名稱，遠端分支的名稱就會直接採用這一個本地端分支的名稱，讓我們在練習一次：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">git checkout -b develop</span><br><span class="line"></span><br><span class="line">touch db.json</span><br><span class="line"></span><br><span class="line">git add .</span><br><span class="line"></span><br><span class="line">git commit -m <span class="string">'增加 db.json'</span></span><br></pre></td></tr></table></figure>
+
+<p>這一次我們在本地端開了一個名為 <code>develop</code> 的分支，執行以下命令進行推送：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push origin develop</span><br></pre></td></tr></table></figure>
+
+<p>或是</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push -u origin develop</span><br></pre></td></tr></table></figure>
+
+<p>請注意，你沒有必要切換到 <code>master</code> 分支才進行推送，你的 Git 命令本身已經添加本地端的哪個分支，除非你要使用 <code>git push</code> 方式進行推送，這時就需要切換到要推送的那個分支，<strong>每一個分支都可以設定一個 upstream</strong>，我自己是習慣將每一個分支都設定好 <code>upstream</code>，日後就可以直接使用 <code>git push</code> 推至指定位置了，工程師就是要少打點字啊！我們來看現在的遠端數據庫有什麼變化：</p>
+<p><img src="https://i.imgur.com/dCYbWTC.png" alt="push 新分支"></p>
+<p>記得將頁面預設呈現的 <code>master</code> 分支切換到 <code>develop</code> 分支，從上面結果可以得知，我們的本地端數據庫已成功同步到遠端數據庫，接下來換本地該如何拉取遠端數據庫的部分：</p>
+<h2 id="將遠端數據庫-Clone-到本地"><a href="#將遠端數據庫-Clone-到本地" class="headerlink" title="將遠端數據庫 Clone 到本地"></a>將遠端數據庫 Clone 到本地</h2><p>我們已經完成將本地數據庫推送至遠端了，將下來示範如何將遠端數據庫克隆回本地：</p>
+<p>先確認目前有哪些分支：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git branch -a</span><br></pre></td></tr></table></figure>
+
+<p>你也可以使用 <code>-r</code> 僅查看遠端分支，但我習慣使用 <code>-a</code> 直接查看所有分支，結果如下：</p>
+<p><img src="https://i.imgur.com/iOltleD.png" alt="git branch -a"></p>
+<p>結果如同預期，因為我們已經分別將 <code>master</code>、<code>develop</code> 分支推至遠端了，所以遠端也存在同名的分支，接下來執行已下命令：</p>
+<ul>
+<li>克隆遠端數據庫的預設分支至本地：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> git@github.com:awdr74100/git-remote-demo.git gh-demo</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>克隆遠端數據庫的指定分支至本地：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> -b master git@github.com:awdr74100/git-remote-demo.git gh-demo</span><br></pre></td></tr></table></figure>
+
+<p>剛剛在 Push 時是使用 SSH 方式驗證，在 Clone 這邊我們也一樣使用 SSH 方式連結，事實上，你想要改成 HTTPS 方式也沒差，如果你想要克隆非 <code>master</code> (origin/HEAD) 的分支，可以加上 <code>-b</code> 參數，後面帶入想要克隆的分支，最後面的 <code>gh-demo</code> 代表的是遠端數據庫要放在本地端的哪個資料夾，如果不存在即建立，如果不寫放置資料夾，預設會在當下命令路徑生成遠端數據庫名稱</p>
+<p><img src="https://i.imgur.com/HaPt1Jc.png" alt="git clone"></p>
+<p>切換並查看剛剛 Clone 下來的數據庫：</p>
+<p><img src="https://i.imgur.com/9BYZTBO.png" alt="git clone 分支缺少"></p>
+<p>到這邊我們已經成功將遠端數據庫 Clone 下來了，但在這邊還有一個問題，從上圖可以發現，這一個數據庫缺少了 <code>develop</code> 分支，預設情況下，使用 <code>git clone</code> 命令只會將 <code>master</code> (origin/HEAD) 分支給複製下來，可能會有人想，我可以直接 <code>git checkout origin/develop</code> 就好了啊，但這樣的作法是無法在本地端工作的，正確的做法應該是將遠端數據庫的分支一併給同步下來，可以使用以下指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git checkout -t origin/develop</span><br></pre></td></tr></table></figure>
+
+<p>再次查看所有分支：</p>
+<p><img src="https://i.imgur.com/EMfHFPi.png" alt="git checkout -t"></p>
+<p><code>-t</code> 全名為 <code>--track</code>，此道命令可將遠端分支建立至本地並追蹤 (即設置 upstream)，此時我們的 <code>gh-demo</code> 數據庫就會與最之前的 <code>project</code> 數據庫一模一樣囉，在這邊補充幾個指令：</p>
+<ul>
+<li>將遠端分支建立至本地並追蹤 (自定義名稱)：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git checkout -b develop origin/develop</span><br></pre></td></tr></table></figure>
+
+<p>這道指令與 <code>git checkout -t origin/develop</code> 結果相同，差別在於可自定義名稱。</p>
+<ul>
+<li>將遠端分支建立至本地並追蹤 (自動辨識遠端是否存在同名分支)：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git checkout develop</span><br></pre></td></tr></table></figure>
+
+<p>這道命令與使用 <code>git checkout -t origin/develop</code> 結果相同，Git 會檢查這一個分支是否洽好存在同名遠端分支，如果存在，即在本地創建這一個分支並追蹤遠端分支。</p>
+<p>以上幾道命令結果都一樣，看你認為哪一個比較好記。到這邊我們已經成功將遠端數據庫克隆至本地，以後只要在有 Git 環境的電腦中，都可以達到異地開發的效果，再也不需要使用 USB 囉。</p>
+<h2 id="使用-Fetch-獲取遠端數據庫修改內容"><a href="#使用-Fetch-獲取遠端數據庫修改內容" class="headerlink" title="使用 Fetch 獲取遠端數據庫修改內容"></a>使用 Fetch 獲取遠端數據庫修改內容</h2><p>到這邊還有一個情境是假設本地端已將數據庫推至遠端，在異地開發時，我們也從遠端複製一份到本地端並提交了數次 commit，最後 Push 到遠端，那一開始已存在本地端檔案但資料落後於遠端的這個人該怎麼辦？讓我們來模擬這個狀況：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> project</span><br><span class="line"></span><br><span class="line">git checkout develop</span><br><span class="line"></span><br><span class="line">touch all.js</span><br><span class="line"></span><br><span class="line">git add .</span><br><span class="line"></span><br><span class="line">git commit -m <span class="string">'新增 all.js'</span></span><br><span class="line"></span><br><span class="line">git checkout master</span><br><span class="line"></span><br><span class="line">git merge develop --no-ff</span><br></pre></td></tr></table></figure>
+
+<p>查看日誌：</p>
+<p><img src="https://i.imgur.com/tYT26fr.png" alt="查看 commit 紀錄-1"></p>
+<p>你會發現我們本地端的兩個分支已經超前遠端分支的紀錄，接下來進行 Push：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push --all origin</span><br></pre></td></tr></table></figure>
+
+<p>在我們前面都是介紹單個分支的推送，事實上，你也可以添加 <code>--all</code> 用以推送本地端所有分支的更新，而 <code>origin</code> 就是之前介紹的主機名稱，再看一次日誌：</p>
+<p><img src="https://i.imgur.com/tfJx30q.png" alt="查看 commit 紀錄-2"></p>
+<p>看起來我們的本地端內容已經被同步到遠端數據庫了，接著換剛剛克隆下來的數據庫：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> gh-demo</span><br></pre></td></tr></table></figure>
+
+<p>執行以下命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git fetch</span><br></pre></td></tr></table></figure>
+
+<p>查看日誌：</p>
+<p><img src="https://i.imgur.com/HjhElq0.png" alt="查看 commit 紀錄-3"></p>
+<p>你會發現本地參照的遠端分支已被更新，這也就是 <code>git fetch</code> 的功用，它會將本地存在的分支從遠端給一併拉下來，接著執行合併動作：</p>
+<ul>
+<li>在 <code>master</code> 分支：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git merge origin/master</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>在 <code>develop</code> 分支：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git merge origin/develop</span><br></pre></td></tr></table></figure>
+
+<p>查看日誌：</p>
+<p><img src="https://i.imgur.com/4k9SaRb.png" alt="查看 commit 紀錄-4"></p>
+<p>大功告成！我們最初的本地端數據庫也被同步完成囉！我們可以針對上面 <code>git fetch</code> 指令做點修改：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git fetch origin master:temp</span><br></pre></td></tr></table></figure>
+
+<p>查看日誌：</p>
+<p><img src="https://i.imgur.com/ysGyR5H.png" alt="查看 commit 紀錄-5"></p>
+<p>預設情況下，<code>git fetch</code> 會把所有的遠端分支拉下來，而上面這到命令的意思就如同前面所講到的 <code>master:master</code>，只拉取遠端的 <code>master</code> 分支並同步到本地端的 <code>temp</code> 分支，不存在即創建，之後我們一樣透過 <code>git merge temp</code> 就可以拿到最新內容了。</p>
+<p>這邊我們再補充一個指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git pull</span><br></pre></td></tr></table></figure>
+
+<p><code>git pull</code> 與 <code>git fetch</code> 同樣都是用來將遠端數據庫給拉下來，不同的地方在於 <code>git pull</code> 會直接將遠端分支合併至本地分支，你可以把它想成 <code>git fetch</code> 與 <code>git merge</code> 的組合技，你就不需要親自合併分支了，方便了不少。</p>
+<p>我個人比較偏好 <code>git fetch</code> 的方式獲取遠端內容，通常在多人開發時，有很大的機率這一個遠端分支與本地分支合併時會發生衝突，使用 <code>git fetch</code> 就可先透過 <code>git diff</code> 比對差異，將衝突內容作修改，避免合併時可能出現的問題，而 <code>git pull</code> 確實比較方便，但如果遠端與本地分支發生衝突，就會直接跳出警告，等著我們慢慢去修，我不太喜歡這樣的做法，各位可以自行試試。</p>
+<h2 id="刪除遠端分支"><a href="#刪除遠端分支" class="headerlink" title="刪除遠端分支"></a>刪除遠端分支</h2><p>在這邊我們補充一下如何刪除遠端的分支，其實原理如同我們前面所提到的 <code>master:master</code> 概念，如果你今天想要移除任何的遠端分支，只需要 Push 一個空的分支即可：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push origin :develop</span><br></pre></td></tr></table></figure>
+
+<p>在 Git v1.7 之後的版本可以使用 <code>--delete</code> 參數：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push --delete origin develop</span><br></pre></td></tr></table></figure>
+
+<p>顯示遠端分支已被刪除：</p>
+<p><img src="https://i.imgur.com/jUhYkHE.png" alt="刪除遠端分支"></p>
+<p>此時一樣可以使用 <code>git log</code> 查看日誌，你會發現遠端的分支被我們刪除囉。</p>
+<h2 id="Git-指令回顧"><a href="#Git-指令回顧" class="headerlink" title="Git 指令回顧"></a>Git 指令回顧</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 新增遠端數據庫</span></span><br><span class="line">git remote add &lt;repo_name&gt; &lt;url&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看所有以添加的遠端數據庫資訊</span></span><br><span class="line">git remote -v</span><br><span class="line"></span><br><span class="line"><span class="comment"># 修改已註冊遠端數據庫位址</span></span><br><span class="line">git remote <span class="built_in">set</span>-url &lt;repo_name&gt; &lt;new url&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 修改已註冊遠端數據庫名稱</span></span><br><span class="line">git remote rename &lt;old_repo_name&gt; &lt;new_repo_name&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 刪除已註冊遠端數據庫</span></span><br><span class="line">git remote remove &lt;repo_name&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 指定分支上傳至遠端數據庫 (同時設定 upstream)</span></span><br><span class="line">git push -u &lt;repo_name&gt; &lt;local_branch&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 指定分支上傳至遠端數據庫 (指定不同名稱)</span></span><br><span class="line">git push &lt;repo_name&gt; &lt;local_branch&gt;:&lt;remote_branch&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 指定分支上傳至遠端數據庫</span></span><br><span class="line">git push &lt;repo_name&gt; &lt;local_branch&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 分支移除 `upstream`</span></span><br><span class="line">git branch --<span class="built_in">unset</span>-upstream &lt;local_branch&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 分支設定 `upstream` 存在即覆蓋</span></span><br><span class="line">git branch -u &lt;repo_name&gt;/&lt;remote_branch&gt; &lt;local_branch&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看遠端分支</span></span><br><span class="line">git branch -r</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看所有分支 (包含遠端與本地)</span></span><br><span class="line">git branch -a</span><br><span class="line"></span><br><span class="line"><span class="comment"># 克隆遠端數據庫的預設分支至本地</span></span><br><span class="line">git <span class="built_in">clone</span> &lt;url&gt; &lt;folder&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 克隆遠端數據庫的指定分支至本地</span></span><br><span class="line">git <span class="built_in">clone</span> -b &lt;remote_branch&gt; &lt;url&gt; &lt;folder&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 將遠端分支建立至本地並追蹤</span></span><br><span class="line">git checkout -t &lt;repo_name&gt;/&lt;remote_branch&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 將遠端分支建立至本地並追蹤 (可自訂名稱)</span></span><br><span class="line">git checkout -b &lt;local_branch&gt; &lt;repo_name&gt;/&lt;remote_branch&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 將遠端分支建立至本地並追蹤 (自動辨識遠端是否存在同名分支)</span></span><br><span class="line">git checkout &lt;remote_branch&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 上傳至遠端數據庫 (全部分支)</span></span><br><span class="line">git push --all &lt;repo_name&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 上傳至遠端數據庫 (全部分支，同時設定 upstream)</span></span><br><span class="line">git push -u &lt;repo_name&gt; --all</span><br><span class="line"></span><br><span class="line"><span class="comment"># 下載遠端數據庫 (所有本地存在分支)</span></span><br><span class="line">git fetch</span><br><span class="line"></span><br><span class="line"><span class="comment"># 合併遠端分支 (將本地分支更新為最新狀態)</span></span><br><span class="line">git merge &lt;repo_name&gt;/&lt;remote_branch&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 下載遠端數據庫 (指定分支)</span></span><br><span class="line">git fetch &lt;repo_name&gt; &lt;remote_branch&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 下載遠端數據庫 (放至指定分支，不存在及建立)</span></span><br><span class="line">git fetch &lt;repo_name&gt; &lt;remote_branch&gt;:&lt;local_branch&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 下載遠端數據庫 (等同於 git fetch + git merge)</span></span><br><span class="line">git pull</span><br><span class="line"></span><br><span class="line"><span class="comment"># 刪除遠端分支</span></span><br><span class="line">git push :&lt;remote_branch&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 刪除遠端分支 (v1.7 以後版本可使用)</span></span><br><span class="line">git push --delete &lt;repo_name&gt; &lt;remote_branch&gt;</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Git/" rel="tag"># Git</a>
+              <a href="/tags/GitHub/" rel="tag"># GitHub</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2020-04-17-git-branch/" rel="next" title="Git 版本控制系統 - 分支的建立與合併分支中的快轉機制">
+                  <i class="fa fa-chevron-left"></i> Git 版本控制系統 - 分支的建立與合併分支中的快轉機制
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2020-04-20-git-reset/" rel="prev" title="Git 版本控制系統 - 檔案還原與重置提交">
+                  Git 版本控制系統 - 檔案還原與重置提交 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+          
+            
+              
+    <div class="comments" id="gitalk-container"></div>
+
+            
+          
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#筆記重點"><span class="nav-number">2.</span> <span class="nav-text">筆記重點</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在-GitHub-開一個遠端數據庫"><span class="nav-number">3.</span> <span class="nav-text">在 GitHub 開一個遠端數據庫</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#設定-GitHub-SSH-金鑰"><span class="nav-number">4.</span> <span class="nav-text">設定 GitHub SSH 金鑰</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#將本地數據庫-Push-至-GitHub"><span class="nav-number">5.</span> <span class="nav-text">將本地數據庫 Push 至 GitHub</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#將遠端數據庫-Clone-到本地"><span class="nav-number">6.</span> <span class="nav-text">將遠端數據庫 Clone 到本地</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用-Fetch-獲取遠端數據庫修改內容"><span class="nav-number">7.</span> <span class="nav-text">使用 Fetch 獲取遠端數據庫修改內容</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#刪除遠端分支"><span class="nav-number">8.</span> <span class="nav-text">刪除遠端分支</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Git-指令回顧"><span class="nav-number">9.</span> <span class="nav-text">Git 指令回顧</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Roya" src="/images/userLogo.jpg">
+  <p class="site-author-name" itemprop="name">Roya</p>
+  <div class="site-description" itemprop="description">Front-End Web Developer<br>學會運用比學會使用還要來的有用</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">69</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/awdr74100" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;awdr74100" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:a78945612385238@gmail.com" title="E-Mail &amp;rarr; mailto:a78945612385238@gmail.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Roya</span>
+</div>
+  <span class="post-meta-divider">轉載文章時請附上作者暱稱與原文連結</span>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+
+<script src="/js/utils.js?v=7.4.2.js"></script>
+
+
+<script src="/js/schemes/pisces.js?v=7.4.2.js"></script>
+
+
+<script src="/js/next-boot.js?v=7.4.2.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+  
+<script src="/js/local-search.js?v=7.4.2.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '7cdb0d531869e18caad8',
+      clientSecret: '0b6a38cef9c3ae1dcf0ea66e916ab68823dbab52',
+      repo: 'awdr74100.github.io',
+      owner: 'awdr74100',
+      admin: ['awdr74100'],
+      id: '46af73ff0dc7efe2a925db45f685b0af',
+        language: 'zh-TW',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+  
+
+
+</body>
+</html>

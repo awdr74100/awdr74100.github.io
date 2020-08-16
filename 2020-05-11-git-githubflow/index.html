@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon-128.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png?v=7.4.2">
+  <link rel="mask-icon" href="/images/favicon-none.svg?v=7.4.2" color="#222">
+  <link rel="alternate" href="/atom.xml" title="Roya's Blog" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"default"},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '複製',
+      copy_success: '複製成功',
+      copy_failure: '複製失敗'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="隨著專案越來越大，協作人員越來越多，衝突發生的機率也越來越高，訂定良好的團隊規範就顯得更為重要，Workflow 因此而誕生，常見的對象有 Git Flow、GitHub Flow 或 GitLab flow 等，主要都是被用來解決團隊間無規範可遵循造成衝突的問題，透過共同遵循的處理流程，達到有條理的進行團隊協作開發。此篇將介紹目前主流的 GitHub Flow 工作流程是如何運作，並透過實際演練">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Git 版本控制系統 - GitHub Flow 工作流程與實際演練">
+<meta property="og:url" content="https://awdr74100.github.io/2020-05-11-git-githubflow/index.html">
+<meta property="og:site_name" content="Roya&#39;s Blog">
+<meta property="og:description" content="隨著專案越來越大，協作人員越來越多，衝突發生的機率也越來越高，訂定良好的團隊規範就顯得更為重要，Workflow 因此而誕生，常見的對象有 Git Flow、GitHub Flow 或 GitLab flow 等，主要都是被用來解決團隊間無規範可遵循造成衝突的問題，透過共同遵循的處理流程，達到有條理的進行團隊協作開發。此篇將介紹目前主流的 GitHub Flow 工作流程是如何運作，並透過實際演練">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/xjHMkOR.png">
+<meta property="og:image" content="https://i.imgur.com/DPpflYE.png">
+<meta property="og:image" content="https://i.imgur.com/b8R9FAb.png">
+<meta property="og:image" content="https://i.imgur.com/WScL3cV.png">
+<meta property="og:image" content="https://i.imgur.com/o8xQyJ0.png">
+<meta property="og:image" content="https://i.imgur.com/blOjpEv.png">
+<meta property="og:image" content="https://i.imgur.com/wcd7EAH.png">
+<meta property="og:image" content="https://i.imgur.com/kEOSyF1.png">
+<meta property="og:image" content="https://i.imgur.com/7SJKkug.png">
+<meta property="og:image" content="https://i.imgur.com/6U2F8t3.png">
+<meta property="og:image" content="https://i.imgur.com/q76yMKN.png">
+<meta property="og:image" content="https://i.imgur.com/ZFiRooC.png">
+<meta property="og:image" content="https://i.imgur.com/gro36Go.png">
+<meta property="og:image" content="https://i.imgur.com/e2vijFv.png">
+<meta property="og:image" content="https://i.imgur.com/sFVSx2r.png">
+<meta property="og:image" content="https://i.imgur.com/P1KQp2O.png">
+<meta property="og:image" content="https://i.imgur.com/rJg3ywT.png">
+<meta property="og:image" content="https://i.imgur.com/OtLgsKR.png">
+<meta property="og:image" content="https://i.imgur.com/E57QN7r.png">
+<meta property="og:image" content="https://i.imgur.com/lWGK47s.png">
+<meta property="og:image" content="https://i.imgur.com/2qH9EL3.png">
+<meta property="og:image" content="https://i.imgur.com/7bcH581.png">
+<meta property="og:image" content="https://i.imgur.com/MLB56GZ.png">
+<meta property="og:image" content="https://i.imgur.com/O4nJ1yJ.png">
+<meta property="og:image" content="https://i.imgur.com/iRXVQ03.png">
+<meta property="og:image" content="https://i.imgur.com/QPrM9cr.png">
+<meta property="article:published_time" content="2020-05-10T16:36:48.000Z">
+<meta property="article:modified_time" content="2020-05-11T16:12:37.000Z">
+<meta property="article:author" content="Roya">
+<meta property="article:tag" content="w3HexSchool">
+<meta property="article:tag" content="Git">
+<meta property="article:tag" content="GitHub">
+<meta property="article:tag" content="GitHub Flow">
+<meta property="article:tag" content="Heroku">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/xjHMkOR.png">
+
+<link rel="canonical" href="https://awdr74100.github.io/2020-05-11-git-githubflow/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Git 版本控制系統 - GitHub Flow 工作流程與實際演練 | Roya's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-150715469-1"></script>
+    <script>
+      var host = window.location.hostname;
+      if (host !== "localhost" || !true) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-150715469-1');
+      }
+    </script>
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Roya's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">現代化 Web 開發技術學習分享</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>標籤<span class="badge">28</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分類<span class="badge">9</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>歸檔<span class="badge">69</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none" placeholder="搜尋..." spellcheck="false" type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://awdr74100.github.io/2020-05-11-git-githubflow/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/userLogo.jpg">
+      <meta itemprop="name" content="Roya">
+      <meta itemprop="description" content="Front-End Web Developer<br>學會運用比學會使用還要來的有用">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Roya's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          Git 版本控制系統 - GitHub Flow 工作流程與實際演練
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-05-11 00:36:48" itemprop="dateCreated datePublished" datetime="2020-05-11T00:36:48+08:00">2020-05-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-05-12 00:12:37" itemprop="dateModified" datetime="2020-05-12T00:12:37+08:00">2020-05-12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Git/" itemprop="url" rel="index">
+                    <span itemprop="name">Git</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>隨著專案越來越大，協作人員越來越多，衝突發生的機率也越來越高，訂定良好的團隊規範就顯得更為重要，Workflow 因此而誕生，常見的對象有 Git Flow、GitHub Flow 或 GitLab flow 等，主要都是被用來解決團隊間無規範可遵循造成衝突的問題，透過共同遵循的處理流程，達到有條理的進行團隊協作開發。此篇將介紹目前主流的 GitHub Flow 工作流程是如何運作，並透過實際演練說明它所能帶給團隊的好處。</p>
+<h2 id="筆記重點"><a href="#筆記重點" class="headerlink" title="筆記重點"></a>筆記重點</h2><ul>
+<li>GitHub Flow 介紹</li>
+<li>建立 Organization 組織</li>
+<li>GitHub Flow 實際演練</li>
+<li>Heroku 自動部屬</li>
+</ul>
+<h2 id="GitHub-Flow-介紹"><a href="#GitHub-Flow-介紹" class="headerlink" title="GitHub Flow 介紹"></a>GitHub Flow 介紹</h2><p>讓我們先來看 <a href="https://guides.github.com/introduction/flow/" target="_blank" rel="external nofollow noopener noreferrer">官方</a> 的介紹：</p>
+<blockquote>
+<p>GitHub flow is a lightweight, branch-based workflow that supports teams and projects where deployments are made regularly.</p>
+</blockquote>
+<p>你現在一定很困惑，沒關係，我當時看到也是滿臉問號，簡單來講呢，GitHub Flow 是基於創建分支所運作，最大的特點在於其流程非常簡單，你不需要像 Git Flow 一樣創建多達 5 種的分支，有新功能需求時在創建對應的 <code>feature</code> 分支即可，其中的主要流程為：</p>
+<ul>
+<li>創建分支 (Create a branch)</li>
+<li>提交修改 (Add commits)</li>
+<li>開啟 PR (Open a Pull Request)</li>
+<li>代碼審核 (Discuss and review your code)</li>
+<li>部屬 (Deploy)</li>
+<li>合併 (Merge)</li>
+</ul>
+<p>剛剛我們提到了創建 <code>feature</code> 分支的部分，當你的功能開發完成後，即透過 PR (Pull Request) 與負責人做溝通，如果有看過我上一篇文章的人應該很熟悉了才對，接著負責人收到你的 PR 後會與你討論相關的內容，確認沒問題即合併到 <code>master</code> 分支，而 <code>master</code> 分支上的每個版本都是可以進行部屬的，這點在我們實際演練時會再做討論，最後即完成了此次的 GitHub Flow 流程，日後有新功能需求時，就只是再重跑一次流程而已。</p>
+<p>你可能還是聽得霧煞煞，簡單來講呢，就是我們只會接觸到對應的 <code>feature</code> 分支，當我們的 <code>feature</code> 分支開發完成後，即發送 PR 給負責人，如果確認沒問題負責人就會將這個 PR (<code>feature</code> 分支) 合併到 <code>master</code> 分支，在合併完成後即自動部屬至伺服器，因為放在 <code>master</code> 分支上的每個版本都是可以直接部屬的。</p>
+<p>現在你可能就有點頭緒了，為了加強對 GitHub Flow 的了解，讓我們來實際演練一番吧！</p>
+<h2 id="建立-Organization-組織"><a href="#建立-Organization-組織" class="headerlink" title="建立 Organization 組織"></a>建立 Organization 組織</h2><p>這邊要強調，GitHub Flow 只是一種工作流程，你可以把它用在開源專案或私有專案上，並沒有說一定要用在哪裡，它更像是一種共識，下面我們會以 GitHub 中的組織 (Organization) 為對象做介紹，說明團隊間是如何使用 GitHub Flow 做運作的，讓我們先在 GitHub 建立一個組織：</p>
+<p><img src="https://i.imgur.com/xjHMkOR.png" alt="建立組織"></p>
+<p>在 GitHub 建立組織相當簡單，就如同新增遠端數據庫一般，透過點選即可完成，之後會跳出邀請成員的畫面：</p>
+<p><img src="https://i.imgur.com/DPpflYE.png" alt="邀請成員"></p>
+<p>這邊我們一樣使用兩支帳號來做示範，被邀請的成員需透過 Email 接收邀請才會正式加入組織，最後的結果為：</p>
+<p><img src="https://i.imgur.com/b8R9FAb.png" alt="組織畫面"></p>
+<p>由於是示範用的，其他細項我們就不做討論，到這邊就已經完成創建組織的動作了，接下來讓我們正式進入到 GitHub Flow 的實際演練章節吧！</p>
+<h2 id="GitHub-Flow-實際演練"><a href="#GitHub-Flow-實際演練" class="headerlink" title="GitHub Flow 實際演練"></a>GitHub Flow 實際演練</h2><p>目前我們登入的帳號為 lanroya，也就是組織的管理者，你可以把它當作專案的負責人，他使用了 express-generator 生成專案的初始環境：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">express -e express-project</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> express-project</span><br><span class="line"></span><br><span class="line">npm i</span><br></pre></td></tr></table></figure>
+
+<p>新增 <code>.gitignore</code> 檔案：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">touch .gitignore</span><br></pre></td></tr></table></figure>
+
+<p>忽略 <code>node_modules</code> 資料夾：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; .gitignore</span><br><span class="line"></span><br><span class="line">node_modules&#x2F;</span><br></pre></td></tr></table></figure>
+
+<p>初始化 Git 環境：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">git init</span><br><span class="line"></span><br><span class="line">git add .</span><br><span class="line"></span><br><span class="line">git commit -m <span class="string">'建立環境'</span></span><br></pre></td></tr></table></figure>
+
+<p>此時的線路圖狀態為：</p>
+<p><img src="https://i.imgur.com/WScL3cV.png" alt="查看目前 commit 紀錄-1"></p>
+<p>目前初始環境已經建立完成，你總不可能要求成員使用 USB 來 copy 你的檔案吧？如同新增帳號底下的遠端數據庫一般，在組織新增一個遠端數據庫：</p>
+<p><img src="https://i.imgur.com/o8xQyJ0.png" alt="在組織新增遠端數據庫"></p>
+<p>我們選擇將組織的遠端數據庫設為公開狀態，當然你也可以設為私有的，但要注意，以預設來說，成員是無法 Fork 私有遠端數據庫的，你必須到組織的設定將其選項打開，成員才可以進行 Fork，組織的遠端數據庫與帳號底下的遠端數據庫基本上沒啥差別，一個是掛在組織底下，一個是掛在帳號底下而已：</p>
+<p><img src="https://i.imgur.com/blOjpEv.png" alt="遠端數據庫成功建立"></p>
+<p>添加組織的遠端數據庫位址：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git remote add origin https://github.com/roxog/express-project.git</span><br></pre></td></tr></table></figure>
+
+<p>將專案推至遠端：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push -u origin master</span><br></pre></td></tr></table></figure>
+
+<p>專案已成功推至遠端：</p>
+<p><img src="https://i.imgur.com/wcd7EAH.png" alt="成功推至遠端數據庫"></p>
+<p>到這邊負責人的操作就先告一段落了，接下來換成員建立 <code>feature</code> 分支並開發新功能的部分，我們採用 GitHub Flow 來運作，登入 awdr74100 帳號並 Fork 組織的專案：</p>
+<p><img src="https://i.imgur.com/kEOSyF1.png" alt="fork 組織的專案"></p>
+<p>此時會跳出選擇 Fork 至哪一個帳號的提示，選擇成員 (awdr74100)，之後就會 Fork 至帳號底下：</p>
+<p><img src="https://i.imgur.com/7SJKkug.png" alt="成功 fork 專案"></p>
+<p>在來的操作就如同帳號底下的遠端數據庫一般，由於我們本地還未有這個資料，這邊先克隆回本地：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/awdr74100/express-project.git project</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> project</span><br></pre></td></tr></table></figure>
+
+<p>查看線路圖狀態：</p>
+<p><img src="https://i.imgur.com/6U2F8t3.png" alt="查看目前 commit 紀錄-2"></p>
+<p>本文重點來了，GitHub Flow 的第一步是在 <code>master</code> 分支建立 <code>feature</code> 的分支，假設我今天要開發的功能是修改路由，可以這樣做：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">git checkout -b feature/edit_router</span><br><span class="line"></span><br><span class="line">... edit /routes/index.js</span><br><span class="line"></span><br><span class="line">git commit -am <span class="string">'修改 router 標題'</span></span><br></pre></td></tr></table></figure>
+
+<p>分支的名稱是可隨意命名的，但必須具備其描述性，目前我們已經完成 GitHub Flow 的第一與第二個步驟了，線路圖狀態為：</p>
+<p><img src="https://i.imgur.com/q76yMKN.png" alt="查看目前 commit 紀錄-3"></p>
+<p>假設新功能已經開發完成了，先將新提交推至帳號底下的遠端數據庫：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push -u origin --all</span><br></pre></td></tr></table></figure>
+
+<p>接著進行 GitHub Flow 的第三步驟，開啟 PR (Pull Request)：</p>
+<p><img src="https://i.imgur.com/ZFiRooC.png" alt="開啟 PR"></p>
+<p>這邊要注意來源與目的的選擇，你是將 <code>feature/edit_router</code> 推到專案的 <code>master</code> 分支，並不是 <code>master</code> 推 <code>master</code>，如果確認沒問題，就發送 RP 吧，此時 GitHub Flow 的第三步驟也就完成了。</p>
+<p>這邊做一個補充，其實也不算補充，如果你有看過上一篇文章的人應該都知道該怎麼做了，如果未來要同步組織的遠端資料庫時，必須添加數據庫的位址：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git remote add <span class="built_in">source</span> https://github.com/roxog/express-project.git</span><br></pre></td></tr></table></figure>
+
+<p>這樣之後就可以使用 <code>fetch</code> 或 <code>pull</code> 將負責人合併後的資料給拉下來，達到同步更新的作用，接下來切換到負責人的帳號 (lanroya) 來處理 PR 吧：</p>
+<p><img src="https://i.imgur.com/gro36Go.png" alt="處理 PR"></p>
+<p>目前來到了 GitHub Flow 的第四個步驟，也就是代碼審核的部分，這邊介紹一個蠻有趣的功能，切換到 <code>Files changed</code> 選項：</p>
+<p><img src="https://i.imgur.com/e2vijFv.png" alt="files changed 功能"></p>
+<p>你可以點擊更動代碼旁邊的 <code>+</code> 按鈕，或是直接將更動代碼整個選起來以進行討論，看起來會像這樣個樣子：</p>
+<p><img src="https://i.imgur.com/sFVSx2r.png" alt="代碼審核"></p>
+<p>點擊 <code>Add single comment</code> 即可添加討論，此時有關的人員都會收到此次的評論通知，現在的 <code>Conversation</code> 看起來會像這樣：</p>
+<p><img src="https://i.imgur.com/P1KQp2O.png" alt="add single comment"></p>
+<p>假設此次的討論已經完成，可以點擊 <code>Resolve conversation</code> 關閉對話，最後確認沒問題的話，點擊 <code>Merge pull request</code> 合併 PR：</p>
+<p><img src="https://i.imgur.com/rJg3ywT.png" alt="合併 PR"></p>
+<p>到這邊我們就跑完 GitHub Flow 的全部步驟了，此時你可能會想，第五個步驟怎麼沒有說明呢？在前面我們有一直強調 <code>master</code> 分支的每個版本都是可以直接部屬至伺服器的，這也就代表說當我們合併這一個 PR 時，進而生成的提交就等於 production 的版本，在這邊你先理解大概的概念就好，下面我們會介紹如何使用 heroku 自動完成部署動作。</p>
+<p>現在你已經會使用 GitHub Flow 運作整個提交流程了，其實就是一直圍繞在 <code>master</code> 開 <code>feature</code> 分支，將 <code>feature</code> 分支推上 fork 的遠端數據庫，之後開啟 PR 發送 <code>feature</code> 分支合併 <code>master</code> 分支的請求，之後又有新功能要開發時，先將本地數據庫與組織數據庫做同步：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git pull <span class="built_in">source</span> master</span><br><span class="line"></span><br><span class="line">git push origin master</span><br></pre></td></tr></table></figure>
+
+<p>此時的線路圖狀態為：</p>
+<p><img src="https://i.imgur.com/OtLgsKR.png" alt="查看目前 commit 紀錄-4"></p>
+<p>要開發新功能就在開一個 <code>feature</code> 分支，之後再重跑一次 GitHub Flow 的流程，這邊要養成一個好習慣先 <code>pull</code> 在 <code>push</code>，也就是先拉在推，你沒辦法保證在過程中是否會有其他成員提交 PR 並審核通過，如同我們之前所說，歷史紀錄不同，肯定會發生衝突，這邊要特別注意。</p>
+<h2 id="Heroku-自動部屬"><a href="#Heroku-自動部屬" class="headerlink" title="Heroku 自動部屬"></a>Heroku 自動部屬</h2><p>這邊我們來補充何謂 <code>master</code> 分支上的每個版本都是可部屬狀態的，通常這個動作會在初始化專案時進行，但為了避免大家混淆，剛剛沒有操作到這一部分，回到 lanroya 帳號操作 Git：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">heroku login</span><br><span class="line"></span><br><span class="line">heroku create</span><br></pre></td></tr></table></figure>
+
+<p>上面操作主要用來在 heroku 開一個伺服器，這邊我們並不會強調 heroku 的使用方式，在之後的 express 章節會再做說明，目前主要用來示範何謂自動部屬，此時的專案會新增 heroku 的遠端位址：</p>
+<p><img src="https://i.imgur.com/E57QN7r.png" alt="查看所有遠端數據庫"></p>
+<p>將專案推至 heroku 並查看：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git push heroku origin master</span><br><span class="line"></span><br><span class="line">heroku open</span><br></pre></td></tr></table></figure>
+
+<p>此時會跳出以下畫面：</p>
+<p><img src="https://i.imgur.com/lWGK47s.png" alt="查看 heroku 部屬畫面-5"></p>
+<p>我們的 express 專案已成功部屬在 heroku，你可以把它想像成 GitHub Page 的感覺，目前的線路圖狀態為：</p>
+<p><img src="https://i.imgur.com/2qH9EL3.png" alt="查看目前 commit 紀錄"></p>
+<p><code>master</code> 分支新增了 <code>heroku/master</code> 的參考，接著到剛剛新增的 heroku 伺服器設定介面：</p>
+<p><img src="https://i.imgur.com/7bcH581.png" alt="heroku 啟用自動部屬功能"></p>
+<p>點擊 <code>Enable Automatic Deploys</code> 啟用自動部屬功能，這樣就完成了，此後組織專案中的 <code>master</code> 分支只要有變動，heroku 都會自動幫你完成部屬的動作，讓我們來測試一次：</p>
+<blockquote>
+<p>當前為成員 (awdr74100) 的操作</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">git checkout -b feature/change_router_title</span><br><span class="line"></span><br><span class="line">... edit router title</span><br><span class="line"></span><br><span class="line">git commit -am <span class="string">'再次修改標題'</span></span><br><span class="line"></span><br><span class="line">git push origin --all</span><br></pre></td></tr></table></figure>
+
+<p>開啟 PR：</p>
+<p><img src="https://i.imgur.com/MLB56GZ.png" alt="再次開啟 PR"></p>
+<p>負責人通過 PR：</p>
+<p><img src="https://i.imgur.com/O4nJ1yJ.png" alt="通過 PR"></p>
+<p>當你按下 <code>Merge pull request</code> 合併 PR 時，因為 <code>master</code> 分支移動了，heroku 就會開始自動部屬的動作：</p>
+<p><img src="https://i.imgur.com/iRXVQ03.png" alt="heroku 自動部屬"></p>
+<p>結果頁面：</p>
+<p><img src="https://i.imgur.com/QPrM9cr.png" alt="結果頁面"></p>
+<p>是不是很酷？我們就再也不需要手動 Push 至 heroku 了，事實上，類似的 PaaS 都有這個功能，比如說我自己非常喜歡的 <a href="https://vercel.com/" target="_blank" rel="external nofollow noopener noreferrer">ZEIT Now</a> 也有這個功能，之後有機會再做示範。</p>
+<p>到這邊我們的 Git 學習路程就告一段落囉。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/w3HexSchool/" rel="tag"># w3HexSchool</a>
+              <a href="/tags/Git/" rel="tag"># Git</a>
+              <a href="/tags/GitHub/" rel="tag"># GitHub</a>
+              <a href="/tags/GitHub-Flow/" rel="tag"># GitHub Flow</a>
+              <a href="/tags/Heroku/" rel="tag"># Heroku</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2020-05-07-git-fork-pullrequest/" rel="next" title="Git 版本控制系統 - Fork 複製倉庫與 Pull Request 請求合併">
+                  <i class="fa fa-chevron-left"></i> Git 版本控制系統 - Fork 複製倉庫與 Pull Request 請求合併
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2020-05-18-scss-install/" rel="prev" title="Sass / SCSS 預處理器 - 基本介紹與編譯環境建立">
+                  Sass / SCSS 預處理器 - 基本介紹與編譯環境建立 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+          
+            
+              
+    <div class="comments" id="gitalk-container"></div>
+
+            
+          
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#筆記重點"><span class="nav-number">2.</span> <span class="nav-text">筆記重點</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GitHub-Flow-介紹"><span class="nav-number">3.</span> <span class="nav-text">GitHub Flow 介紹</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#建立-Organization-組織"><span class="nav-number">4.</span> <span class="nav-text">建立 Organization 組織</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GitHub-Flow-實際演練"><span class="nav-number">5.</span> <span class="nav-text">GitHub Flow 實際演練</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Heroku-自動部屬"><span class="nav-number">6.</span> <span class="nav-text">Heroku 自動部屬</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Roya" src="/images/userLogo.jpg">
+  <p class="site-author-name" itemprop="name">Roya</p>
+  <div class="site-description" itemprop="description">Front-End Web Developer<br>學會運用比學會使用還要來的有用</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">69</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/awdr74100" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;awdr74100" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:a78945612385238@gmail.com" title="E-Mail &amp;rarr; mailto:a78945612385238@gmail.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Roya</span>
+</div>
+  <span class="post-meta-divider">轉載文章時請附上作者暱稱與原文連結</span>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+
+<script src="/js/utils.js?v=7.4.2.js"></script>
+
+
+<script src="/js/schemes/pisces.js?v=7.4.2.js"></script>
+
+
+<script src="/js/next-boot.js?v=7.4.2.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+  
+<script src="/js/local-search.js?v=7.4.2.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '7cdb0d531869e18caad8',
+      clientSecret: '0b6a38cef9c3ae1dcf0ea66e916ab68823dbab52',
+      repo: 'awdr74100.github.io',
+      owner: 'awdr74100',
+      admin: ['awdr74100'],
+      id: '92e9b97b664c09315d174d37fb461ace',
+        language: 'zh-TW',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+  
+
+
+</body>
+</html>

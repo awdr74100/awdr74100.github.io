@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon-128.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png?v=7.4.2">
+  <link rel="mask-icon" href="/images/favicon-none.svg?v=7.4.2" color="#222">
+  <link rel="alternate" href="/atom.xml" title="Roya's Blog" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"default"},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '複製',
+      copy_success: '複製成功',
+      copy_failure: '複製失敗'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="之前我們有提到如何使用 html-webpack-plugin 內建的 minify 選項壓縮 HTML，而 JavaScript 則是依靠 Webpack 本身內建的 TerserWebpackPlugin 進行壓縮，唯獨少了 CSS 的方法，這次就來介紹如何使用 optimize-css-assets-webpack-plugin 壓縮我們的 CSS，其內部預設是使用 cssnano 作為編譯">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Webpack 前端打包工具 - 使用 optimize-css-assets-webpack-plugin 壓縮 CSS">
+<meta property="og:url" content="https://awdr74100.github.io/2020-07-06-webpack-optimizecssassetswebpackplugin/index.html">
+<meta property="og:site_name" content="Roya&#39;s Blog">
+<meta property="og:description" content="之前我們有提到如何使用 html-webpack-plugin 內建的 minify 選項壓縮 HTML，而 JavaScript 則是依靠 Webpack 本身內建的 TerserWebpackPlugin 進行壓縮，唯獨少了 CSS 的方法，這次就來介紹如何使用 optimize-css-assets-webpack-plugin 壓縮我們的 CSS，其內部預設是使用 cssnano 作為編譯">
+<meta property="og:locale" content="zh_TW">
+<meta property="article:published_time" content="2020-07-05T16:54:26.000Z">
+<meta property="article:modified_time" content="2020-07-06T16:12:53.000Z">
+<meta property="article:author" content="Roya">
+<meta property="article:tag" content="CSS">
+<meta property="article:tag" content="Node.js">
+<meta property="article:tag" content="PostCSS">
+<meta property="article:tag" content="w3HexSchool">
+<meta property="article:tag" content="Webpack">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://awdr74100.github.io/2020-07-06-webpack-optimizecssassetswebpackplugin/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Webpack 前端打包工具 - 使用 optimize-css-assets-webpack-plugin 壓縮 CSS | Roya's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-150715469-1"></script>
+    <script>
+      var host = window.location.hostname;
+      if (host !== "localhost" || !true) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-150715469-1');
+      }
+    </script>
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Roya's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">現代化 Web 開發技術學習分享</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>標籤<span class="badge">28</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分類<span class="badge">9</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>歸檔<span class="badge">69</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none" placeholder="搜尋..." spellcheck="false" type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://awdr74100.github.io/2020-07-06-webpack-optimizecssassetswebpackplugin/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/userLogo.jpg">
+      <meta itemprop="name" content="Roya">
+      <meta itemprop="description" content="Front-End Web Developer<br>學會運用比學會使用還要來的有用">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Roya's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          Webpack 前端打包工具 - 使用 optimize-css-assets-webpack-plugin 壓縮 CSS
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-07-06 00:54:26" itemprop="dateCreated datePublished" datetime="2020-07-06T00:54:26+08:00">2020-07-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-07-07 00:12:53" itemprop="dateModified" datetime="2020-07-07T00:12:53+08:00">2020-07-07</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Webpack/" itemprop="url" rel="index">
+                    <span itemprop="name">Webpack</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>之前我們有提到如何使用 html-webpack-plugin 內建的 minify 選項壓縮 HTML，而 JavaScript 則是依靠 Webpack 本身內建的 TerserWebpackPlugin 進行壓縮，唯獨少了 CSS 的方法，這次就來介紹如何使用 optimize-css-assets-webpack-plugin 壓縮我們的 CSS，其內部預設是使用 cssnano 作為編譯器，cssnano 是建立在 PostCSS 生態系統上的工具，代表我們也可使用 postcss-loader 搭配 cssnano 來達到同樣的目的及效果，如果專案本身已導入 PostCSS，建議直接搭配 cssnano 可更快的完成壓縮目的。</p>
+<h2 id="筆記重點"><a href="#筆記重點" class="headerlink" title="筆記重點"></a>筆記重點</h2><ul>
+<li>optimize-css-assets-webpack-plugin 安裝</li>
+<li>optimize-css-assets-webpack-plugin 基本使用</li>
+<li>optimize-css-assets-webpack-plugin 可傳遞選項</li>
+<li>補充：搭配 mini-css-extract-plugin 生成 source-map 失敗</li>
+<li>補充：使用 postcss-loader 搭配 cssnano 進行壓縮</li>
+</ul>
+<h2 id="optimize-css-assets-webpack-plugin-安裝"><a href="#optimize-css-assets-webpack-plugin-安裝" class="headerlink" title="optimize-css-assets-webpack-plugin 安裝"></a>optimize-css-assets-webpack-plugin 安裝</h2><blockquote>
+<p>套件連結：<a href="https://www.npmjs.com/package/optimize-css-assets-webpack-plugin" target="_blank" rel="external nofollow noopener noreferrer">optimize-css-assets-webpack-plugin</a></p>
+</blockquote>
+<p>主要的套件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install optimize-css-assets-webpack-plugin -D</span><br></pre></td></tr></table></figure>
+
+<p>過程會使用到的套件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install css-loader mini-css-extract-plugin -D</span><br></pre></td></tr></table></figure>
+
+<p>package.json：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"devDependencies"</span>: &#123;</span><br><span class="line">    <span class="attr">"css-loader"</span>: <span class="string">"^3.6.0"</span>,</span><br><span class="line">    <span class="attr">"mini-css-extract-plugin"</span>: <span class="string">"^0.9.0"</span>,</span><br><span class="line">    <span class="attr">"optimize-css-assets-webpack-plugin"</span>: <span class="string">"^5.0.3"</span>,</span><br><span class="line">    <span class="attr">"webpack"</span>: <span class="string">"^4.43.0"</span>,</span><br><span class="line">    <span class="attr">"webpack-cli"</span>: <span class="string">"^3.3.12"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>optimize-css-assets-webpack-plugin 只是用來將 CSS 給進行壓縮，實際處理 CSS 的動作還是得交由 css-loader 和 mini-css-extract-plugin 來完成，這邊你不需要下載 cssnano，此為 optimize-css-assets-webpack-plugin 的相依套件，為了保證壓縮如預期進行，官方已經幫我們包裝好了。</p>
+<h2 id="optimize-css-assets-webpack-plugin-基本使用"><a href="#optimize-css-assets-webpack-plugin-基本使用" class="headerlink" title="optimize-css-assets-webpack-plugin 基本使用"></a>optimize-css-assets-webpack-plugin 基本使用</h2><p>初始專案結構：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">webpack-demo&#x2F;</span><br><span class="line">│</span><br><span class="line">├─── node_modules&#x2F;</span><br><span class="line">├─── src&#x2F;</span><br><span class="line">│   │</span><br><span class="line">│   └─── css&#x2F;</span><br><span class="line">│       │</span><br><span class="line">│       └─── all.css      # CSS 主檔案</span><br><span class="line">│   │</span><br><span class="line">│   └─── main.js          # entry 入口檔案</span><br><span class="line">│</span><br><span class="line">├─── webpack.config.js    # Webpack 配置檔案</span><br><span class="line">├─── package-lock.json</span><br><span class="line">└─── package.json</span><br></pre></td></tr></table></figure>
+
+<p>撰寫 CSS 範例：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.text-primary</span> &#123;</span><br><span class="line">  <span class="attribute">color</span>: blue;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.text-danger</span> &#123;</span><br><span class="line">  <span class="attribute">color</span>: red;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>配置 <code>webpack.config.js</code> 檔案：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">'path'</span>);</span><br><span class="line"><span class="keyword">const</span> MiniCssExtractPlugin = <span class="built_in">require</span>(<span class="string">'mini-css-extract-plugin'</span>);</span><br><span class="line"><span class="comment">// 載入 optimize-css-assets-webpack-plugin (第一步)</span></span><br><span class="line"><span class="keyword">const</span> OptimizeCssAssetsPlugin = <span class="built_in">require</span>(<span class="string">'optimize-css-assets-webpack-plugin'</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  entry: <span class="string">'./src/main.js'</span>,</span><br><span class="line">  output: &#123;</span><br><span class="line">    path: path.resolve(__dirname, <span class="string">'dist'</span>),</span><br><span class="line">    filename: <span class="string">'js/[name].js'</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="built_in">module</span>: &#123;</span><br><span class="line">    rules: [</span><br><span class="line">      &#123;</span><br><span class="line">        test: <span class="regexp">/\.css$/i</span>,</span><br><span class="line">        use: [MiniCssExtractPlugin.loader, <span class="string">'css-loader'</span>],</span><br><span class="line">      &#125;,</span><br><span class="line">    ],</span><br><span class="line">  &#125;,</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> MiniCssExtractPlugin(&#123;</span><br><span class="line">      filename: <span class="string">'css/[name].css'</span>,</span><br><span class="line">    &#125;),</span><br><span class="line">    <span class="comment">// 創建實例 (第二步)</span></span><br><span class="line">    <span class="keyword">new</span> OptimizeCssAssetsPlugin(&#123;</span><br><span class="line">      <span class="comment">// 傳入編譯器可傳遞選項 (可選)</span></span><br><span class="line">      cssProcessorPluginOptions: &#123;</span><br><span class="line">        preset: [<span class="string">'default'</span>, &#123; <span class="attr">discardComments</span>: &#123; <span class="attr">removeAll</span>: <span class="literal">true</span> &#125; &#125;],</span><br><span class="line">      &#125;,</span><br><span class="line">    &#125;),</span><br><span class="line">  ],</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>optimize-css-assets-webpack-plugin 預設的編譯器為 cssnano，如果你想針對這一個編譯器傳入選項，這邊可使用 <code>cssProcessorPluginOptions</code> 屬性，方法就如同你在 <code>postcss.config.js</code> 內設置的那樣，記得格式不要寫錯，單純修改 <code>preset</code> 可採 <code>String</code> 的形式，如果想將選項傳遞進去，則須修改為 <code>Array</code> 的形式，詳細可參考 <a href="https://cssnano.co/guides/presets" target="_blank" rel="external nofollow noopener noreferrer">cssnano</a> 的說明。</p>
+<p>entry 入口處 (<code>src/main.js</code>) 引入 CSS 檔案：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">'./css/all.css'</span>; <span class="comment">// 使用 ESM 方式引入</span></span><br></pre></td></tr></table></figure>
+
+<p>至 <code>package.json</code> 新增編譯指令：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"scripts"</span>: &#123;</span><br><span class="line">    <span class="attr">"build"</span>: <span class="string">"webpack --mode development"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>執行編譯指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm run build</span><br></pre></td></tr></table></figure>
+
+<p>檢查 <code>./dist/css/all.css</code> 是否成功被壓縮：</p>
+<!-- prettier-ignore-start -->
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.text-primary</span>&#123;<span class="attribute">color</span>:<span class="number">#00f</span>&#125;<span class="selector-class">.text-danger</span>&#123;<span class="attribute">color</span>:red&#125;</span><br></pre></td></tr></table></figure>
+<!-- prettier-ignore-end -->
+
+<p>大公告成！目前我們壓縮的配置都是參照 cssnano 中的 <code>default</code> 模式，另外還有 <code>advanced</code> 模式可做使用，這點將在下方 postcss-loader 結合 cssnano 的章節共同做介紹。</p>
+<h2 id="optimize-css-assets-webpack-plugin-可傳遞選項"><a href="#optimize-css-assets-webpack-plugin-可傳遞選項" class="headerlink" title="optimize-css-assets-webpack-plugin 可傳遞選項"></a>optimize-css-assets-webpack-plugin 可傳遞選項</h2><p>可參考 <a href="https://www.npmjs.com/package/optimize-css-assets-webpack-plugin#configuration" target="_blank" rel="external nofollow noopener noreferrer">optimize-css-assets-webpack-plugin Options</a> 可傳遞參數列表，以下為常用的參數配置：</p>
+<ul>
+<li><p>assetNameRegExp：<code>RegExp</code><br>指示應壓縮的資源，默認為 <code>/\.css$/g</code></p>
+</li>
+<li><p>cssProcessor：<code>Compiler</code><br>用於處理壓縮的編譯器，默認為 <code>cssnano</code></p>
+</li>
+<li><p>cssProcessorOptions：<code>Object</code><br>將選項傳遞給 cssProcessor 的接口，默認為 <code>{}</code></p>
+</li>
+<li><p>cssProcessorPluginOptions：<code>Object</code><br>將選項傳遞給 cssProcessor 中 plugin 的接口，默認為 <code>{}</code></p>
+</li>
+</ul>
+<p>說實在的，我不太能理解作者可傳遞選項的命名方式，這邊的 <code>cssProcessorOptions</code> 應該是要指 <code>cssProcessor</code> 的可傳遞選項才對，結果卻是傳入不包含 <code>plugins</code> 的 PostCSS 選項，詳細可參考 PostCSS 中的 <a href="https://github.com/postcss/postcss#options" target="_blank" rel="external nofollow noopener noreferrer">options</a>，直接來看範例：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> OptimizeCssAssetsPlugin = <span class="built_in">require</span>(<span class="string">'optimize-css-assets-webpack-plugin'</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> OptimizeCssAssetsPlugin(&#123;</span><br><span class="line">      assetNameRegExp: <span class="regexp">/\.css$/g</span>,</span><br><span class="line">      cssProcessor: <span class="built_in">require</span>(<span class="string">'cssnano'</span>),</span><br><span class="line">      cssProcessorOptions: &#123;</span><br><span class="line">        map: &#123;</span><br><span class="line">          inline: <span class="literal">false</span>,</span><br><span class="line">          annotation: <span class="literal">true</span>,</span><br><span class="line">        &#125;,</span><br><span class="line">      &#125;,</span><br><span class="line">      cssProcessorPluginOptions: &#123;</span><br><span class="line">        preset: <span class="string">'default'</span>,</span><br><span class="line">      &#125;,</span><br><span class="line">    &#125;),</span><br><span class="line">  ],</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="補充：搭配-mini-css-extract-plugin-生成-source-map-失敗"><a href="#補充：搭配-mini-css-extract-plugin-生成-source-map-失敗" class="headerlink" title="補充：搭配 mini-css-extract-plugin 生成 source-map 失敗"></a>補充：搭配 mini-css-extract-plugin 生成 source-map 失敗</h2><p>這套件有個詭異的地方在於使用 optimize-css-assets-webpack-plugin 搭配 mini-css-extract-plugin 會導致 source-map 生成失敗，先讓我們來模擬下情境：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">'path'</span>);</span><br><span class="line"><span class="keyword">const</span> MiniCssExtractPlugin = <span class="built_in">require</span>(<span class="string">'mini-css-extract-plugin'</span>);</span><br><span class="line"><span class="keyword">const</span> OptimizeCssAssetsPlugin = <span class="built_in">require</span>(<span class="string">'optimize-css-assets-webpack-plugin'</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  devtool: <span class="string">'source-map'</span>, <span class="comment">// 選擇生成實體 .map 文件</span></span><br><span class="line">  entry: <span class="string">'./src/main.js'</span>,</span><br><span class="line">  output: &#123;</span><br><span class="line">    path: path.resolve(__dirname, <span class="string">'dist'</span>),</span><br><span class="line">    filename: <span class="string">'js/[name].js'</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="built_in">module</span>: &#123;</span><br><span class="line">    rules: [</span><br><span class="line">      &#123;</span><br><span class="line">        test: <span class="regexp">/\.css$/i</span>,</span><br><span class="line">        use: [</span><br><span class="line">          MiniCssExtractPlugin.loader,</span><br><span class="line">          &#123;</span><br><span class="line">            loader: <span class="string">'css-loader'</span>,</span><br><span class="line">            options: &#123;</span><br><span class="line">              sourceMap: <span class="literal">true</span>, <span class="comment">// 開啟 sourcemap 支持</span></span><br><span class="line">            &#125;,</span><br><span class="line">          &#125;,</span><br><span class="line">        ],</span><br><span class="line">      &#125;,</span><br><span class="line">    ],</span><br><span class="line">  &#125;,</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> MiniCssExtractPlugin(&#123;</span><br><span class="line">      filename: <span class="string">'css/[name].css'</span>,</span><br><span class="line">    &#125;),</span><br><span class="line">    <span class="keyword">new</span> OptimizeCssAssetsPlugin(),</span><br><span class="line">  ],</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>關於 source-map 的使用可參考我之前寫過的 <a href="https://awdr74100.github.io/2020-04-02-webpack-devtool/">文章</a>，接著進行編譯：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm run build</span><br></pre></td></tr></table></figure>
+
+<p>編譯結果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">webpack-demo&#x2F;</span><br><span class="line">│</span><br><span class="line">├─── dist&#x2F;</span><br><span class="line">│   │</span><br><span class="line">│   └─── css&#x2F;</span><br><span class="line">│       │</span><br><span class="line">│       └─── main.css</span><br><span class="line">│   │</span><br><span class="line">│   └─── js&#x2F;</span><br><span class="line">│       │</span><br><span class="line">│       ├─── main.js</span><br><span class="line">│       └─── main.js.map</span><br></pre></td></tr></table></figure>
+
+<p>發現特別的地方了嗎？我們的 CSS 並沒有成功生成 <code>.map</code> 檔案，自然也就沒有 source-map 的效果，如果你把 optimize-css-assets-webpack-plugin 給拿掉，source-map 就生出來了，這很明顯是這個套件的問題，但也不用太過於擔心，這個問題不是只有我們遇到，且 GitHub 已經有人給出答案了，詳細可參考 <a href="https://github.com/NMFR/optimize-css-assets-webpack-plugin/issues/53" target="_blank" rel="external nofollow noopener noreferrer">Issues</a>，這邊需要使用到前面提到了 <code>cssProcessorOptions</code> 選項，參考以下範例：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> OptimizeCssAssetsPlugin(&#123;</span><br><span class="line">      cssProcessorOptions: &#123;</span><br><span class="line">        map: &#123;</span><br><span class="line">          inline: <span class="literal">false</span>,</span><br><span class="line">          annotation: <span class="literal">true</span>,</span><br><span class="line">        &#125;,</span><br><span class="line">      &#125;,</span><br><span class="line">    &#125;),</span><br><span class="line">  ],</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>將 <code>inline</code> 設為 <code>false</code> 的用意是避免生成內聯映射，這樣就能正確生成 <code>.map</code> 文件了，以及將 <code>annotation</code> 設為 true 用以向 <code>.css</code> 文件添加 source-map 的路徑註釋，讓我們在編譯一次：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">webpack-demo&#x2F;</span><br><span class="line">│</span><br><span class="line">├─── dist&#x2F;</span><br><span class="line">│   │</span><br><span class="line">│   └─── css&#x2F;</span><br><span class="line">│       │</span><br><span class="line">│       ├─── main.css</span><br><span class="line">│       └─── main.css.map</span><br><span class="line">│   │</span><br><span class="line">│   └─── js&#x2F;</span><br><span class="line">│       │</span><br><span class="line">│       ├─── main.js</span><br><span class="line">│       └─── main.js.map</span><br></pre></td></tr></table></figure>
+
+<p>這次 CSS 的 source-map 就成功生成了，以上是在將 <code>devtool</code> 設為 <code>source-map</code> 時才需要這樣做，在 development 環境推薦使用的 <code>cheap-module-eval-source-map</code> 則有不同的做法，參考以下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> OptimizeCssAssetsPlugin(&#123;</span><br><span class="line">      cssProcessorOptions: &#123;</span><br><span class="line">        map: &#123;</span><br><span class="line">          inline: <span class="literal">true</span>,</span><br><span class="line">        &#125;,</span><br><span class="line">      &#125;,</span><br><span class="line">    &#125;),</span><br><span class="line">  ],</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p><code>cheap-module-eval-source-map</code> 為內聯模式，代表我們須將 <code>inline</code> 設為 <code>true</code>，這時你可能就有疑問了，<code>true</code> 不是默認選項嗎？我們還需要設置？答案是沒錯，<a href="https://github.com/postcss/postcss/blob/master/docs/source-maps.md#options" target="_blank" rel="external nofollow noopener noreferrer">官方文檔</a> 有提到如果以前的 source-map 類型為外部地圖，而不是內聯地圖，則即使你未設置 <code>inline</code> 選項，PostCSS 也不會嵌入地圖，你可以把它理解為使用 mini-css-extract-plugin 生成實體 CSS 檔案，就是必須告訴她 <code>inline</code> 要為 <code>true</code>，不然會導致失敗，如果你使用的是 style-loader，就都沒這些問題，因為 style-loader 始終都為內聯地圖，並不會有 <code>.css</code> 實體檔案的產生。</p>
+<h2 id="補充：使用-postcss-loader-搭配-cssnano-進行壓縮"><a href="#補充：使用-postcss-loader-搭配-cssnano-進行壓縮" class="headerlink" title="補充：使用 postcss-loader 搭配 cssnano 進行壓縮"></a>補充：使用 postcss-loader 搭配 cssnano 進行壓縮</h2><p>如果當前專案本身就已經導入 PostCSS，那我推薦你直接使用 cssnano 來完成壓縮，過程也不會像 optimize-css-assets-webpack-plugin 這麼多陷阱，請先將 postcss-loader 與 cssnano 安裝進來：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install postcss-loader cssnano -D</span><br></pre></td></tr></table></figure>
+
+<p>cssnano 為 optimize-css-assets-webpack-plugin 的相依套件，這邊可以先檢查 <code>node_modules</code> 是否存在這個套件，或者直接將其覆蓋也是可以，接著將 postcss-loader 給配置進來：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">'path'</span>);</span><br><span class="line"><span class="keyword">const</span> MiniCssExtractPlugin = <span class="built_in">require</span>(<span class="string">'mini-css-extract-plugin'</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  devtool: <span class="string">'source-map'</span>,</span><br><span class="line">  mode: process.env.NODE_ENV,</span><br><span class="line">  entry: <span class="string">'./src/main.js'</span>,</span><br><span class="line">  output: &#123;</span><br><span class="line">    path: path.resolve(__dirname, <span class="string">'dist'</span>),</span><br><span class="line">    filename: <span class="string">'js/[name].js'</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="built_in">module</span>: &#123;</span><br><span class="line">    rules: [</span><br><span class="line">      &#123;</span><br><span class="line">        test: <span class="regexp">/\.css$/i</span>,</span><br><span class="line">        use: [</span><br><span class="line">          MiniCssExtractPlugin.loader,</span><br><span class="line">          &#123;</span><br><span class="line">            loader: <span class="string">'css-loader'</span>,</span><br><span class="line">            options: &#123;</span><br><span class="line">              sourceMap: <span class="literal">true</span>,</span><br><span class="line">            &#125;,</span><br><span class="line">          &#125;,</span><br><span class="line">          <span class="comment">// 新增 postcss-loader</span></span><br><span class="line">          &#123;</span><br><span class="line">            loader: <span class="string">'postcss-loader'</span>,</span><br><span class="line">            options: &#123;</span><br><span class="line">              sourceMap: <span class="literal">true</span>, <span class="comment">// 開啟 sourcemap 支持</span></span><br><span class="line">            &#125;,</span><br><span class="line">          &#125;,</span><br><span class="line">        ],</span><br><span class="line">      &#125;,</span><br><span class="line">    ],</span><br><span class="line">  &#125;,</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> MiniCssExtractPlugin(&#123;</span><br><span class="line">      filename: <span class="string">'css/[name].css'</span>,</span><br><span class="line">    &#125;),</span><br><span class="line">  ],</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>這邊我們可把與 optimize-css-assets-webpack-plugin 相關的代碼都給拿掉，我們不需要它了，我個人是偏好在獨立的 <code>postcss.config.js</code> 檔案內撰寫 PostCSS 設定，你也可以在 postcss-loader 中的 <code>options</code> 下進行撰寫，隨看個人喜好，參考以下：</p>
+<p>在 <code>./</code> 根目錄新增名為 <code>postcss.config.js</code> 的檔案：</p>
+<figure class="highlight diff"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"> webpack-demo/</span><br><span class="line"> │</span><br><span class="line"><span class="addition">+└─── postcss.config.js</span></span><br></pre></td></tr></table></figure>
+
+<p>將相關 plugin 載入進來：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  plugins: [<span class="built_in">require</span>(<span class="string">'cssnano'</span>)],</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>有關 plugin 的傳遞選項可由後方帶入：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="built_in">require</span>(<span class="string">'cssnano'</span>)(&#123;</span><br><span class="line">      preset: [<span class="string">'default'</span>, &#123; <span class="attr">discardComments</span>: &#123; <span class="attr">removeAll</span>: <span class="literal">true</span> &#125; &#125;],</span><br><span class="line">    &#125;),</span><br><span class="line">  ],</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>如果你配置過 autoprefixer，那你應該對上面過程很熟悉才對，兩者都屬於 PostCSS 中的 Plugin，配置方法自然也就都差不多，接著直接進行編譯：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm run build</span><br></pre></td></tr></table></figure>
+
+<p>檢查是否成功壓縮：</p>
+<!-- prettier-ignore-start -->
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.text-primary</span>&#123;<span class="attribute">color</span>:<span class="number">#00f</span>&#125;<span class="selector-class">.text-danger</span>&#123;<span class="attribute">color</span>:red;<span class="attribute">display</span>:flex&#125;</span><br></pre></td></tr></table></figure>
+<!-- prettier-ignore-end -->
+
+<p>檢查是否成功生成 <code>.map</code> 文件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">webpack-demo&#x2F;</span><br><span class="line">│</span><br><span class="line">├─── dist&#x2F;</span><br><span class="line">│   │</span><br><span class="line">│   └─── css&#x2F;</span><br><span class="line">│       │</span><br><span class="line">│       ├─── main.css</span><br><span class="line">│       └─── main.css.map</span><br><span class="line">│   │</span><br><span class="line">│   └─── js&#x2F;</span><br><span class="line">│       │</span><br><span class="line">│       ├─── main.js</span><br><span class="line">│       └─── main.js.map</span><br></pre></td></tr></table></figure>
+
+<p>這不就與使用 optimize-css-assets-webpack-plugin 的結果一樣嗎？且我們不需要去操心 <code>inline</code> 之類的選項，過程簡單許多，這邊補充之前提到的 <code>advanced</code> 模式：</p>
+<p>安裝高級優化組件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install cssnano-preset-advanced</span><br></pre></td></tr></table></figure>
+
+<p>更改 cssnano 中的 <code>preset</code> 選項：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="built_in">require</span>(<span class="string">'cssnano'</span>)(&#123;</span><br><span class="line">      preset: <span class="string">'advanced'</span>,</span><br><span class="line">    &#125;),</span><br><span class="line">  ],</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>關於 <code>default</code> 與 <code>advanced</code> 的差異，詳細可參考 <a href="https://cssnano.co/optimisations/" target="_blank" rel="external nofollow noopener noreferrer">這邊</a>，簡單來講就是啟用更深層的優化，但可能會有更改原始代碼的情況發生。請斟酌使用。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CSS/" rel="tag"># CSS</a>
+              <a href="/tags/Node-js/" rel="tag"># Node.js</a>
+              <a href="/tags/PostCSS/" rel="tag"># PostCSS</a>
+              <a href="/tags/w3HexSchool/" rel="tag"># w3HexSchool</a>
+              <a href="/tags/Webpack/" rel="tag"># Webpack</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2020-06-29-webpack-dotenvwebpack/" rel="next" title="Webpack 前端打包工具 - 使用 dotenv-webpack 設置全局變量">
+                  <i class="fa fa-chevron-left"></i> Webpack 前端打包工具 - 使用 dotenv-webpack 設置全局變量
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2020-07-13-webpack-prerenderspaplugin/" rel="prev" title="Webpack 前端打包工具 - 使用 prerender-spa-plugin 預渲染單頁應用">
+                  Webpack 前端打包工具 - 使用 prerender-spa-plugin 預渲染單頁應用 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+          
+            
+              
+    <div class="comments" id="gitalk-container"></div>
+
+            
+          
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#筆記重點"><span class="nav-number">2.</span> <span class="nav-text">筆記重點</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#optimize-css-assets-webpack-plugin-安裝"><span class="nav-number">3.</span> <span class="nav-text">optimize-css-assets-webpack-plugin 安裝</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#optimize-css-assets-webpack-plugin-基本使用"><span class="nav-number">4.</span> <span class="nav-text">optimize-css-assets-webpack-plugin 基本使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#optimize-css-assets-webpack-plugin-可傳遞選項"><span class="nav-number">5.</span> <span class="nav-text">optimize-css-assets-webpack-plugin 可傳遞選項</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#補充：搭配-mini-css-extract-plugin-生成-source-map-失敗"><span class="nav-number">6.</span> <span class="nav-text">補充：搭配 mini-css-extract-plugin 生成 source-map 失敗</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#補充：使用-postcss-loader-搭配-cssnano-進行壓縮"><span class="nav-number">7.</span> <span class="nav-text">補充：使用 postcss-loader 搭配 cssnano 進行壓縮</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Roya" src="/images/userLogo.jpg">
+  <p class="site-author-name" itemprop="name">Roya</p>
+  <div class="site-description" itemprop="description">Front-End Web Developer<br>學會運用比學會使用還要來的有用</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">69</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/awdr74100" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;awdr74100" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:a78945612385238@gmail.com" title="E-Mail &amp;rarr; mailto:a78945612385238@gmail.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Roya</span>
+</div>
+  <span class="post-meta-divider">轉載文章時請附上作者暱稱與原文連結</span>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+
+<script src="/js/utils.js?v=7.4.2.js"></script>
+
+
+<script src="/js/schemes/pisces.js?v=7.4.2.js"></script>
+
+
+<script src="/js/next-boot.js?v=7.4.2.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+  
+<script src="/js/local-search.js?v=7.4.2.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '7cdb0d531869e18caad8',
+      clientSecret: '0b6a38cef9c3ae1dcf0ea66e916ab68823dbab52',
+      repo: 'awdr74100.github.io',
+      owner: 'awdr74100',
+      admin: ['awdr74100'],
+      id: '9097300edb19f3bf4d420faf1ad5b4e5',
+        language: 'zh-TW',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+  
+
+
+</body>
+</html>

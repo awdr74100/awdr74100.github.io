@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon-128.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png?v=7.4.2">
+  <link rel="mask-icon" href="/images/favicon-none.svg?v=7.4.2" color="#222">
+  <link rel="alternate" href="/atom.xml" title="Roya's Blog" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"default"},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '複製',
+      copy_success: '複製成功',
+      copy_failure: '複製失敗'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="上一次在介紹 mini-css-extract-plugin 時，有提到關於使用 background-image:url() 以相對路徑參考本地圖片時所發生的錯誤，最後是使用 file-loader 解決此問題；簡單來說，file-loader 就是用來處理一般開發網頁時所使用的靜態資源，例如：字形、圖片等等，將所有資源載入到 Webpack 內，並且解析資源的相互依賴，最後以配置的選項生成對應">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Webpack 前端打包工具 - 使用 url-loader 與 file-loader 處理靜態資源">
+<meta property="og:url" content="https://awdr74100.github.io/2020-03-09-webpack-urlloader-fileloader/index.html">
+<meta property="og:site_name" content="Roya&#39;s Blog">
+<meta property="og:description" content="上一次在介紹 mini-css-extract-plugin 時，有提到關於使用 background-image:url() 以相對路徑參考本地圖片時所發生的錯誤，最後是使用 file-loader 解決此問題；簡單來說，file-loader 就是用來處理一般開發網頁時所使用的靜態資源，例如：字形、圖片等等，將所有資源載入到 Webpack 內，並且解析資源的相互依賴，最後以配置的選項生成對應">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/MOMIu8C.png">
+<meta property="og:image" content="https://i.imgur.com/MoyAU11.png">
+<meta property="article:published_time" content="2020-03-08T17:12:33.000Z">
+<meta property="article:modified_time" content="2020-03-09T16:35:08.000Z">
+<meta property="article:author" content="Roya">
+<meta property="article:tag" content="Node.js">
+<meta property="article:tag" content="w3HexSchool">
+<meta property="article:tag" content="Webpack">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/MOMIu8C.png">
+
+<link rel="canonical" href="https://awdr74100.github.io/2020-03-09-webpack-urlloader-fileloader/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Webpack 前端打包工具 - 使用 url-loader 與 file-loader 處理靜態資源 | Roya's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-150715469-1"></script>
+    <script>
+      var host = window.location.hostname;
+      if (host !== "localhost" || !true) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-150715469-1');
+      }
+    </script>
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Roya's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">現代化 Web 開發技術學習分享</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>標籤<span class="badge">28</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分類<span class="badge">9</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>歸檔<span class="badge">69</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none" placeholder="搜尋..." spellcheck="false" type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://awdr74100.github.io/2020-03-09-webpack-urlloader-fileloader/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/userLogo.jpg">
+      <meta itemprop="name" content="Roya">
+      <meta itemprop="description" content="Front-End Web Developer<br>學會運用比學會使用還要來的有用">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Roya's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          Webpack 前端打包工具 - 使用 url-loader 與 file-loader 處理靜態資源
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-03-09 01:12:33" itemprop="dateCreated datePublished" datetime="2020-03-09T01:12:33+08:00">2020-03-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-03-10 00:35:08" itemprop="dateModified" datetime="2020-03-10T00:35:08+08:00">2020-03-10</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Webpack/" itemprop="url" rel="index">
+                    <span itemprop="name">Webpack</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上一次在介紹 mini-css-extract-plugin 時，有提到關於使用 background-image:url() 以相對路徑參考本地圖片時所發生的錯誤，最後是使用 file-loader 解決此問題；簡單來說，file-loader 就是用來處理一般開發網頁時所使用的靜態資源，例如：字形、圖片等等，將所有資源載入到 Webpack 內，並且解析資源的相互依賴，最後以配置的選項生成對應的結果；而 url-loader 則類似於 file-loader，可依資源的大小做對應的處理。此篇將介紹 file-loader 與 url-loader 的使用方法，以及兩者在應用時最大的差別為何。</p>
+<h2 id="筆記重點"><a href="#筆記重點" class="headerlink" title="筆記重點"></a>筆記重點</h2><ul>
+<li>url-loader 與 file-loader 安裝</li>
+<li>url-loader 與 file-loader 基本使用</li>
+<li>url-loader 與 file-loader 可傳遞選項</li>
+<li>補充：url-loader 與 file-loader 實際應用</li>
+<li>補充：file-loader 載入本地字體</li>
+</ul>
+<h2 id="url-loader-與-file-loader-安裝"><a href="#url-loader-與-file-loader-安裝" class="headerlink" title="url-loader 與 file-loader 安裝"></a>url-loader 與 file-loader 安裝</h2><blockquote>
+<p>套件連結：<a href="https://github.com/webpack-contrib/url-loader" target="_blank" rel="external nofollow noopener noreferrer">url-loader</a>、<a href="https://github.com/webpack-contrib/file-loader" target="_blank" rel="external nofollow noopener noreferrer">file-loader</a></p>
+</blockquote>
+<p>主要的套件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install url-loader file-loader -D</span><br></pre></td></tr></table></figure>
+
+<p>package.json：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"devDependencies"</span>: &#123;</span><br><span class="line">    <span class="attr">"file-loader"</span>: <span class="string">"^6.0.0"</span>,</span><br><span class="line">    <span class="attr">"url-loader"</span>: <span class="string">"^4.0.0"</span>,</span><br><span class="line">    <span class="attr">"webpack"</span>: <span class="string">"^4.42.1"</span>,</span><br><span class="line">    <span class="attr">"webpack-cli"</span>: <span class="string">"^3.3.11"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在前面章節，我們會先以 file-loader 做示範，直到關於 <code>base64</code> 一詞的出現，才會使用到 url-loader，請先將兩個 loader 進行安裝。</p>
+<h2 id="file-loader-與-url-loader-基本使用"><a href="#file-loader-與-url-loader-基本使用" class="headerlink" title="file-loader 與 url-loader 基本使用"></a>file-loader 與 url-loader 基本使用</h2><p>初始專案結構：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">webpack-demo&#x2F;</span><br><span class="line">│</span><br><span class="line">├─── node_modules&#x2F;</span><br><span class="line">├─── src&#x2F;</span><br><span class="line">│   │</span><br><span class="line">│   └─── img&#x2F;</span><br><span class="line">│       │</span><br><span class="line">│       └─── test.png     # 測試用圖片</span><br><span class="line">│   │</span><br><span class="line">│   └─── main.js          # entry 入口檔案</span><br><span class="line">│</span><br><span class="line">├─── webpack.config.js    # Webpack 配置檔案</span><br><span class="line">├─── package-lock.json</span><br><span class="line">└─── package.json</span><br></pre></td></tr></table></figure>
+
+<p>配置 <code>webpack.config.js</code> 檔案：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">'path'</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  entry: <span class="string">'./src/main.js'</span>,</span><br><span class="line">  output: &#123;</span><br><span class="line">    path: path.resolve(__dirname, <span class="string">'dist'</span>),</span><br><span class="line">    filename: <span class="string">'bundle.js'</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="built_in">module</span>: &#123;</span><br><span class="line">    rules: [</span><br><span class="line">      &#123;</span><br><span class="line">        test: <span class="regexp">/\.(png|jpe?g|gif)$/i</span>,</span><br><span class="line">        use: [</span><br><span class="line">          <span class="comment">// 配置 loader (第一步)</span></span><br><span class="line">          &#123;</span><br><span class="line">            loader: <span class="string">'file-loader'</span>,</span><br><span class="line">          &#125;,</span><br><span class="line">        ],</span><br><span class="line">      &#125;,</span><br><span class="line">    ],</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>配置 file-loader 相對簡單，這邊要注意的是，目前我們的 Regex 只有單純篩選圖片的相關檔案，並未包含其他靜態資源。</p>
+<p>entry 入口處 (<code>src/main.js</code>) 引入圖片檔案：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">'./img/test.png'</span>;</span><br></pre></td></tr></table></figure>
+
+<p>執行編譯指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm run build</span><br></pre></td></tr></table></figure>
+
+<p>此時會生成名稱為 hash 值的圖片檔案：</p>
+<figure class="highlight diff"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"> webpack-demo/</span><br><span class="line"> │</span><br><span class="line"> ├─── dist/</span><br><span class="line"> │   │</span><br><span class="line"><span class="addition">+│   ├─── 4664caca877b29c20cf1cc536e41911e.png</span></span><br><span class="line"> │   └─── bundle.js</span><br></pre></td></tr></table></figure>
+
+<p>相信有閱讀過以前 Webpack 文章的朋友已經發現其中的問題，那就是我們還沒有配置 <code>filename</code>，導致預設名稱為 hash 值，這邊要注意，file-loader 並沒有 <code>filename</code> 這個屬性，取而代之的是 <code>name</code> 屬性，讓我們趕緊來配置它：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="built_in">module</span>: &#123;</span><br><span class="line">    rules: [</span><br><span class="line">      &#123;</span><br><span class="line">        test: <span class="regexp">/\.(png|jpe?g|gif)$/i</span>,</span><br><span class="line">        use: [</span><br><span class="line">          <span class="comment">// 配置 loader (第一步)</span></span><br><span class="line">          &#123;</span><br><span class="line">            loader: <span class="string">'file-loader'</span>,</span><br><span class="line">            options: &#123;</span><br><span class="line">              <span class="comment">// 配置 name 屬性 (第二步)</span></span><br><span class="line">              name: <span class="string">'[name].[ext]'</span>,</span><br><span class="line">            &#125;,</span><br><span class="line">          &#125;,</span><br><span class="line">        ],</span><br><span class="line">      &#125;,</span><br><span class="line">    ],</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>在 file-loader 中的 <code>name</code> 屬性就類似於其他 loader 或 plugin 的 <code>filename</code> 屬性，不同的地方在於，<code>name</code> 屬性得依照官方文件中的 <a href="https://github.com/webpack-contrib/file-loader#placeholders" target="_blank" rel="external nofollow noopener noreferrer">Placeholders</a> 配置才行，上面這個配置就是最基本的依照 entry 檔案的名稱以及附檔名進行 output。</p>
+<div class="note danger">切記先將 dist 資料夾完全刪除，以保證最新的編譯結果如同預期，之後也會介紹使用 clean-webpack-plugin 解決此問題</div>
+
+<p>再次執行編譯指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm run build</span><br></pre></td></tr></table></figure>
+
+<p>此時會生成與 entry 檔案名稱相同的圖片檔案：</p>
+<figure class="highlight diff"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"> webpack-demo/</span><br><span class="line"> │</span><br><span class="line"> ├─── dist/</span><br><span class="line"> │   │</span><br><span class="line"><span class="addition">+│   ├─── test.png</span></span><br><span class="line"> │   └─── bundle.js</span><br></pre></td></tr></table></figure>
+
+<p>以上就是 file-loader 的基本使用，可能有人會問，那 url-loader 呢？神奇的事情要發生了！讓我們直接將上面的 <code>webpack.config.js</code> 中的 file-loader 更改為 url-loader，如下所示：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="built_in">module</span>: &#123;</span><br><span class="line">    rules: [</span><br><span class="line">      &#123;</span><br><span class="line">        test: <span class="regexp">/\.(png|jpe?g|gif)$/i</span>,</span><br><span class="line">        use: [</span><br><span class="line">          &#123;</span><br><span class="line">            loader: <span class="string">'url-loader'</span>, <span class="comment">// 將 file-loader 更改為 url-loader</span></span><br><span class="line">            options: &#123;</span><br><span class="line">              name: <span class="string">'[name].[ext]'</span>,</span><br><span class="line">            &#125;,</span><br><span class="line">          &#125;,</span><br><span class="line">        ],</span><br><span class="line">      &#125;,</span><br><span class="line">    ],</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>此時如果你執行 <code>npm run build</code> 進行編譯，結果會與 file-loader 一模一樣，有沒有很神奇？事實上，url-loader 預設提供了一個名為 <code>fallback</code> 的選項，用以調用超過文件大小的程序，如下所示：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="built_in">module</span>: &#123;</span><br><span class="line">    rules: [</span><br><span class="line">      &#123;</span><br><span class="line">        test: <span class="regexp">/\.(png|jpg|gif)$/i</span>,</span><br><span class="line">        use: [</span><br><span class="line">          &#123;</span><br><span class="line">            loader: <span class="string">'url-loader'</span>,</span><br><span class="line">            options: &#123;</span><br><span class="line">              <span class="comment">// 超過大小時調用 file-loader 處理該檔案</span></span><br><span class="line">              fallback: <span class="built_in">require</span>.resolve(<span class="string">'file-loader'</span>),</span><br><span class="line">            &#125;,</span><br><span class="line">          &#125;,</span><br><span class="line">        ],</span><br><span class="line">      &#125;,</span><br><span class="line">    ],</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>而 <strong>url-loader 中的 options 選項是與 file-loader 共用的</strong>，差別在於 url-loader 新增了 <code>limit</code> 選項，用以設置可轉為 base64 的文件大小上限，如下所示：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="built_in">module</span>: &#123;</span><br><span class="line">    rules: [</span><br><span class="line">      &#123;</span><br><span class="line">        test: <span class="regexp">/\.(png|jpe?g|gif)$/i</span>,</span><br><span class="line">        use: [</span><br><span class="line">          &#123;</span><br><span class="line">            loader: <span class="string">'url-loader'</span>,</span><br><span class="line">            options: &#123;</span><br><span class="line">              name: <span class="string">'[name].[ext]'</span>,</span><br><span class="line">              limit: <span class="number">8192</span>, <span class="comment">// 用以限制須轉為 base64 的文件大小 (單位：byte)</span></span><br><span class="line">            &#125;,</span><br><span class="line">          &#125;,</span><br><span class="line">        ],</span><br><span class="line">      &#125;,</span><br><span class="line">    ],</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>url-loader 唯一的功能就在於將資源轉換為 <code>base64</code> 的格式，主要依靠 <code>limit</code> 控制需轉換的文件，轉為 <code>base64</code> 的好處就在於，往後網頁在渲染圖片時，不需要以 request 的方式加載圖片，直接向 JavaScript 檔案拿取即可，這樣子以效能來說，會提高許多，但你也不能把大小的上限設定太高，由於 <code>base64</code> 是存在於 bundle.js 內，這樣子的做法會導致 JavaScript 異常的肥大，對於效能來說反而會下降，衡量並設置適當的大小才是正確的作法。</p>
+<p>再次執行編譯指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm run build</span><br></pre></td></tr></table></figure>
+
+<p>通過 url-loader 的文件將轉成 <code>base64</code> 存在於 bundle.js 內：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">webpack-demo&#x2F;</span><br><span class="line">│</span><br><span class="line">├─── dist&#x2F;</span><br><span class="line">│   │</span><br><span class="line">│   └─── bundle.js    # 圖片轉為 base64 存在於 JavaScript 檔案內</span><br></pre></td></tr></table></figure>
+
+<p>關於 <code>base64</code> 的實際應用將在下面補充，讓我們來做個總結：</p>
+<div class="note warning">file-loader 用以將靜態資源載入到 Webpack 內，並且解析資源的相互依賴關係，最後 output 到指定的位置，而 url-loader 用以將指定大小上限內的圖片資源轉換為 base64 格式，如遇到超過上限的資源，將 fallback 給 file-loader 做處理，兩者功能並沒有衝突，由於處理對象相同，導致很多人會搞混，通常兩個 loader 都是一起使用居多，並且直接設置 url-loader 即可</div>
+
+<h2 id="url-loader-與-file-loader-可傳遞選項"><a href="#url-loader-與-file-loader-可傳遞選項" class="headerlink" title="url-loader 與 file-loader 可傳遞選項"></a>url-loader 與 file-loader 可傳遞選項</h2><div class="note warning">可與 file-loader 選項共用</div>
+
+<p>可參考 <a href="https://github.com/webpack-contrib/url-loader#options" target="_blank" rel="external nofollow noopener noreferrer">url-loader Options</a> 可傳遞參數列表，以下為常用的參數配置：</p>
+<ul>
+<li><p>limit：<code>Number</code> | <code>Boolean</code> | <code>String</code><br>限制可轉為 base64 的檔案大小上限，單位為 byte，默認為 <code>underfined</code></p>
+</li>
+<li><p>fallback：<code>String</code><br>指定當文件大小超過 limit 限制時，需轉向的加載程序，默認為 <code>fiel-loader</code></p>
+</li>
+</ul>
+<p>範例：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="built_in">module</span>: &#123;</span><br><span class="line">    rules: [</span><br><span class="line">      &#123;</span><br><span class="line">        test: <span class="regexp">/\.(png|jpg|gif)$/i</span>,</span><br><span class="line">        use: [</span><br><span class="line">          &#123;</span><br><span class="line">            loader: <span class="string">'url-loader'</span>,</span><br><span class="line">            options: &#123;</span><br><span class="line">              <span class="comment">// 用以限制須轉為 base64 的文件大小 (單位：byte)</span></span><br><span class="line">              limit: <span class="number">8192</span>,</span><br><span class="line">              <span class="comment">// 超過大小及調用 file-loader</span></span><br><span class="line">              fallback: <span class="built_in">require</span>.resolve(<span class="string">'file-loader'</span>),</span><br><span class="line">            &#125;,</span><br><span class="line">          &#125;,</span><br><span class="line">        ],</span><br><span class="line">      &#125;,</span><br><span class="line">    ],</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<p>可參考 <a href="https://github.com/webpack-contrib/file-loader#options" target="_blank" rel="external nofollow noopener noreferrer">file-loader Options</a> 可傳遞參數列表，以下為常用的參數配置：</p>
+<ul>
+<li><p>name：<code>String</code> | <code>Function</code><br>設置 output 時的文件名稱，相關參數可參考 <a href="https://github.com/webpack-contrib/file-loader#placeholders" target="_blank" rel="external nofollow noopener noreferrer">Placeholders</a>，默認為 <code>[contenthash].[ext]</code></p>
+</li>
+<li><p>outputPath：<code>String</code> | <code>Function</code><br>指定目標文件的公共路徑，在 <a href="https://awdr74100.github.io/2020-03-02-webpack-minicssextractplugin/#補充：publicPath-修改目標公共路徑">mini-css-extract-plugin</a> 文章有介紹到，默認為 <code>underfined</code></p>
+</li>
+</ul>
+<p>範例：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="built_in">module</span>: &#123;</span><br><span class="line">    rules: [</span><br><span class="line">      &#123;</span><br><span class="line">        test: <span class="regexp">/\.(png|jpg|gif)$/i</span>,</span><br><span class="line">        use: [</span><br><span class="line">          &#123;</span><br><span class="line">            loader: <span class="string">'file-loader'</span>,</span><br><span class="line">            options: &#123;</span><br><span class="line">              <span class="comment">// 設置 output 時的檔案名稱</span></span><br><span class="line">              name: <span class="string">'img/[name].[ext]'</span>,</span><br><span class="line">              <span class="comment">// 修改公共路徑</span></span><br><span class="line">              publicPath: <span class="string">'../'</span>,</span><br><span class="line">            &#125;,</span><br><span class="line">          &#125;,</span><br><span class="line">        ],</span><br><span class="line">      &#125;,</span><br><span class="line">    ],</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="補充：url-loader-與-file-loader-實際應用"><a href="#補充：url-loader-與-file-loader-實際應用" class="headerlink" title="補充：url-loader 與 file-loader 實際應用"></a>補充：url-loader 與 file-loader 實際應用</h2><p>前面講解到了 url-loader 與 file-loader 的基本使用方式，這次讓我們帶入到實際應用內，加深各位對這兩個 loader 的印象。</p>
+<blockquote>
+<p>套件連結：<a href="https://github.com/webpack-contrib/url-loader" target="_blank" rel="external nofollow noopener noreferrer">url-loader</a>、<a href="https://github.com/webpack-contrib/file-loader" target="_blank" rel="external nofollow noopener noreferrer">file-loader</a>、<a href="https://github.com/webpack-contrib/css-loader" target="_blank" rel="external nofollow noopener noreferrer">css-loader</a>、<a href="https://github.com/webpack-contrib/mini-css-extract-plugin" target="_blank" rel="external nofollow noopener noreferrer">mini-css-extract-plugin</a></p>
+</blockquote>
+<p>主要的套件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install url-loader file-loader -D</span><br></pre></td></tr></table></figure>
+
+<p>過程會使用的套件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install css-loader mini-css-extract-plugin -D</span><br></pre></td></tr></table></figure>
+
+<p>初始專案結構：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">webpack-demo&#x2F;</span><br><span class="line">│</span><br><span class="line">├─── node_modules&#x2F;</span><br><span class="line">├─── src&#x2F;</span><br><span class="line">│   │</span><br><span class="line">│   └─── img&#x2F;</span><br><span class="line">│       │</span><br><span class="line">│       ├─── banner.jpg   # Size &gt;&#x3D; 10 KB</span><br><span class="line">│       └─── logo.jpg     # Size &lt; 10 KB</span><br><span class="line">│   │</span><br><span class="line">│   └─── css&#x2F;</span><br><span class="line">│       │</span><br><span class="line">│       └─── all.css      # CSS 主檔案</span><br><span class="line">│   │</span><br><span class="line">│   └─── main.js          # entry 入口檔案</span><br><span class="line">│</span><br><span class="line">├─── index.html           # 引入 bundle.js 與 main.css 測試用檔案</span><br><span class="line">├─── webpack.config.js    # Webpack 配置檔案</span><br><span class="line">├─── package-lock.json</span><br><span class="line">└─── package.json</span><br></pre></td></tr></table></figure>
+
+<p>撰寫 CSS 範例：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.w-100-h-100</span> &#123;</span><br><span class="line">  <span class="attribute">width</span>: <span class="number">100px</span>;</span><br><span class="line">  <span class="attribute">height</span>: <span class="number">100px</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.bg-cover</span> &#123;</span><br><span class="line">  <span class="attribute">background-position</span>: center center;</span><br><span class="line">  <span class="attribute">background-repeat</span>: no-repeat;</span><br><span class="line">  <span class="attribute">background-size</span>: cover;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.banner</span> &#123;</span><br><span class="line">  <span class="attribute">background-image</span>: <span class="built_in">url</span>(<span class="string">'../img/banner.jpg'</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.logo</span> &#123;</span><br><span class="line">  <span class="attribute">background-image</span>: <span class="built_in">url</span>(<span class="string">'../img/logo.png'</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>配置 <code>webpack.config.js</code> 檔案：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">'path'</span>);</span><br><span class="line"><span class="keyword">const</span> MiniCssExtractPlugin = <span class="built_in">require</span>(<span class="string">'mini-css-extract-plugin'</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  entry: <span class="string">'./src/main.js'</span>,</span><br><span class="line">  output: &#123;</span><br><span class="line">    path: path.resolve(__dirname, <span class="string">'dist'</span>),</span><br><span class="line">    filename: <span class="string">'js/bundle.js'</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="built_in">module</span>: &#123;</span><br><span class="line">    rules: [</span><br><span class="line">      &#123;</span><br><span class="line">        test: <span class="regexp">/\.css$/i</span>,</span><br><span class="line">        use: [</span><br><span class="line">          &#123;</span><br><span class="line">            loader: MiniCssExtractPlugin.loader,</span><br><span class="line">            <span class="comment">// 由於 CSS 增加了一層的結構，相對的 publicPath 也需增加一層</span></span><br><span class="line">            options: &#123;</span><br><span class="line">              publicPath: <span class="string">'../'</span>,</span><br><span class="line">            &#125;,</span><br><span class="line">          &#125;,</span><br><span class="line">          <span class="string">'css-loader'</span>,</span><br><span class="line">        ],</span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        test: <span class="regexp">/\.(png|jpe?g|gif)$/i</span>,</span><br><span class="line">        use: [</span><br><span class="line">          &#123;</span><br><span class="line">            <span class="comment">// 直接配置 url-loader 就好，超過上限的資源會自動 fallback 給 file-loader</span></span><br><span class="line">            loader: <span class="string">'url-loader'</span>,</span><br><span class="line">            options: &#123;</span><br><span class="line">              name: <span class="string">'img/[name].[ext]'</span>,</span><br><span class="line">              limit: <span class="number">10000</span>,</span><br><span class="line">            &#125;,</span><br><span class="line">          &#125;,</span><br><span class="line">        ],</span><br><span class="line">      &#125;,</span><br><span class="line">    ],</span><br><span class="line">  &#125;,</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> MiniCssExtractPlugin(&#123;</span><br><span class="line">      filename: <span class="string">'css/[name].css'</span>,</span><br><span class="line">    &#125;),</span><br><span class="line">  ],</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>這邊要特別注意！並不是 file-loader 與 url-loader 都要進行配置，直接配置 url-loader 就等同於配置了 file-loader，<code>limit</code> 內的會交由 url-loader 處理，超過 <code>limit</code> 的資源則會 fallback 給 file-loader 進行處理。</p>
+<div class="note danger">Webpack 會自動解析 CSS 內的參考圖檔，將它抓出來以 require 的方式處理，除非有特定資源需要透過 file-loader 處理，不然不需要另外的 import 這些 CSS 所用的圖檔</div>
+
+<p>entry 入口處 (<code>src/main.js</code>) 引入 CSS 檔案：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">'./css/all.css'</span>;</span><br></pre></td></tr></table></figure>
+
+<p>至 <code>package.json</code> 新增編譯指令：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"scripts"</span>: &#123;</span><br><span class="line">    <span class="attr">"build"</span>: <span class="string">"webpack --mode development"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>執行編譯指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm run build</span><br></pre></td></tr></table></figure>
+
+<p>至 <code>./index.html</code> 引入打包而成的 <code>bundle.js</code> 與 <code>main.css</code> 檔案：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 其他省略 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- 引入打包生成的 CSS --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span> <span class="attr">href</span>=<span class="string">"dist/css/main.css"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"banner w-100-h-100 bg-cover"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"logo w-100-h-100 bg-cover"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- 引入打包生成的 JavaScript --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"dist/js/bundle.js"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>查看結果：</p>
+<p><img src="https://i.imgur.com/MOMIu8C.png" alt="file-loader 結果"></p>
+<p><img src="https://i.imgur.com/MoyAU11.png" alt="url-loader 結果"></p>
+<p>從上面結果可以得知，logo.png 圖檔已被轉換成 base64 格式，而 banner.png 這張較大的圖檔，被 url-loader fallback 給 file-loader 處理，最後就只是在配置的指定位置生成而已。</p>
+<h2 id="補充：file-loader-載入本地字體"><a href="#補充：file-loader-載入本地字體" class="headerlink" title="補充：file-loader 載入本地字體"></a>補充：file-loader 載入本地字體</h2><p>有時我們在開發網頁時，會需要使用一些特殊字體，像我本身就很常到 <a href="https://fonts.google.com/" target="_blank" rel="external nofollow noopener noreferrer">Google Fonts</a> 拉一些字體出來用，不僅可以增加網頁整體的質感，還可以擺脫傳統字體的呆板樣式。</p>
+<p>而外部字體的載入方式有很多種，包含一般最為常見的 CSS link，或是使用 <code>@import</code> 方式載入字體，我個人是偏好使用 <code>@font-face</code> 來載入字體，將字體給下載下來，提供較為穩定的載入字體方法。</p>
+<p>先前介紹了以 file-loader 或 url-loader 來處理圖片等靜態資源，此章節將介紹如何以 file-loader 處理 <code>.ttf</code>、<code>.otf</code> 等字體資源，讓我們直接開始吧！</p>
+<blockquote>
+<p>請先至 <a href="https://fonts.google.com/" target="_blank" rel="external nofollow noopener noreferrer">Google Fonts</a> 隨意下載字體，並放置在 <code>src/font</code> 內</p>
+</blockquote>
+<figure class="highlight diff"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"> webpack-demo/</span><br><span class="line"> │</span><br><span class="line"> ├─── src/</span><br><span class="line"> │   │</span><br><span class="line"><span class="addition">+│   └─── font/</span></span><br><span class="line"><span class="addition">+│       │</span></span><br><span class="line"><span class="addition">+│       └─── NotoSansTC-Regular.otf</span></span><br></pre></td></tr></table></figure>
+
+<p>以 <code>@font-face</code> 載入本地字體：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">@<span class="keyword">font-face</span> &#123;</span><br><span class="line">  <span class="attribute">font-family</span>: <span class="string">'NotoSansTC'</span>;</span><br><span class="line">  <span class="attribute">src</span>: <span class="built_in">url</span>(<span class="string">'../font/NotoSansTC-Regular.otf'</span>) <span class="built_in">format</span>(<span class="string">'opentype'</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-tag">p</span> &#123;</span><br><span class="line">  <span class="attribute">font-family</span>: <span class="string">'NotoSansTC'</span>;</span><br><span class="line">  <span class="attribute">font-size</span>: <span class="number">40px</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>配置 <code>webpack.config.js</code> 檔案：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">'path'</span>);</span><br><span class="line"><span class="keyword">const</span> MiniCssExtractPlugin = <span class="built_in">require</span>(<span class="string">'mini-css-extract-plugin'</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  entry: <span class="string">'./src/main.js'</span>,</span><br><span class="line">  output: &#123;</span><br><span class="line">    path: path.resolve(__dirname, <span class="string">'dist'</span>),</span><br><span class="line">    filename: <span class="string">'js/bundle.js'</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="built_in">module</span>: &#123;</span><br><span class="line">    rules: [</span><br><span class="line">      &#123;</span><br><span class="line">        test: <span class="regexp">/\.css$/i</span>,</span><br><span class="line">        use: [</span><br><span class="line">          &#123;</span><br><span class="line">            loader: MiniCssExtractPlugin.loader,</span><br><span class="line">            options: &#123;</span><br><span class="line">              publicPath: <span class="string">'../'</span>,</span><br><span class="line">            &#125;,</span><br><span class="line">          &#125;,</span><br><span class="line">          <span class="string">'css-loader'</span>,</span><br><span class="line">        ],</span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="comment">// 處理 require("font")</span></span><br><span class="line">      &#123;</span><br><span class="line">        test: <span class="regexp">/\.(woff|woff2|eot|ttf|otf|)$/</span>,</span><br><span class="line">        use: [</span><br><span class="line">          &#123;</span><br><span class="line">            loader: <span class="string">'file-loader'</span>,</span><br><span class="line">            options: &#123;</span><br><span class="line">              name: <span class="string">'font/[name].[ext]'</span>,</span><br><span class="line">            &#125;,</span><br><span class="line">          &#125;,</span><br><span class="line">        ],</span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="comment">// 處理 require("image")</span></span><br><span class="line">      &#123;</span><br><span class="line">        test: <span class="regexp">/\.(png|jpe?g|gif)$/i</span>,</span><br><span class="line">        use: [</span><br><span class="line">          &#123;</span><br><span class="line">            loader: <span class="string">'url-loader'</span>,</span><br><span class="line">            options: &#123;</span><br><span class="line">              name: <span class="string">'img/[name].[ext]'</span>,</span><br><span class="line">              limit: <span class="number">10000</span>,</span><br><span class="line">            &#125;,</span><br><span class="line">          &#125;,</span><br><span class="line">        ],</span><br><span class="line">      &#125;,</span><br><span class="line">    ],</span><br><span class="line">  &#125;,</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> MiniCssExtractPlugin(&#123;</span><br><span class="line">      filename: <span class="string">'css/[name].css'</span>,</span><br><span class="line">    &#125;),</span><br><span class="line">  ],</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>這邊要注意，如果你打算將圖片、文字打包後放置在同一個路徑下，可以不必另外寫一個 Regex 去處理，<strong>上面這種寫法，主要是將圖片與文字放置在不同的資料夾</strong>，千萬要記得，Webpack 會將 CSS 內的相關路徑參考語法轉換為 <code>require</code> 的方式進行處理，並不是說 file-loader 的配置只能在 url-loader 區塊內配置，Webpack 是以 Regex 配對相關的 use，千萬不要搞混了！</p>
+<p>執行編譯：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm run build</span><br></pre></td></tr></table></figure>
+
+<p>此時 <code>src</code> 資料夾內的 <code>font</code> 也通通打包進來了，以下為打包後的 <code>dist</code> 資料夾專案結構：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">webpack-demo&#x2F;</span><br><span class="line">│</span><br><span class="line">├─── dist&#x2F;</span><br><span class="line">│   │</span><br><span class="line">│   └─── font&#x2F;</span><br><span class="line">│       │</span><br><span class="line">│       └─── NotoSansTC-Regular.otf</span><br><span class="line">&#x2F;&#x2F; 其他省略</span><br></pre></td></tr></table></figure>
+
+<p>觀察打包生成的 CSS 檔案：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">@<span class="keyword">font-face</span> &#123;</span><br><span class="line">  <span class="attribute">font-family</span>: <span class="string">'NotoSansTC'</span>;</span><br><span class="line">  <span class="attribute">src</span>: <span class="built_in">url</span>(../font/NotoSansTC-Regular.otf) <span class="built_in">format</span>(<span class="string">'opentype'</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-tag">p</span> &#123;</span><br><span class="line">  <span class="attribute">font-family</span>: <span class="string">'NotoSansTC'</span>;</span><br><span class="line">  <span class="attribute">font-size</span>: <span class="number">40px</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>從上面結果可以得知，CSS 內的 <code>@font-face</code> 連結也是正確的，直接打開網頁即可看到字體已被更改，此時我們打包字體的目的也就成功了。</p>
+<p>有人可能會問，font 字體可以使用 url-loader 處理嗎？答案是可以的，但非常不建議這樣做，英文字體少說 150 KB 起跳，而中文字體則是 5MB 起跳，對於網頁的效能來說，會有非常大的影響，這也是之前提到的 url-loader 中 limit 選項需要自己去衡量的原因，一般來說 8KB 左右就是極限了，超過的檔案就都建議以 file-loader 進行處理，各位可以自己試試看。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Node-js/" rel="tag"># Node.js</a>
+              <a href="/tags/w3HexSchool/" rel="tag"># w3HexSchool</a>
+              <a href="/tags/Webpack/" rel="tag"># Webpack</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2020-03-05-webpack-postcssloader/" rel="next" title="Webpack 前端打包工具 - 使用 postcss-loader 自動為 CSS 增加 Prefix">
+                  <i class="fa fa-chevron-left"></i> Webpack 前端打包工具 - 使用 postcss-loader 自動為 CSS 增加 Prefix
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2020-03-16-webpack-babelloader/" rel="prev" title="Webpack 前端打包工具 - 使用 babel-loader 編譯並轉換 ES6+ 代碼">
+                  Webpack 前端打包工具 - 使用 babel-loader 編譯並轉換 ES6+ 代碼 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+          
+            
+              
+    <div class="comments" id="gitalk-container"></div>
+
+            
+          
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#筆記重點"><span class="nav-number">2.</span> <span class="nav-text">筆記重點</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#url-loader-與-file-loader-安裝"><span class="nav-number">3.</span> <span class="nav-text">url-loader 與 file-loader 安裝</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#file-loader-與-url-loader-基本使用"><span class="nav-number">4.</span> <span class="nav-text">file-loader 與 url-loader 基本使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#url-loader-與-file-loader-可傳遞選項"><span class="nav-number">5.</span> <span class="nav-text">url-loader 與 file-loader 可傳遞選項</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#補充：url-loader-與-file-loader-實際應用"><span class="nav-number">6.</span> <span class="nav-text">補充：url-loader 與 file-loader 實際應用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#補充：file-loader-載入本地字體"><span class="nav-number">7.</span> <span class="nav-text">補充：file-loader 載入本地字體</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Roya" src="/images/userLogo.jpg">
+  <p class="site-author-name" itemprop="name">Roya</p>
+  <div class="site-description" itemprop="description">Front-End Web Developer<br>學會運用比學會使用還要來的有用</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">69</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/awdr74100" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;awdr74100" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:a78945612385238@gmail.com" title="E-Mail &amp;rarr; mailto:a78945612385238@gmail.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Roya</span>
+</div>
+  <span class="post-meta-divider">轉載文章時請附上作者暱稱與原文連結</span>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+
+<script src="/js/utils.js?v=7.4.2.js"></script>
+
+
+<script src="/js/schemes/pisces.js?v=7.4.2.js"></script>
+
+
+<script src="/js/next-boot.js?v=7.4.2.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+  
+<script src="/js/local-search.js?v=7.4.2.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '7cdb0d531869e18caad8',
+      clientSecret: '0b6a38cef9c3ae1dcf0ea66e916ab68823dbab52',
+      repo: 'awdr74100.github.io',
+      owner: 'awdr74100',
+      admin: ['awdr74100'],
+      id: 'c26ceac3e4e26eeb7c856b15233ab254',
+        language: 'zh-TW',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+  
+
+
+</body>
+</html>

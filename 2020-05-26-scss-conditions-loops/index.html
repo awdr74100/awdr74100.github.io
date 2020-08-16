@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon-128.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png?v=7.4.2">
+  <link rel="mask-icon" href="/images/favicon-none.svg?v=7.4.2" color="#222">
+  <link rel="alternate" href="/atom.xml" title="Roya's Blog" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"default"},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '複製',
+      copy_success: '複製成功',
+      copy_failure: '複製失敗'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="雖然說撰寫樣式表其複雜性遠遠低於一般的主流程式語言，但無法否認在某些時候我們確實需要更高效的做法來達到目的，迴圈處理就是個很好的例子，傳統 CSS 撰寫樣式必定是透過手動輸入的方式來完成，而 Sass &#x2F; SCSS 提供了像是 @for、@each、@while 語句，讓我們透過迴圈的方式快速產出樣式，藉此達到高效開發的目的，其中也包含像是 @if、@else if 等條件判斷式，可根據其判斷輸出">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Sass &#x2F; SCSS 預處理器 - @if、@else if 條件判斷與 @for、@each 迴圈處理">
+<meta property="og:url" content="https://awdr74100.github.io/2020-05-26-scss-conditions-loops/index.html">
+<meta property="og:site_name" content="Roya&#39;s Blog">
+<meta property="og:description" content="雖然說撰寫樣式表其複雜性遠遠低於一般的主流程式語言，但無法否認在某些時候我們確實需要更高效的做法來達到目的，迴圈處理就是個很好的例子，傳統 CSS 撰寫樣式必定是透過手動輸入的方式來完成，而 Sass &#x2F; SCSS 提供了像是 @for、@each、@while 語句，讓我們透過迴圈的方式快速產出樣式，藉此達到高效開發的目的，其中也包含像是 @if、@else if 等條件判斷式，可根據其判斷輸出">
+<meta property="og:locale" content="zh_TW">
+<meta property="article:published_time" content="2020-05-26T12:15:42.000Z">
+<meta property="article:modified_time" content="2020-05-27T17:13:58.000Z">
+<meta property="article:author" content="Roya">
+<meta property="article:tag" content="SCSS">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://awdr74100.github.io/2020-05-26-scss-conditions-loops/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Sass / SCSS 預處理器 - @if、@else if 條件判斷與 @for、@each 迴圈處理 | Roya's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-150715469-1"></script>
+    <script>
+      var host = window.location.hostname;
+      if (host !== "localhost" || !true) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-150715469-1');
+      }
+    </script>
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Roya's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">現代化 Web 開發技術學習分享</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>標籤<span class="badge">28</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分類<span class="badge">9</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>歸檔<span class="badge">69</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none" placeholder="搜尋..." spellcheck="false" type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://awdr74100.github.io/2020-05-26-scss-conditions-loops/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/userLogo.jpg">
+      <meta itemprop="name" content="Roya">
+      <meta itemprop="description" content="Front-End Web Developer<br>學會運用比學會使用還要來的有用">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Roya's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          Sass / SCSS 預處理器 - @if、@else if 條件判斷與 @for、@each 迴圈處理
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-05-26 20:15:42" itemprop="dateCreated datePublished" datetime="2020-05-26T20:15:42+08:00">2020-05-26</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-05-28 01:13:58" itemprop="dateModified" datetime="2020-05-28T01:13:58+08:00">2020-05-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/SCSS/" itemprop="url" rel="index">
+                    <span itemprop="name">SCSS</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>雖然說撰寫樣式表其複雜性遠遠低於一般的主流程式語言，但無法否認在某些時候我們確實需要更高效的做法來達到目的，迴圈處理就是個很好的例子，傳統 CSS 撰寫樣式必定是透過手動輸入的方式來完成，而 Sass / SCSS 提供了像是 @for、@each、@while 語句，讓我們透過迴圈的方式快速產出樣式，藉此達到高效開發的目的，其中也包含像是 @if、@else if 等條件判斷式，可根據其判斷輸出不同的樣式，讓我們在較複雜的情境依然能夠保持其樣式表的靈活度。</p>
+<h2 id="筆記重點"><a href="#筆記重點" class="headerlink" title="筆記重點"></a>筆記重點</h2><ul>
+<li>條件判斷式與邏輯運算子</li>
+<li>迴圈處理與實際應用</li>
+</ul>
+<h2 id="條件判斷式與邏輯運算子"><a href="#條件判斷式與邏輯運算子" class="headerlink" title="條件判斷式與邏輯運算子"></a>條件判斷式與邏輯運算子</h2><p>像是 <code>if</code>、<code>else if</code> 這種條件判斷式有接觸過任一程式語言的人應該都很熟悉了才對，能夠幫助我們依造判斷的結果選用不同的內容，讓我們直接來看範例：</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$device</span>: mobile;</span><br><span class="line"></span><br><span class="line"><span class="selector-tag">p</span> &#123;</span><br><span class="line">  @<span class="keyword">if</span> <span class="variable">$device</span> == desktop &#123;</span><br><span class="line">    <span class="attribute">font-size</span>: <span class="number">1.5rem</span>;</span><br><span class="line">  &#125; @<span class="keyword">else</span> if <span class="variable">$device</span> == pad &#123;</span><br><span class="line">    <span class="attribute">font-size</span>: <span class="number">1.25rem</span>;</span><br><span class="line">  &#125; @<span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="attribute">font-size</span>: <span class="number">1rem</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="attribute">color</span>: red;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>就如同一般程式語言的條件判斷式寫法，這應該蠻好理解的，但這邊要注意 SCSS 並未提供像是 <code>switch</code> 等語句，僅提供以下條件判斷式語句：</p>
+<ul>
+<li><code>@if</code>：如果為 <code>true</code>，則該塊被運行</li>
+<li><code>@else</code>：跟隨 <code>@if</code> 規則，如果為 <code>false</code>，則該塊被運行</li>
+<li><code>@else if</code>：在 <code>@else</code> 評估其規則，運作如同 <code>@if</code></li>
+</ul>
+<p>與 Python 類似，僅提供以上三種判斷式語句，且比對的方法也幾乎差不多，如果你是 JavaScript 的開發者，應該很常使用像是 <code>===</code> 進行比對，在 SCSS 你不必這樣做，也不能這樣做，只需要撰寫傳統的 <code>==</code>、<code>!=</code>、<code>&gt;=</code> 比較其目標即可，這邊針對邏輯運算子做個補充：</p>
+<ul>
+<li><code>and</code>：兩個運算式都是 <code>true</code> 時才會回傳 <code>true</code></li>
+<li><code>or</code>：兩個運算式有任一個是 <code>true</code> 時就會回傳 <code>true</code></li>
+<li><code>not</code> 反轉運算式結果</li>
+</ul>
+<p>一樣與 Python 類似，其邏輯判斷子都變得更為直接，這邊我們再來看個範例：</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$primary</span>: rgb(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.text-primary</span> &#123;</span><br><span class="line">  @<span class="keyword">if</span> (<span class="variable">$primary</span> == black and <span class="variable">$primary</span> == <span class="number">#000000</span>) &#123;</span><br><span class="line">    <span class="attribute">color</span>: <span class="variable">$primary</span>;</span><br><span class="line">  &#125; @<span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="attribute">color</span>: red;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>此時的編譯結果為：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.text-primary</span> &#123;</span><br><span class="line">  <span class="attribute">color</span>: black;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>一般對於這種邏輯運算子不外乎就是比較字串或數值之間的關係，在 SCSS 定義了像是 <code>#000000</code> 顏色的型態，我們可透過相同方式比較顏色之間的關係，當初看到也覺得很新奇，居然連顏色也可以比較，雖然使用頻率可能未必來的比基本型態高，但確實在某些時候可能能夠帶來關鍵性的作用。</p>
+<h2 id="迴圈處理與實際應用"><a href="#迴圈處理與實際應用" class="headerlink" title="迴圈處理與實際應用"></a>迴圈處理與實際應用</h2><p>接下來進入到迴圈處理的環節，在這邊要先強調，SCSS 並未像一般程式語言需處理各種複雜的情境，為了方便開發者的處理流程，進而衍伸出像是 JavaScript 中的 <code>for in</code>、<code>for of</code> 等方法，這些東西在 SCSS 都不存在，SCSS 就只有提供像 <code>@for</code>、<code>@each</code>、<code>@while</code> 等基本迴圈處理方法，畢竟需求很單純，這點在下面會在做說明，讓我們先從 <code>@for</code> 開始介紹：</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">@<span class="keyword">for</span> <span class="variable">$var</span> from 1 to 3 &#123;</span><br><span class="line">  <span class="selector-class">.mt-</span>#&#123;<span class="variable">$var</span>&#125; &#123;</span><br><span class="line">    <span class="attribute">margin-top</span>: <span class="variable">$var</span> * <span class="number">10px</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>這邊的 <code>$var</code> 就類似於 JavaScript 中用 <code>let</code> 宣告的變數，區塊外是讀不到這個變數的，其他字詞的解釋如下：</p>
+<ul>
+<li><code>start</code>：迴圈的起始值，這裡為 <code>1</code></li>
+<li><code>end</code>：迴圈的結束值，這裡為 <code>3</code></li>
+<li><code>to</code>：處理方式為 <code>start &lt; end</code>，不包含迴圈的結束值</li>
+<li><code>through</code>：處理方式為 <code>start &lt;= end</code>，包含迴圈的結束值</li>
+</ul>
+<p>如同上面解釋，使用 <code>to</code> 的話迴圈只會跑兩次，我們想要跑三次，故這邊使用 <code>through</code> 來進行：</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">@<span class="keyword">for</span> <span class="variable">$var</span> from 1 through 3 &#123;</span><br><span class="line">  <span class="selector-class">.mt-</span>#&#123;<span class="variable">$var</span>&#125; &#123;</span><br><span class="line">    <span class="attribute">margin-top</span>: <span class="variable">$var</span> * <span class="number">10px</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>這邊還有一點要注意，在之前我們有提到在某些時候 SCSS 無法辨認其值是屬於需解析的變數還是預設的屬性值，其中的屬性值也有可能是字串，以上面範例來說，當我們把 <code>$var</code> 寫在 class 名稱時，就會產生此問題，解決辦法如之前，使用 <code>#{}</code> 將變數包裝起來即可，讓我們來看最後的編譯結果：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.mt-1</span> &#123;</span><br><span class="line">  <span class="attribute">margin-top</span>: <span class="number">10px</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.mt-2</span> &#123;</span><br><span class="line">  <span class="attribute">margin-top</span>: <span class="number">20px</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.mt-3</span> &#123;</span><br><span class="line">  <span class="attribute">margin-top</span>: <span class="number">30px</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>利用迴圈處理，我們就能快速產生需要的樣式，這樣子的結果就如同 Bootstrap 中的 Spacing 處理一般，大幅提高了其開發效率，讓我們在試一次：</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$list</span>: red blue black;</span><br><span class="line"></span><br><span class="line">@<span class="keyword">for</span> <span class="variable">$var</span> from 1 through length(<span class="variable">$list</span>) &#123;</span><br><span class="line">  <span class="selector-class">.text-</span>#&#123;nth(<span class="variable">$list</span>,<span class="variable">$var</span>)&#125; &#123;</span><br><span class="line">    <span class="attribute">color</span>: nth(<span class="variable">$list</span>, <span class="variable">$var</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>這也是我們在撰寫一般程式語言最常用到的迴圈處理，利用迴圈產生數值進而取出陣列中的值，但在這邊我不太推薦以 <code>@for</code> 下去做，從編譯結果就可以得知：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.text-red</span> &#123;</span><br><span class="line">  <span class="attribute">color</span>: red;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.text-blue</span> &#123;</span><br><span class="line">  <span class="attribute">color</span>: blue;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.text-black</span> &#123;</span><br><span class="line">  <span class="attribute">color</span>: black;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>一般我們不會取作像 <code>.text-blue</code> 這樣的 class 名稱，如果其樣式顏色做了更改，這會導致名稱與內容不相符的狀況，搞的很詭異，盡量都是以工具性質去做命名，不要以語意化方式命名，這時就是 <code>maps</code> 出場的時候了：</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$theme-colors</span>: (</span><br><span class="line">  primary: <span class="number">#0000ff</span>,</span><br><span class="line">  success: <span class="number">#008000</span>,</span><br><span class="line">  warning: <span class="number">#ffff00</span>,</span><br><span class="line">  danger: <span class="number">#ff0000</span>,</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p><code>maps</code> 型態就如同一般語言的 Object，關於 <code>maps</code> 的介紹可參考上一篇文章，一般語言如果要遍歷 Object 可使用 <code>for in</code> 語句，但 SCSS 並沒有 <code>for in</code> 語句，取而代之的是 <code>@each</code> 語句，如下範例：</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">@<span class="keyword">each</span> <span class="variable">$key</span>, <span class="variable">$value</span> in <span class="variable">$theme-colors</span> &#123;</span><br><span class="line">  <span class="selector-class">.text-</span>#&#123;<span class="variable">$key</span>&#125; &#123;</span><br><span class="line">    <span class="attribute">color</span>: <span class="variable">$value</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>這邊的 <code>@each</code> 就類似於 Python 的 <code>for in</code> 語句，我個人是把它記成 JavaScript 中 <code>for of</code> 結合 <code>Object.entries()</code> 並搭配解構的處理方式：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="keyword">const</span> [key, value] <span class="keyword">of</span> <span class="built_in">Object</span>.entries(obj)) &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(key); <span class="comment">// primary</span></span><br><span class="line">  <span class="built_in">console</span>.log(value); <span class="comment">// 0000ff</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果將被賦值的兩個變數更改為一個，此時這一個變數拿到的就是單獨的 List 物件，你可以從 JavaScript 解構的方向去思考，更可以直接拿掉 <code>$value</code> 變數，直接讀取 <code>$key</code> 變數看看，這個變數就會得到 <code>iterator</code> 的結果，讓我們來看最後的編譯結果為何：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.text-primary</span> &#123;</span><br><span class="line">  <span class="attribute">color</span>: <span class="number">#0000ff</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.text-success</span> &#123;</span><br><span class="line">  <span class="attribute">color</span>: <span class="number">#008000</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.text-warning</span> &#123;</span><br><span class="line">  <span class="attribute">color</span>: <span class="number">#ffff00</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.text-danger</span> &#123;</span><br><span class="line">  <span class="attribute">color</span>: <span class="number">#ff0000</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>有沒有似曾相似的感覺？沒錯，Bootstrap 中的主題顏色就是依靠此方式生成的，可以參考 <a href="https://github.com/twbs/bootstrap/blob/master/scss/_variables.scss" target="_blank" rel="external nofollow noopener noreferrer">官方文檔</a>，其中也包含像 <code>.bg-primary</code>、<code>btn-primary</code> 等樣式，原理都是一模一樣的，相比於傳統 CSS 依靠手動方式撰寫樣式，使用 SCSS 能夠快速並符合結構化方式自動生成樣式，這也是為什麼 SCSS 越來越火紅的原因，這個坑跳了就不想回去了，最後來介紹 <code>@while</code> 迴圈處理語句：</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$num</span>: <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">@<span class="keyword">while</span> <span class="variable">$num</span> &lt;= 3 &#123;</span><br><span class="line">  <span class="selector-class">.pt-</span>#&#123;<span class="variable">$num</span>&#125; &#123;</span><br><span class="line">    <span class="attribute">padding-top</span>: <span class="variable">$num</span> * <span class="number">10px</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="variable">$num</span>: <span class="variable">$num</span> + <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>就如同一般語言的 <code>while</code> 語句，透過 <code>true</code> 或 <code>false</code> 控制迴圈流程，我比較不建議使用 <code>@while</code> 來處理迴圈，就連官方自己也說除非是特別複雜的情境，不然盡量不要使用 <code>@while</code> 語句，易造成可讀性低落的問題，更好的選擇應該是 <code>@for</code> 或 <code>@each</code> 才對。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/SCSS/" rel="tag"># SCSS</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2020-05-25-scss-variables/" rel="next" title="Sass / SCSS 預處理器 - Variables 變數宣告與 !global、!default 標誌定義">
+                  <i class="fa fa-chevron-left"></i> Sass / SCSS 預處理器 - Variables 變數宣告與 !global、!default 標誌定義
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2020-05-30-scss-mixin-include/" rel="prev" title="Sass / SCSS 預處理器 - @mixin 建立混入與 @include 載入混入">
+                  Sass / SCSS 預處理器 - @mixin 建立混入與 @include 載入混入 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+          
+            
+              
+    <div class="comments" id="gitalk-container"></div>
+
+            
+          
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#筆記重點"><span class="nav-number">2.</span> <span class="nav-text">筆記重點</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#條件判斷式與邏輯運算子"><span class="nav-number">3.</span> <span class="nav-text">條件判斷式與邏輯運算子</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#迴圈處理與實際應用"><span class="nav-number">4.</span> <span class="nav-text">迴圈處理與實際應用</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Roya" src="/images/userLogo.jpg">
+  <p class="site-author-name" itemprop="name">Roya</p>
+  <div class="site-description" itemprop="description">Front-End Web Developer<br>學會運用比學會使用還要來的有用</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">69</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/awdr74100" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;awdr74100" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:a78945612385238@gmail.com" title="E-Mail &amp;rarr; mailto:a78945612385238@gmail.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Roya</span>
+</div>
+  <span class="post-meta-divider">轉載文章時請附上作者暱稱與原文連結</span>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+
+<script src="/js/utils.js?v=7.4.2.js"></script>
+
+
+<script src="/js/schemes/pisces.js?v=7.4.2.js"></script>
+
+
+<script src="/js/next-boot.js?v=7.4.2.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+  
+<script src="/js/local-search.js?v=7.4.2.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '7cdb0d531869e18caad8',
+      clientSecret: '0b6a38cef9c3ae1dcf0ea66e916ab68823dbab52',
+      repo: 'awdr74100.github.io',
+      owner: 'awdr74100',
+      admin: ['awdr74100'],
+      id: '308c729530938b34eff6bf176b25c3cb',
+        language: 'zh-TW',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+  
+
+
+</body>
+</html>

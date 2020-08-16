@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon-128.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png?v=7.4.2">
+  <link rel="mask-icon" href="/images/favicon-none.svg?v=7.4.2" color="#222">
+  <link rel="alternate" href="/atom.xml" title="Roya's Blog" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"default"},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '複製',
+      copy_success: '複製成功',
+      copy_failure: '複製失敗'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="此篇將紀錄從接觸 Gulp 開始到後來能夠獨立開發專案所需 Gulp 環境的學習總結。前面會先把之前所遇到的坑做一個解決辦法補充，比如透過 Babel 編譯後，require 語法無法在 Browser 運行等問題，以及使用 gulp-rename 套件後，該如何連同 HTML 相關的引用路徑做一個響應變動等等，最後也會提供我最為常用的 Gulp 開發環境，供有興趣的開發者快速導入現有專案。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Gulp 前端自動化 - 基於 Gulp 4 的學習總結">
+<meta property="og:url" content="https://awdr74100.github.io/2020-02-10-gulp-final/index.html">
+<meta property="og:site_name" content="Roya&#39;s Blog">
+<meta property="og:description" content="此篇將紀錄從接觸 Gulp 開始到後來能夠獨立開發專案所需 Gulp 環境的學習總結。前面會先把之前所遇到的坑做一個解決辦法補充，比如透過 Babel 編譯後，require 語法無法在 Browser 運行等問題，以及使用 gulp-rename 套件後，該如何連同 HTML 相關的引用路徑做一個響應變動等等，最後也會提供我最為常用的 Gulp 開發環境，供有興趣的開發者快速導入現有專案。">
+<meta property="og:locale" content="zh_TW">
+<meta property="article:published_time" content="2020-02-10T15:30:55.000Z">
+<meta property="article:modified_time" content="2020-02-13T10:25:51.000Z">
+<meta property="article:author" content="Roya">
+<meta property="article:tag" content="Gulp 4">
+<meta property="article:tag" content="Node.js">
+<meta property="article:tag" content="w3HexSchool">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://awdr74100.github.io/2020-02-10-gulp-final/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Gulp 前端自動化 - 基於 Gulp 4 的學習總結 | Roya's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-150715469-1"></script>
+    <script>
+      var host = window.location.hostname;
+      if (host !== "localhost" || !true) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-150715469-1');
+      }
+    </script>
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Roya's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">現代化 Web 開發技術學習分享</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>標籤<span class="badge">28</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分類<span class="badge">9</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>歸檔<span class="badge">69</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none" placeholder="搜尋..." spellcheck="false" type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://awdr74100.github.io/2020-02-10-gulp-final/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/userLogo.jpg">
+      <meta itemprop="name" content="Roya">
+      <meta itemprop="description" content="Front-End Web Developer<br>學會運用比學會使用還要來的有用">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Roya's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          Gulp 前端自動化 - 基於 Gulp 4 的學習總結
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-02-10 23:30:55" itemprop="dateCreated datePublished" datetime="2020-02-10T23:30:55+08:00">2020-02-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-02-13 18:25:51" itemprop="dateModified" datetime="2020-02-13T18:25:51+08:00">2020-02-13</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Gulp/" itemprop="url" rel="index">
+                    <span itemprop="name">Gulp</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>此篇將紀錄從接觸 Gulp 開始到後來能夠獨立開發專案所需 Gulp 環境的學習總結。前面會先把之前所遇到的坑做一個解決辦法補充，比如透過 Babel 編譯後，require 語法無法在 Browser 運行等問題，以及使用 gulp-rename 套件後，該如何連同 HTML 相關的引用路徑做一個響應變動等等，最後也會提供我最為常用的 Gulp 開發環境，供有興趣的開發者快速導入現有專案。</p>
+<h2 id="筆記重點"><a href="#筆記重點" class="headerlink" title="筆記重點"></a>筆記重點</h2><ul>
+<li>本系列文章</li>
+<li>踩坑 - require 語法無法在 Browser 運行</li>
+<li>踩坑 - HTML 引用路徑該如何做響應變動</li>
+<li>總結 - Gulp 常用開發環境</li>
+</ul>
+<h2 id="本系列文章"><a href="#本系列文章" class="headerlink" title="本系列文章"></a>本系列文章</h2><ul>
+<li><a href="https://awdr74100.github.io/2019-12-24-gulp-install/">Gulp 前端自動化 - 環境安裝與執行</a></li>
+<li><a href="https://awdr74100.github.io/2019-12-31-gulp-gulpsass/">Gulp 前端自動化 - 編譯 Sass/SCSS</a></li>
+<li><a href="https://awdr74100.github.io/2020-01-02-gulp-gulppug/">Gulp 前端自動化 - 編譯 Pug</a></li>
+<li><a href="https://awdr74100.github.io/2020-01-08-gulp-gulpbabel/">Gulp 前端自動化 - 使用 Babel 編譯 ES6</a></li>
+<li><a href="https://awdr74100.github.io/2020-01-12-gulp-gulppostcss/">Gulp 前端自動化 - PostCSS 與 Autoprefixer</a></li>
+<li><a href="https://awdr74100.github.io/2020-01-13-gulp-gulpsourcemaps/">Gulp 前端自動化 - 生成 SourceMap 映射文件</a></li>
+<li><a href="https://awdr74100.github.io/2020-01-14-gulp-browsersync/">Gulp 前端自動化 - Browsersync 瀏覽器同步測試工具</a></li>
+<li><a href="https://awdr74100.github.io/2020-01-15-gulp-del/">Gulp 前端自動化 - 自動清除檔案與資料夾</a></li>
+<li><a href="https://awdr74100.github.io/2020-01-17-gulp-gulphtmlmin-gulpcleancss-gulpuglify/">Gulp 前端自動化 - 壓縮 HTML、CSS、JavaScript 代碼</a></li>
+<li><a href="https://awdr74100.github.io/2020-01-20-gulp-gulpimagemin/">Gulp 前端自動化 - 壓縮並優化圖片</a></li>
+<li><a href="https://awdr74100.github.io/2020-01-21-gulp-minimist/">Gulp 前端自動化 - Minimist 命令行參數解析工具</a></li>
+<li><a href="https://awdr74100.github.io/2020-01-22-gulp-gulprename/">Gulp 前端自動化 - 替換 Stream 中的檔案名稱</a></li>
+<li><a href="https://awdr74100.github.io/2020-01-24-gulp-includebootstrap/">Gulp 前端自動化 - 導入 Bootstrap 客製並編譯它</a></li>
+<li><a href="https://awdr74100.github.io/2020-01-26-gulp-modular/">Gulp 前端自動化 - CommonJS 模組化設計</a></li>
+<li><a href="https://awdr74100.github.io/2020-01-28-gulp-upgradegulp/">Gulp 前端自動化 - 升級至 Gulp 4 完整說明</a></li>
+<li><a href="https://awdr74100.github.io/2020-02-03-gulp-gulpfilebabel/">Gulp 前端自動化 - 使用 ES6 Module 撰寫 Gulpfile</a></li>
+</ul>
+<h2 id="踩坑-require-語法無法在-Browser-運行"><a href="#踩坑-require-語法無法在-Browser-運行" class="headerlink" title="踩坑 - require 語法無法在 Browser 運行"></a>踩坑 - require 語法無法在 Browser 運行</h2><p>在之前的 <a href="https://awdr74100.github.io/2020-01-08-gulp-gulpbabel/">使用 Babel 編譯 ES6</a> 文章中，有提到關於 @babel/runtime 與 @babel/polyfill 的使用方式，解決 Babel 預設只能處理 Syntax 的問題，但此時也就衍發了另一個問題，那就是編譯後檔案中的 require 語法是無法在 Browser 運行的，require 語法屬於 Node.js 的模組化語法，瀏覽器不兼容此語法，當初卡了這個問題好久，最後找到了 Webpack-stream 這一個套件，透過打包的方式解決此問題，讓我們直接來使用它吧！</p>
+<p>初始專案結構：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">gulp-demo&#x2F;</span><br><span class="line">│</span><br><span class="line">├─── node_modules&#x2F;</span><br><span class="line">├─── source&#x2F;</span><br><span class="line">│   │</span><br><span class="line">│   └─── js&#x2F;</span><br><span class="line">│       │</span><br><span class="line">│       └─── all.js</span><br><span class="line">│</span><br><span class="line">├─── gulpfile.js</span><br><span class="line">├─── package-lock.json</span><br><span class="line">└─── package.json</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>套件連結：<a href="https://www.npmjs.com/package/gulp-babel" target="_blank" rel="external nofollow noopener noreferrer">gulp-babel</a>、<a href="https://www.npmjs.com/package/@babel/runtime-corejs3" target="_blank" rel="external nofollow noopener noreferrer">@babel/runtime-corejs3</a>、<a href="https://www.npmjs.com/package/@babel/plugin-transform-runtime" target="_blank" rel="external nofollow noopener noreferrer">@babel/plugin-transform-runtime</a></p>
+</blockquote>
+<p>安裝 Babel：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install gulp-babel @babel/core @babel/preset-env</span><br></pre></td></tr></table></figure>
+
+<p>安裝 Plugins：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install @babel/runtime-corejs3 @babel/plugin-transform-runtime</span><br></pre></td></tr></table></figure>
+
+<p>撰寫 ES6+ 版本代碼：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> arr = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>];</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> result = arr.filter(<span class="function">(<span class="params">item</span>) =&gt;</span> item &gt; <span class="number">3</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(result);</span><br></pre></td></tr></table></figure>
+
+<p>載入並使用 gulp-babel：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> gulp = <span class="built_in">require</span>(<span class="string">'gulp'</span>);</span><br><span class="line"><span class="keyword">const</span> babel = <span class="built_in">require</span>(<span class="string">'gulp-babel'</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> babelTask = <span class="function"><span class="params">()</span> =&gt;</span> gulp.src(<span class="string">'./source/js/*.js'</span>).pipe(babel()).pipe(gulp.dest(<span class="string">'public/js'</span>));</span><br><span class="line"></span><br><span class="line">exports.default = babelTask;</span><br></pre></td></tr></table></figure>
+
+<p>新增並配置 <code>.babelrc</code>：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"presets"</span>: [<span class="string">"@babel/preset-env"</span>],</span><br><span class="line">  <span class="attr">"plugins"</span>: [</span><br><span class="line">    [</span><br><span class="line">      <span class="string">"@babel/plugin-transform-runtime"</span>,</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="attr">"corejs"</span>: <span class="number">3</span></span><br><span class="line">      &#125;</span><br><span class="line">    ]</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>執行指定任務：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ gulp</span><br></pre></td></tr></table></figure>
+
+<p>編譯結果：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">'use strict'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> _interopRequireDefault = <span class="built_in">require</span>(<span class="string">'@babel/runtime-corejs3/helpers/interopRequireDefault'</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> _filter = _interopRequireDefault(<span class="built_in">require</span>(<span class="string">'@babel/runtime-corejs3/core-js-stable/instance/filter'</span>));</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> arr = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>];</span><br><span class="line"><span class="keyword">var</span> result = (<span class="number">0</span>, _filter[<span class="string">'default'</span>])(arr).call(arr, <span class="function"><span class="keyword">function</span> (<span class="params">item</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> item &gt; <span class="number">3</span>;</span><br><span class="line">&#125;);</span><br><span class="line"><span class="built_in">console</span>.log(result);</span><br></pre></td></tr></table></figure>
+
+<p>瀏覽器運行結果(報錯)：</p>
+<p><code style="color:#e74b4b">Uncaught ReferenceError: require is not defined</code></p>
+<p>很明顯的 require 語法是無法在瀏覽器上運行的，通常都得透過像是 Webpack 的打包工具，將代碼轉換為適合瀏覽器的可用格式才能成功運行，事實上，Webpack-stream 就是 Webpack 用來與 Gulp 搭配的集成工具，透過 Webpack 的配置方式即可完成操作，讓我們先從安裝開始。</p>
+<blockquote>
+<p>套件連結：<a href="https://www.npmjs.com/package/webpack-stream" target="_blank" rel="external nofollow noopener noreferrer">webpack-stream</a>、<a href="https://github.com/babel/babel-loader" target="_blank" rel="external nofollow noopener noreferrer">babel-loader</a></p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install webpack-stream babel-loader</span><br></pre></td></tr></table></figure>
+
+<p>Webpack 本身是 Webpack-stream 相依套件，我們只需下載 Webpack-stream 即可，另外也必須下載 babel-loader 作為編譯的預處理器。</p>
+<p>載入並使用 webpack-stream：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> gulp = <span class="built_in">require</span>(<span class="string">'gulp'</span>);</span><br><span class="line"><span class="keyword">const</span> babel = <span class="built_in">require</span>(<span class="string">'gulp-babel'</span>);</span><br><span class="line"><span class="keyword">const</span> webpack = <span class="built_in">require</span>(<span class="string">'webpack-stream'</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> babelTask = <span class="function"><span class="params">()</span> =&gt;</span></span><br><span class="line">  gulp</span><br><span class="line">    .src(<span class="string">'./source/js/*.js'</span>)</span><br><span class="line">    .pipe(</span><br><span class="line">      webpack(&#123;</span><br><span class="line">        mode: <span class="string">'production'</span>,</span><br><span class="line">        output: &#123;</span><br><span class="line">          filename: <span class="string">'all.js'</span>,</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="built_in">module</span>: &#123;</span><br><span class="line">          rules: [</span><br><span class="line">            &#123;</span><br><span class="line">              test: <span class="regexp">/\.m?js$/</span>,</span><br><span class="line">              exclude: <span class="regexp">/(node_modules|bower_components)/</span>,</span><br><span class="line">              use: &#123;</span><br><span class="line">                loader: <span class="string">'babel-loader'</span>,</span><br><span class="line">              &#125;,</span><br><span class="line">            &#125;,</span><br><span class="line">          ],</span><br><span class="line">        &#125;,</span><br><span class="line">      &#125;)</span><br><span class="line">    )</span><br><span class="line">    .pipe(gulp.dest(<span class="string">'public/js'</span>));</span><br><span class="line"></span><br><span class="line">exports.default = babelTask;</span><br></pre></td></tr></table></figure>
+
+<p>執行指定任務：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ gulp</span><br></pre></td></tr></table></figure>
+
+<p>瀏覽器運行結果(成功)：</p>
+<p><code>[ 4, 5 ]</code></p>
+<p>相信熟悉 Webpack 的人對於上面配置應該再清楚不過了，事實上，Webpack-stream 就是用來導入 Webpack 的 Gulp 工具，當 Webpack 所在的 Stream 處理完成時，即進入下一個 pipe 節點，由於 babel-loader 的使用，我們也不需要使用 gulp-babel 了，Webpack 與 Gulp 的結合就是採用此方法來完成，有興趣的可以在進行研究，之後也會推出一系列的 Webpack 文章，敬請期待。</p>
+<h2 id="踩坑-HTML-引用路徑該如何做響應變動"><a href="#踩坑-HTML-引用路徑該如何做響應變動" class="headerlink" title="踩坑 - HTML 引用路徑該如何做響應變動"></a>踩坑 - HTML 引用路徑該如何做響應變動</h2><p>在我們之前介紹到 minimist 命令行參數解析工具時，有提到關於 development 與 production 環境的差別，當時是以 gulp-clean-css 與 gulp-rename 套件去做示例，假設當前為 production 環境，需使用 gulp-clean-css 壓縮代碼並且使用 gulp-rename 更改名稱為 <code>.min.css</code> 檔，此時當我們開啟 index.html 檔案時，會發現 js 與 css 都沒有被載入進來，因為此環境編譯後檔案是不存在 <code>.js</code> 或 <code>.css</code> 檔案的，檔名通通都改成 <code>.min</code> 了，可能會有人手動去更改編譯前的引用路徑，但這有違使用自動化工具的目的，這時我們可以使用 gulp-html-replace 套件來解決這一個問題，讓我們直接開始吧！</p>
+<p>初始專案結構：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">gulp-demo&#x2F;</span><br><span class="line">│</span><br><span class="line">├─── node_modules&#x2F;</span><br><span class="line">├─── source&#x2F;</span><br><span class="line">│   │</span><br><span class="line">│   └─── css&#x2F;</span><br><span class="line">│       │</span><br><span class="line">│       └─── all.css</span><br><span class="line">│   │</span><br><span class="line">│   └─── index.html</span><br><span class="line">│</span><br><span class="line">├─── gulpfile.js</span><br><span class="line">├─── package-lock.json</span><br><span class="line">└─── package.json</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>套件連結：<a href="https://www.npmjs.com/package/del" target="_blank" rel="external nofollow noopener noreferrer">del</a>、<a href="https://www.npmjs.com/package/gulp-clean-css" target="_blank" rel="external nofollow noopener noreferrer">gulp-clean-css</a>、<a href="https://www.npmjs.com/search?q=gulp-if" target="_blank" rel="external nofollow noopener noreferrer">gulp-if</a>、<a href="https://www.npmjs.com/package/gulp-rename" target="_blank" rel="external nofollow noopener noreferrer">gulp-rename</a>、<a href="https://www.npmjs.com/package/minimist" target="_blank" rel="external nofollow noopener noreferrer">minimist</a>、<a href="https://www.npmjs.com/package/gulp-html-replace" target="_blank" rel="external nofollow noopener noreferrer">gulp-html-replace</a></p>
+</blockquote>
+<p>相關套件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install del gulp-clean-css gulp-if gulp-rename minimist</span><br></pre></td></tr></table></figure>
+
+<p>主要套件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install gulp-html-replace</span><br></pre></td></tr></table></figure>
+
+<p>載入並使用 gulp-html-replace：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> gulp = <span class="built_in">require</span>(<span class="string">'gulp'</span>);</span><br><span class="line"><span class="keyword">const</span> cleanCSS = <span class="built_in">require</span>(<span class="string">'gulp-clean-css'</span>);</span><br><span class="line"><span class="keyword">const</span> parseArgs = <span class="built_in">require</span>(<span class="string">'minimist'</span>);</span><br><span class="line"><span class="keyword">const</span> gulpif = <span class="built_in">require</span>(<span class="string">'gulp-if'</span>);</span><br><span class="line"><span class="keyword">const</span> rename = <span class="built_in">require</span>(<span class="string">'gulp-rename'</span>);</span><br><span class="line"><span class="keyword">const</span> del = <span class="built_in">require</span>(<span class="string">'del'</span>);</span><br><span class="line"><span class="keyword">const</span> htmlreplace = <span class="built_in">require</span>(<span class="string">'gulp-html-replace'</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 獲取命令行參數</span></span><br><span class="line"><span class="keyword">const</span> argv = parseArgs(process.argv.slice(<span class="number">2</span>)).env;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> htmlTask = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> gulp</span><br><span class="line">    .src(<span class="string">'./source/*.html'</span>)</span><br><span class="line">    .pipe(</span><br><span class="line">      gulpif(</span><br><span class="line">        argv === <span class="string">'production'</span>,</span><br><span class="line">        htmlreplace(&#123;</span><br><span class="line">          css: <span class="string">'css/all.min.css'</span>, <span class="comment">// 針對指定 name 做替換</span></span><br><span class="line">        &#125;)</span><br><span class="line">      )</span><br><span class="line">    )</span><br><span class="line">    .pipe(gulp.dest(<span class="string">'./public'</span>));</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> cssTask = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> gulp</span><br><span class="line">    .src(<span class="string">'source/css/*.css'</span>)</span><br><span class="line">    .pipe(gulpif(argv === <span class="string">'production'</span>, cleanCSS(&#123; <span class="attr">compatibility</span>: <span class="string">'ie8'</span> &#125;)))</span><br><span class="line">    .pipe(</span><br><span class="line">      gulpif(</span><br><span class="line">        argv === <span class="string">'production'</span>,</span><br><span class="line">        rename(&#123;</span><br><span class="line">          suffix: <span class="string">'.min'</span>,</span><br><span class="line">        &#125;)</span><br><span class="line">      )</span><br><span class="line">    )</span><br><span class="line">    .pipe(gulp.dest(<span class="string">'public/css'</span>));</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> clean = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> del([<span class="string">'public'</span>]);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">exports.default = gulp.series(clean, gulp.parallel(htmlTask, cssTask));</span><br></pre></td></tr></table></figure>
+
+<p>開啟 <code>./source/index.html</code> 並輸入以下註解：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- build:css --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span> <span class="attr">href</span>=<span class="string">"css/all.css"</span> /&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- endbuild --&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>在 production 環境執行指定任務：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ gulp --env production</span><br></pre></td></tr></table></figure>
+
+<p>編譯結果：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span> <span class="attr">href</span>=<span class="string">"css/all.min.css"</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>從上面結果可得知，使用 gulp-html-replace 套件確實可以響應引用路徑，它的原理其實很簡單，如下範例：</p>
+<p><code>index.html</code>：</p>
+<!-- prettier-ignore-start -->
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- build:css1 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span> <span class="attr">href</span>=<span class="string">"css/style1"</span> /&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- endbuild --&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- build:css2 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span> <span class="attr">href</span>=<span class="string">"css/style2"</span> /&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- endbuild --&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- build:js --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"js/js1"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"js/js2"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"js/js3"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- endbuild --&gt;</span></span><br><span class="line">    </span><br><span class="line">  <span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<!-- prettier-ignore-end -->
+
+<p><code>gulpfile.js</code>：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">htmlreplace(&#123;</span><br><span class="line">  css1: <span class="string">'css/style1.min.css'</span>, <span class="comment">// 針對 css1 塊做替換</span></span><br><span class="line">  css2: <span class="string">'css/style2.min.css'</span>, <span class="comment">// 針對 css2 塊做替換</span></span><br><span class="line">  js: <span class="string">'js/all.min.js'</span>, <span class="comment">// 針對 js 塊做替換</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>編譯結果：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span> <span class="attr">href</span>=<span class="string">"css/style1.min.css"</span> /&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span> <span class="attr">href</span>=<span class="string">"css/style2.min.css"</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"js/all.min.js"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>使用 gulp-html-replace 的關鍵在於 <code>&lt;!-- build:name --&gt;</code> 註解中的 name 需要與 <code>htmlreplace</code> 中的 <code>key</code> 相互對應，告知此區塊開始進行處理，並且加入<code>&lt;!-- endbuild --&gt;</code> 告知此處結束處理，這邊要注意的是此操作是以塊的方式進行處理，如同上面範例的 js 區塊，不管有幾行的代碼，通通都會被取代成相對應的代碼，搭配 gulp-if 等相關套件即可解決 gulp-rename 後引用路徑錯誤的問題，達到真正的自動化效果。</p>
+<h2 id="總結-Gulp-常用開發環境"><a href="#總結-Gulp-常用開發環境" class="headerlink" title="總結 - Gulp 常用開發環境"></a>總結 - Gulp 常用開發環境</h2><table>
+<thead>
+<tr>
+<th>主要套件</th>
+<th>優化套件</th>
+<th>輔助套件</th>
+<th>通用套件</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a href="https://www.npmjs.com/package/gulp-babel" target="_blank" rel="external nofollow noopener noreferrer">gulp-babel</a></td>
+<td><a href="https://www.npmjs.com/package/gulp-clean-css" target="_blank" rel="external nofollow noopener noreferrer">gulp-clean-css</a></td>
+<td><a href="https://www.npmjs.com/package/gulp-rename" target="_blank" rel="external nofollow noopener noreferrer">gulp-rename</a></td>
+<td><a href="https://www.npmjs.com/package/browser-sync" target="_blank" rel="external nofollow noopener noreferrer">browser-sync</a></td>
+</tr>
+<tr>
+<td><a href="https://www.npmjs.com/package/gulp-pug" target="_blank" rel="external nofollow noopener noreferrer">gulp-pug</a></td>
+<td><a href="https://www.npmjs.com/package/gulp-htmlmin" target="_blank" rel="external nofollow noopener noreferrer">gulp-htmlmin</a></td>
+<td><a href="https://www.npmjs.com/package/gulp-html-replace" target="_blank" rel="external nofollow noopener noreferrer">gulp-html-replace</a></td>
+<td><a href="https://www.npmjs.com/package/minimist" target="_blank" rel="external nofollow noopener noreferrer">minimist</a></td>
+</tr>
+<tr>
+<td><a href="https://www.npmjs.com/package/gulp-sass" target="_blank" rel="external nofollow noopener noreferrer">gulp-sass</a></td>
+<td><a href="https://www.npmjs.com/package/gulp-imagemin" target="_blank" rel="external nofollow noopener noreferrer">gulp-imagemin</a></td>
+<td><a href="https://www.npmjs.com/package/gulp-sourcemaps" target="_blank" rel="external nofollow noopener noreferrer">gulp-sourcemaps</a></td>
+<td><a href="https://www.npmjs.com/package/webpack-stream" target="_blank" rel="external nofollow noopener noreferrer">webpack-stream</a></td>
+</tr>
+<tr>
+<td><a href="https://www.npmjs.com/package/gulp-postcss" target="_blank" rel="external nofollow noopener noreferrer">gulp-postcss</a></td>
+<td><a href="https://www.npmjs.com/package/gulp-uglify" target="_blank" rel="external nofollow noopener noreferrer">gulp-uglify</a></td>
+<td><a href="https://www.npmjs.com/package/gulp-if" target="_blank" rel="external nofollow noopener noreferrer">gulp-if</a></td>
+<td><a href="https://www.npmjs.com/package/del" target="_blank" rel="external nofollow noopener noreferrer">del</a></td>
+</tr>
+</tbody></table>
+<p>安裝套件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm i gulp-babel gulp-sass gulp-postcss gulp-clean-css gulp-htmlmin gulp-imagemin gulp-uglify gulp-rename gulp-html-replace gulp-sourcemaps gulp-if browser-sync minimist webpack-stream del</span><br></pre></td></tr></table></figure>
+
+<p>Babel 相關套件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm i @babel/core @babel/preset-env @babel/plugin-transform-runtime @babel/runtime-corejs3</span><br></pre></td></tr></table></figure>
+
+<p>PostCSS 相關套件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm i autoprefixer</span><br></pre></td></tr></table></figure>
+
+<p>Webpack-stream 相關套件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm i babel-loader</span><br></pre></td></tr></table></figure>
+
+<p>新增並配置 <code>gulpfile.js</code>：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> gulp = <span class="built_in">require</span>(<span class="string">'gulp'</span>);</span><br><span class="line"><span class="keyword">const</span> sass = <span class="built_in">require</span>(<span class="string">'gulp-sass'</span>);</span><br><span class="line"><span class="keyword">const</span> pug = <span class="built_in">require</span>(<span class="string">'gulp-pug'</span>);</span><br><span class="line"><span class="keyword">const</span> babel = <span class="built_in">require</span>(<span class="string">'gulp-babel'</span>);</span><br><span class="line"><span class="keyword">const</span> postcss = <span class="built_in">require</span>(<span class="string">'gulp-postcss'</span>);</span><br><span class="line"><span class="keyword">const</span> autoprefixer = <span class="built_in">require</span>(<span class="string">'autoprefixer'</span>);</span><br><span class="line"><span class="keyword">const</span> sourcemaps = <span class="built_in">require</span>(<span class="string">'gulp-sourcemaps'</span>);</span><br><span class="line"><span class="keyword">const</span> browserSync = <span class="built_in">require</span>(<span class="string">'browser-sync'</span>).create();</span><br><span class="line"><span class="keyword">const</span> del = <span class="built_in">require</span>(<span class="string">'del'</span>);</span><br><span class="line"><span class="keyword">const</span> htmlmin = <span class="built_in">require</span>(<span class="string">'gulp-htmlmin'</span>);</span><br><span class="line"><span class="keyword">const</span> cleanCSS = <span class="built_in">require</span>(<span class="string">'gulp-clean-css'</span>);</span><br><span class="line"><span class="keyword">const</span> uglify = <span class="built_in">require</span>(<span class="string">'gulp-uglify'</span>);</span><br><span class="line"><span class="keyword">const</span> imagemin = <span class="built_in">require</span>(<span class="string">'gulp-imagemin'</span>);</span><br><span class="line"><span class="keyword">const</span> parseArgs = <span class="built_in">require</span>(<span class="string">'minimist'</span>);</span><br><span class="line"><span class="keyword">const</span> gulpif = <span class="built_in">require</span>(<span class="string">'gulp-if'</span>);</span><br><span class="line"><span class="keyword">const</span> rename = <span class="built_in">require</span>(<span class="string">'gulp-rename'</span>);</span><br><span class="line"><span class="keyword">const</span> htmlreplace = <span class="built_in">require</span>(<span class="string">'gulp-html-replace'</span>);</span><br><span class="line"><span class="keyword">const</span> webpack = <span class="built_in">require</span>(<span class="string">'webpack-stream'</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">/* --- 獲取命令行參數 --- */</span></span><br><span class="line"><span class="keyword">const</span> argv = parseArgs(process.argv.slice(<span class="number">2</span>)).env;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* --- 編譯 Sass/SCSS --- */</span></span><br><span class="line"><span class="keyword">const</span> scssTask = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> gulp</span><br><span class="line">    .src(<span class="string">'./source/scss/*.scss'</span>)</span><br><span class="line">    .pipe(sourcemaps.init())</span><br><span class="line">    .pipe(sass().on(<span class="string">'error'</span>, sass.logError))</span><br><span class="line">    .pipe(postcss())</span><br><span class="line">    .pipe(gulpif(argv === <span class="string">'production'</span>, cleanCSS(&#123; <span class="attr">compatibility</span>: <span class="string">'ie8'</span> &#125;)))</span><br><span class="line">    .pipe(</span><br><span class="line">      gulpif(</span><br><span class="line">        argv === <span class="string">'production'</span>,</span><br><span class="line">        rename(&#123;</span><br><span class="line">          suffix: <span class="string">'.min'</span>,</span><br><span class="line">        &#125;)</span><br><span class="line">      )</span><br><span class="line">    )</span><br><span class="line">    .pipe(sourcemaps.write(<span class="string">'./'</span>))</span><br><span class="line">    .pipe(gulp.dest(<span class="string">'./public/css'</span>));</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* --- 編譯 HTML --- */</span></span><br><span class="line"><span class="keyword">const</span> htmlTask = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> gulp</span><br><span class="line">    .src(<span class="string">'source/**/*.html'</span>)</span><br><span class="line">    .pipe(gulpif(argv === <span class="string">'production'</span>, htmlmin(&#123; <span class="attr">collapseWhitespace</span>: <span class="literal">true</span> &#125;)))</span><br><span class="line">    .pipe(</span><br><span class="line">      gulpif(</span><br><span class="line">        argv === <span class="string">'production'</span>,</span><br><span class="line">        htmlreplace(&#123;</span><br><span class="line">          css: <span class="string">'css/all.min.css'</span>,</span><br><span class="line">          js: <span class="string">'js/all.min.js'</span>,</span><br><span class="line">        &#125;)</span><br><span class="line">      )</span><br><span class="line">    )</span><br><span class="line">    .pipe(gulp.dest(<span class="string">'./public/'</span>));</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* --- 編譯 ES6+ 代碼 --- */</span></span><br><span class="line"><span class="keyword">const</span> babelTask = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> gulp</span><br><span class="line">    .src(<span class="string">'./source/js/*.js'</span>)</span><br><span class="line">    .pipe(babel())</span><br><span class="line">    .pipe(</span><br><span class="line">      webpack(&#123;</span><br><span class="line">        mode: <span class="string">'development'</span>,</span><br><span class="line">        output: &#123;</span><br><span class="line">          filename: <span class="string">'all.js'</span>,</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="built_in">module</span>: &#123;</span><br><span class="line">          rules: [</span><br><span class="line">            &#123;</span><br><span class="line">              test: <span class="regexp">/\.m?js$/</span>,</span><br><span class="line">              exclude: <span class="regexp">/(node_modules|bower_components)/</span>,</span><br><span class="line">              use: &#123;</span><br><span class="line">                loader: <span class="string">'babel-loader'</span>,</span><br><span class="line">              &#125;,</span><br><span class="line">            &#125;,</span><br><span class="line">          ],</span><br><span class="line">        &#125;,</span><br><span class="line">      &#125;)</span><br><span class="line">    )</span><br><span class="line">    .pipe(gulpif(argv === <span class="string">'production'</span>, uglify()))</span><br><span class="line">    .pipe(</span><br><span class="line">      gulpif(</span><br><span class="line">        argv === <span class="string">'production'</span>,</span><br><span class="line">        rename(&#123;</span><br><span class="line">          suffix: <span class="string">'.min'</span>,</span><br><span class="line">        &#125;)</span><br><span class="line">      )</span><br><span class="line">    )</span><br><span class="line">    .pipe(gulp.dest(<span class="string">'./public/js/'</span>));</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* --- 本地伺服器 --- */</span></span><br><span class="line"><span class="keyword">const</span> watch = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  browserSync.init(&#123;</span><br><span class="line">    server: &#123;</span><br><span class="line">      baseDir: <span class="string">'./public'</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;);</span><br><span class="line">  gulp.watch(<span class="string">'./source/js/*.js'</span>, gulp.series(babelTask));</span><br><span class="line">  gulp.watch(<span class="string">'./source/*.html'</span>, gulp.series(htmlTask));</span><br><span class="line">  gulp.watch(<span class="string">'./source/scss/*.scss'</span>, gulp.series(scssTask));</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* --- 刪除指定目錄檔案 --- */</span></span><br><span class="line"><span class="keyword">const</span> cleanTask = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> del([<span class="string">'./public'</span>]);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* --- 壓縮圖檔 --- */</span></span><br><span class="line"><span class="keyword">const</span> imageTask = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> gulp</span><br><span class="line">    .src(<span class="string">'source/img/*'</span>)</span><br><span class="line">    .pipe(gulpif(argv === <span class="string">'production'</span>, imagemin()))</span><br><span class="line">    .pipe(gulp.dest(<span class="string">'public/img'</span>));</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  scss: scssTask, <span class="comment">// 單獨編譯 Sass/SCSS</span></span><br><span class="line">  html: htmlTask, <span class="comment">// 單獨編譯 HTML</span></span><br><span class="line">  babel: babelTask, <span class="comment">// 單獨編譯 ES6+ 代碼</span></span><br><span class="line">  image: imageTask, <span class="comment">// 壓縮圖檔</span></span><br><span class="line">  clean: cleanTask, <span class="comment">// 刪除指定檔案目錄</span></span><br><span class="line">  serve: gulp.series(cleanTask, gulp.parallel(scssTask, htmlTask, babelTask, imageTask), watch),</span><br><span class="line">  build: gulp.series(cleanTask, gulp.parallel(scssTask, htmlTask, babelTask, imageTask)),</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>新增並配置 <code>.babelrc</code>：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"presets"</span>: [<span class="string">"@babel/preset-env"</span>],</span><br><span class="line">  <span class="attr">"plugins"</span>: [</span><br><span class="line">    [</span><br><span class="line">      <span class="string">"@babel/plugin-transform-runtime"</span>,</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="attr">"corejs"</span>: <span class="number">3</span></span><br><span class="line">      &#125;</span><br><span class="line">    ]</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>新增並配置 <code>postcss.config.js</code>：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  plugins: [<span class="built_in">require</span>(<span class="string">'autoprefixer'</span>)],</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>新增並配置 <code>.browserslistrc</code>：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">last 2 version</span><br><span class="line">&gt; 1%</span><br><span class="line">IE 10</span><br></pre></td></tr></table></figure>
+
+<p>學到了這邊，看到很多相關文章都在探討 Webpack 將會取代 Gulp 成為主流，但我認為兩者本質上是不同的東西，何來比較？各有各的優缺點，雙方是互補的，在上面範例中，由於 require 無法運行在瀏覽器上面，我也是導入 Webpack-stream 用以打包代碼，並沒有誰好誰不好的說法，Gulp 適合小型開發，配置簡單，輕鬆上手，而 Wepack 適合開發稍有規模的專案，尤其是 SPA (單頁式應用)，對於筆者來講，兩個工具都把它學起來，就沒有這麼多的麻煩了，之後也會有一系列的 Webpack 文章，敬請期待。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Gulp-4/" rel="tag"># Gulp 4</a>
+              <a href="/tags/Node-js/" rel="tag"># Node.js</a>
+              <a href="/tags/w3HexSchool/" rel="tag"># w3HexSchool</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2020-02-03-gulp-gulpfilebabel/" rel="next" title="Gulp 前端自動化 - 使用 ES6 Module 撰寫 Gulpfile">
+                  <i class="fa fa-chevron-left"></i> Gulp 前端自動化 - 使用 ES6 Module 撰寫 Gulpfile
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2020-02-15-nodejs-nvm/" rel="prev" title="在 Windows 環境下使用 nvm 管控 NodeJS">
+                  在 Windows 環境下使用 nvm 管控 NodeJS <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+          
+            
+              
+    <div class="comments" id="gitalk-container"></div>
+
+            
+          
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#筆記重點"><span class="nav-number">2.</span> <span class="nav-text">筆記重點</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#本系列文章"><span class="nav-number">3.</span> <span class="nav-text">本系列文章</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#踩坑-require-語法無法在-Browser-運行"><span class="nav-number">4.</span> <span class="nav-text">踩坑 - require 語法無法在 Browser 運行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#踩坑-HTML-引用路徑該如何做響應變動"><span class="nav-number">5.</span> <span class="nav-text">踩坑 - HTML 引用路徑該如何做響應變動</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#總結-Gulp-常用開發環境"><span class="nav-number">6.</span> <span class="nav-text">總結 - Gulp 常用開發環境</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Roya" src="/images/userLogo.jpg">
+  <p class="site-author-name" itemprop="name">Roya</p>
+  <div class="site-description" itemprop="description">Front-End Web Developer<br>學會運用比學會使用還要來的有用</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">69</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/awdr74100" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;awdr74100" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:a78945612385238@gmail.com" title="E-Mail &amp;rarr; mailto:a78945612385238@gmail.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Roya</span>
+</div>
+  <span class="post-meta-divider">轉載文章時請附上作者暱稱與原文連結</span>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+
+<script src="/js/utils.js?v=7.4.2.js"></script>
+
+
+<script src="/js/schemes/pisces.js?v=7.4.2.js"></script>
+
+
+<script src="/js/next-boot.js?v=7.4.2.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+  
+<script src="/js/local-search.js?v=7.4.2.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '7cdb0d531869e18caad8',
+      clientSecret: '0b6a38cef9c3ae1dcf0ea66e916ab68823dbab52',
+      repo: 'awdr74100.github.io',
+      owner: 'awdr74100',
+      admin: ['awdr74100'],
+      id: '35e104c91c9cee0582b57b892be4bd71',
+        language: 'zh-TW',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+  
+
+
+</body>
+</html>

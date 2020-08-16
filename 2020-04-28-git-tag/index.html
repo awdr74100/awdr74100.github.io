@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon-128.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png?v=7.4.2">
+  <link rel="mask-icon" href="/images/favicon-none.svg?v=7.4.2" color="#222">
+  <link rel="alternate" href="/atom.xml" title="Roya's Blog" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"default"},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '複製',
+      copy_success: '複製成功',
+      copy_failure: '複製失敗'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="在我們使用某些函式庫或框架進行開發時，途中可能會遇到某些無法理解的內部錯誤，這時最直接的方法就是到官方 GitHub 中的 releases 頁面查找是否有已釋出的修復版本並進行更新；這邊你所看到的版本號其實是由 Git 為特定版本進行標記所形成的標籤，標籤就如同分支一般的存在，但本質上還是有些差異，該如何正確使用標籤標記特定版本以及標籤與分支何謂本質上的差別，本篇都會講到。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Git 版本控制系統 - 使用標籤為特定版本號做標記">
+<meta property="og:url" content="https://awdr74100.github.io/2020-04-28-git-tag/index.html">
+<meta property="og:site_name" content="Roya&#39;s Blog">
+<meta property="og:description" content="在我們使用某些函式庫或框架進行開發時，途中可能會遇到某些無法理解的內部錯誤，這時最直接的方法就是到官方 GitHub 中的 releases 頁面查找是否有已釋出的修復版本並進行更新；這邊你所看到的版本號其實是由 Git 為特定版本進行標記所形成的標籤，標籤就如同分支一般的存在，但本質上還是有些差異，該如何正確使用標籤標記特定版本以及標籤與分支何謂本質上的差別，本篇都會講到。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/KyKR9pC.png">
+<meta property="og:image" content="https://i.imgur.com/G9KzWkc.png">
+<meta property="og:image" content="https://i.imgur.com/QAJj4sh.png">
+<meta property="og:image" content="https://i.imgur.com/sOYtuKd.png">
+<meta property="og:image" content="https://i.imgur.com/m5JPLBI.png">
+<meta property="og:image" content="https://i.imgur.com/XsFkRbm.png">
+<meta property="og:image" content="https://i.imgur.com/U3aKeu3.png">
+<meta property="og:image" content="https://i.imgur.com/tlhg2Vm.png">
+<meta property="og:image" content="https://i.imgur.com/x03kiLz.png">
+<meta property="og:image" content="https://i.imgur.com/V9iaICz.png">
+<meta property="og:image" content="https://i.imgur.com/Af53gYG.png">
+<meta property="og:image" content="https://i.imgur.com/CXOIDzk.png">
+<meta property="og:image" content="https://i.imgur.com/6H7WerU.png">
+<meta property="og:image" content="https://i.imgur.com/atBgK2s.png">
+<meta property="og:image" content="https://i.imgur.com/qFcwXBo.png">
+<meta property="og:image" content="https://i.imgur.com/1dOSXXU.png">
+<meta property="article:published_time" content="2020-04-28T09:30:02.000Z">
+<meta property="article:modified_time" content="2020-04-29T11:59:02.000Z">
+<meta property="article:author" content="Roya">
+<meta property="article:tag" content="Git">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/KyKR9pC.png">
+
+<link rel="canonical" href="https://awdr74100.github.io/2020-04-28-git-tag/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Git 版本控制系統 - 使用標籤為特定版本號做標記 | Roya's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-150715469-1"></script>
+    <script>
+      var host = window.location.hostname;
+      if (host !== "localhost" || !true) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-150715469-1');
+      }
+    </script>
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Roya's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">現代化 Web 開發技術學習分享</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>標籤<span class="badge">28</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分類<span class="badge">9</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>歸檔<span class="badge">69</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none" placeholder="搜尋..." spellcheck="false" type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://awdr74100.github.io/2020-04-28-git-tag/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/userLogo.jpg">
+      <meta itemprop="name" content="Roya">
+      <meta itemprop="description" content="Front-End Web Developer<br>學會運用比學會使用還要來的有用">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Roya's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          Git 版本控制系統 - 使用標籤為特定版本號做標記
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-04-28 17:30:02" itemprop="dateCreated datePublished" datetime="2020-04-28T17:30:02+08:00">2020-04-28</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-04-29 19:59:02" itemprop="dateModified" datetime="2020-04-29T19:59:02+08:00">2020-04-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Git/" itemprop="url" rel="index">
+                    <span itemprop="name">Git</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在我們使用某些函式庫或框架進行開發時，途中可能會遇到某些無法理解的內部錯誤，這時最直接的方法就是到官方 GitHub 中的 releases 頁面查找是否有已釋出的修復版本並進行更新；這邊你所看到的版本號其實是由 Git 為特定版本進行標記所形成的標籤，標籤就如同分支一般的存在，但本質上還是有些差異，該如何正確使用標籤標記特定版本以及標籤與分支何謂本質上的差別，本篇都會講到。</p>
+<h2 id="筆記重點"><a href="#筆記重點" class="headerlink" title="筆記重點"></a>筆記重點</h2><ul>
+<li>新增標籤</li>
+<li>刪除標籤</li>
+<li>遠端標籤相關操作</li>
+<li>標籤與分支差異</li>
+<li>Git 指令回顧</li>
+</ul>
+<h2 id="新增標籤"><a href="#新增標籤" class="headerlink" title="新增標籤"></a>新增標籤</h2><p>讓我們先新增一個專案並提交數次 commit 紀錄：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">mkdir project</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> project</span><br><span class="line"></span><br><span class="line">git init</span><br><span class="line"></span><br><span class="line">touch index.html</span><br><span class="line"></span><br><span class="line">git add .</span><br><span class="line"></span><br><span class="line">git commit -m <span class="string">'add index.html'</span></span><br><span class="line"></span><br><span class="line">touch all.css</span><br><span class="line"></span><br><span class="line">git add .</span><br><span class="line"></span><br><span class="line">git commit -m <span class="string">'add index.html'</span></span><br><span class="line"></span><br><span class="line">touch all.js</span><br><span class="line"></span><br><span class="line">git add .</span><br><span class="line"></span><br><span class="line">git commit -m <span class="string">'add all.js'</span></span><br></pre></td></tr></table></figure>
+
+<p>查看目前日誌：</p>
+<p><img src="https://i.imgur.com/KyKR9pC.png" alt="查看目前 commit 紀錄-1"></p>
+<p>要在 Git 中使用標籤非常的簡單，先讓我們來執行以下命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git tag v1.0.0</span><br></pre></td></tr></table></figure>
+
+<p>此時你會發現所在的 commit 節點新增了一個名為 <code>tag: v1.0.0</code> 的狀態：</p>
+<p><img src="https://i.imgur.com/G9KzWkc.png" alt="查看目前 commit 紀錄-2"></p>
+<p>這就是新增標籤的方法，是不是非常的簡單？標籤名稱你可以隨意命名，但通常我們都是用來標記當前的開發版本，讓我們在試一次：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git tag v0.9.0 2755da8</span><br></pre></td></tr></table></figure>
+
+<p>事實上，標籤的語法與分支幾乎差不多，只不過關鍵字一個是 <code>branch</code> 一個是 <code>tag</code> 的差別而已，你也可以在指定 commit 節點貼上標籤，就如同上面所示，讓我們來看目前的狀態：</p>
+<p><img src="https://i.imgur.com/QAJj4sh.png" alt="查看目前 commit 紀錄-3"></p>
+<p>確實 <code>2755da8</code> 節點也被貼上了標籤，有沒有注意到我都是用 “貼上” 一詞？標籤與分支同樣都屬於貼紙一般的存在，並不是說你刪除了哪一個分支或標籤這一個節點就不見了，頂多只是這個貼紙被撕掉了，你還是可以重貼這張貼紙。</p>
+<p>請注意，我們上面使用的標籤形式都是屬於輕量標籤 (lightweight tag)，這邊還有另外一種標籤形式為帶註解標籤 (annotated tag)，命令如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git tag v0.8.1 v0.9.0^ -am <span class="string">'Bug fix'</span></span><br></pre></td></tr></table></figure>
+
+<p>如同我們前面所提到，標籤與分支都是如同貼紙一般的存在，你也可以使用標籤搭配相對路徑的方式，指定作用的 commit 節點，上面示範了使用 <code>^</code> 指定前一個節點，這邊的 <code>-am</code> 參數等同於 <code>-a + -m</code>，<code>-a</code> 代表請 Git 幫你建立帶註解的標籤，而後面的 <code>-m</code> 如同 commit 的 <code>-m</code>，即訊息內容，讓我們來看目前的狀態：</p>
+<p><img src="https://i.imgur.com/sOYtuKd.png" alt="查看目前 commit 紀錄-4"></p>
+<p>這時你會發現 <code>2b7826b</code> 節點也被貼上標籤了，但看起來輕量標籤與帶註解標籤好像沒什麼差別？讓我們使用以下指令將標籤記錄顯示出來：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git show v0.9.0</span><br></pre></td></tr></table></figure>
+
+<p><code>git show</code> 主要用來顯示指定提交版本的異動，你可以在後面指定標籤、分支、SHA-1 等屬性，如果都沒有指定，預設即會顯示 <code>HEAD</code> 的版本內容，讓我們來看此時結果為何：</p>
+<p><img src="https://i.imgur.com/m5JPLBI.png" alt="git show 0.9.0"></p>
+<p>你會發現輕量標籤真的就只是一張很單純的貼紙，沒有任何的註解內容，顯示的都只是預設就該顯示的內容，這也是官方比較推薦使用帶註解標籤的原因，讓我們來看帶註解標籤有何不同：</p>
+<p><img src="https://i.imgur.com/XsFkRbm.png" alt="git show 0.8.1"></p>
+<p>帶註解標籤比輕量標籤多了一些資訊，可以很直接看到是誰將這張貼紙貼了上去以及貼紙的內容，我自己是比較常用帶註解標籤，既然你都要貼標籤了，必定是有其原因，這時如果你使用輕量標籤，日後就沒辦法檢視貼這張標籤的原因了，在這邊補充幾個指令：</p>
+<ul>
+<li>顯示所有標籤</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git tag</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>顯示所有標籤及資訊 (優先顯示帶註解標籤內容，輕量標籤則顯示 commit 訊息內容)</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git tag -n</span><br></pre></td></tr></table></figure>
+
+<p>這邊比較特別的是 <code>git tag -n</code> 命令，讓我們來執行它並查看結果：</p>
+<p><img src="https://i.imgur.com/U3aKeu3.png" alt="git tag -n"></p>
+<p>你會發現與單純顯示標籤不同，多了訊息的資訊，這一個訊息有可能為帶註解標籤內容或者 commit 訊息內容，這邊請記住一個原則，此訊息內容優先選擇帶註解標籤內容，如為輕量標籤則顯示 commit 訊息內容。</p>
+<p>到這邊已經完成對輕量標籤與帶註解標籤的相關操作了，其實你真的不用想得太複雜，分支的指令與標籤的指令真得幾乎一模一樣，比如說等等會介紹的刪除標籤，其實你應該也猜得出來指令是什麼了，讓我們繼續看下去。</p>
+<h2 id="刪除標籤"><a href="#刪除標籤" class="headerlink" title="刪除標籤"></a>刪除標籤</h2><p>刪除標籤並沒有分所謂的輕量標籤或帶註解標籤，通通一視同仁，使用以下指令刪除標籤：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git tag -d 0.9.0</span><br></pre></td></tr></table></figure>
+
+<p>此時會跳出標籤已被刪除的提示：</p>
+<p><img src="https://i.imgur.com/tlhg2Vm.png" alt="git tag -d"></p>
+<p>讓我們來看目前日誌：</p>
+<p><img src="https://i.imgur.com/x03kiLz.png" alt="查看目前 commit 紀錄-5"></p>
+<p>確實 <code>v0.9.0</code> 標籤被我們刪除了，在標籤刪除的操作中，並沒有像分支有分所謂的 <code>-d</code> 或 <code>-D</code>，畢竟標籤就只是單純的黏貼作用，隨時都可以取代。</p>
+<p>以上就是標籤在本地端的相關操作，接下來進入到重頭戲將標籤推至遠端數據庫的部分。</p>
+<h2 id="遠端標籤相關操作"><a href="#遠端標籤相關操作" class="headerlink" title="遠端標籤相關操作"></a>遠端標籤相關操作</h2><p>請先至 GitHub 開一個遠端數據庫並將本地內容 Push 上去：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git remote add origin git@github.com:awdr74100/tag-demo.git</span><br><span class="line"></span><br><span class="line">git push -u origin --all</span><br></pre></td></tr></table></figure>
+
+<p>此時的狀態為：</p>
+<p><img src="https://i.imgur.com/V9iaICz.png" alt="查看目前 commit 紀錄-6"></p>
+<p>讓我們來看 GitHub 中的 releases 頁面是否有本地的 Tag 標籤：</p>
+<p><img src="https://i.imgur.com/Af53gYG.png" alt="GitHub reslease"></p>
+<p>放心，沒有是很正常的，<code>git push</code> 預設是不會把標籤連同 Push 上去的，得另外使用以下指令：</p>
+<ul>
+<li>指定標籤上傳至遠端數據庫：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push origin v1.0.0</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>全部標籤上傳至遠端數據庫：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push origin --tags</span><br></pre></td></tr></table></figure>
+
+<p>此時會提示遠端新增了本地 Push 上去的分支：</p>
+<p><img src="https://i.imgur.com/CXOIDzk.png" alt="git push origin --tags"></p>
+<p>查看 GitHub Releases 頁面是否成功提交：</p>
+<p><img src="https://i.imgur.com/6H7WerU.png" alt="GitHub Releases"></p>
+<p>大功告成！事實上，本地標籤是被推至 GitHub 中的 Tag 頁面，Releases 頁面是 GitHub 的高級功能，你可以針對這一個版本寫些內容，如下所示：</p>
+<blockquote>
+<p>Tags &gt; Create release</p>
+</blockquote>
+<p><img src="https://i.imgur.com/atBgK2s.png" alt="Create release"></p>
+<p>是不是很酷？以後你也可以發行自己的版本囉，這邊再補充幾個指令：</p>
+<ul>
+<li>刪除遠端標籤</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push origin :v0.8.1</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>刪除遠端標籤 (v1.7 以後版本可使用)</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push --delete origin v0.8.1</span><br></pre></td></tr></table></figure>
+
+<p>遠端標籤刪除的命令與分支也是幾乎一樣，Push 一個空的標籤即可，在較新的 Git 版本，你也可以使用 <code>--delete</code> 參數刪除標籤。但這邊要注意，如果存在同名的分支或標籤，Git 會因為不知道選擇哪個而跳錯，解決辦法也很簡單，使用以下命令：</p>
+<ul>
+<li>刪除遠端標籤 (明確命令)：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push origin :refs/tags/&lt;remote_tag&gt;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>刪除遠端分支 (明確命令)：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push origin :refs/heads/&lt;remote_branch&gt;</span><br></pre></td></tr></table></figure>
+
+<p>雖然說一般人不太可能把分支名取作 <code>v0.8.1</code>，但這邊還是稍微注意一下比較好。</p>
+<p>這邊再做最後一個補充：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> git@github.com:awdr74100/tag-demo.git tag-demo-copy</span><br></pre></td></tr></table></figure>
+
+<p>標籤不需要像分支得透過 <code>git checkout -t origin/&lt;remote_branch&gt;</code> 才能在本地使用遠端分支，克隆的同時，就已經把全部標籤取回本地了。</p>
+<h2 id="標籤與分支差異"><a href="#標籤與分支差異" class="headerlink" title="標籤與分支差異"></a>標籤與分支差異</h2><p>跑過一次上面的流程，相信各位差不多了解標籤的使用了，讓我們回到重點，標籤與分支何謂本質上的差異，先讓我們來看目前的日誌：</p>
+<p><img src="https://i.imgur.com/qFcwXBo.png" alt="查看目前 commit 紀錄-7"></p>
+<p>新增一個分支並提交一次 commit 紀錄：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">git checkout -b develop</span><br><span class="line"></span><br><span class="line">touch db.json</span><br><span class="line"></span><br><span class="line">git add .</span><br><span class="line"></span><br><span class="line">git commit -m <span class="string">'add db.json'</span></span><br></pre></td></tr></table></figure>
+
+<p>查看目前日誌：</p>
+<p><img src="https://i.imgur.com/1dOSXXU.png" alt="查看目前 commit 紀錄-8"></p>
+<p>發現差別了嗎？分支會隨著 commit 而移動，標籤只會停留在當時黏貼的位置，就是這麼簡單，沒有其他差異了，兩者都是貼紙一般的存在，你想要怎麼撕怎麼貼，隨你開心。</p>
+<p>實務上，分支會使用在特定部分的開發，而標籤則是使用在特定版本的標記。</p>
+<h2 id="Git-指令回顧"><a href="#Git-指令回顧" class="headerlink" title="Git 指令回顧"></a>Git 指令回顧</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 新增標籤 (輕量標籤)</span></span><br><span class="line">git tag &lt;tag_name&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 指定節點新增標籤 (輕量標籤)</span></span><br><span class="line">git tag &lt;tag_name&gt; &lt;SHA-1&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 新增標籤 (帶註解標籤)</span></span><br><span class="line">git tag &lt;tag_name&gt; -am <span class="string">'message'</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 指定節點新增標籤 (帶註解標籤)</span></span><br><span class="line">git tag &lt;tag_name&gt; &lt;SHA-1&gt; -am <span class="string">'message'</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 指定節點新增標籤 (同上)</span></span><br><span class="line">git tag &lt;tag_name&gt; &lt;SHA-1&gt; -a -m <span class="string">'message'</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 顯示提交版本異動</span></span><br><span class="line">git show</span><br><span class="line"></span><br><span class="line"><span class="comment"># 顯示提交版本異動 (標籤示範)</span></span><br><span class="line">git show &lt;tag_name&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 顯示所有標籤</span></span><br><span class="line">git tag</span><br><span class="line"></span><br><span class="line"><span class="comment"># 顯示所有標籤及資訊 (優先顯示帶註解標籤內容，輕量標籤則顯示 commit 訊息內容)</span></span><br><span class="line">git tag -n</span><br><span class="line"></span><br><span class="line"><span class="comment"># 刪除指定標籤</span></span><br><span class="line">git tag -d &lt;tag_name&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 指定標籤上傳至遠端數據庫</span></span><br><span class="line">git push &lt;repo_name&gt; &lt;tag_name&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 全部標籤上傳至遠端數據庫</span></span><br><span class="line">git push &lt;repo_name&gt; --tags</span><br><span class="line"></span><br><span class="line"><span class="comment"># 刪除遠端標籤</span></span><br><span class="line">git push &lt;repo_name&gt; :&lt;remote_tag&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 刪除遠端標籤 (v1.7 以後版本可使用)</span></span><br><span class="line">git push --delete &lt;repo_name&gt; &lt;remote_tag&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 刪除遠端標籤 (明確命令)</span></span><br><span class="line">git push &lt;repo_name&gt; :refs/tags/&lt;remote_tag&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 刪除遠端分支 (明確命令)</span></span><br><span class="line">git push &lt;repo_name&gt; :refs/heads/&lt;remote_branch&gt;</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Git/" rel="tag"># Git</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2020-04-27-git-diff/" rel="next" title="Git 版本控制系統 - 比對檔案版本差異與標示說明">
+                  <i class="fa fa-chevron-left"></i> Git 版本控制系統 - 比對檔案版本差異與標示說明
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2020-05-04-git-rebase/" rel="prev" title="Git 版本控制系統 - rebase 合併分支與 pull --rebase 同步提交">
+                  Git 版本控制系統 - rebase 合併分支與 pull --rebase 同步提交 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+          
+            
+              
+    <div class="comments" id="gitalk-container"></div>
+
+            
+          
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#筆記重點"><span class="nav-number">2.</span> <span class="nav-text">筆記重點</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#新增標籤"><span class="nav-number">3.</span> <span class="nav-text">新增標籤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#刪除標籤"><span class="nav-number">4.</span> <span class="nav-text">刪除標籤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#遠端標籤相關操作"><span class="nav-number">5.</span> <span class="nav-text">遠端標籤相關操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#標籤與分支差異"><span class="nav-number">6.</span> <span class="nav-text">標籤與分支差異</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Git-指令回顧"><span class="nav-number">7.</span> <span class="nav-text">Git 指令回顧</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Roya" src="/images/userLogo.jpg">
+  <p class="site-author-name" itemprop="name">Roya</p>
+  <div class="site-description" itemprop="description">Front-End Web Developer<br>學會運用比學會使用還要來的有用</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">69</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/awdr74100" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;awdr74100" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:a78945612385238@gmail.com" title="E-Mail &amp;rarr; mailto:a78945612385238@gmail.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Roya</span>
+</div>
+  <span class="post-meta-divider">轉載文章時請附上作者暱稱與原文連結</span>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+
+<script src="/js/utils.js?v=7.4.2.js"></script>
+
+
+<script src="/js/schemes/pisces.js?v=7.4.2.js"></script>
+
+
+<script src="/js/next-boot.js?v=7.4.2.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+  
+<script src="/js/local-search.js?v=7.4.2.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '7cdb0d531869e18caad8',
+      clientSecret: '0b6a38cef9c3ae1dcf0ea66e916ab68823dbab52',
+      repo: 'awdr74100.github.io',
+      owner: 'awdr74100',
+      admin: ['awdr74100'],
+      id: '5db99138a88681d4ae71fd05681518af',
+        language: 'zh-TW',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+  
+
+
+</body>
+</html>

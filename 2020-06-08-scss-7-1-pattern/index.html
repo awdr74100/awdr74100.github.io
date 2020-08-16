@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon-128.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png?v=7.4.2">
+  <link rel="mask-icon" href="/images/favicon-none.svg?v=7.4.2" color="#222">
+  <link rel="alternate" href="/atom.xml" title="Roya's Blog" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"default"},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '複製',
+      copy_success: '複製成功',
+      copy_failure: '複製失敗'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="前一篇說明了如何利用 @import 將 partial 檔案給載入進來，進而達到模組化的目的，但這邊有一個問題是，我們該針對那些內容來模組化呢？當初這點捆擾了我許久，直到發現原來有所謂的 Sass 7-1 Pattern 可參考，7-1 模式是構建 Sass 項目的一種流行且有效的模組化方法，由 7 個資料夾與 1 個檔案所組成，每一個資料夾都有各自實現的對象，我們可把同個實現對象但不同部分的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Sass &#x2F; SCSS 預處理器 - 依造 Sass 7-1 Pattern 構建項目">
+<meta property="og:url" content="https://awdr74100.github.io/2020-06-08-scss-7-1-pattern/index.html">
+<meta property="og:site_name" content="Roya&#39;s Blog">
+<meta property="og:description" content="前一篇說明了如何利用 @import 將 partial 檔案給載入進來，進而達到模組化的目的，但這邊有一個問題是，我們該針對那些內容來模組化呢？當初這點捆擾了我許久，直到發現原來有所謂的 Sass 7-1 Pattern 可參考，7-1 模式是構建 Sass 項目的一種流行且有效的模組化方法，由 7 個資料夾與 1 個檔案所組成，每一個資料夾都有各自實現的對象，我們可把同個實現對象但不同部分的">
+<meta property="og:locale" content="zh_TW">
+<meta property="article:published_time" content="2020-06-08T10:08:59.000Z">
+<meta property="article:modified_time" content="2020-06-09T16:44:50.000Z">
+<meta property="article:author" content="Roya">
+<meta property="article:tag" content="SCSS">
+<meta property="article:tag" content="w3HexSchool">
+<meta property="article:tag" content="CSS Methodologies">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://awdr74100.github.io/2020-06-08-scss-7-1-pattern/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Sass / SCSS 預處理器 - 依造 Sass 7-1 Pattern 構建項目 | Roya's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-150715469-1"></script>
+    <script>
+      var host = window.location.hostname;
+      if (host !== "localhost" || !true) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-150715469-1');
+      }
+    </script>
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Roya's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">現代化 Web 開發技術學習分享</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>標籤<span class="badge">28</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分類<span class="badge">9</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>歸檔<span class="badge">69</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none" placeholder="搜尋..." spellcheck="false" type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://awdr74100.github.io/2020-06-08-scss-7-1-pattern/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/userLogo.jpg">
+      <meta itemprop="name" content="Roya">
+      <meta itemprop="description" content="Front-End Web Developer<br>學會運用比學會使用還要來的有用">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Roya's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          Sass / SCSS 預處理器 - 依造 Sass 7-1 Pattern 構建項目
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-06-08 18:08:59" itemprop="dateCreated datePublished" datetime="2020-06-08T18:08:59+08:00">2020-06-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-06-10 00:44:50" itemprop="dateModified" datetime="2020-06-10T00:44:50+08:00">2020-06-10</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/SCSS/" itemprop="url" rel="index">
+                    <span itemprop="name">SCSS</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>前一篇說明了如何利用 @import 將 partial 檔案給載入進來，進而達到模組化的目的，但這邊有一個問題是，我們該針對那些內容來模組化呢？當初這點捆擾了我許久，直到發現原來有所謂的 Sass 7-1 Pattern 可參考，7-1 模式是構建 Sass 項目的一種流行且有效的模組化方法，由 7 個資料夾與 1 個檔案所組成，每一個資料夾都有各自實現的對象，我們可把同個實現對象但不同部分的 Sass 模組給放進去，這些模組最後都會被根目錄檔案視為 @import 對象，使之編譯成單獨的 CSS 檔案。</p>
+<h2 id="筆記重點"><a href="#筆記重點" class="headerlink" title="筆記重點"></a>筆記重點</h2><ul>
+<li>Sass 7-1 Pattern 介紹</li>
+<li>Sass 7-1 Pattern 實際案例</li>
+</ul>
+<h2 id="Sass-7-1-Pattern-介紹"><a href="#Sass-7-1-Pattern-介紹" class="headerlink" title="Sass 7-1 Pattern 介紹"></a>Sass 7-1 Pattern 介紹</h2><p>Sass 7-1 Pattern 主要由國外開發者 <a href="https://hugogiraudel.com/" target="_blank" rel="external nofollow noopener noreferrer">Hugo Giraudel</a> 在廣為流傳的 <a href="https://sass-guidelin.es/" target="_blank" rel="external nofollow noopener noreferrer">Sass Guidelines</a> 所提出，其架構主要由 7 個文件夾與 1 個檔案所組成，他看起來像這個樣子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">scss&#x2F;</span><br><span class="line">│</span><br><span class="line">├─── abstracts&#x2F;</span><br><span class="line">│   │</span><br><span class="line">│   ├─── _variables.scss</span><br><span class="line">│   ├─── _functions.scss</span><br><span class="line">│   ├─── _mixins.scss</span><br><span class="line">│   └─── _placeholders.scss</span><br><span class="line">│</span><br><span class="line">├─── base&#x2F;</span><br><span class="line">│   │</span><br><span class="line">│   ├─── _reset.scss</span><br><span class="line">│   ├─── _typography.scss</span><br><span class="line">│   └─── ...</span><br><span class="line">│</span><br><span class="line">├─── components&#x2F;</span><br><span class="line">│   │</span><br><span class="line">│   ├─── _buttons.scss</span><br><span class="line">│   ├─── _carousel.scss</span><br><span class="line">│   ├─── _cover.scss</span><br><span class="line">│   ├─── _dropdown.scss</span><br><span class="line">│   └─── ...</span><br><span class="line">│</span><br><span class="line">├─── layout&#x2F;</span><br><span class="line">│   │</span><br><span class="line">│   ├─── _navigation.scss</span><br><span class="line">│   ├─── _grid.scss</span><br><span class="line">│   ├─── _header.scss</span><br><span class="line">│   ├─── _footer.scss</span><br><span class="line">│   ├─── _sidebar.scss</span><br><span class="line">│   ├─── _forms.scss</span><br><span class="line">│   └─── ...</span><br><span class="line">│</span><br><span class="line">├─── pages&#x2F;</span><br><span class="line">│   │</span><br><span class="line">│   ├─── _home.scss</span><br><span class="line">│   ├─── _contact.scss</span><br><span class="line">│   └─── ...</span><br><span class="line">│</span><br><span class="line">├─── themes&#x2F;</span><br><span class="line">│   │</span><br><span class="line">│   ├─── _theme.scss</span><br><span class="line">│   ├─── _dark.scss</span><br><span class="line">│   └─── ...</span><br><span class="line">│</span><br><span class="line">├─── vendors&#x2F;</span><br><span class="line">│   │</span><br><span class="line">│   ├─── _bootstrap.scss</span><br><span class="line">│   ├─── _jquery-ui.scss</span><br><span class="line">│   └─── ...</span><br><span class="line">│</span><br><span class="line">└─── all.scss</span><br></pre></td></tr></table></figure>
+
+<p>其中每個資料夾代表的意義為：</p>
+<p><strong>Abstracts 資料夾</strong></p>
+<p><code>abstracts/</code> (有些稱為 <code>helpers/</code> 或 <code>utils/</code>) 資料夾包含了整個項目中所使用到的 Sass 輔助工具，這裡存放著每一個全局變數、函數、混入與佔位符，只要是編譯後不輸出任何 CSS 的檔案都屬此類，以下參考：</p>
+<ul>
+<li><code>_variables.scss</code></li>
+<li><code>_functions.scss</code></li>
+<li><code>_mixins.scss</code></li>
+<li><code>_placeholders.scss</code></li>
+</ul>
+<p><strong>Base 資料夾</strong></p>
+<p><code>base/</code> (有些稱為 <code>config/</code>) 資料夾主要放置整個網站大規模使用到的樣式設定，比如 <a href="https://meyerweb.com/eric/tools/css/reset/" target="_blank" rel="external nofollow noopener noreferrer">meyerweb</a> 或 <a href="https://necolas.github.io/normalize.css/8.0.1/normalize.css" target="_blank" rel="external nofollow noopener noreferrer">normalize</a> 版本的重製文件，又或者是一些全域套用的預設樣式，包含字行字體相關的設定也算在內，以下參考：</p>
+<ul>
+<li><code>_reset.scss</code></li>
+<li><code>_typography.scss</code></li>
+<li><code>_base.scss</code></li>
+</ul>
+<p><strong>Components 資料夾</strong></p>
+<p><code>components/</code> (有些稱為 <code>modules/</code>) 資料夾存放網站某些較小可重複使用的元件，可以把它理解為 <a href="http://getbem.com/" target="_blank" rel="external nofollow noopener noreferrer">BEM</a> 中的 Block，以下參考：</p>
+<ul>
+<li><code>_buttons.scss</code></li>
+<li><code>_carousel.scss</code></li>
+<li><code>_cover.scss</code></li>
+<li><code>_dropdown.scss</code></li>
+</ul>
+<p><strong>Layout 資料夾</strong></p>
+<p><code>layout/</code> 資料夾存放構建網站或者應用程序使用到的佈局部分，可以把它理解為網站的每一頁都需使用到的大型元件，常見的 <code>header</code>、<code>footer</code>、<code>sidebar</code> 就包含在此類，像是 RWD 必備的 Grid System 也算在內，以下參考：</p>
+<ul>
+<li><code>_navigation.scss</code></li>
+<li><code>_grid.scss</code></li>
+<li><code>_header.scss</code></li>
+<li><code>_footer.scss</code></li>
+<li><code>_sidebar.scss</code></li>
+<li><code>_forms.scss</code></li>
+</ul>
+<p><strong>Pages 資料夾</strong></p>
+<p><code>pages/</code> 資料夾存放每一個網頁特定且零碎的樣式檔案，通常 <code>layout/</code> 與 <code>components</code> 除外的頁面樣式就包含在此類，建議將檔案名稱取做與頁面同樣名稱：</p>
+<ul>
+<li><code>_home.scss</code></li>
+<li><code>_contact.scss</code></li>
+</ul>
+<p><strong>Themes 資料夾</strong></p>
+<p><code>themes/</code> 資料夾存放網站中的主題顏色，如果你有設計像是 Dark Mode 的轉換效果，相關的樣式就算在此類，以下參考：</p>
+<ul>
+<li><code>_theme.scss</code></li>
+<li><code>_dark.scss</code></li>
+</ul>
+<p><strong>Vendors 資料夾</strong></p>
+<p><code>vendors</code> 資料夾主要放置由外部庫或框架使用的第三方代碼，如果你必須覆蓋任何 <code>vendors</code> 的某個樣式，建議另外新增同名的檔案並放入名為 <code>vendors-extensions/</code> 的第 8 個新增資料夾，以下參考：</p>
+<ul>
+<li><code>_bootstrap.scss</code></li>
+<li><code>_jquery-ui</code></li>
+</ul>
+<p>以上就是各資料夾專門放置的檔案對象，接著就是將這些檔案彙整到 <code>all.scss</code> 中，為了保持可讀性，主文件不該存在任何 <code>@import</code> 以外的代碼，且必須遵守以下規則：</p>
+<ul>
+<li>每個 <code>@import</code> 引用一個文件</li>
+<li>每個 <code>@import</code> 單獨一行</li>
+<li>從相同資料夾引入的檔案之間不用空行</li>
+<li>從不同資料夾引入的檔案之間需用空行分隔</li>
+<li>忽略文件擴展名與 <code>_</code> 前綴</li>
+</ul>
+<p>Sass Guidelines 中有建議的 <code>@import</code> 順序，你可以依造他的順序，或者是自行排序，只要記住 SCSS 是由上到下進行編譯代表需注意其模組依賴性即可，最後他看起來應該像這個樣子：</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">@<span class="keyword">import</span> <span class="string">'./base/reset'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./base/typography'</span>;</span><br><span class="line"></span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./helpers/variables'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./helpers/functions'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./helpers/mixins'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./helpers/placeholders'</span>;</span><br><span class="line"></span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./layout/grid'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./layout/footer'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./layout/forms'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./layout/header'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./layout/navigation'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./layout/sidebar'</span>;</span><br><span class="line"></span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./components/buttons'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./components/carousel'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./components/cover'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./components/dropdown'</span>;</span><br><span class="line"></span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./pages/home'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./pages/contact'</span>;</span><br><span class="line"></span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./vendors/bootstrap'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./vendors/jquery-ui'</span>;</span><br><span class="line"></span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./themes/theme'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./themes/dark'</span>;</span><br></pre></td></tr></table></figure>
+
+<p>這邊做個補充，官方有提到也可使用以下方式載入元件：</p>
+<!-- prettier-ignore-start -->
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">@<span class="keyword">import</span></span><br><span class="line">    <span class="string">'./base/reset'</span>,</span><br><span class="line">    <span class="string">'./base/typography'</span>;</span><br><span class="line"></span><br><span class="line">@<span class="keyword">import</span></span><br><span class="line">    <span class="string">'./helpers/variables'</span>,</span><br><span class="line">    <span class="string">'./helpers/functions'</span>,</span><br><span class="line">    <span class="string">'./helpers/mixins'</span>,</span><br><span class="line">    <span class="string">'./helpers/placeholders'</span>;</span><br><span class="line"><span class="comment">// ...</span></span><br></pre></td></tr></table></figure>
+<!-- prettier-ignore-end -->
+
+<p>這邊要強調，所謂的 7-1 模式只是提供參考用，具體上要怎麼搭，最好按項目大小來決定，如果項目規模較小，用 7-1 模式就顯得有點大材小用了，7-1 模式最重要的是它拆分模組的概念，如果了解其概念，往後在處理各種規模的樣式表都能勢如破竹。</p>
+<h2 id="Sass-7-1-Pattern-實際案例"><a href="#Sass-7-1-Pattern-實際案例" class="headerlink" title="Sass 7-1 Pattern 實際案例"></a>Sass 7-1 Pattern 實際案例</h2><p>如果你還是對 7-1 模式感到困惑，不妨可參考下面提供的實際案例：</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">@<span class="keyword">import</span> <span class="string">'./base/reset'</span>;</span><br><span class="line"></span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./helpers/variables'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./helpers/spacing'</span>;</span><br><span class="line"></span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./layout/grid'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./layout/footer'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./layout/header'</span>;</span><br><span class="line"></span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./components/banner'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./components/button'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./components/card'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./components/formLogin'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./components/formRegister'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./components/formCard'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./components/navbar'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./components/ribbon'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./components/search'</span>;</span><br><span class="line"></span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./pages/home'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./pages/login'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./pages/register'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./pages/cart'</span>;</span><br><span class="line"></span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./vendors/pure'</span>;</span><br></pre></td></tr></table></figure>
+
+<p>從 Sass 的主文件可以得知這個網站總共有 4 個頁面，分別為 <code>home</code>、<code>login</code>、<code>register</code>、<code>cart</code>，在樣式表的開頭使用了 CSS Reset 將畫面樣式做重整，內部使用了 Grid System 與 Spacing 來完成基本的佈局，網站充滿了大量可重複使用的元件，比如說 <code>button</code>、<code>card</code> 等，最後在 <code>vendors/</code> 資料夾載入了 <a href="https://purecss.io/" target="_blank" rel="external nofollow noopener noreferrer">Pure.css</a> 框架。</p>
+<p>有沒有發現我少建立 <code>themes/</code> 資料夾？如果你的網站沒有主題顏色自然也就沒有建立的必要，這也是我們之前提到的 7-1 模式只是提供參考用，具體上該怎麼做還是得依專案而定。</p>
+<p>跑過了一次實際案例相信你對 7-1 模式的模組拆分技巧有更深入的了解，你也可以參考 <a href="https://sass-guidelin.es/" target="_blank" rel="external nofollow noopener noreferrer">Sass Guidelines</a> 作者 <a href="https://hugogiraudel.com/" target="_blank" rel="external nofollow noopener noreferrer">Hugo Giraudel</a> 使用 <a href="https://hugogiraudel.com/" target="_blank" rel="external nofollow noopener noreferrer">Hugo</a> 所創建的 Blog 原始碼，裏頭 Sass 拆分的方式就是依造 7-1 模式，以下為連結：</p>
+<ul>
+<li><a href="https://github.com/HugoGiraudel/hugogiraudel.com/tree/master/assets/sass" target="_blank" rel="external nofollow noopener noreferrer">Source Code</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/SCSS/" rel="tag"># SCSS</a>
+              <a href="/tags/w3HexSchool/" rel="tag"># w3HexSchool</a>
+              <a href="/tags/CSS-Methodologies/" rel="tag"># CSS Methodologies</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2020-06-05-scss-import-partials/" rel="next" title="Sass / SCSS 預處理器 - @import 載入模組與 Partials 建立部分模組">
+                  <i class="fa fa-chevron-left"></i> Sass / SCSS 預處理器 - @import 載入模組與 Partials 建立部分模組
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2020-06-19-scss-oocss-smacss-bem/" rel="prev" title="Sass / SCSS 預處理器 - OOCSS、SMACSS、BEM 模組化方法論">
+                  Sass / SCSS 預處理器 - OOCSS、SMACSS、BEM 模組化方法論 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+          
+            
+              
+    <div class="comments" id="gitalk-container"></div>
+
+            
+          
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#筆記重點"><span class="nav-number">2.</span> <span class="nav-text">筆記重點</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Sass-7-1-Pattern-介紹"><span class="nav-number">3.</span> <span class="nav-text">Sass 7-1 Pattern 介紹</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Sass-7-1-Pattern-實際案例"><span class="nav-number">4.</span> <span class="nav-text">Sass 7-1 Pattern 實際案例</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Roya" src="/images/userLogo.jpg">
+  <p class="site-author-name" itemprop="name">Roya</p>
+  <div class="site-description" itemprop="description">Front-End Web Developer<br>學會運用比學會使用還要來的有用</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">69</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/awdr74100" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;awdr74100" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:a78945612385238@gmail.com" title="E-Mail &amp;rarr; mailto:a78945612385238@gmail.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Roya</span>
+</div>
+  <span class="post-meta-divider">轉載文章時請附上作者暱稱與原文連結</span>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+
+<script src="/js/utils.js?v=7.4.2.js"></script>
+
+
+<script src="/js/schemes/pisces.js?v=7.4.2.js"></script>
+
+
+<script src="/js/next-boot.js?v=7.4.2.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+  
+<script src="/js/local-search.js?v=7.4.2.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '7cdb0d531869e18caad8',
+      clientSecret: '0b6a38cef9c3ae1dcf0ea66e916ab68823dbab52',
+      repo: 'awdr74100.github.io',
+      owner: 'awdr74100',
+      admin: ['awdr74100'],
+      id: '67d5c0b213ad7883777de3aca78f9af8',
+        language: 'zh-TW',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+  
+
+
+</body>
+</html>

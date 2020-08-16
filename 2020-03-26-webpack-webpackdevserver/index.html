@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon-128.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png?v=7.4.2">
+  <link rel="mask-icon" href="/images/favicon-none.svg?v=7.4.2" color="#222">
+  <link rel="alternate" href="/atom.xml" title="Roya's Blog" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"default"},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '複製',
+      copy_success: '複製成功',
+      copy_failure: '複製失敗'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="在 Gulp 的環境中，我們會導入 Browsersync 套件方便以 Live Reload 方式做開發，在 Webpack 中也有類似的套件，名為 webpack-dev-server，與傳統 Live Reload 工具較為不同的是，除了支援 Live Reload 方式以外，同時也支援 HMR (Hot Module Replacement) 特性，再不刷新 Browser 的情況下注入修">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Webpack 前端打包工具 - 使用 webpack-dev-server 實現以 Live Reload 或 HMR 方式進行開發">
+<meta property="og:url" content="https://awdr74100.github.io/2020-03-26-webpack-webpackdevserver/index.html">
+<meta property="og:site_name" content="Roya&#39;s Blog">
+<meta property="og:description" content="在 Gulp 的環境中，我們會導入 Browsersync 套件方便以 Live Reload 方式做開發，在 Webpack 中也有類似的套件，名為 webpack-dev-server，與傳統 Live Reload 工具較為不同的是，除了支援 Live Reload 方式以外，同時也支援 HMR (Hot Module Replacement) 特性，再不刷新 Browser 的情況下注入修">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/34bUNUB.png">
+<meta property="og:image" content="https://i.imgur.com/y3LdnUC.png">
+<meta property="og:image" content="https://i.imgur.com/SxB251Q.png">
+<meta property="og:image" content="https://i.imgur.com/mjYgGce.png">
+<meta property="og:image" content="https://i.imgur.com/XYo10pE.png">
+<meta property="og:image" content="https://i.imgur.com/v4MnYuL.gif">
+<meta property="og:image" content="https://i.imgur.com/7qMS2rR.gif">
+<meta property="og:image" content="https://i.imgur.com/X79xFMt.png">
+<meta property="og:image" content="https://i.imgur.com/BdC2CuW.png">
+<meta property="og:image" content="https://i.imgur.com/saCnIPI.png">
+<meta property="article:published_time" content="2020-03-25T16:20:08.000Z">
+<meta property="article:modified_time" content="2020-07-01T08:56:38.000Z">
+<meta property="article:author" content="Roya">
+<meta property="article:tag" content="Node.js">
+<meta property="article:tag" content="Webpack">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/34bUNUB.png">
+
+<link rel="canonical" href="https://awdr74100.github.io/2020-03-26-webpack-webpackdevserver/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Webpack 前端打包工具 - 使用 webpack-dev-server 實現以 Live Reload 或 HMR 方式進行開發 | Roya's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-150715469-1"></script>
+    <script>
+      var host = window.location.hostname;
+      if (host !== "localhost" || !true) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-150715469-1');
+      }
+    </script>
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Roya's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">現代化 Web 開發技術學習分享</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>標籤<span class="badge">28</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分類<span class="badge">9</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>歸檔<span class="badge">69</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none" placeholder="搜尋..." spellcheck="false" type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://awdr74100.github.io/2020-03-26-webpack-webpackdevserver/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/userLogo.jpg">
+      <meta itemprop="name" content="Roya">
+      <meta itemprop="description" content="Front-End Web Developer<br>學會運用比學會使用還要來的有用">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Roya's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          Webpack 前端打包工具 - 使用 webpack-dev-server 實現以 Live Reload 或 HMR 方式進行開發
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-03-26 00:20:08" itemprop="dateCreated datePublished" datetime="2020-03-26T00:20:08+08:00">2020-03-26</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-07-01 16:56:38" itemprop="dateModified" datetime="2020-07-01T16:56:38+08:00">2020-07-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Webpack/" itemprop="url" rel="index">
+                    <span itemprop="name">Webpack</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在 Gulp 的環境中，我們會導入 Browsersync 套件方便以 Live Reload 方式做開發，在 Webpack 中也有類似的套件，名為 webpack-dev-server，與傳統 Live Reload 工具較為不同的是，除了支援 Live Reload 方式以外，同時也支援 HMR (Hot Module Replacement) 特性，再不刷新 Browser 的情況下注入修改過後的代碼，達到不丟失應用狀態下即時更新畫面。此篇將介紹如何使用 webpack-dev-server 以 Live Reload 或 HMR 方式進行開發，途中也會補充 publicPath 與 contentBase 這兩個坑人的選項正確用法。</p>
+<h2 id="筆記重點"><a href="#筆記重點" class="headerlink" title="筆記重點"></a>筆記重點</h2><ul>
+<li>webpack-dev-server 安裝</li>
+<li>webpack-dev-server 基本使用</li>
+<li>webpack-dev-server 可傳遞選項</li>
+<li>補充：開啟 HMR 支持</li>
+<li>補充：允許本地網路下設備進行訪問</li>
+</ul>
+<h2 id="webpack-dev-server-安裝"><a href="#webpack-dev-server-安裝" class="headerlink" title="webpack-dev-server 安裝"></a>webpack-dev-server 安裝</h2><blockquote>
+<p>套件連結：<a href="https://github.com/webpack/webpack-dev-server" target="_blank" rel="external nofollow noopener noreferrer">webpack-dev-server</a></p>
+</blockquote>
+<p>主要的套件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install webpack-dev-server -D</span><br></pre></td></tr></table></figure>
+
+<p>過程會使用到的套件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install css-loader html-webpack-plugin mini-css-extract-plugin -D</span><br></pre></td></tr></table></figure>
+
+<p>package.json：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"devDependencies"</span>: &#123;</span><br><span class="line">    <span class="attr">"css-loader"</span>: <span class="string">"^3.4.2"</span>,</span><br><span class="line">    <span class="attr">"html-webpack-plugin"</span>: <span class="string">"^4.0.3"</span>,</span><br><span class="line">    <span class="attr">"mini-css-extract-plugin"</span>: <span class="string">"^0.9.0"</span>,</span><br><span class="line">    <span class="attr">"webpack"</span>: <span class="string">"^4.42.1"</span>,</span><br><span class="line">    <span class="attr">"webpack-cli"</span>: <span class="string">"^3.3.11"</span>,</span><br><span class="line">    <span class="attr">"webpack-dev-server"</span>: <span class="string">"^3.10.3"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>請先將一般開發環境所需的 loader 與 plugin 進行安裝，最後也必須安裝 webpack-dev-server 用以作為此次討論的目標。</p>
+<h2 id="webpack-dev-server-基本使用"><a href="#webpack-dev-server-基本使用" class="headerlink" title="webpack-dev-server 基本使用"></a>webpack-dev-server 基本使用</h2><div class="note warning">此次範例會搭配 css-loader、html-webpack-plugin、mini-css-extract-plugin 一起使用，相關文章連結：<a href="https://awdr74100.github.io/2020-02-26-webpack-cssloader-styleloader/" target="_blank">css-loader</a>、<a href="https://awdr74100.github.io/2020-03-23-webpack-htmlwebpackplugin/" target="_blank">html-webpack-plugin</a>、<a href="https://awdr74100.github.io/2020-03-02-webpack-minicssextractplugin/" target="_blank">mini-css-extract-plugin</a></div>
+
+<p>初始專案結構：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">webpack-demo&#x2F;</span><br><span class="line">│</span><br><span class="line">├─── node_modules&#x2F;</span><br><span class="line">├─── src&#x2F;</span><br><span class="line">│   │</span><br><span class="line">│   └─── css&#x2F;</span><br><span class="line">│       │</span><br><span class="line">│       └─── all.css      # CSS 主檔案</span><br><span class="line">│   │</span><br><span class="line">│   └─── js&#x2F;</span><br><span class="line">│       │</span><br><span class="line">│       └─── all.js       # JavaScript 主檔案</span><br><span class="line">│   │</span><br><span class="line">│   ├─── index.html       # HTML 主檔案</span><br><span class="line">│   └─── main.js          # entry 入口檔案</span><br><span class="line">│</span><br><span class="line">├─── webpack.config.js    # Webpack 配置檔案</span><br><span class="line">├─── package-lock.json</span><br><span class="line">└─── package.json</span><br></pre></td></tr></table></figure>
+
+<p>撰寫 CSS 範例：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.text-primary</span> &#123;</span><br><span class="line">  <span class="attribute">color</span>: <span class="number">#2525b1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>撰寫 JavaScript 範例：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="string">'Hello World'</span>);</span><br></pre></td></tr></table></figure>
+
+<p>至 <code>./src/index.html</code> 撰寫 HTML 模板範例：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"en"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">"viewport"</span> <span class="attr">content</span>=<span class="string">"width=device-width, initial-scale=1.0"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>Document<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">h1</span> <span class="attr">class</span>=<span class="string">"text-primary"</span>&gt;</span>Hello World<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<div class="note warning">此段落不需要配置任何有關 webpack-dev-server 的設定</div>
+
+<p>配置 <code>webpack.config.js</code> 檔案：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">'path'</span>);</span><br><span class="line"><span class="keyword">const</span> MiniCssExtractPlugin = <span class="built_in">require</span>(<span class="string">'mini-css-extract-plugin'</span>);</span><br><span class="line"><span class="keyword">const</span> HtmlWebpackPlugin = <span class="built_in">require</span>(<span class="string">'html-webpack-plugin'</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  entry: <span class="string">'./src/main.js'</span>,</span><br><span class="line">  output: &#123;</span><br><span class="line">    path: path.resolve(__dirname, <span class="string">'dist'</span>),</span><br><span class="line">    filename: <span class="string">'js/[name].js'</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="built_in">module</span>: &#123;</span><br><span class="line">    rules: [</span><br><span class="line">      &#123;</span><br><span class="line">        test: <span class="regexp">/\.css$/i</span>,</span><br><span class="line">        use: [MiniCssExtractPlugin.loader, <span class="string">'css-loader'</span>],</span><br><span class="line">      &#125;,</span><br><span class="line">    ],</span><br><span class="line">  &#125;,</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> MiniCssExtractPlugin(&#123;</span><br><span class="line">      filename: <span class="string">'css/[name].css'</span>,</span><br><span class="line">    &#125;),</span><br><span class="line">    <span class="keyword">new</span> HtmlWebpackPlugin(&#123;</span><br><span class="line">      template: <span class="string">'./src/index.html'</span>,</span><br><span class="line">      filename: <span class="string">'index.html'</span>,</span><br><span class="line">    &#125;),</span><br><span class="line">  ],</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>你一定看過很多文章寫說需要配置 <code>devServer.contentBase</code> 選項，才能夠正確指定伺服器需啟動根目錄為何，這完全是錯誤的解釋，在上面範例中，我們沒有配置任何的 <code>devServer</code> 選項，全部都已預設方式配置，讓我們來看結果如何。</p>
+<p>entry 入口處 (<code>src/main.js</code>) 引入 CSS、JavaScript 檔案：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">'./css/all.css'</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="string">'./js/all'</span>;</span><br></pre></td></tr></table></figure>
+
+<p>至 <code>package.json</code> 新增編譯指令：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"scripts"</span>: &#123;</span><br><span class="line">    <span class="attr">"dev"</span>: <span class="string">"webpack-dev-server --mode development"</span>,</span><br><span class="line">    <span class="attr">"build"</span>: <span class="string">"webpack --mode development"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>請注意上面指令的寫法，以往我們都是使用 <code>webpack</code> 來執行編譯，這邊可新增內容為 <code>webpack-dev-server</code> 的 <code>dev</code> 指令進行以 webpack-dev-server 開啟 localhost 的動作。</p>
+<p>執行 <code>dev</code> 指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm run dev</span><br></pre></td></tr></table></figure>
+
+<p>手動輸入 <code>localhost:8080</code> 開啟本地伺服器：</p>
+<p><img src="https://i.imgur.com/34bUNUB.png" alt="webpack-dev-server 開啟結果"></p>
+<p>成功運行！我們可以從上面結果得知，使用 <code>webpack-dev-server</code> 能夠開啟一個本地伺服器，預設的 port 為 8080，且支援 Live Reload，你可以自由的更改 CSS、JavaScript、HTML 檔案，Browser 會自動刷新所有內容，以後都不用按 F5 囉。</p>
+<p>此時你可能會去找 <code>dist</code> 的資料夾是否有成功編譯後的檔案，答案是沒有的，使用 webpack-dev-server 會將打包後的檔案暫存在記憶體內，並不會打包出實體的檔案，你可以把它想像成在記憶體內的 <code>dist</code> 資料夾，實體的 <code>dist</code> 資料夾結構為何，記憶體內的 <code>dist</code> 資料夾結構就為何；由於我們使用了 html-webpack-plugin 將指定模板進行打包，所以我們的實體/記憶體 <code>dist</code> 資料夾在根目錄就會有自動引入靜態檔案的 <code>index.html</code>，本地伺服器預設就是將這一個檔案進行載入，也就跑出了上面的畫面。</p>
+<p>讓我們回來探討 webpack-dev-server 的 <code>devServer</code> 選項作用為何，請先新增以下內容：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="comment">// 其他省略</span></span><br><span class="line">  devServer: &#123;</span><br><span class="line">    port: <span class="number">9000</span>,</span><br><span class="line">    open: <span class="literal">true</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>port</code><ul>
+<li>用來設定本地伺服器的端口，預設為 8080</li>
+<li>命令列：webpack-dev-server <span>-</span><span>-</span>port 9000</li>
+</ul>
+</li>
+<li><code>open</code><ul>
+<li>伺服器啟動後是否自動打開瀏覽器，預設為 false</li>
+<li>命令列：webpack-dev-server <span>-</span><span>-</span>open</li>
+</ul>
+</li>
+</ul>
+<p>上面這兩個選項蠻好理解的，且我平常也都會設定，免除手動開啟伺服器的困擾。讓我們來看其他選項：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="comment">// 其他省略</span></span><br><span class="line">  devServer: &#123;</span><br><span class="line">    publicPath: <span class="string">'/assets/'</span>,</span><br><span class="line">    contentBase: path.resolve(__dirname, <span class="string">'dist'</span>),</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>publicPath</code><ul>
+<li>打包生成的靜態文件在記憶體中的位置 (若 devServer.publicPath 沒有設置，則參考 output.publicPath 的值，若兩者都沒有設置，預設為 <code>/</code> )</li>
+</ul>
+</li>
+<li><code>contentBase</code><ul>
+<li>告訴伺服器從何處提供原始內容。僅當你要提供靜態文件時才需要配置 (devServer.publicPath 優先於此選項使用，預設為當前執行目錄)</li>
+</ul>
+</li>
+</ul>
+<p>上面這兩個選項就有點抽象了，讓我們直接執行 <code>npm run dev</code> 查看結果：</p>
+<p>位置：<code>localhost:8080</code></p>
+<p><img src="https://i.imgur.com/y3LdnUC.png" alt="webpack-dev-server devServer.publicPath 無法取得"></p>
+<p>位置：<code>localhost:8080/assets/</code></p>
+<p><img src="https://i.imgur.com/SxB251Q.png" alt="webpack-dev-server devServer.publicPath 成功取得"></p>
+<p>我們可以從上面結果得知，伺服器的存取位置被改變了，以下是模擬存在記憶體的資料夾結構：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">localhost&#x2F;</span><br><span class="line">│</span><br><span class="line">├─── assets&#x2F;</span><br><span class="line">│   │</span><br><span class="line">│   └─── css&#x2F;</span><br><span class="line">│       │</span><br><span class="line">│       └─── main.css</span><br><span class="line">│   │</span><br><span class="line">│   └─── js&#x2F;</span><br><span class="line">│       │</span><br><span class="line">│       └─── main.js</span><br><span class="line">│   │</span><br><span class="line">│   └─── index.html</span><br></pre></td></tr></table></figure>
+
+<p>相信大家已經猜的到 <code>devServer.publicPath</code> 的功能了，它會在記憶體中的 <code>dist</code> 資料夾增加一層 <code>assets</code> 目錄，這也導致預設的 <code>localhost:8080</code> 找不到任何檔案，需要到下一層的目錄才找的到 <code>index.html</code> 這一支檔案，也就是 <code>localhost:8080/assets/</code> 內，這邊要注意的是如果你沒有配置 <code>devServer.publicPath</code> 選項，預設會向 <code>output.publicPath</code> 取值，如果兩者都沒有配置，預設值為 <code>/</code>，這也是為什麼一開始都沒有配置任何 <code>devServer</code> 選項時，能夠直接在 <code>localhost:8080</code> 看到畫面的原因。</p>
+<p>至於 <code>devServer.contentBase</code> 是最常被誤解的選項，你可能看過很多人都是像上面範例一樣配置，但這樣子是完全沒有意義的，<code>devServer.contentBase</code> 主要用來使 webpack-dev-server 在開啟伺服器時如果找不到 <code>index.html</code> 檔案，就轉而載入指定的內容，像是範例中的 <code>dist</code> 資料夾，根本不存在這一個資料夾，載入時也就引發了 express 的 middleware 提示 (webpack-dev-server 是基於 Node.js 中的 express 建構出來)，這也是為什麼上面範例中 <code>localhost:8080</code> 會跳出 <code>Cannot GET /</code> 的原因，伺服器找不到存在於 <code>/</code> 的 <code>index.html</code> 檔案，轉而向 <code>devServer.contentBase</code> 取得內容，但根本不存在 <code>webpack-demo/dist</code> 這一個資料夾，導致同樣也找不到內容，就直接跳錯誤了，你可以嘗試把配置改成如下內容：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  devServer: &#123;</span><br><span class="line">    contentBase: path.resolve(__dirname, <span class="string">'node_modules'</span>),</span><br><span class="line">  &#125;,</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> HtmlWebpackPlugin(&#123;</span><br><span class="line">      template: <span class="string">'./src/index.html'</span>,</span><br><span class="line">      filename: <span class="string">'index789.html'</span>, <span class="comment">// 將 index.html 改為 index789.html</span></span><br><span class="line">    &#125;),</span><br><span class="line">  ],</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>位置：<code>localhost:8080</code></p>
+<p><img src="https://i.imgur.com/mjYgGce.png" alt="webpack-dev-server devServer.contentPath 無法取得"></p>
+<p>位置：<code>localhost:8080/index789.html</code></p>
+<p><img src="https://i.imgur.com/XYo10pE.png" alt="webpack-dev-server devServer.contentPath 成功取得"></p>
+<p>如同我們前面所講到的，<code>devServer.contentBase</code> 選項主要用來使伺服器在 <code>devServer.publicPath</code> 目錄下找不到 <code>index.html</code> 檔案時，轉而載入的內容，由於我們指定了 <code>node_modules</code> 目錄，這也就導致在 <code>localhost:8080</code> 根路徑時，載入的是 <code>node_modules</code> 目錄的內容，<code>localhost:8080/index789.html</code> 載入的才是正確內容。</p>
+<p>經過了上面的介紹，相信各位已經了解 <code>devServer</code> 常見的配置了，當我們不配置 <code>publicPath</code> 與 <code>contentBase</code> 選項且 html-webpack-plugin 的 <code>filename</code> 為 <code>index.html</code> 時，伺服器取得的資料夾結構就如同實體編譯出來的資料夾結構，這也是為什麼當初不配置任何 <code>devServer</code> 選項能夠成功開啟伺服器並且指向正確目錄的原因。</p>
+<h2 id="webpack-dev-server-可傳遞選項"><a href="#webpack-dev-server-可傳遞選項" class="headerlink" title="webpack-dev-server 可傳遞選項"></a>webpack-dev-server 可傳遞選項</h2><p>可參考 <a href="https://webpack.js.org/configuration/dev-server/#devserverstats-" target="_blank" rel="external nofollow noopener noreferrer">webpack-dev-server Configuration</a> 可傳遞參數列表，以下為常用的參數配置：</p>
+<ul>
+<li><p>clientLogLevel：<code>silent</code> | <code>trace</code> | <code>debug</code> | <code>info</code> | <code>warn</code> | <code>error</code> | <code>none</code> | <code>warning</code><br>控制台需顯示何種狀態下的訊息，默認為 <code>info</code></p>
+</li>
+<li><p>compress：<code>Boolean</code><br>啟用 <a href="https://betterexplained.com/articles/how-to-optimize-your-site-with-gzip-compression/" target="_blank" rel="external nofollow noopener noreferrer">gzip</a> 壓縮，默認為 <code>false</code></p>
+</li>
+<li><p>overlay：<code>Boolean</code> | <code>Object: { errors : boolean, warnings : boolean}</code><br>出現錯誤或警告時，在瀏覽器全屏顯示內容，默認為 <code>false</code></p>
+</li>
+<li><p>stats：<code>none</code> | <code>errors-only</code> | <code>minimal</code> | <code>normal</code> | <code>verbose</code> | <code>Object</code><br>精準控制要顯示的 bundle 訊息，可使用集成配置或自訂配置，可參考 <a href="https://webpack.js.org/configuration/stats/" target="_blank" rel="external nofollow noopener noreferrer">stats 文檔</a>，默認為 <code>normal</code></p>
+</li>
+<li><p>host：<code>String</code><br>指定要使用的主機，默認為 <code>localhost</code></p>
+</li>
+<li><p>useLocalIp：<code>Boolean</code><br>使用本地 IP 打開瀏覽器，默認為 <code>false</code></p>
+</li>
+</ul>
+<p>範例：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  devServer: &#123;</span><br><span class="line">    clientLogLevel: <span class="string">'silent'</span>,</span><br><span class="line">    compress: <span class="literal">true</span>,</span><br><span class="line">    overlay: <span class="literal">true</span>,</span><br><span class="line">    stats: <span class="string">'errors-only'</span>,</span><br><span class="line">    host: <span class="string">'0.0.0.0'</span>, <span class="comment">// 允許本地網路下設備進行訪問</span></span><br><span class="line">    useLocalIp: <span class="literal">true</span>, <span class="comment">// 直接以本地 IP 打開瀏覽器</span></span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="補充：開啟-HMR-支持"><a href="#補充：開啟-HMR-支持" class="headerlink" title="補充：開啟 HMR 支持"></a>補充：開啟 HMR 支持</h2><p>在上面所有的操作中，我們都是以 Live Reload 方式進行，所謂的 Live Reload 就是只說在刷新瀏覽器時注入修改過後的代碼，達到即時更新的目的，雖然說已經很好用了，但是在某些情況下還是有點小抱怨，比如說 Live Reload 並不能夠保存應用的狀態 (states)，當刷新頁面後，應用之前的狀態也會丟失，因為它是以重新載入的方式處理修改過後的代碼，這在於某些情況下，真的很不方便，開發體驗也較差，你可以把它想像成傳統頁面與 SPA 頁面之間的差異。</p>
+<p>也因為上面所提到的問題，webpack-dev-server 的出現就是為了解決這一個問題，它兼容 Live Reload 方式進行開發，同時也支援了 HMR (Hot Module Replacement) 方式開發，所謂的 HMR 就是指在不刷新畫面的狀態下，注入修改過後的代碼，你可以把它想像成在 Chrome 的開發者工具直接修改 Style 樣式一般，提供開發的體驗以及效率。Webpack 預設是使用 Live Reload，我們可透過配置方式開啟 HMR 功能，讓我們直接開始吧！</p>
+<p>配置 <code>webpack.config.js</code> 檔案：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  devServer: &#123;</span><br><span class="line">    hot: <span class="literal">true</span>, <span class="comment">// 開啟 HMR 支持</span></span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>當你啟用 <code>devServer.hot</code> 選項時，Webpack 會自動引入 <code>webpack.HotModuleReplacementPlugin</code>，代表說我們不需要手動引入這一個 Plugin，只需要單純的開啟 <code>hot</code> 選像即可。</p>
+<p>entry 入口處 (<code>src/main.js</code>) 引入 HMR JavaScript API：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 其他省略 ...</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 開啟 HMR 支持 (全部模組)</span></span><br><span class="line"><span class="keyword">if</span> (<span class="built_in">module</span>.hot) &#123;</span><br><span class="line">  <span class="built_in">module</span>.hot.accept();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>切記一定要在 entry 入口處增加上面這段代碼，以完全啟用 HMR 功能。</p>
+<p>到了這邊我們可以先執行 <code>npm run dev</code> 查看結果：</p>
+<p><img src="https://i.imgur.com/v4MnYuL.gif" alt="webpack-dev-server 開啟 HMR 支持"></p>
+<p>以上測試是基於修改 <code>./src/js/all.js</code> 檔案而成，可以發現 HMR 確實成功啟用了，再不更新頁面的狀態下注入打包過後的新代碼，開發體驗提高不少，但這邊還有一個問題，就是修改 <code>./src/css/all.css</code> 檔案時，並沒有任何反應，那是因為我們還沒有開啟 mini-css-extract-plugin 的 HMR 支持，操作如下：</p>
+<div class="note warning">style-loader 預設就已經開啟 HMR 支持，不需要特別做設定</div>
+
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="built_in">module</span>: &#123;</span><br><span class="line">    rules: [</span><br><span class="line">      &#123;</span><br><span class="line">        test: <span class="regexp">/\.css$/i</span>,</span><br><span class="line">        use: [</span><br><span class="line">          &#123;</span><br><span class="line">            loader: MiniCssExtractPlugin.loader,</span><br><span class="line">            options: &#123;</span><br><span class="line">              hmr: <span class="literal">true</span>, <span class="comment">// 開啟 HMR 支持</span></span><br><span class="line">            &#125;,</span><br><span class="line">          &#125;,</span><br><span class="line">          <span class="string">'css-loader'</span>,</span><br><span class="line">        ],</span><br><span class="line">      &#125;,</span><br><span class="line">    ],</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>執行 <code>npm run dev</code> 查看結果：</p>
+<p><img src="https://i.imgur.com/7qMS2rR.gif" alt="mini-css-extract-plugin 開啟 HMR 支持"></p>
+<p>這邊還有一個最尷尬的情況，那就是 html-webpack-plugin 不支持 HMR 方式進行，這也是為什麼修改 <code>./src/index.html</code> 時完全沒有反應的原因，解決辦法就是將 index.html 當成 Live Reload 方式進行，操作如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.expores = &#123;</span><br><span class="line">  devServer: &#123;</span><br><span class="line">    contentBase: <span class="string">'./src/index.html'</span>,</span><br><span class="line">    watchContentBase: <span class="literal">true</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>前面有講解到關於 <code>contentBase</code> 的使用技巧，而 <code>watchContentBase</code> 這一個選項就是用來更改 <code>contentBase</code> 作用的，當你開啟這一個選項，它會幫你監控指定目錄或檔案是否有更動，如果有，即刷新頁面。當然如果你使用的是像 vue-loader 等方式進行畫面渲染的話，就沒有這一個問題，因為都會通過 entry 入口處，而 html-webpack-plugin 是以抓取模板的方式進行處理，並不會通過 entry，這也導致了無法支援 HMR，說實在的，真的很可惜阿。</p>
+<h2 id="補充：允許本地網路下設備進行訪問"><a href="#補充：允許本地網路下設備進行訪問" class="headerlink" title="補充：允許本地網路下設備進行訪問"></a>補充：允許本地網路下設備進行訪問</h2><p>這邊補充關於同個網路下的設備如何訪問 webpack-dev-server，這是一個我蠻常使用的技巧，好讓網站在正式上線前能夠透過不同裝置查看是否符合預期效果，在開始介紹之前，<strong>請確保你想訪問的設備與當前 webpack-dev-server 執行的設備在同個區網下</strong>，讓我們先從配置開始說明：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.expores = &#123;</span><br><span class="line">  devServer: &#123;</span><br><span class="line">    host: <span class="string">'0.0.0.0'</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>將 <code>host</code> 設置為 <code>0.0.0.0</code> 的目的在於監聽本機所有能訪問的 IP 地址，這邊你可以把它理解為將本機中的 <code>IPv4</code> 位址設為外部可訪問，此時開啟伺服器會跳出以下畫面：</p>
+<p><img src="https://i.imgur.com/X79xFMt.png" alt="將 host 設為 0.0.0.0"></p>
+<p>到這邊我們就已經成功一半了，剩下的一半為透過 <code>IPv4</code> 位址訪問伺服器，這邊我們可輸入 <code>ipconfig</code> 查詢 <code>IPv4</code> 位址：</p>
+<p><img src="https://i.imgur.com/BdC2CuW.png" alt="查詢 IPv4 位址"></p>
+<p>接著輸入 <code>IPv4</code> 位址與端口號碼即可訪問到伺服器：</p>
+<p><img src="https://i.imgur.com/saCnIPI.png" alt="成功訪問到伺服器"></p>
+<p>在同個網路下的設備也是透過這個 <code>IPv4</code> 位址與端口號碼訪問伺服器，如果你嫌上面步驟麻煩，也可設置 <code>useLocalIp</code> 選項：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.expores = &#123;</span><br><span class="line">  devServer: &#123;</span><br><span class="line">    host: <span class="string">'0.0.0.0'</span>,</span><br><span class="line">    useLocalIp: <span class="literal">true</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>這樣它預設就會運行在本機中的 <code>IPv4</code> 位址，你也不需要特地去找 <code>IPv4</code> 位址，前面只是在告訴你如何尋找 <code>IPv4</code> 位址而已，通常我也是直接使用這一個選項，真正達到懶人的境界。</p>
+<p>這邊補充關於前端在串接 API 時，同個網路下的設備可能發生的問題：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;localhost:3000&#x2F;login</span><br></pre></td></tr></table></figure>
+
+<p>通常我們前端在開發時所串接的 API 都是跑在本地端的，雖然說直接以 deploy 上去的伺服器來串接會比較方便，但可能有耗損流量的問題，我自己是習慣跑在 <code>localhost</code> 就對了，這時候就得注意區網下設備是無法訪問到 <code>localhost</code> 的，因為 <code>localhost</code> 預設是指向 <code>127.0.0.1</code>，代表只有本機可以訪問，我們所要做的就是將 API 的位址更改為外部可訪問的位址，即前面的 <code>host</code> 設置：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">app.listen(port, <span class="string">'0.0.0.0'</span>, () =&gt; &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">`開啟 port 為 <span class="subst">$&#123;port&#125;</span> 的 localhost`</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>這邊拿 Express 來說明，上面是一個很基本的開啟 localhost 方法，第一個參數為 <code>port</code>，第二個參數為 <code>host</code>，將 <code>host</code> 設置為 <code>0.0.0.0</code> 即可與 webpack-dev-server 有同樣的效果，其實在 Express 不需要特別去做設置，因為預設的 <code>host</code> 就是 <code>0.0.0.0</code>，這邊只是要強調如何更改 <code>host</code> 選項而已，接著前端的 API 可改由以下訪問：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;192.168.1.107:3000&#x2F;login</span><br></pre></td></tr></table></figure>
+
+<p>這邊就能避免本機可訪問 API，區網下設備無法訪問 API 的問題</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Node-js/" rel="tag"># Node.js</a>
+              <a href="/tags/Webpack/" rel="tag"># Webpack</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2020-03-25-webpack-cleanwebpackplugin/" rel="next" title="Webpack 前端打包工具 - 使用 clean-webpack-plugin 清除構建資料夾">
+                  <i class="fa fa-chevron-left"></i> Webpack 前端打包工具 - 使用 clean-webpack-plugin 清除構建資料夾
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2020-03-28-webpack-includebootstrap/" rel="prev" title="Webpack 前端打包工具 - 客製化 Bootstrap 樣式並進行編譯">
+                  Webpack 前端打包工具 - 客製化 Bootstrap 樣式並進行編譯 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+          
+            
+              
+    <div class="comments" id="gitalk-container"></div>
+
+            
+          
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#筆記重點"><span class="nav-number">2.</span> <span class="nav-text">筆記重點</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#webpack-dev-server-安裝"><span class="nav-number">3.</span> <span class="nav-text">webpack-dev-server 安裝</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#webpack-dev-server-基本使用"><span class="nav-number">4.</span> <span class="nav-text">webpack-dev-server 基本使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#webpack-dev-server-可傳遞選項"><span class="nav-number">5.</span> <span class="nav-text">webpack-dev-server 可傳遞選項</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#補充：開啟-HMR-支持"><span class="nav-number">6.</span> <span class="nav-text">補充：開啟 HMR 支持</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#補充：允許本地網路下設備進行訪問"><span class="nav-number">7.</span> <span class="nav-text">補充：允許本地網路下設備進行訪問</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Roya" src="/images/userLogo.jpg">
+  <p class="site-author-name" itemprop="name">Roya</p>
+  <div class="site-description" itemprop="description">Front-End Web Developer<br>學會運用比學會使用還要來的有用</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">69</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/awdr74100" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;awdr74100" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:a78945612385238@gmail.com" title="E-Mail &amp;rarr; mailto:a78945612385238@gmail.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Roya</span>
+</div>
+  <span class="post-meta-divider">轉載文章時請附上作者暱稱與原文連結</span>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+
+<script src="/js/utils.js?v=7.4.2.js"></script>
+
+
+<script src="/js/schemes/pisces.js?v=7.4.2.js"></script>
+
+
+<script src="/js/next-boot.js?v=7.4.2.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+  
+<script src="/js/local-search.js?v=7.4.2.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '7cdb0d531869e18caad8',
+      clientSecret: '0b6a38cef9c3ae1dcf0ea66e916ab68823dbab52',
+      repo: 'awdr74100.github.io',
+      owner: 'awdr74100',
+      admin: ['awdr74100'],
+      id: '485a10becd87f224e12ccb5591bd5f08',
+        language: 'zh-TW',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+  
+
+
+</body>
+</html>

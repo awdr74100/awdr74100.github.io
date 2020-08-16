@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon-128.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png?v=7.4.2">
+  <link rel="mask-icon" href="/images/favicon-none.svg?v=7.4.2" color="#222">
+  <link rel="alternate" href="/atom.xml" title="Roya's Blog" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"default"},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '複製',
+      copy_success: '複製成功',
+      copy_failure: '複製失敗'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="大多人開發項目都是使用 Axios 或者 jQuery 庫的 $.ajax 方法來完成 HTTP 請求行為，如果要使用 JS 原生的方法，只有 XMLHttpRequest 可以選擇，但程序繁瑣、順序混亂等問題，我相信大家因該都有遇到過，這次來記錄一下 ES6 新增的原生方法 Fetch API。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Web APIs - 使用原生 Fetch API 獲取遠端資料">
+<meta property="og:url" content="https://awdr74100.github.io/2020-08-08-webapis-fetch/index.html">
+<meta property="og:site_name" content="Roya&#39;s Blog">
+<meta property="og:description" content="大多人開發項目都是使用 Axios 或者 jQuery 庫的 $.ajax 方法來完成 HTTP 請求行為，如果要使用 JS 原生的方法，只有 XMLHttpRequest 可以選擇，但程序繁瑣、順序混亂等問題，我相信大家因該都有遇到過，這次來記錄一下 ES6 新增的原生方法 Fetch API。">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/Iz6mnGL.png">
+<meta property="article:published_time" content="2020-08-08T01:36:48.000Z">
+<meta property="article:modified_time" content="2020-08-09T15:50:16.000Z">
+<meta property="article:author" content="Roya">
+<meta property="article:tag" content="JavaScript">
+<meta property="article:tag" content="ES6">
+<meta property="article:tag" content="w3HexSchool">
+<meta property="article:tag" content="Web APIs">
+<meta property="article:tag" content="AJAX">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/Iz6mnGL.png">
+
+<link rel="canonical" href="https://awdr74100.github.io/2020-08-08-webapis-fetch/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Web APIs - 使用原生 Fetch API 獲取遠端資料 | Roya's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-150715469-1"></script>
+    <script>
+      var host = window.location.hostname;
+      if (host !== "localhost" || !true) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-150715469-1');
+      }
+    </script>
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Roya's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">現代化 Web 開發技術學習分享</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>標籤<span class="badge">28</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分類<span class="badge">9</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>歸檔<span class="badge">69</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none" placeholder="搜尋..." spellcheck="false" type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://awdr74100.github.io/2020-08-08-webapis-fetch/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/userLogo.jpg">
+      <meta itemprop="name" content="Roya">
+      <meta itemprop="description" content="Front-End Web Developer<br>學會運用比學會使用還要來的有用">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Roya's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          Web APIs - 使用原生 Fetch API 獲取遠端資料
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-08-08 09:36:48" itemprop="dateCreated datePublished" datetime="2020-08-08T09:36:48+08:00">2020-08-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-08-09 23:50:16" itemprop="dateModified" datetime="2020-08-09T23:50:16+08:00">2020-08-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Web-APIs/" itemprop="url" rel="index">
+                    <span itemprop="name">Web APIs</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>大多人開發項目都是使用 Axios 或者 jQuery 庫的 $.ajax 方法來完成 HTTP 請求行為，如果要使用 JS 原生的方法，只有 XMLHttpRequest 可以選擇，但程序繁瑣、順序混亂等問題，我相信大家因該都有遇到過，這次來記錄一下 ES6 新增的原生方法 Fetch API。</p>
+<h2 id="筆記重點"><a href="#筆記重點" class="headerlink" title="筆記重點"></a>筆記重點</h2><ul>
+<li>傳統 XMLHttpRequest 方法</li>
+<li>Fetch 基本用法</li>
+<li>ReadableStream 解析方法</li>
+<li>Fetch POST 行為</li>
+</ul>
+<h2 id="傳統-XMLHttpRequest-方法"><a href="#傳統-XMLHttpRequest-方法" class="headerlink" title="傳統 XMLHttpRequest 方法"></a>傳統 XMLHttpRequest 方法</h2><img src="https://i.imgur.com/Iz6mnGL.png" alt="XMLHttpRequest行為">
+
+<p>一般人對於 AJAX 行為的理解，差不多都是從封裝過後的方法去做學習，原因很簡單，容易理解、操作方便，但有時我們不想要套用框架，需要使用原生的寫法，我們就只能選擇 <code>XMLHttpRequest</code> 這一個物件去做使用，他是 JS 原生對於 HTTP 請求的操作物件，範例如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 宣告一個 xhr 物件</span></span><br><span class="line"><span class="keyword">let</span> xhr = <span class="keyword">new</span> XMLHttpRequest();</span><br><span class="line"></span><br><span class="line"><span class="comment">// 請求方式、請求網址、處理方式( true：非同步處理 , false：同步處理 ))</span></span><br><span class="line">xhr.open(<span class="string">'get'</span>, <span class="string">'https://randomuser.me/api/'</span>, <span class="literal">true</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 送出請求</span></span><br><span class="line">xhr.send(<span class="literal">null</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 請求成功觸發</span></span><br><span class="line">xhr.onload = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">let</span> data = <span class="built_in">JSON</span>.parse(xhr.response);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>上面是一個 GET 請求範例，很明顯的程序與封裝過後的方法相比較為繁瑣，且令人詬病的點在於<strong>每一個請求都必須新增一個請求的實體</strong>，一個網站通常也不會只有一個請求，整個建構下來，會變得非常混亂，通常不太建議使用這個方法做請求。</p>
+<h2 id="Fetch-基本用法"><a href="#Fetch-基本用法" class="headerlink" title="Fetch 基本用法"></a>Fetch 基本用法</h2><p><code>Fetch()</code> 是 ES6 新增的 HTTP 請求方法，基於 Promise 所設計，他讓接口更簡單、簡潔、同時也避免了回調的複雜性，主要就是用來取代傳統的 <code>XMLHttpRequest</code> 方法，下面是一個基本的範例：</p>
+<ul>
+<li><code>json()</code> 解析為 JSON 物件</li>
+<li><code>then()</code> 觸發下一步操作</li>
+<li><code>catch()</code> 錯誤時觸發</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">fetch(<span class="string">'https://randomuser.me/api/'</span>)</span><br><span class="line">  .then(<span class="function">(<span class="params">response</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// 操作 response 屬性、方法</span></span><br><span class="line">    <span class="keyword">return</span> response.json();</span><br><span class="line">  &#125;)</span><br><span class="line">  .then(<span class="function">(<span class="params">data</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// 實際存取到資料</span></span><br><span class="line">    <span class="built_in">console</span>.log(data);</span><br><span class="line">  &#125;)</span><br><span class="line">  .catch(<span class="function">(<span class="params">error</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// 錯誤回應</span></span><br><span class="line">    <span class="built_in">console</span>.log(error);</span><br><span class="line">  &#125;);</span><br></pre></td></tr></table></figure>
+
+<p>上面是基於 GET 請求所撰寫的範例，很明顯的，更為簡單、直接，且利用 Promise 的特性，一步一步的使用 then 操作回應，關於 response 可應用的屬性、方法，將在下面做介紹。</p>
+<h2 id="ReadableStream-解析方法"><a href="#ReadableStream-解析方法" class="headerlink" title="ReadableStream 解析方法"></a>ReadableStream 解析方法</h2><p>在 <code>Fetch()</code> 回應的資料中，我們可以使用相關的屬性、方法傳遞給下一步做使用，但要注意的是我們<strong>不能直接在回應資料中做資料取用</strong>，因為 Fetch 回應的資料，實際上是一個物件實例，我們所要做的，就是針對這一個物件實例中的 <strong>ReadableStream</strong> 做解析，下面是相關的解析方法：</p>
+<ul>
+<li><code>json()</code>：解析為 JSON 物件</li>
+<li><code>text()</code>：解析為 String 字串</li>
+<li><code>blob()</code>：解析為 Blob 內容</li>
+<li><code>arrayBuffer()</code>：解析為 ArrayBuffer 內容</li>
+<li><code>formData()</code>：解析為 formData 內容</li>
+<li><code>clone()</code>：複製實例物件</li>
+</ul>
+<h2 id="Fetch-POST-行為"><a href="#Fetch-POST-行為" class="headerlink" title="Fetch POST 行為"></a>Fetch POST 行為</h2><p>在上面都是使用 GET 行為當作範例，不需設定 method，因為 GET 為預設行為，如需使用其他行為，只需要<strong>加入相對應屬性並包裝成物件</strong>即可，如下範例：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">fetch(<span class="string">'https://vue-course-api.hexschool.io/admin/signin'</span>, &#123;</span><br><span class="line">  <span class="comment">// 設定為 POST 請求</span></span><br><span class="line">  method: <span class="string">'post'</span>,</span><br><span class="line">  <span class="comment">// 在 headers 加入 json 格式</span></span><br><span class="line">  headers: &#123;</span><br><span class="line">    <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="comment">// 傳送內容須轉換為字串</span></span><br><span class="line">  body: <span class="built_in">JSON</span>.stringify(&#123;</span><br><span class="line">    username: <span class="string">'test@gmail.com'</span>,</span><br><span class="line">    password: <span class="string">'66666666'</span>,</span><br><span class="line">  &#125;),</span><br><span class="line">&#125;)</span><br><span class="line">  .then(<span class="function">(<span class="params">response</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> response.json();</span><br><span class="line">  &#125;)</span><br><span class="line">  .then(<span class="function">(<span class="params">data</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(data);</span><br><span class="line">  &#125;)</span><br><span class="line">  .catch(<span class="function">(<span class="params">error</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(error);</span><br><span class="line">  &#125;);</span><br></pre></td></tr></table></figure>
+
+<p>這次使用六角學院的登入帳號 API 做 POST 行為測試，Fetch 畢竟還是未經過封裝的原生行為，需在傳送內容中做一些調整，這邊要注意的是<strong>傳送內容需轉換為字串</strong>，不然會造成解析錯誤。</p>
+<h2 id="使用感想"><a href="#使用感想" class="headerlink" title="使用感想"></a>使用感想</h2><p>針對 Fetch API 我認為的確有效改善傳統 <code>XMLHttpRequest</code> 為人所詬病的問題，<strong>寫起來乾淨又好維護</strong>，<strong>且基於 Promise 設計</strong>，<strong>支援 async/await</strong>，確實非常強大，不過對於開發稍有規模的專案來講，我還是會以 Axios 來做使用，畢竟支援 Promise 且操作方便，核心是以 xhr 物件做封裝，也不需考慮支援性問題；<strong>Fetch API 畢竟還是底層方法</strong>，操作過程還是得<strong>自己編寫各式各樣的封裝和異常處理</strong>，<strong>並非開箱即用</strong>，不過我認為，他絕對是推動前端 HTTP 行為的潛力股，時間問題而已。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+              <a href="/tags/ES6/" rel="tag"># ES6</a>
+              <a href="/tags/w3HexSchool/" rel="tag"># w3HexSchool</a>
+              <a href="/tags/Web-APIs/" rel="tag"># Web APIs</a>
+              <a href="/tags/AJAX/" rel="tag"># AJAX</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2020-08-01-tools-eslint/" rel="next" title="導入 ESLint 控管程式碼品質">
+                  <i class="fa fa-chevron-left"></i> 導入 ESLint 控管程式碼品質
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2020-08-14-javascript-promise/" rel="prev" title="JavaScript - Promise 非同步物件使用方式及變體方法">
+                  JavaScript - Promise 非同步物件使用方式及變體方法 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+          
+            
+              
+    <div class="comments" id="gitalk-container"></div>
+
+            
+          
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#筆記重點"><span class="nav-number">2.</span> <span class="nav-text">筆記重點</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#傳統-XMLHttpRequest-方法"><span class="nav-number">3.</span> <span class="nav-text">傳統 XMLHttpRequest 方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Fetch-基本用法"><span class="nav-number">4.</span> <span class="nav-text">Fetch 基本用法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ReadableStream-解析方法"><span class="nav-number">5.</span> <span class="nav-text">ReadableStream 解析方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Fetch-POST-行為"><span class="nav-number">6.</span> <span class="nav-text">Fetch POST 行為</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用感想"><span class="nav-number">7.</span> <span class="nav-text">使用感想</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Roya" src="/images/userLogo.jpg">
+  <p class="site-author-name" itemprop="name">Roya</p>
+  <div class="site-description" itemprop="description">Front-End Web Developer<br>學會運用比學會使用還要來的有用</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">69</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/awdr74100" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;awdr74100" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:a78945612385238@gmail.com" title="E-Mail &amp;rarr; mailto:a78945612385238@gmail.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Roya</span>
+</div>
+  <span class="post-meta-divider">轉載文章時請附上作者暱稱與原文連結</span>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+
+<script src="/js/utils.js?v=7.4.2.js"></script>
+
+
+<script src="/js/schemes/pisces.js?v=7.4.2.js"></script>
+
+
+<script src="/js/next-boot.js?v=7.4.2.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+  
+<script src="/js/local-search.js?v=7.4.2.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '7cdb0d531869e18caad8',
+      clientSecret: '0b6a38cef9c3ae1dcf0ea66e916ab68823dbab52',
+      repo: 'awdr74100.github.io',
+      owner: 'awdr74100',
+      admin: ['awdr74100'],
+      id: 'dfc7d89be0b335aace63e035630c03e1',
+        language: 'zh-TW',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+  
+
+
+</body>
+</html>

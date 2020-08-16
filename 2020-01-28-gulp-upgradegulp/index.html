@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon-128.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png?v=7.4.2">
+  <link rel="mask-icon" href="/images/favicon-none.svg?v=7.4.2" color="#222">
+  <link rel="alternate" href="/atom.xml" title="Roya's Blog" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"default"},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '複製',
+      copy_success: '複製成功',
+      copy_failure: '複製失敗'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="Gulp 4 已經推出有一段時間了，有礙於網上文章大多都是使用 Gulp 3 版本，對於學習 Gulp 4 的開發者來說較為不友善，此篇將完整解說 Gulp 3 與 Gulp 4 的差異，包含 Gulp 4 新增的幾個好用語法，比如 gulp.series()、gulp.parallel() 等等，以及 task() API 已不被官方推薦使用，取而代之的 function task 究竟如何使用">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Gulp 前端自動化 - 升級至 Gulp 4 完整說明">
+<meta property="og:url" content="https://awdr74100.github.io/2020-01-28-gulp-upgradegulp/index.html">
+<meta property="og:site_name" content="Roya&#39;s Blog">
+<meta property="og:description" content="Gulp 4 已經推出有一段時間了，有礙於網上文章大多都是使用 Gulp 3 版本，對於學習 Gulp 4 的開發者來說較為不友善，此篇將完整解說 Gulp 3 與 Gulp 4 的差異，包含 Gulp 4 新增的幾個好用語法，比如 gulp.series()、gulp.parallel() 等等，以及 task() API 已不被官方推薦使用，取而代之的 function task 究竟如何使用">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/DwSH0cc.jpg">
+<meta property="og:image" content="https://i.imgur.com/8hnbIk4.jpg">
+<meta property="og:image" content="https://i.imgur.com/eiTqPEO.jpg">
+<meta property="article:published_time" content="2020-01-28T12:29:52.000Z">
+<meta property="article:modified_time" content="2020-02-03T07:29:54.000Z">
+<meta property="article:author" content="Roya">
+<meta property="article:tag" content="Gulp 4">
+<meta property="article:tag" content="Node.js">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/DwSH0cc.jpg">
+
+<link rel="canonical" href="https://awdr74100.github.io/2020-01-28-gulp-upgradegulp/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Gulp 前端自動化 - 升級至 Gulp 4 完整說明 | Roya's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-150715469-1"></script>
+    <script>
+      var host = window.location.hostname;
+      if (host !== "localhost" || !true) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-150715469-1');
+      }
+    </script>
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Roya's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">現代化 Web 開發技術學習分享</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>標籤<span class="badge">28</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分類<span class="badge">9</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>歸檔<span class="badge">69</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none" placeholder="搜尋..." spellcheck="false" type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://awdr74100.github.io/2020-01-28-gulp-upgradegulp/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/userLogo.jpg">
+      <meta itemprop="name" content="Roya">
+      <meta itemprop="description" content="Front-End Web Developer<br>學會運用比學會使用還要來的有用">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Roya's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          Gulp 前端自動化 - 升級至 Gulp 4 完整說明
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-01-28 20:29:52" itemprop="dateCreated datePublished" datetime="2020-01-28T20:29:52+08:00">2020-01-28</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-02-03 15:29:54" itemprop="dateModified" datetime="2020-02-03T15:29:54+08:00">2020-02-03</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Gulp/" itemprop="url" rel="index">
+                    <span itemprop="name">Gulp</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Gulp 4 已經推出有一段時間了，有礙於網上文章大多都是使用 Gulp 3 版本，對於學習 Gulp 4 的開發者來說較為不友善，此篇將完整解說 Gulp 3 與 Gulp 4 的差異，包含 Gulp 4 新增的幾個好用語法，比如 gulp.series()、gulp.parallel() 等等，以及 task() API 已不被官方推薦使用，取而代之的 function task 究竟如何使用，全部內容都將完整說明。</p>
+<h2 id="筆記重點"><a href="#筆記重點" class="headerlink" title="筆記重點"></a>筆記重點</h2><ul>
+<li>註冊 Task 任務的新方法</li>
+<li>任務依賴和執行函式</li>
+<li>非同步完成</li>
+<li>Watch API 可監聽全局事件</li>
+</ul>
+<h2 id="註冊-Task-任務的新方法"><a href="#註冊-Task-任務的新方法" class="headerlink" title="註冊 Task 任務的新方法"></a>註冊 Task 任務的新方法</h2><p>在 Gulp 3 版本，我們都是使用 <code>gulp.tsak()</code> API 去註冊任務，之後再使用 CLI 指令去執行任務，這個流程在 Gulp 4 版本一樣可以使用，但官方已不再推薦使用 <code>gulp.task()</code> API，在 Gulp 4 版本，取而代之的是使用 <code>function</code> 來建立任務，以及 <code>exports</code> 來導出任務，範例如下：</p>
+<p>Gulp 3：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> gulp = <span class="built_in">require</span>(<span class="string">'gulp'</span>);</span><br><span class="line"></span><br><span class="line">gulp.task(<span class="string">'build'</span>, (cb) =&gt; &#123;</span><br><span class="line">  <span class="comment">// 任務內容</span></span><br><span class="line">  cb();</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>Gulp 4：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">compile_Sass</span>(<span class="params">cb</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 任務內容</span></span><br><span class="line">  cb();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* --- export.任務名稱 = 工作內容相關函式名稱 --- */</span></span><br><span class="line">exports.build = compile_Sass;</span><br></pre></td></tr></table></figure>
+
+<p>使用 <code>function 工作內容相關函式名稱() {}</code> 即可建立任務，此時任務狀態為 Private，不會被 CLI 給偵測到，只能供內部使用，此時可以使用 <code>exports.工作名稱 = 工作內容相關函式名稱</code> 將任務導出，CLI 即可偵測到任務，狀態為 Public，最後執行 <code>gulp build</code> 指令執行任務，結果會與 Gulp 3 相同，讓我們來看其他例子：</p>
+<p><strong>多任務執行</strong>：</p>
+<p>Gulp 3：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> gulp = <span class="built_in">require</span>(<span class="string">'gulp'</span>);</span><br><span class="line"></span><br><span class="line">gulp.task(<span class="string">'scss'</span>, (cb) =&gt; &#123;</span><br><span class="line">  <span class="comment">// 任務內容</span></span><br><span class="line">  cb();</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">gulp.task(<span class="string">'pug'</span>, (cb) =&gt; &#123;</span><br><span class="line">  <span class="comment">// 任務內容</span></span><br><span class="line">  cb();</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">gulp.task(<span class="string">'build'</span>, gulp.series(<span class="string">'scss'</span>, <span class="string">'pug'</span>));</span><br></pre></td></tr></table></figure>
+
+<p>Gulp 4：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> gulp = <span class="built_in">require</span>(<span class="string">'gulp'</span>);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">scss</span>(<span class="params">cb</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 任務內容</span></span><br><span class="line">  cb();</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="number">4</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">pug</span>(<span class="params">cb</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 任務內容</span></span><br><span class="line">  cb();</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="number">4</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">exports.build = gulp.series(scss, pug);</span><br></pre></td></tr></table></figure>
+
+<p>在 Gulp 3 我們都是使用字串形式的 <code>taskname</code> 作為參數執行任務，但在 Gulp 4 新增接受 <code>function</code> 作為參數執行任務，這也是之前文章提到可使用 CommonJS 模組化的關鍵，彈性與上個版本相比提高了不少，這確實是件好事，接著我們來說明之前提到的 Private Task 與 Public Task 究竟是什麼，請先使用 <code>gulp --tasks</code> 檢視所有任務：</p>
+<p>Gulp 3：</p>
+<img src="https://i.imgur.com/DwSH0cc.jpg" alt="Gulp 3 所有任務">
+
+<p>Gulp 4：</p>
+<img src="https://i.imgur.com/8hnbIk4.jpg" alt="Gulp 4 所有任務">
+
+<p>在 Gulp 3 中，所有宣告的任務都屬於 Public Task，這樣子的界定方式容易造成結構混亂，而在 Gulp 4 中，分為 Private Task 和 Public Task 兩種狀態任務：</p>
+<ul>
+<li><p>公開任務 (Public Task)：從 <code>gulpfile.js</code> 被導出 (exports)，可以通過 CLI 命令直接調用。例如：<code>exports.build = build</code></p>
+</li>
+<li><p>私有任務 (Private Task)：被設計在內部使用，通常做為 series() 或 parallel() 組合的參數部分。例如：<code>exports.build = gulp.series(scss, pug)</code></p>
+</li>
+</ul>
+<p>雖然與 Gulp 3 相比可能較為麻煩，但這樣子的界定方式能夠有效的避免結構混亂導致維護困難等問題。</p>
+<h2 id="任務依賴和執行函式"><a href="#任務依賴和執行函式" class="headerlink" title="任務依賴和執行函式"></a>任務依賴和執行函式</h2><p>以往 Gulp 都是採用任務依賴的方式執行任務，如下範例：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">gulp.task(<span class="string">'compile'</span>, [<span class="string">'jade'</span>, <span class="string">'sass'</span>, <span class="string">'watch'</span>], () =&gt; &#123;</span><br><span class="line">  <span class="comment">// 任務內容</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>此時執行 <code>gulp compile</code> 即可非同步執行所有任務，亦即<strong>並行執行</strong> <code>jade</code>、<code>sass</code>、<code>watch</code> 任務，當依賴任務執行完成，最後才會執行自身 <code>compile</code> 的任務，這是比較簡單的情況，假設我們在執行 <code>compile</code> 任務前，需要清除先前編譯的資料呢？寫法可能如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">gulp.task(<span class="string">'compile'</span>, [<span class="string">'clean'</span>, <span class="string">'jade'</span>, <span class="string">'sass'</span>, <span class="string">'watch'</span>], () =&gt; &#123;</span><br><span class="line">  <span class="comment">// 任務內容</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>上面這個寫法是錯的，前面有提到 Gulp 3 的 Array 寫法是以<strong>並行執行</strong>所有任務，也就代表當我們執行 <code>jade</code> 或 <code>sass</code> 任務時，編譯出來的檔案可能會被 <code>clean</code> 任務給直接清除掉，正確的流程應該為執行 <code>compile</code> 任務前，必須先執行 <code>clean</code> 任務且已執行完成，亦即<strong>串行執行</strong>，這時可使用 <a href="https://www.npmjs.com/package/run-sequence" target="_blank" rel="external nofollow noopener noreferrer">run-sequence</a> 套件來改寫任務：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">gulp.task(<span class="string">'compile'</span>, () =&gt; &#123;</span><br><span class="line">  runSequence(<span class="string">'clean'</span>, [<span class="string">'jade'</span>, <span class="string">'sass'</span>, <span class="string">'watch'</span>]);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>run-sequence 套件可幫助我們並行或串行執行任務，以上面這個範例來說，當我們執行 <code>gulp compile</code> 指令時，會先觸發 <code>clean</code> 任務，當任務完成時，才會並行觸發 <code>jade</code>、<code>sass</code>、<code>watch</code> 任務，相同的概念可無限延伸，可能會有人問，會不會有點麻煩？還需要載入套件才可以使用？沒錯！但這是 Gulp 3 的說法，Gulp 4 新增了兩個革命性的 API 以解決此問題，讓我們先來看範例：</p>
+<!-- prettier-ignore-start -->
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">gulp.task(</span><br><span class="line">  <span class="string">"compile"</span>,</span><br><span class="line">  gulp.series(<span class="string">"clean"</span>, gulp.parallel(<span class="string">"jade"</span>, <span class="string">"sass"</span>, <span class="string">"watch"</span>))</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<!-- prettier-ignore-end -->
+
+<p><strong>Gulp 4 棄用了任務依賴改而使用執行函式來操作任務</strong>，也就代表如果你在 Gulp 4 版本中使用任務依賴的寫法(如同之前範例)，會引發錯誤，取而代之的是使用 <code>gulp.series()</code> 與 <code>gulp.parallel</code> API 來操作任務，兩者差別如下：</p>
+<ul>
+<li><p><code>gulp.series()</code>：用於串行(同步)任務執行，可接受 <code>taskname</code> 或 <code>function</code> 作為任務執行參數。</p>
+</li>
+<li><p><code>gulp.parallel</code>：用於並行(非同步)任務執行，可接受 <code>taskname</code> 或 <code>function</code> 作為任務執行參數。</p>
+</li>
+</ul>
+<p>當初就是因為 Gulp 官方也認為依靠套件來處理串行、並行任務較不方便，進而改寫 Gulp 並推出這兩個 API，實際使用下來，我認為可以完全取代 Gulp 3 的任務依賴寫法，超好用的！舊有開發者也可以無痛上手，你可以幫她想像成 runSequence 套件的另一種寫法，不過不需要載入任何套件，此為 Gulp 4 內建 API，讓我們來看其他範例：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 只載入 Gulp 相關 API</span></span><br><span class="line"><span class="keyword">const</span> &#123; series, parallel &#125; = <span class="built_in">require</span>(<span class="string">'gulp'</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> clean = <span class="function"><span class="keyword">function</span>(<span class="params">cb</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 任務內容</span></span><br><span class="line">  cb();</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> css = series(clean, <span class="function"><span class="keyword">function</span>(<span class="params">cb</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 任務內容</span></span><br><span class="line">  cb();</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> javascript = series(clean, <span class="function"><span class="keyword">function</span>(<span class="params">cb</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 任務內容</span></span><br><span class="line">  cb();</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">/* --- 導出任務 --- */</span></span><br><span class="line">exports.build = parallel(css, javascript);</span><br></pre></td></tr></table></figure>
+
+<p>上面這個範例存在一個 Bug，那就是 clean 任務在並行執行 <code>css</code> 與 <code>javascript</code> 任務時，被執行了兩次，這樣子的作法可能會導致無法預期的結果，在 Gulp 4 中，以先前介紹的 <code>function Task</code> 來說明，<strong>建議一個 function 只完成自己的任務內容，最後在導出任務</strong>，此時寫法可改為：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 只載入 Gulp 相關 API</span></span><br><span class="line"><span class="keyword">const</span> &#123; series, parallel &#125; = <span class="built_in">require</span>(<span class="string">'gulp'</span>);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">clean</span>(<span class="params">cb</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 任務內容</span></span><br><span class="line">  cb();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">css</span>(<span class="params">cb</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 任務內容</span></span><br><span class="line">  cb();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">javascript</span>(<span class="params">cb</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 任務內容</span></span><br><span class="line">  cb();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* --- 導出任務 --- */</span></span><br><span class="line">exports.build = series(clean, parallel(css, javascript));</span><br></pre></td></tr></table></figure>
+
+<p>現在 <code>clean</code> 任務只會被執行一次，結構也變得更加明確，這才是 Gulp 的正確寫法與流程。</p>
+<h2 id="非同步完成"><a href="#非同步完成" class="headerlink" title="非同步完成"></a>非同步完成</h2><p>在 Gulp 4 版本，非同步操作(並行執行)完成後須執行一個 callback 函式用以通知 Gulp 這個任務已經完成，讓我們直接來看範例：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> gulp = <span class="built_in">require</span>(<span class="string">'gulp'</span>);</span><br><span class="line"><span class="keyword">const</span> sass = <span class="built_in">require</span>(<span class="string">'gulp-sass'</span>);</span><br><span class="line"></span><br><span class="line">gulp.task(<span class="string">'sass'</span>, () =&gt; &#123;</span><br><span class="line">  gulp</span><br><span class="line">    .src(<span class="string">'./src/scss/*.scss'</span>)</span><br><span class="line">    .pipe(sass().on(<span class="string">'error'</span>, sass.logError))</span><br><span class="line">    .pipe(gulp.dest(<span class="string">'./dist/css'</span>));</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>上面是一個基本的編譯 SCSS 範例，此時執行 <code>gulp sass</code> 指令，會跳出如下圖錯誤：</p>
+<img src="https://i.imgur.com/eiTqPEO.jpg" alt="Gulp 3 所有任務">
+
+<p>這個問題是發生在 Gulp 無法明確知道 <code>sass</code> 任務何時結束進而引發的錯誤；在 Gulp 3 版本，此問題將被忽略，但在 Gulp 4 版本，更加的嚴格，你必須明確告知任務已經完成，好讓 Gulp 正常的處理流程，有以下幾種方法可以幫助我們告知任務已經完成：</p>
+<ul>
+<li>返回一個 Stream：</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">gulp.task(<span class="string">'sass'</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> gulp</span><br><span class="line">    .src(<span class="string">'./src/scss/*.scss'</span>)</span><br><span class="line">    .pipe(sass().on(<span class="string">'error'</span>, sass.logError))</span><br><span class="line">    .pipe(gulp.dest(<span class="string">'./dist/css'</span>));</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>兌現 Promise：</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">gulp.task(<span class="string">'sass'</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">Promise</span>.resolve(</span><br><span class="line">    gulp</span><br><span class="line">      .src(<span class="string">'./src/scss/*.scss'</span>)</span><br><span class="line">      .pipe(sass().on(<span class="string">'error'</span>, sass.logError))</span><br><span class="line">      .pipe(gulp.dest(<span class="string">'./dist/css'</span>))</span><br><span class="line">  );</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>調用 callback：</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">gulp.task(<span class="string">'sass'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">cb</span>) </span>&#123;</span><br><span class="line">  gulp</span><br><span class="line">    .src(<span class="string">'./src/scss/*.scss'</span>)</span><br><span class="line">    .pipe(sass().on(<span class="string">'error'</span>, sass.logError))</span><br><span class="line">    .pipe(gulp.dest(<span class="string">'./dist/css'</span>));</span><br><span class="line">  cb();</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>返回 RxJS 觀察對象：</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> Observable = <span class="built_in">require</span>(<span class="string">"rx"</span>).Observable;</span><br><span class="line"></span><br><span class="line">gulp.task(<span class="string">"sass"</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> Observable.return(</span><br><span class="line">    gulp</span><br><span class="line">      .src(<span class="string">"./src/scss/*.scss"</span>)</span><br><span class="line">      .pipe(sass().on(<span class="string">"error"</span>, sass.logError))</span><br><span class="line">      .pipe(gulp.dest(<span class="string">"./dist/css"</span>))</span><br><span class="line">  );</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>由上面幾種方法來說，調用 callback 看起來更加容易，這也是我一般開發較常使用的方法。</p>
+<h2 id="Watch-API-可監聽全局事件"><a href="#Watch-API-可監聽全局事件" class="headerlink" title="Watch API 可監聽全局事件"></a>Watch API 可監聽全局事件</h2><p>Gulp 本身內建的監控檔案變動 API 相信大家都有使用過，基本上也算是開發者使用 Gulp 必備的功能，在 Gulp 3 版本，我們可使用 <code>gulp.watch()</code> 與 <code>gulp.watch().on()</code> 函式監控檔案變動，如下範例：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">gulp.task(<span class="string">'watch'</span>, () =&gt; &#123;</span><br><span class="line">  gulp.watch(<span class="string">'./src/scss/*.scss'</span>, gulp.series(<span class="string">'sass'</span>)).on(<span class="string">'change'</span>, (event) =&gt; &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(event);</span><br><span class="line">    <span class="built_in">console</span>.log(path);</span><br><span class="line">    <span class="built_in">console</span>.log(stats);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>基本上 Gulp 3 版本的 <code>gulp.watch()</code> 已經可滿足大部分需求，一般開發足以應付，硬要挑剔的話，可能只剩無法全局監聽檔案可說嘴，但這的確是個問題，有時候我們需要知道更動檔案的相關資訊，比如說：新增、刪除事件等等，對於 Gulp 3 版本來講，是無法提供新增或刪除檔案等相關資料的，一部分人可能會去使用 <code>gulp-watch</code> 套件，這的確也是個辦法，但與之前提到的 run-sequence 套件來說，這些基本的功能也需要依靠套件去完成，會不會有點麻煩？到了 Gulp 4 版本，改寫了內部 <code>gulp.watch()</code> 的運作邏輯，新增了幾個參數可以使用，讓我們直接看範例：</p>
+<!-- prettier-ignore-start -->
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">gulp.task(<span class="string">"watch"</span>, () =&gt; &#123;</span><br><span class="line">  gulp</span><br><span class="line">    .watch(<span class="string">"./src/scss/*.scss"</span>, gulp.series(<span class="string">"sass"</span>))</span><br><span class="line">    .on(<span class="string">"all"</span>, (event, path, stats) =&gt; &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(event);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<!-- prettier-ignore-end -->
+
+<p>使用 function task：</p>
+<!-- prettier-ignore-start -->
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">exports.watch = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  gulp</span><br><span class="line">    .watch(<span class="string">"./src/scss/*.scss"</span>, gulp.series(<span class="string">"sass"</span>))</span><br><span class="line">    .on(<span class="string">"all"</span>, (event, path, stats) =&gt; &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(event);</span><br><span class="line">      <span class="built_in">console</span>.log(path);</span><br><span class="line">      <span class="built_in">console</span>.log(stats);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<!-- prettier-ignore-end -->
+
+<p>Gulp 4 版本的 <code>gulp.watch()</code> API 可使用 <code>all</code> 作為事件名稱，代表著任何事件都將被觸發，包含新增、刪除等等，以及新增了 <code>path</code> 與 <code>stats</code> 參數，訪問參數即可得知更動檔案的相關資訊，簡單來講就是小幅加強了 <code>gulp.watch()</code> 函式，也不需要再使用其他套件，內建的 API 足以勝任大部分工作。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Gulp-4/" rel="tag"># Gulp 4</a>
+              <a href="/tags/Node-js/" rel="tag"># Node.js</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2020-01-26-gulp-modular/" rel="next" title="Gulp 前端自動化 - CommonJS 模組化設計">
+                  <i class="fa fa-chevron-left"></i> Gulp 前端自動化 - CommonJS 模組化設計
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2020-02-03-gulp-gulpfilebabel/" rel="prev" title="Gulp 前端自動化 - 使用 ES6 Module 撰寫 Gulpfile">
+                  Gulp 前端自動化 - 使用 ES6 Module 撰寫 Gulpfile <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+          
+            
+              
+    <div class="comments" id="gitalk-container"></div>
+
+            
+          
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#筆記重點"><span class="nav-number">2.</span> <span class="nav-text">筆記重點</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#註冊-Task-任務的新方法"><span class="nav-number">3.</span> <span class="nav-text">註冊 Task 任務的新方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#任務依賴和執行函式"><span class="nav-number">4.</span> <span class="nav-text">任務依賴和執行函式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#非同步完成"><span class="nav-number">5.</span> <span class="nav-text">非同步完成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Watch-API-可監聽全局事件"><span class="nav-number">6.</span> <span class="nav-text">Watch API 可監聽全局事件</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Roya" src="/images/userLogo.jpg">
+  <p class="site-author-name" itemprop="name">Roya</p>
+  <div class="site-description" itemprop="description">Front-End Web Developer<br>學會運用比學會使用還要來的有用</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">69</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/awdr74100" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;awdr74100" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:a78945612385238@gmail.com" title="E-Mail &amp;rarr; mailto:a78945612385238@gmail.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Roya</span>
+</div>
+  <span class="post-meta-divider">轉載文章時請附上作者暱稱與原文連結</span>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+
+<script src="/js/utils.js?v=7.4.2.js"></script>
+
+
+<script src="/js/schemes/pisces.js?v=7.4.2.js"></script>
+
+
+<script src="/js/next-boot.js?v=7.4.2.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+  
+<script src="/js/local-search.js?v=7.4.2.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '7cdb0d531869e18caad8',
+      clientSecret: '0b6a38cef9c3ae1dcf0ea66e916ab68823dbab52',
+      repo: 'awdr74100.github.io',
+      owner: 'awdr74100',
+      admin: ['awdr74100'],
+      id: 'b5de27be6531fc23bb790bc0543a255e',
+        language: 'zh-TW',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+  
+
+
+</body>
+</html>

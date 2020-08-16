@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon-128.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png?v=7.4.2">
+  <link rel="mask-icon" href="/images/favicon-none.svg?v=7.4.2" color="#222">
+  <link rel="alternate" href="/atom.xml" title="Roya's Blog" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"default"},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '複製',
+      copy_success: '複製成功',
+      copy_failure: '複製失敗'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="在 Webpack 中我們會使用 DefinePlugin 或 EnvironmentPlugin 來設置全局變量，以提供 entry 內的模組針對這一個變數快速做響應，但有一點困擾我們的是，這兩個 Plugin 撰寫的全局變量都是屬於顯式性質的，代表任何人都能從所撰寫的位置得知這一個全局變量，如果情況發生在尚未發布的專案，有心人就可利用這一個變量，通常為測試主機位址，進一步做攻擊的動作，在後端我">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Webpack 前端打包工具 - 使用 dotenv-webpack 設置全局變量">
+<meta property="og:url" content="https://awdr74100.github.io/2020-06-29-webpack-dotenvwebpack/index.html">
+<meta property="og:site_name" content="Roya&#39;s Blog">
+<meta property="og:description" content="在 Webpack 中我們會使用 DefinePlugin 或 EnvironmentPlugin 來設置全局變量，以提供 entry 內的模組針對這一個變數快速做響應，但有一點困擾我們的是，這兩個 Plugin 撰寫的全局變量都是屬於顯式性質的，代表任何人都能從所撰寫的位置得知這一個全局變量，如果情況發生在尚未發布的專案，有心人就可利用這一個變量，通常為測試主機位址，進一步做攻擊的動作，在後端我">
+<meta property="og:locale" content="zh_TW">
+<meta property="article:published_time" content="2020-06-29T13:23:49.000Z">
+<meta property="article:modified_time" content="2020-06-30T10:01:30.000Z">
+<meta property="article:author" content="Roya">
+<meta property="article:tag" content="Node.js">
+<meta property="article:tag" content="w3HexSchool">
+<meta property="article:tag" content="Webpack">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://awdr74100.github.io/2020-06-29-webpack-dotenvwebpack/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Webpack 前端打包工具 - 使用 dotenv-webpack 設置全局變量 | Roya's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-150715469-1"></script>
+    <script>
+      var host = window.location.hostname;
+      if (host !== "localhost" || !true) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-150715469-1');
+      }
+    </script>
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Roya's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">現代化 Web 開發技術學習分享</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>標籤<span class="badge">28</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分類<span class="badge">9</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>歸檔<span class="badge">69</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none" placeholder="搜尋..." spellcheck="false" type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://awdr74100.github.io/2020-06-29-webpack-dotenvwebpack/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/userLogo.jpg">
+      <meta itemprop="name" content="Roya">
+      <meta itemprop="description" content="Front-End Web Developer<br>學會運用比學會使用還要來的有用">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Roya's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          Webpack 前端打包工具 - 使用 dotenv-webpack 設置全局變量
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-06-29 21:23:49" itemprop="dateCreated datePublished" datetime="2020-06-29T21:23:49+08:00">2020-06-29</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-06-30 18:01:30" itemprop="dateModified" datetime="2020-06-30T18:01:30+08:00">2020-06-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Webpack/" itemprop="url" rel="index">
+                    <span itemprop="name">Webpack</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在 Webpack 中我們會使用 DefinePlugin 或 EnvironmentPlugin 來設置全局變量，以提供 entry 內的模組針對這一個變數快速做響應，但有一點困擾我們的是，這兩個 Plugin 撰寫的全局變量都是屬於顯式性質的，代表任何人都能從所撰寫的位置得知這一個全局變量，如果情況發生在尚未發布的專案，有心人就可利用這一個變量，通常為測試主機位址，進一步做攻擊的動作，在後端我們會使用 dotenv 套件，前端可使用 dotenv-webpack 套件，屬 DefinePlugin 與 dotenv 的包裝，進一步將變量中的敏感信息隱藏起來。</p>
+<h2 id="筆記重點"><a href="#筆記重點" class="headerlink" title="筆記重點"></a>筆記重點</h2><ul>
+<li>dotenv-webpack 安裝</li>
+<li>dotenv-webpack 基本使用</li>
+<li>dotenv-webpack 可傳遞選項</li>
+<li>補充：cross-env 與 dotenv-webpack 差別</li>
+</ul>
+<h2 id="dotenv-webpack-安裝"><a href="#dotenv-webpack-安裝" class="headerlink" title="dotenv-webpack 安裝"></a>dotenv-webpack 安裝</h2><blockquote>
+<p>套件連結：<a href="https://www.npmjs.com/package/dotenv-webpack" target="_blank" rel="external nofollow noopener noreferrer">dotenv-webpack</a></p>
+</blockquote>
+<p>主要的套件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install dotenv-webpack -D</span><br></pre></td></tr></table></figure>
+
+<p>package.json：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"devDependencies"</span>: &#123;</span><br><span class="line">    <span class="attr">"dotenv-webpack"</span>: <span class="string">"^1.8.0"</span>,</span><br><span class="line">    <span class="attr">"webpack"</span>: <span class="string">"^4.43.0"</span>,</span><br><span class="line">    <span class="attr">"webpack-cli"</span>: <span class="string">"^3.3.12"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>dotenv-webpack 屬 DefinePlugin 與 dotenv 的包裝，這兩個套件都不需要額外進行安裝，其中的 DefinePlugin 是 Webpack 本身就存在的套件，而 dotenv 則是 dotenv-webpack 的相依套件，嚴格來講是 dotenv-default 的相依套件。</p>
+<h2 id="dotenv-webpack-基本使用"><a href="#dotenv-webpack-基本使用" class="headerlink" title="dotenv-webpack 基本使用"></a>dotenv-webpack 基本使用</h2><p>初始專案結構：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">webpack-demo&#x2F;</span><br><span class="line">│</span><br><span class="line">├─── node_modules&#x2F;</span><br><span class="line">├─── src&#x2F;</span><br><span class="line">│   │</span><br><span class="line">│   └─── main.js          # entry 入口檔案</span><br><span class="line">│</span><br><span class="line">├─── webpack.config.js    # Webpack 配置檔案</span><br><span class="line">├─── package-lock.json</span><br><span class="line">└─── package.json</span><br></pre></td></tr></table></figure>
+
+<p>前面我們先來看 DefinePlugin 與 EnvironmentPlugin 是如何設置全局變量的：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">'path'</span>);</span><br><span class="line"><span class="keyword">const</span> webpack = <span class="built_in">require</span>(<span class="string">'webpack'</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  entry: <span class="string">'./src/main.js'</span>,</span><br><span class="line">  output: &#123;</span><br><span class="line">    path: path.resolve(__dirname, <span class="string">'dist'</span>),</span><br><span class="line">    filename: <span class="string">'js/[name].js'</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> webpack.DefinePlugin(&#123;</span><br><span class="line">      API_URL: <span class="string">'http://localhost:3000'</span>,</span><br><span class="line">    &#125;),</span><br><span class="line">  ],</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>這邊要注意，上面 DefinePlugin 中的 value 寫法是錯誤的，可參考以下示例：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 讀取</span></span><br><span class="line"><span class="built_in">console</span>.log(API_URL);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 結果</span></span><br><span class="line"><span class="built_in">console</span>.log(http:<span class="comment">//localhost:3000);</span></span><br></pre></td></tr></table></figure>
+
+<p>DefinePlugin 會將編譯範圍內的全局變量 key 替換成對應的 value，這邊的替換是指原封不動的進行替換，此時可能就會造成像上面這樣子的結果，建議透過 <code>JSON.stringify()</code> 來完成予值動作：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> webpack.DefinePlugin(&#123;</span><br><span class="line">      API_URL: <span class="built_in">JSON</span>.stringify(<span class="string">'http://localhost:3000'</span>),</span><br><span class="line">    &#125;),</span><br><span class="line">  ],</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>此時就能確保編譯後的結果如預期：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="string">'http://localhost:3000'</span>);</span><br></pre></td></tr></table></figure>
+
+<p>很明顯的 DefinePlugin 有著不直覺的設計，這才有了後來的 EnvironmentPlugin 出現：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> webpack.EnvironmentPlugin(&#123;</span><br><span class="line">      API_URL: <span class="string">'http://localhost:3000'</span>,</span><br><span class="line">    &#125;),</span><br><span class="line">  ],</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>上面等效於以下 DefinePlugin 的寫法：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> webpack.DefinePlugin(&#123;</span><br><span class="line">      <span class="string">'process.env.API_URL'</span>: <span class="built_in">JSON</span>.stringify(<span class="string">'http://localhost:3000'</span>),</span><br><span class="line">    &#125;),</span><br><span class="line">  ],</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>是不是很酷？在 EnvironmentPlugin 宣告的全局變量始終都會有 <code>process.env</code> 字串符前綴，這邊的 <code>process.env</code> 並不是指環境變數，如果你到 <code>process.env</code> 底下是找不到 <code>API_URL</code> 這個對象的，加入 <code>process.env</code> 的目的在於模擬環境變數的使用，這邊我們也不需要手動加入 <code>JSON.stringify()</code> 語法，EnvironmentPlugin 會自動幫我們添加，可參考以下示例：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 讀取</span></span><br><span class="line"><span class="built_in">console</span>.log(process.env.API_URL);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 結果</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'http://localhost:3000'</span>);</span><br></pre></td></tr></table></figure>
+
+<p>跑過 DefinePlugin 與 EnvironmentPlugin 你會發現兩者所撰寫的全局變量都是屬於顯示性質的，假設你將此專案推至 GitHub 等遠端 Repository 並將其設為公開，任何人都能在 Webpack 配置檔看到這些全局變量，這是很危險的一件事，這時候就是 dotenv-webpack 出場的時候了，配置如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">'path'</span>);</span><br><span class="line"><span class="comment">// 載入 dotenv-webpack (第一步)</span></span><br><span class="line"><span class="keyword">const</span> Dotenv = <span class="built_in">require</span>(<span class="string">'dotenv-webpack'</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  entry: <span class="string">'./src/main.js'</span>,</span><br><span class="line">  output: &#123;</span><br><span class="line">    path: path.resolve(__dirname, <span class="string">'dist'</span>),</span><br><span class="line">    filename: <span class="string">'js/[name].js'</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="comment">// 創建實例 (第二步)</span></span><br><span class="line">    <span class="keyword">new</span> Dotenv(),</span><br><span class="line">  ],</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>配置 dotenv-webpack 相當簡單，與其他 Webpack Plugin 大同小異，在 dotenv-webpack 內部有一個可傳遞選項名為 <code>path</code>，預設指向 <code>./.env</code> 這支檔案，這也是我們設置全局變量的地方，請先新增名為 <code>.env</code> 的檔案：</p>
+<figure class="highlight diff"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"> webpack-demo/</span><br><span class="line"> │</span><br><span class="line"><span class="addition">+└─── .env</span></span><br></pre></td></tr></table></figure>
+
+<p>配置方法如同後端的 dotenv 套件，參考以下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">API_URL &#x3D; http:&#x2F;&#x2F;localhost:3000</span><br></pre></td></tr></table></figure>
+
+<p>目前我們就只是將全局變量額外撰寫至 <code>.env</code> 檔內，為了達到隱藏的目的可將 <code>.env</code> 檔案新增至 <code>.gitignore</code> 內，這樣就能避免 GitHub 存在任何顯式型態的全局變量，接著來說明 <code>.env</code> 檔內的全局變量該如何做使用：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 讀取</span></span><br><span class="line"><span class="built_in">console</span>.log(process.env.API_URL);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 結果</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'http://localhost:3000'</span>);</span><br></pre></td></tr></table></figure>
+
+<p>畢竟 dotenv-webpack 屬 DefinePlugin 與 dotenv 的包裝，取用的方法自然就跟 DefinePlugin 很像，優點是少了 DefinePlugin 那些不直覺的設計，dotenv-webpack 內部與 EnvironmentPlugin 差不多，都已經幫我們處理好 <code>process.env</code> 與 <code>JSON.stringify()</code> 的問題，凡是在 <code>.env</code> 設置的全局變量，一律都是使用 <code>process.env.XXX</code> 將其讀取，這邊唯一要注意的是 <code>.env</code> 設置的全局變量都是屬於字串型態，在某些情況下我們得自己處理轉型的問題。</p>
+<p>這邊做個補充，在 <code>.env</code> 撰寫的全局變量嚴格來講並不屬於隱式型態，畢竟在前端沒有所謂的隱式說法，最後還是會透過打包暴露給引用對象，凡是有基礎底子的人都能透過原始碼推測全局變量的內容值，dotenv-webpack 所能做的就是限制全局變量的暴露關係，只將代碼中顯示引用的全局變量暴露給最終綑綁包，代表未經引用的變量將被拋棄，任何人都無法查看這一個變量內容。</p>
+<h2 id="dotenv-webpack-可傳遞選項"><a href="#dotenv-webpack-可傳遞選項" class="headerlink" title="dotenv-webpack 可傳遞選項"></a>dotenv-webpack 可傳遞選項</h2><p>可參考 <a href="https://www.npmjs.com/package/dotenv-webpack#properties" target="_blank" rel="external nofollow noopener noreferrer">dotenv-webpack Options</a> 可傳遞參數列表，以下為常用的參數配置：</p>
+<ul>
+<li><p>path：<code>String</code><br>配置全局變量的位置，默認為 <code>./.env</code></p>
+</li>
+<li><p>systemvars：<code>Boolean</code><br>允許加載所有系統變量，包含 cross-env 設置的變量，默認為 <code>false</code></p>
+</li>
+</ul>
+<p>範例：</p>
+<!-- prettier-ignore-start -->
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> Dotenv = <span class="built_in">require</span>(<span class="string">"dotenv-webpack"</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> Dotenv(&#123;</span><br><span class="line">      path:</span><br><span class="line">        process.env.NODE_ENV === <span class="string">"development"</span></span><br><span class="line">          ? <span class="string">"./.env.development"</span></span><br><span class="line">          : <span class="string">"./.env.production"</span>,</span><br><span class="line">      systemvars: <span class="literal">true</span>, <span class="comment">// 允許讀取 process.env 下的任意系統變量</span></span><br><span class="line">    &#125;),</span><br><span class="line">  ],</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<!-- prettier-ignore-end -->
+
+<h2 id="補充：cross-env-與-dotenv-webpack-差別"><a href="#補充：cross-env-與-dotenv-webpack-差別" class="headerlink" title="補充：cross-env 與 dotenv-webpack 差別"></a>補充：cross-env 與 dotenv-webpack 差別</h2><p>這邊補充關於 cross-env 與 dotenv-webpack 的差別，嚴格來講是比較 cross-env 與 DefinePlugin 的差別，畢竟 dotenv-webpack 與 EnvironmentPlugin 都是基於 DefinePlugin 所設計，前面已經安裝過 dotenv-webpack 了，這邊將 cross-env 也給安裝進來：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install cross-env -D</span><br></pre></td></tr></table></figure>
+
+<p>接著在 <code>package.json</code> 新增 <code>cross-env</code> 指令：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"scripts"</span>: &#123;</span><br><span class="line">    <span class="attr">"dev"</span>: <span class="string">"cross-env NODE_ENV=development webpack"</span>,</span><br><span class="line">    <span class="attr">"build"</span>: <span class="string">"cross-env NODE_ENV=production webpack"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>之前我們有提到使用 cross-env 的目的在於兼容各平台的環境變數設置，畢竟在 Windows 系統下是無法直接像 <code>NODE_ENV=development</code> 這樣設置環境變數的，這時候就牽扯到一個問題了，那就是這個環境變數取用的範圍是到哪裡？直接來看範例：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ./webpack.config.js</span></span><br><span class="line"><span class="built_in">console</span>.log(process.env.NODE_ENV); <span class="comment">// development</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// ./src/main.js</span></span><br><span class="line"><span class="built_in">console</span>.log(process.env.NODE_ENV); <span class="comment">// development</span></span><br></pre></td></tr></table></figure>
+
+<p>這時你可能會認為 cross-env 設置的環境變數可在任何地方做使用，代表運行環境與編譯環境都能讀取到值，這其實是錯誤的觀念，你可以嘗試將 cross-env 的變量更改為如下：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"scripts"</span>: &#123;</span><br><span class="line">    <span class="attr">"dev"</span>: <span class="string">"cross-env NODE_ENV=development USER_NAME=Roya webpack"</span>,</span><br><span class="line">    <span class="attr">"build"</span>: <span class="string">"cross-env NODE_ENV=production USER_NAME=Eric webpack"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>接著讀取環境變量：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ./webpack.config.js</span></span><br><span class="line"><span class="built_in">console</span>.log(process.env.NODE_ENV); <span class="comment">// development</span></span><br><span class="line"><span class="built_in">console</span>.log(process.env.USER_NAME); <span class="comment">// Roya</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// ./src/main.js</span></span><br><span class="line"><span class="built_in">console</span>.log(process.env.NODE_ENV); <span class="comment">// development</span></span><br><span class="line"><span class="built_in">console</span>.log(process.env.USER_NAME); <span class="comment">// undefined</span></span><br></pre></td></tr></table></figure>
+
+<p>發現到神奇的地方了嗎？除了 <code>NODE_ENV</code> 變量以外，其它變量在編譯環境都讀不到值，這邊的編譯環境是指 entry 入口引入的那些模組，比如說 <code>./src/main.js</code>，而運行環境就是指除此之外的那些檔案，比如說 <code>./webpack.config.js</code>，這邊的 <code>NODE_ENV</code> 變量其實不是由 cross-env 設置的，而是我們在設置 <code>mode</code> 選項時，Webpack 自動使用 DefinePlugin 設置的，參考以下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> webpack.DefinePlugin(&#123;</span><br><span class="line">      <span class="string">'process.env.NODE_ENV'</span>: <span class="built_in">JSON</span>.stringify(<span class="string">'&lt;當前環境&gt;'</span>),</span><br><span class="line">    &#125;),</span><br><span class="line">  ],</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>所以我們可以得出的結論是，<strong>使用 cross-env 設置的環境變量只能在運行環境讀取到其值</strong>，在編譯環境是無法讀取到值的，較常使用在 <code>webpack.config.js</code> 做為邏輯的判斷。</p>
+<p>看完了 cross-env 的介紹，接著來看 DefinePlugin 設置的變量範圍：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> webpack.DefinePlugin(&#123;</span><br><span class="line">      <span class="string">'process.env.USER_NAME'</span>: <span class="built_in">JSON</span>.stringify(<span class="string">'Roya'</span>),</span><br><span class="line">    &#125;),</span><br><span class="line">  ],</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>如同我們前面所說，上面寫法等效於以下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> webpack.EnvironmentPlugin(&#123;</span><br><span class="line">      USER_NAME: <span class="string">'Roya'</span>,</span><br><span class="line">    &#125;),</span><br><span class="line">  ],</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>也等效於 dotenv-webpack 的寫法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">USER_NAME &#x3D; Roya</span><br></pre></td></tr></table></figure>
+
+<p>接著讀取全局變量：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ./webpack.config.js</span></span><br><span class="line"><span class="built_in">console</span>.log(process.env.USER_NAME); <span class="comment">// undefined</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// ./src/main.js</span></span><br><span class="line"><span class="built_in">console</span>.log(process.env.USER_NAME); <span class="comment">// Roya</span></span><br></pre></td></tr></table></figure>
+
+<p>很明顯的 <strong>DefinePlugin、EnvironmentPlugin、dotenv-webpack 設置的全局變量都只存在於編譯環境內</strong>，畢竟要先有編譯的這個動作，Webpack 才能將這些變量注入進去，這點蠻合理的，這也是我前面強調這些方法屬於全局變量但不屬於環境變量的原因。</p>
+<p>基於 cross-env 設置的變量是屬於環境變量，代表變量是掛載到 <code>process.env</code> 物件下，假設你使用的是 dotenv-webpack 設置變量，可開啟 <code>systemvars</code> 選項，這時編譯環境內就能夠讀取到 cross-env 設置的環境變量，可參考以下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> Dotenv(&#123;</span><br><span class="line">      systemvars: <span class="literal">true</span>,</span><br><span class="line">    &#125;),</span><br><span class="line">  ],</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>不須在 <code>.env</code> 設置全局變數，直接讀取 cross-env 設置的環境變量即可：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(process.env.USER_NAME);</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Node-js/" rel="tag"># Node.js</a>
+              <a href="/tags/w3HexSchool/" rel="tag"># w3HexSchool</a>
+              <a href="/tags/Webpack/" rel="tag"># Webpack</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2020-06-24-scss-gridsystem-spacing/" rel="next" title="Sass / SCSS 預處理器 - 自建 CSS 框架中的 Grid System 與 Spacing">
+                  <i class="fa fa-chevron-left"></i> Sass / SCSS 預處理器 - 自建 CSS 框架中的 Grid System 與 Spacing
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2020-07-06-webpack-optimizecssassetswebpackplugin/" rel="prev" title="Webpack 前端打包工具 - 使用 optimize-css-assets-webpack-plugin 壓縮 CSS">
+                  Webpack 前端打包工具 - 使用 optimize-css-assets-webpack-plugin 壓縮 CSS <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+          
+            
+              
+    <div class="comments" id="gitalk-container"></div>
+
+            
+          
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#筆記重點"><span class="nav-number">2.</span> <span class="nav-text">筆記重點</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dotenv-webpack-安裝"><span class="nav-number">3.</span> <span class="nav-text">dotenv-webpack 安裝</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dotenv-webpack-基本使用"><span class="nav-number">4.</span> <span class="nav-text">dotenv-webpack 基本使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dotenv-webpack-可傳遞選項"><span class="nav-number">5.</span> <span class="nav-text">dotenv-webpack 可傳遞選項</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#補充：cross-env-與-dotenv-webpack-差別"><span class="nav-number">6.</span> <span class="nav-text">補充：cross-env 與 dotenv-webpack 差別</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Roya" src="/images/userLogo.jpg">
+  <p class="site-author-name" itemprop="name">Roya</p>
+  <div class="site-description" itemprop="description">Front-End Web Developer<br>學會運用比學會使用還要來的有用</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">69</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/awdr74100" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;awdr74100" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:a78945612385238@gmail.com" title="E-Mail &amp;rarr; mailto:a78945612385238@gmail.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Roya</span>
+</div>
+  <span class="post-meta-divider">轉載文章時請附上作者暱稱與原文連結</span>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+
+<script src="/js/utils.js?v=7.4.2.js"></script>
+
+
+<script src="/js/schemes/pisces.js?v=7.4.2.js"></script>
+
+
+<script src="/js/next-boot.js?v=7.4.2.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+  
+<script src="/js/local-search.js?v=7.4.2.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '7cdb0d531869e18caad8',
+      clientSecret: '0b6a38cef9c3ae1dcf0ea66e916ab68823dbab52',
+      repo: 'awdr74100.github.io',
+      owner: 'awdr74100',
+      admin: ['awdr74100'],
+      id: '9ed012cc830fcf376933860038533f9e',
+        language: 'zh-TW',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+  
+
+
+</body>
+</html>

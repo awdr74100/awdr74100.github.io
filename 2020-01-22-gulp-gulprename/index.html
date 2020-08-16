@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon-128.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png?v=7.4.2">
+  <link rel="mask-icon" href="/images/favicon-none.svg?v=7.4.2" color="#222">
+  <link rel="alternate" href="/atom.xml" title="Roya's Blog" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"default"},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '複製',
+      copy_success: '複製成功',
+      copy_failure: '複製失敗'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="上一次介紹了 Minimist 這個套件以區分生產環境與開發環境的處理流程，通常在一般開發中，我們會針對生產環境與開發環境所釋出的檔案個別命名以方便辨認，但在 Gulp 中預設是無法進行重命名操作的，Stream 的起始文件名稱為何，導出時名稱就為何。此篇將介紹如何使用 gulp rename 套件針對 Gulp 中的 Stream 檔案進行重命名動作。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Gulp 前端自動化 - 替換 Stream 中的檔案名稱">
+<meta property="og:url" content="https://awdr74100.github.io/2020-01-22-gulp-gulprename/index.html">
+<meta property="og:site_name" content="Roya&#39;s Blog">
+<meta property="og:description" content="上一次介紹了 Minimist 這個套件以區分生產環境與開發環境的處理流程，通常在一般開發中，我們會針對生產環境與開發環境所釋出的檔案個別命名以方便辨認，但在 Gulp 中預設是無法進行重命名操作的，Stream 的起始文件名稱為何，導出時名稱就為何。此篇將介紹如何使用 gulp rename 套件針對 Gulp 中的 Stream 檔案進行重命名動作。">
+<meta property="og:locale" content="zh_TW">
+<meta property="article:published_time" content="2020-01-22T12:56:36.000Z">
+<meta property="article:modified_time" content="2020-02-10T06:19:30.000Z">
+<meta property="article:author" content="Roya">
+<meta property="article:tag" content="Gulp 4">
+<meta property="article:tag" content="Node.js">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://awdr74100.github.io/2020-01-22-gulp-gulprename/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Gulp 前端自動化 - 替換 Stream 中的檔案名稱 | Roya's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-150715469-1"></script>
+    <script>
+      var host = window.location.hostname;
+      if (host !== "localhost" || !true) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-150715469-1');
+      }
+    </script>
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Roya's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">現代化 Web 開發技術學習分享</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>標籤<span class="badge">28</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分類<span class="badge">9</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>歸檔<span class="badge">69</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none" placeholder="搜尋..." spellcheck="false" type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://awdr74100.github.io/2020-01-22-gulp-gulprename/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/userLogo.jpg">
+      <meta itemprop="name" content="Roya">
+      <meta itemprop="description" content="Front-End Web Developer<br>學會運用比學會使用還要來的有用">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Roya's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          Gulp 前端自動化 - 替換 Stream 中的檔案名稱
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-01-22 20:56:36" itemprop="dateCreated datePublished" datetime="2020-01-22T20:56:36+08:00">2020-01-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-02-10 14:19:30" itemprop="dateModified" datetime="2020-02-10T14:19:30+08:00">2020-02-10</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Gulp/" itemprop="url" rel="index">
+                    <span itemprop="name">Gulp</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上一次介紹了 Minimist 這個套件以區分生產環境與開發環境的處理流程，通常在一般開發中，我們會針對生產環境與開發環境所釋出的檔案個別命名以方便辨認，但在 Gulp 中預設是無法進行重命名操作的，Stream 的起始文件名稱為何，導出時名稱就為何。此篇將介紹如何使用 gulp rename 套件針對 Gulp 中的 Stream 檔案進行重命名動作。</p>
+<h2 id="筆記重點"><a href="#筆記重點" class="headerlink" title="筆記重點"></a>筆記重點</h2><ul>
+<li>gulp-rename 安裝</li>
+<li>gulp-rename 基本使用</li>
+<li>gulp-rename 可傳遞方法</li>
+</ul>
+<h2 id="gulp-rename-安裝"><a href="#gulp-rename-安裝" class="headerlink" title="gulp-rename 安裝"></a>gulp-rename 安裝</h2><blockquote>
+<p>套件連結：<a href="https://www.npmjs.com/package/gulp-rename" target="_blank" rel="external nofollow noopener noreferrer">gulp-rename</a></p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install gulp-rename</span><br></pre></td></tr></table></figure>
+
+<p>無任何相依套件，直接安裝即可。</p>
+<h2 id="gulp-rename-基本使用"><a href="#gulp-rename-基本使用" class="headerlink" title="gulp-rename 基本使用"></a>gulp-rename 基本使用</h2><div class="note warning">此次範例會結合 minimist、gulp-sass 套件一起使用，相關文章連結：<a href="https://awdr74100.github.io/2020-01-21-gulp-minimist/" target="_blank">minimist</a>、<a href="https://awdr74100.github.io/2019-12-31-gulp-gulpsass/" target="_blank">gulp-sass</a></div>
+
+<p>初始專案結構：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">gulp-demo&#x2F;</span><br><span class="line">│</span><br><span class="line">├─── node_modules&#x2F;</span><br><span class="line">├─── source&#x2F;</span><br><span class="line">│   │</span><br><span class="line">│   └─── scss&#x2F;</span><br><span class="line">│       │</span><br><span class="line">│       └─── all.scss     # SCSS 主檔案</span><br><span class="line">│</span><br><span class="line">├─── gulpfile.js          # Gulp 配置檔案</span><br><span class="line">├─── package-lock.json</span><br><span class="line">└─── package.json         # 安裝 gulp、gulp-rename、other...</span><br></pre></td></tr></table></figure>
+
+<p>載入並使用 gulp-rename：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> gulp = <span class="built_in">require</span>(<span class="string">'gulp'</span>);</span><br><span class="line"><span class="keyword">const</span> sass = <span class="built_in">require</span>(<span class="string">'gulp-sass'</span>);</span><br><span class="line"><span class="keyword">const</span> cleanCSS = <span class="built_in">require</span>(<span class="string">'gulp-clean-css'</span>);</span><br><span class="line"><span class="keyword">const</span> parseArgs = <span class="built_in">require</span>(<span class="string">'minimist'</span>);</span><br><span class="line"><span class="keyword">const</span> gulpif = <span class="built_in">require</span>(<span class="string">'gulp-if'</span>);</span><br><span class="line"><span class="keyword">const</span> rename = <span class="built_in">require</span>(<span class="string">'gulp-rename'</span>); <span class="comment">// 載入 gulp-rename 套件</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 獲取命令行參數</span></span><br><span class="line"><span class="keyword">const</span> argv = parseArgs(process.argv.slice(<span class="number">2</span>)).env;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* --- SCSS 編譯 --- */</span></span><br><span class="line">gulp.task(<span class="string">'sass'</span>, () =&gt; &#123;</span><br><span class="line">  <span class="keyword">return</span> gulp</span><br><span class="line">    .src(<span class="string">'./source/scss/*.scss'</span>)</span><br><span class="line">    .pipe(sass().on(<span class="string">'error'</span>, sass.logError))</span><br><span class="line">    .pipe(gulpif(argv === <span class="string">'production'</span>, cleanCSS(&#123; <span class="attr">compatibility</span>: <span class="string">'ie8'</span> &#125;)))</span><br><span class="line">    .pipe(gulpif(argv === <span class="string">'production'</span>, rename(<span class="string">'all.min.css'</span>))) <span class="comment">// 重命名</span></span><br><span class="line">    .pipe(gulp.dest(<span class="string">'public/css'</span>)); <span class="comment">// ./public/css/all.min.css</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>在 production 環境執行指定任務：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ gulp sass --env production</span><br></pre></td></tr></table></figure>
+
+<p>此時生成檔案的名稱會從 <code>all.css</code> 改為 <code>all.min.css</code>，由於上面這一個 rename 名稱是寫死的，如果有多個檔案同時導入，最後在導出檔案時因為名稱相同，可能會發生錯誤，我們可以改使用下面寫法：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> gulp = <span class="built_in">require</span>(<span class="string">'gulp'</span>);</span><br><span class="line"><span class="keyword">const</span> sass = <span class="built_in">require</span>(<span class="string">'gulp-sass'</span>);</span><br><span class="line"><span class="keyword">const</span> cleanCSS = <span class="built_in">require</span>(<span class="string">'gulp-clean-css'</span>);</span><br><span class="line"><span class="keyword">const</span> parseArgs = <span class="built_in">require</span>(<span class="string">'minimist'</span>);</span><br><span class="line"><span class="keyword">const</span> gulpif = <span class="built_in">require</span>(<span class="string">'gulp-if'</span>);</span><br><span class="line"><span class="keyword">const</span> rename = <span class="built_in">require</span>(<span class="string">'gulp-rename'</span>); <span class="comment">// 載入 gulp-rename 套件</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 獲取命令行參數</span></span><br><span class="line"><span class="keyword">const</span> argv = parseArgs(process.argv.slice(<span class="number">2</span>)).env;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* --- SCSS 編譯 --- */</span></span><br><span class="line">gulp.task(<span class="string">'sass'</span>, () =&gt; &#123;</span><br><span class="line">  <span class="keyword">return</span> gulp</span><br><span class="line">    .src(<span class="string">'./source/scss/*.scss'</span>)</span><br><span class="line">    .pipe(sass().on(<span class="string">'error'</span>, sass.logError))</span><br><span class="line">    .pipe(gulpif(argv === <span class="string">'production'</span>, cleanCSS(&#123; <span class="attr">compatibility</span>: <span class="string">'ie8'</span> &#125;)))</span><br><span class="line">    .pipe(</span><br><span class="line">      gulpif(</span><br><span class="line">        argv === <span class="string">'production'</span>,</span><br><span class="line">        rename(<span class="function">(<span class="params">path</span>) =&gt;</span> &#123;</span><br><span class="line">          <span class="built_in">console</span>.log(path); <span class="comment">// &#123; dirname: '.', basename: 'all', extname: '.css' &#125;</span></span><br><span class="line">          path.basename += <span class="string">'.min'</span>;</span><br><span class="line">        &#125;)</span><br><span class="line">      )</span><br><span class="line">    )</span><br><span class="line">    .pipe(gulp.dest(<span class="string">'public/css'</span>)); <span class="comment">// ./public/css/all.min.css</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>gulp-rename 套件預設可傳入一個 callback，第一個參數可得到初始檔案組成的物件，針對這一個物件做修改，同樣也可以達到重命名的目的，推薦使用此方法。</p>
+<h2 id="gulp-rename-可傳遞方法"><a href="#gulp-rename-可傳遞方法" class="headerlink" title="gulp-rename 可傳遞方法"></a>gulp-rename 可傳遞方法</h2><p>可參考 <a href="https://www.npmjs.com/package/gulp-rename#usage" target="_blank" rel="external nofollow noopener noreferrer">rename Options</a> 可傳遞參數列表，以下為常用的參數配置：</p>
+<ul>
+<li><p>dirname：<code>String</code><br>檔案目錄，預設為 <code>./</code></p>
+</li>
+<li><p>basename：<code>String</code><br>基本名稱，預設為 <code>Stream 初始檔案名稱</code></p>
+</li>
+<li><p>prefix：<code>String</code><br>增加前綴，預設為 <code>none</code></p>
+</li>
+<li><p>suffix：<code>String</code><br>增加後綴，預設為 <code>none</code></p>
+</li>
+<li><p>extname：<code>String</code><br>副檔名，預設為 <code>Stream 初始檔案副檔名</code></p>
+</li>
+</ul>
+<p>範例：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">gulp.task(<span class="string">'sass'</span>, () =&gt; &#123;</span><br><span class="line">  <span class="keyword">return</span> gulp</span><br><span class="line">    .src(<span class="string">'./source/scss/*.scss'</span>)</span><br><span class="line">    .pipe(sass().on(<span class="string">'error'</span>, sass.logError))</span><br><span class="line">    .pipe(gulpif(argv === <span class="string">'production'</span>, cleanCSS(&#123; <span class="attr">compatibility</span>: <span class="string">'ie8'</span> &#125;)))</span><br><span class="line">    .pipe(</span><br><span class="line">      rename(&#123;</span><br><span class="line">        dirname: <span class="string">'./component'</span>,</span><br><span class="line">        basename: <span class="string">'stylesheet'</span>,</span><br><span class="line">        prefix: <span class="string">'master-'</span>,</span><br><span class="line">        suffix: <span class="string">'.min'</span>,</span><br><span class="line">      &#125;)</span><br><span class="line">    )</span><br><span class="line">    .pipe(gulp.dest(<span class="string">'public/css'</span>)); <span class="comment">// ./public/component/master-stylesheet.min.css</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>以可傳遞選項方式重命名檔案，相比上面幾種方法來說，似乎最為方便，我個人是比較常使用此方法，自己喜歡最重要。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Gulp-4/" rel="tag"># Gulp 4</a>
+              <a href="/tags/Node-js/" rel="tag"># Node.js</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2020-01-21-gulp-minimist/" rel="next" title="Gulp 前端自動化 - Minimist 命令行參數解析工具">
+                  <i class="fa fa-chevron-left"></i> Gulp 前端自動化 - Minimist 命令行參數解析工具
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2020-01-24-gulp-includebootstrap/" rel="prev" title="Gulp 前端自動化 - 客製化 Bootstrap 樣式並進行編譯">
+                  Gulp 前端自動化 - 客製化 Bootstrap 樣式並進行編譯 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+          
+            
+              
+    <div class="comments" id="gitalk-container"></div>
+
+            
+          
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#筆記重點"><span class="nav-number">2.</span> <span class="nav-text">筆記重點</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gulp-rename-安裝"><span class="nav-number">3.</span> <span class="nav-text">gulp-rename 安裝</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gulp-rename-基本使用"><span class="nav-number">4.</span> <span class="nav-text">gulp-rename 基本使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gulp-rename-可傳遞方法"><span class="nav-number">5.</span> <span class="nav-text">gulp-rename 可傳遞方法</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Roya" src="/images/userLogo.jpg">
+  <p class="site-author-name" itemprop="name">Roya</p>
+  <div class="site-description" itemprop="description">Front-End Web Developer<br>學會運用比學會使用還要來的有用</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">69</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/awdr74100" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;awdr74100" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:a78945612385238@gmail.com" title="E-Mail &amp;rarr; mailto:a78945612385238@gmail.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Roya</span>
+</div>
+  <span class="post-meta-divider">轉載文章時請附上作者暱稱與原文連結</span>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+
+<script src="/js/utils.js?v=7.4.2.js"></script>
+
+
+<script src="/js/schemes/pisces.js?v=7.4.2.js"></script>
+
+
+<script src="/js/next-boot.js?v=7.4.2.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+  
+<script src="/js/local-search.js?v=7.4.2.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '7cdb0d531869e18caad8',
+      clientSecret: '0b6a38cef9c3ae1dcf0ea66e916ab68823dbab52',
+      repo: 'awdr74100.github.io',
+      owner: 'awdr74100',
+      admin: ['awdr74100'],
+      id: 'be5133d8e4577b8b494d8448250b4076',
+        language: 'zh-TW',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+  
+
+
+</body>
+</html>

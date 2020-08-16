@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon-128.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png?v=7.4.2">
+  <link rel="mask-icon" href="/images/favicon-none.svg?v=7.4.2" color="#222">
+  <link rel="alternate" href="/atom.xml" title="Roya's Blog" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"default"},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '複製',
+      copy_success: '複製成功',
+      copy_failure: '複製失敗'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="Bootstrap 目前已經算是前端必備的技能了，相信大部分人在使用時都是以 CDN 的方式進行載入，但這樣子的作法等同於將整個官方預編譯好的 Bootstrap 進行載入，當我們需要客製化 Bootstrap 樣式時，必定得採取其他方法。此篇將介紹如何使用 npm 方式載入 Bootstrap，並透過 Gulp 編譯屬於我們自己的客製化樣式。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Gulp 前端自動化 - 客製化 Bootstrap 樣式並進行編譯">
+<meta property="og:url" content="https://awdr74100.github.io/2020-01-24-gulp-includebootstrap/index.html">
+<meta property="og:site_name" content="Roya&#39;s Blog">
+<meta property="og:description" content="Bootstrap 目前已經算是前端必備的技能了，相信大部分人在使用時都是以 CDN 的方式進行載入，但這樣子的作法等同於將整個官方預編譯好的 Bootstrap 進行載入，當我們需要客製化 Bootstrap 樣式時，必定得採取其他方法。此篇將介紹如何使用 npm 方式載入 Bootstrap，並透過 Gulp 編譯屬於我們自己的客製化樣式。">
+<meta property="og:locale" content="zh_TW">
+<meta property="article:published_time" content="2020-01-24T07:46:07.000Z">
+<meta property="article:modified_time" content="2020-02-03T07:31:19.000Z">
+<meta property="article:author" content="Roya">
+<meta property="article:tag" content="CSS">
+<meta property="article:tag" content="Gulp 4">
+<meta property="article:tag" content="Node.js">
+<meta property="article:tag" content="Bootstrap">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://awdr74100.github.io/2020-01-24-gulp-includebootstrap/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Gulp 前端自動化 - 客製化 Bootstrap 樣式並進行編譯 | Roya's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-150715469-1"></script>
+    <script>
+      var host = window.location.hostname;
+      if (host !== "localhost" || !true) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-150715469-1');
+      }
+    </script>
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Roya's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">現代化 Web 開發技術學習分享</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>標籤<span class="badge">28</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分類<span class="badge">9</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>歸檔<span class="badge">69</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none" placeholder="搜尋..." spellcheck="false" type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://awdr74100.github.io/2020-01-24-gulp-includebootstrap/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/userLogo.jpg">
+      <meta itemprop="name" content="Roya">
+      <meta itemprop="description" content="Front-End Web Developer<br>學會運用比學會使用還要來的有用">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Roya's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          Gulp 前端自動化 - 客製化 Bootstrap 樣式並進行編譯
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-01-24 15:46:07" itemprop="dateCreated datePublished" datetime="2020-01-24T15:46:07+08:00">2020-01-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-02-03 15:31:19" itemprop="dateModified" datetime="2020-02-03T15:31:19+08:00">2020-02-03</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Gulp/" itemprop="url" rel="index">
+                    <span itemprop="name">Gulp</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Bootstrap 目前已經算是前端必備的技能了，相信大部分人在使用時都是以 CDN 的方式進行載入，但這樣子的作法等同於將整個官方預編譯好的 Bootstrap 進行載入，當我們需要客製化 Bootstrap 樣式時，必定得採取其他方法。此篇將介紹如何使用 npm 方式載入 Bootstrap，並透過 Gulp 編譯屬於我們自己的客製化樣式。</p>
+<h2 id="筆記重點"><a href="#筆記重點" class="headerlink" title="筆記重點"></a>筆記重點</h2><ul>
+<li>相關套件安裝</li>
+<li>客製並編譯 Bootstrap 預設變數</li>
+<li>客製並編譯 Bootstrap 載入元件</li>
+</ul>
+<h2 id="相關套件安裝"><a href="#相關套件安裝" class="headerlink" title="相關套件安裝"></a>相關套件安裝</h2><blockquote>
+<p>套件連結：<a href="https://www.npmjs.com/package/gulp-sass" target="_blank" rel="external nofollow noopener noreferrer">gulp-sass</a>、<a href="https://www.npmjs.com/package/gulp-postcss" target="_blank" rel="external nofollow noopener noreferrer">gulp-postcss</a>、<a href="https://www.npmjs.com/package/autoprefixer" target="_blank" rel="external nofollow noopener noreferrer">autoprefixer</a>、<a href="https://getbootstrap.com/" target="_blank" rel="external nofollow noopener noreferrer">bootstrap</a></p>
+</blockquote>
+<p>bootstrap：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install bootstrap</span><br></pre></td></tr></table></figure>
+
+<p>require：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install gulp-sass gulp-postcss autoprefixer</span><br></pre></td></tr></table></figure>
+
+<p>Bootstrap 4 主要由 SCSS 建構而成，當你使用 npm 方式進行安裝時，在下載下來的 package 內即包含未編譯的 SCSS 原始檔案，我們可以針對這一個原始檔案進行客製化並編譯它，在這邊使用 gulp-sass 套件進行編譯，由於 Bootstrap 官方的預編譯版本有使用到 autoprefixer 插件以便自動在構建時向某些 CSS 屬性增加前輟詞，我們在處理編譯後檔案時，也必須參照此作法，所以同時安裝了 gulp-postcss 與 autoprefixer 套件。</p>
+<h2 id="客製並編譯-Bootstrap-預設變數"><a href="#客製並編譯-Bootstrap-預設變數" class="headerlink" title="客製並編譯 Bootstrap 預設變數"></a>客製並編譯 Bootstrap 預設變數</h2><div class="note warning">此次範例會結合 gulp-sass、gulp-postcss 套件一起使用，相關文章連結：<a href="https://awdr74100.github.io/2019-12-31-gulp-gulpsass/" target="_blank">gulp-sass</a>、<a href="https://awdr74100.github.io/2020-01-12-gulp-gulppostcss/" target="_blank">gulp-postcss</a></div>
+
+<p>初始專案結構：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">gulp-demo&#x2F;</span><br><span class="line">│</span><br><span class="line">├─── node_modules&#x2F;</span><br><span class="line">├─── source&#x2F;</span><br><span class="line">│   │</span><br><span class="line">│   └─── scss&#x2F;</span><br><span class="line">│       │</span><br><span class="line">│       └─── helpers</span><br><span class="line">│           │</span><br><span class="line">│           └─── _variables.scss    # 新增並修改 Bootstrap 預設變數</span><br><span class="line">│       │</span><br><span class="line">│       └─── all.scss     # SCSS 主檔案</span><br><span class="line">│</span><br><span class="line">├─── gulpfile.js          # Gulp 配置檔案</span><br><span class="line">├─── package-lock.json</span><br><span class="line">└─── package.json         # 安裝 gulp、gulp-sass、gulp-postcss、autoprefixer、bootstrap</span><br></pre></td></tr></table></figure>
+
+<div class="note warning">推薦使用懶人覆蓋法，將 ./node_modules/bootstrap/scss/_variables.scss 另存新檔至本地端</div>
+
+<p>新增 <code>./source/scss/helpers/_variables.scss</code> 並修改預設變數(須查詢預設變數名稱)：</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 查詢 node_modules/bootstrap/scss/_variables.scss 預設變數並新增到本地檔案 */</span></span><br><span class="line"></span><br><span class="line"><span class="variable">$primary</span>: <span class="number">#178ba0</span>; <span class="comment">// 隨意修改變數</span></span><br><span class="line"><span class="variable">$success</span>: <span class="number">#35a327</span>;</span><br></pre></td></tr></table></figure>
+
+<p>新增 <code>./source/scss/helpers/_variables.scss</code> 並修改預設變數(懶人覆蓋法)：</p>
+<!-- prettier-ignore-start -->
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 另存新檔 node_modules/bootstrap/scss/_variables.scss 預設變數並修改 */</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 其他省略 ...</span></span><br><span class="line"><span class="variable">$primary</span>:       <span class="number">#178ba0</span>; <span class="comment">// $blue !default;</span></span><br><span class="line"><span class="variable">$success</span>:       <span class="number">#35a327</span>; <span class="comment">// $green !default;</span></span><br></pre></td></tr></table></figure>
+<!-- prettier-ignore-end -->
+
+<p>根據官方文檔說明，Bootstrap 4 中的每個 SCSS 變數都包含 <code>!default</code> 標誌，允許您在自己的 SCSS 中覆蓋變數的預設值，而無需修改 Bootstrap 的原始碼。唯一要注意的是<strong>新變數必須在導入 Bootstrap 的 SCSS 主文件之前</strong>，否則無法成功，如下範例：</p>
+<div class="note warning">includePaths 為 gulp-sass 套件的可傳遞選項，接受屬性值為字串符陣列，默認為空陣列，主要用來讓解析引擎遍歷這些傳入的路徑，尋找 SCSS 模塊，已嘗試解析 @import 宣告</div>
+
+<p>路徑：<code>./source/scss/all.scss</code></p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* --- Required (使用 includePaths 方法) --- */</span></span><br><span class="line">@<span class="keyword">import</span> <span class="string">'functions'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'./helpers/variables'</span>; <span class="comment">// 使用本地檔案</span></span><br><span class="line">@<span class="keyword">import</span> <span class="string">'mixins'</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* --- Bootstrap 主檔案 --- */</span></span><br><span class="line"><span class="comment">// @import "../../node_modules/bootstrap/scss/bootstrap.scss";</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* --- Bootstrap 主檔案 (使用 includePaths 方法)--- */</span></span><br><span class="line">@<span class="keyword">import</span> <span class="string">'bootstrap'</span>;</span><br></pre></td></tr></table></figure>
+
+<p>編寫 <code>gulpfile.js</code> 文件</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> gulp = <span class="built_in">require</span>(<span class="string">'gulp'</span>);</span><br><span class="line"><span class="keyword">const</span> sass = <span class="built_in">require</span>(<span class="string">'gulp-sass'</span>);</span><br><span class="line"><span class="keyword">const</span> postcss = <span class="built_in">require</span>(<span class="string">'gulp-postcss'</span>);</span><br><span class="line"><span class="keyword">const</span> autoprefixer = <span class="built_in">require</span>(<span class="string">'autoprefixer'</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">/* --- SCSS 編譯 --- */</span></span><br><span class="line">gulp.task(<span class="string">'sass'</span>, () =&gt; &#123;</span><br><span class="line">  <span class="keyword">return</span> gulp</span><br><span class="line">    .src(<span class="string">'./source/scss/*.scss'</span>)</span><br><span class="line">    .pipe(</span><br><span class="line">      sass(&#123;</span><br><span class="line">        outputStyle: <span class="string">'compressed'</span>, <span class="comment">// 執行壓縮</span></span><br><span class="line">        includePaths: [<span class="string">'node_modules/bootstrap/scss/'</span>], <span class="comment">// 導入 sass 模塊可能路徑</span></span><br><span class="line">      &#125;).on(<span class="string">'error'</span>, sass.logError)</span><br><span class="line">    )</span><br><span class="line">    .pipe(postcss([autoprefixer()])) <span class="comment">// 加入 CSS Prefix</span></span><br><span class="line">    .pipe(gulp.dest(<span class="string">'./public/css'</span>));</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>建立 <code>.browserslistrc</code> 並輸入官方編譯版本：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&gt;= 1%</span><br><span class="line">last 1 major version</span><br><span class="line">not dead</span><br><span class="line">Chrome &gt;= 45</span><br><span class="line">Firefox &gt;= 38</span><br><span class="line">Edge &gt;= 12</span><br><span class="line">Explorer &gt;= 10</span><br><span class="line">iOS &gt;= 9</span><br><span class="line">Safari &gt;= 9</span><br><span class="line">Android &gt;= 4.4</span><br><span class="line">Opera &gt;= 30</span><br></pre></td></tr></table></figure>
+
+<p>依造官方 <a href="https://getbootstrap.com/docs/4.4/getting-started/browsers-devices/" target="_blank" rel="external nofollow noopener noreferrer">Browsers and devices</a> 文檔說明，使用 Autoprefixer 可搭配 <a href="https://github.com/browserslist/browserslist" target="_blank" rel="external nofollow noopener noreferrer">Browserslist</a> 進行 CSS Prefix 支援裝置設定，上面為官方預編譯各裝置支援版本。</p>
+<p>執行指定任務：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ gulp sass</span><br></pre></td></tr></table></figure>
+
+<p>生成 <code>./public/css/all.css</code> 檔案，觀察 Bootstrap 預設變數是否成功更改：</p>
+<p>官方預編譯版本：</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.text-primary</span> &#123;</span><br><span class="line">  <span class="attribute">color</span>: <span class="number">#007bff</span> <span class="meta">!important</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.text-success</span> &#123;</span><br><span class="line">  <span class="attribute">color</span>: <span class="number">#28a745</span> <span class="meta">!important</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 其他省略</span></span><br></pre></td></tr></table></figure>
+
+<p>客製化版本：</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.text-primary</span> &#123;</span><br><span class="line">  <span class="attribute">color</span>: <span class="number">#178ba0</span> <span class="meta">!important</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.text-success</span> &#123;</span><br><span class="line">  <span class="attribute">color</span>: <span class="number">#35a327</span> <span class="meta">!important</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 其他省略</span></span><br></pre></td></tr></table></figure>
+
+<p>由上面結果可得知，Bootstrap 預設變數已經被我們給覆蓋掉，同時也代表整個流程正確無誤，事實上 Bootstrap 客製化應用都大同小異，差別只在於你想要如何客製化 Bootstrap 而已。</p>
+<h2 id="客製並編譯-Bootstrap-載入元件"><a href="#客製並編譯-Bootstrap-載入元件" class="headerlink" title="客製並編譯 Bootstrap 載入元件"></a>客製並編譯 Bootstrap 載入元件</h2><p>Bootstrap 最為人詬病的問題大概就是 package 實在是太大了，雖然可透過壓縮方式進行縮小化，但與 <a href="https://purecss.io/" target="_blank" rel="external nofollow noopener noreferrer">Pure.css</a> 等同類型框架相比還是太大了，內含的許多元件在實際開發時，幾乎都用不太到，造成空間的浪費；我們可以嘗試客製 Bootstrap 載入元件，以減少 package 的大小，讓我們先從 Bootstrap 架構開始說明：</p>
+<p>Bootstrap 組成架構：</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 路徑：node_modules/bootstrap/scss/bootstrap.scss</span></span><br><span class="line"></span><br><span class="line">@<span class="keyword">import</span> <span class="string">'functions'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'variables'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'mixins'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'root'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'reboot'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'type'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'images'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'code'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'grid'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'tables'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'forms'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'buttons'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'transitions'</span>;</span><br><span class="line"><span class="comment">// 以下省略 ...</span></span><br></pre></td></tr></table></figure>
+
+<p>Bootstrap 是一個標準的 OOCSS 範例，也因為使用此設計準則，我們可以很輕鬆的移除沒有使用到的元件。請先將 Bootstrap 主檔案內容複製到 <code>./source/scss/all.scss</code> 內，接著註釋掉不需使用的元件，如下範例：</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 路徑：./source/scss/all.scss</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Required</span></span><br><span class="line">@<span class="keyword">import</span> <span class="string">'functions'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'variables'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'mixins'</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 自訂需載入的元件</span></span><br><span class="line">@<span class="keyword">import</span> <span class="string">'forms'</span>;</span><br><span class="line">@<span class="keyword">import</span> <span class="string">'buttons'</span>;</span><br><span class="line"><span class="comment">// @import "transitions";</span></span><br><span class="line"><span class="comment">// @import "dropdown";</span></span><br><span class="line">@<span class="keyword">import</span> <span class="string">'button-group'</span>;</span><br><span class="line"><span class="comment">// ... 以下省略</span></span><br></pre></td></tr></table></figure>
+
+<p><code>gulpfile.js</code> 檔案內容如同前面範例，這邊要注意的是，<code>function</code>、<code>variables</code>、<code>mixins</code> 是必要載入的檔案，所有元件都須依賴這三個檔案。</p>
+<p>執行指定任務</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ gulp sass</span><br></pre></td></tr></table></figure>
+
+<p>最後觀察編譯後 CSS 檔案，你會發現檔案縮小了很多，這就是客製化 Bootstrap 載入元件的方法，在每次開發後可自行載入須使用的元件，有利於減少 CSS 檔案大小。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CSS/" rel="tag"># CSS</a>
+              <a href="/tags/Gulp-4/" rel="tag"># Gulp 4</a>
+              <a href="/tags/Node-js/" rel="tag"># Node.js</a>
+              <a href="/tags/Bootstrap/" rel="tag"># Bootstrap</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2020-01-22-gulp-gulprename/" rel="next" title="Gulp 前端自動化 - 替換 Stream 中的檔案名稱">
+                  <i class="fa fa-chevron-left"></i> Gulp 前端自動化 - 替換 Stream 中的檔案名稱
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2020-01-26-gulp-modular/" rel="prev" title="Gulp 前端自動化 - CommonJS 模組化設計">
+                  Gulp 前端自動化 - CommonJS 模組化設計 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+          
+            
+              
+    <div class="comments" id="gitalk-container"></div>
+
+            
+          
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#筆記重點"><span class="nav-number">2.</span> <span class="nav-text">筆記重點</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#相關套件安裝"><span class="nav-number">3.</span> <span class="nav-text">相關套件安裝</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#客製並編譯-Bootstrap-預設變數"><span class="nav-number">4.</span> <span class="nav-text">客製並編譯 Bootstrap 預設變數</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#客製並編譯-Bootstrap-載入元件"><span class="nav-number">5.</span> <span class="nav-text">客製並編譯 Bootstrap 載入元件</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Roya" src="/images/userLogo.jpg">
+  <p class="site-author-name" itemprop="name">Roya</p>
+  <div class="site-description" itemprop="description">Front-End Web Developer<br>學會運用比學會使用還要來的有用</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">69</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/awdr74100" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;awdr74100" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:a78945612385238@gmail.com" title="E-Mail &amp;rarr; mailto:a78945612385238@gmail.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Roya</span>
+</div>
+  <span class="post-meta-divider">轉載文章時請附上作者暱稱與原文連結</span>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+
+<script src="/js/utils.js?v=7.4.2.js"></script>
+
+
+<script src="/js/schemes/pisces.js?v=7.4.2.js"></script>
+
+
+<script src="/js/next-boot.js?v=7.4.2.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+  
+<script src="/js/local-search.js?v=7.4.2.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '7cdb0d531869e18caad8',
+      clientSecret: '0b6a38cef9c3ae1dcf0ea66e916ab68823dbab52',
+      repo: 'awdr74100.github.io',
+      owner: 'awdr74100',
+      admin: ['awdr74100'],
+      id: 'e7a49f521b467454a5e5f5904fb24c4a',
+        language: 'zh-TW',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+  
+
+
+</body>
+</html>

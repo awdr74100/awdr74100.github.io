@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon-128.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png?v=7.4.2">
+  <link rel="mask-icon" href="/images/favicon-none.svg?v=7.4.2" color="#222">
+  <link rel="alternate" href="/atom.xml" title="Roya's Blog" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"default"},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '複製',
+      copy_success: '複製成功',
+      copy_failure: '複製失敗'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="Git 是一個分散式的版本控制系統，可針對專案的不同版本進行操作。當初在學 Git 時是直接買書回來看，大概知道什麼時候該打什麼指令，但我還是認為自己的基礎不夠扎實，還不到業界的標準，如果你是應徵軟體相關的工作，這肯定是必備技能。此系列文章主要紀錄在各種情境下，該如何靈活使用 Git 管控我們的專案版本，到後半段的文章也會提及如何將專案部屬至遠端的 Git 伺服器，如 GitHub、Bitbuck">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Git 版本控制系統 - 環境安裝與基本指令">
+<meta property="og:url" content="https://awdr74100.github.io/2020-04-16-git-install/index.html">
+<meta property="og:site_name" content="Roya&#39;s Blog">
+<meta property="og:description" content="Git 是一個分散式的版本控制系統，可針對專案的不同版本進行操作。當初在學 Git 時是直接買書回來看，大概知道什麼時候該打什麼指令，但我還是認為自己的基礎不夠扎實，還不到業界的標準，如果你是應徵軟體相關的工作，這肯定是必備技能。此系列文章主要紀錄在各種情境下，該如何靈活使用 Git 管控我們的專案版本，到後半段的文章也會提及如何將專案部屬至遠端的 Git 伺服器，如 GitHub、Bitbuck">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/2oSCNHQ.png">
+<meta property="og:image" content="https://i.imgur.com/dIsQMmS.png">
+<meta property="og:image" content="https://i.imgur.com/Oa2A1VI.png">
+<meta property="og:image" content="https://i.imgur.com/hZOQ3Hx.png">
+<meta property="og:image" content="https://i.imgur.com/ZMA2SyS.png">
+<meta property="og:image" content="https://i.imgur.com/mizZplS.png">
+<meta property="og:image" content="https://i.imgur.com/ist48Oz.png">
+<meta property="og:image" content="https://i.imgur.com/S1hTuvl.png">
+<meta property="og:image" content="https://i.imgur.com/1jNHeF0.png">
+<meta property="og:image" content="https://i.imgur.com/J6iONlw.png">
+<meta property="og:image" content="https://i.imgur.com/QnJrqHG.png">
+<meta property="og:image" content="https://i.imgur.com/scWvYQ1.jpg">
+<meta property="og:image" content="https://i.imgur.com/7jvZNjc.png">
+<meta property="og:image" content="https://i.imgur.com/grzPncJ.png">
+<meta property="og:image" content="https://i.imgur.com/oD6TcQa.png">
+<meta property="og:image" content="https://i.imgur.com/mMaJ7rN.png">
+<meta property="article:published_time" content="2020-04-15T16:31:36.000Z">
+<meta property="article:modified_time" content="2020-04-17T10:20:15.000Z">
+<meta property="article:author" content="Roya">
+<meta property="article:tag" content="Git">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/2oSCNHQ.png">
+
+<link rel="canonical" href="https://awdr74100.github.io/2020-04-16-git-install/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Git 版本控制系統 - 環境安裝與基本指令 | Roya's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-150715469-1"></script>
+    <script>
+      var host = window.location.hostname;
+      if (host !== "localhost" || !true) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-150715469-1');
+      }
+    </script>
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Roya's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">現代化 Web 開發技術學習分享</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>標籤<span class="badge">28</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分類<span class="badge">9</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>歸檔<span class="badge">69</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none" placeholder="搜尋..." spellcheck="false" type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://awdr74100.github.io/2020-04-16-git-install/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/userLogo.jpg">
+      <meta itemprop="name" content="Roya">
+      <meta itemprop="description" content="Front-End Web Developer<br>學會運用比學會使用還要來的有用">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Roya's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          Git 版本控制系統 - 環境安裝與基本指令
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-04-16 00:31:36" itemprop="dateCreated datePublished" datetime="2020-04-16T00:31:36+08:00">2020-04-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-04-17 18:20:15" itemprop="dateModified" datetime="2020-04-17T18:20:15+08:00">2020-04-17</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Git/" itemprop="url" rel="index">
+                    <span itemprop="name">Git</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Git 是一個分散式的版本控制系統，可針對專案的不同版本進行操作。當初在學 Git 時是直接買書回來看，大概知道什麼時候該打什麼指令，但我還是認為自己的基礎不夠扎實，還不到業界的標準，如果你是應徵軟體相關的工作，這肯定是必備技能。此系列文章主要紀錄在各種情境下，該如何靈活使用 Git 管控我們的專案版本，到後半段的文章也會提及如何將專案部屬至遠端的 Git 伺服器，如 GitHub、Bitbucket 等，最後會以常見的 Work Flow，如 GitHub Fow 收尾，加深自己對 Git 的印象。</p>
+<h2 id="筆記重點"><a href="#筆記重點" class="headerlink" title="筆記重點"></a>筆記重點</h2><ul>
+<li>為什麼需要使用 Git？</li>
+<li>安裝 Git 至 Windows 環境下</li>
+<li>使用者設定 / 全域與區域差別</li>
+<li>初始化 Git Repository</li>
+<li>Git 基本指令</li>
+<li>設定 Git 指令縮寫</li>
+<li>Git 指令回顧</li>
+</ul>
+<h2 id="為什麼需要使用-Git？"><a href="#為什麼需要使用-Git？" class="headerlink" title="為什麼需要使用 Git？"></a>為什麼需要使用 Git？</h2><p>假設你是一位 Web 開發人員，在做專案開發時可能會遇到以下情境：</p>
+<p><img src="https://i.imgur.com/2oSCNHQ.png" alt="傳統版本控制"></p>
+<p>為了保證之後可查看過往的開發紀錄，在每次新的開發時，我們都會直接另存新檔並將修改內容直接以標題顯示，老實講，我以前就是這樣幹的，我是一位有點強迫症的人，我喜歡在每次開發時都遍歷過往的紀錄，避免自己陷入曾發生的錯誤，但你不覺得這樣子顯得很不專業嗎？身為一位開發人員，居然用這麼傳統的方式辨別每次開發的過程，何不我們嘗試使用版本控制進行開發呢？</p>
+<p><img src="https://i.imgur.com/dIsQMmS.png" alt="使用 Git 版本控制"></p>
+<p>以上為 VSCode 中的 Git History 插件效果，是不是覺得很驚人？在也不需要另存新檔了，你可能會有疑問，這不就只是在每次開發時做一次紀錄嗎？我需要知道的是紀錄的內容阿！</p>
+<p><img src="https://i.imgur.com/Oa2A1VI.png" alt="使用 Git 進行比對"></p>
+<p>透過簡單的指令即可比對不同版本的差異，你是不是越來越有興趣了？讓我們再做一個示例：</p>
+<ul>
+<li>當前狀態 (master)：</li>
+</ul>
+<p><img src="https://i.imgur.com/hZOQ3Hx.png" alt="當前最新狀態"></p>
+<ul>
+<li>新增內文 (6cb782f)：</li>
+</ul>
+<p><img src="https://i.imgur.com/ZMA2SyS.png" alt="切換到指定狀態"></p>
+<p>你沒有看錯，代碼被還原到指定的紀錄上了，但這不代表以後的紀錄被刪除了，你可以自由的切換當前專案的版本。有時候在團隊開發時，可能會有同一份檔案被修改的情況，以往我們都是用口述的方式進行討論，但現在不用這麼麻煩了，來看以下示例：</p>
+<p><img src="https://i.imgur.com/mizZplS.png" alt="版本衝突"></p>
+<p>當我們遇到版本衝突時，Git 會提示衝突的地方，我們只需要與夥伴溝通要使用誰的版本即可，是不是很方便？說了這麼多，讓我們直接開始使用 Git 吧！</p>
+<h2 id="安裝-Git-至-Windows-環境下"><a href="#安裝-Git-至-Windows-環境下" class="headerlink" title="安裝 Git 至 Windows 環境下"></a>安裝 Git 至 Windows 環境下</h2><p>由於我本身是 Windows 的環境，故以下教學都是針對此環境進行。</p>
+<blockquote>
+<p>官方連結：<a href="https://git-scm.com/" target="_blank" rel="external nofollow noopener noreferrer">Git</a></p>
+</blockquote>
+<p><img src="https://i.imgur.com/ist48Oz.png" alt="Git 下載頁面"></p>
+<p>安裝過程就一路給它按下去就對了，安裝完成後可以在滑鼠右鍵選單內容找到 <code>Git Bash Here</code> 與 <code>Git GUI Here</code> 選項，在這邊我們可以選擇 <code>Git Bash Here</code>，此時會跳出以下視窗：</p>
+<p><img src="https://i.imgur.com/S1hTuvl.png" alt="Git Bash"></p>
+<p>這個就是 Git 內建的命令提示字元，嚴格來講應該算是模擬 Linux 系統內的 Bash，我們所有的 Git 指令都會在這邊完成，當然你也可以使用 Windows 底下的 PowerShell 或 CMD，只要 Git 有成功安裝，隨你高興，我們可使用以下指令確認 Git 是否有成功安裝：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git --version</span><br></pre></td></tr></table></figure>
+
+<p>假設出現 Git 的版本號，即代表安裝成功，如下圖：</p>
+<p><img src="https://i.imgur.com/1jNHeF0.png" alt="git --version"></p>
+<h2 id="使用者設定-全域與區域差別"><a href="#使用者設定-全域與區域差別" class="headerlink" title="使用者設定 / 全域與區域差別"></a>使用者設定 / 全域與區域差別</h2><p>在觀看此文章段落之前，可以先至下一個段落實際把玩 Git 一番，這樣對此段落內容會比較有感覺。當我們在不設定當下使用者是誰的情況下，會跳出以下錯誤：</p>
+<p><img src="https://i.imgur.com/J6iONlw.png" alt="使用者未設定"></p>
+<p>就如同字面上的意思，當我們要提交一個 commit 時，必須告訴 Git 當下的使用者是誰，以保證未來可以追蹤此提交的使用者，這時可以輸入它給予的建議設定使用者，如下所示：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git config --global user.name <span class="string">"Roya"</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git config --global user.email <span class="string">'a78945612385238@gmail.com'</span></span><br></pre></td></tr></table></figure>
+
+<p>上面這兩道指令主要用來設定使用者的姓名與信箱，此時可輸入以下指令檢查是否成功設定：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git config --list</span><br></pre></td></tr></table></figure>
+
+<p>如果出現 <code>user.name</code> 與 <code>user.email</code> 即代表設定成功。</p>
+<p>這邊介紹另一種檢查的方法，至 <code>C:\Users\${USER}\.gitconfig</code> 查看內容：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[user]</span><br><span class="line">    name &#x3D; Roya</span><br><span class="line">    email &#x3D; a78945612385238@gmail.com</span><br></pre></td></tr></table></figure>
+
+<p>這一個檔案是 Git 的全域配置檔，還記得我們上面使用 <code>--global</code> 參數進行配置嗎？如果以全域方式設定使用者，在往後進行任何 Git 操作時，預設都會以這一個使用者為主，通常只在第一次使用 Git 時都才要設定，你也可以使用區域方式配置使用者，如下所示：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git config --<span class="built_in">local</span> user.name <span class="string">'Eric'</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git config --<span class="built_in">local</span> user.email <span class="string">'asdwef@gmail.com'</span></span><br></pre></td></tr></table></figure>
+
+<p>區域配置的設定一樣會有專屬設定檔，專案資料夾內的 <code>/.git/config</code> 檔案就是了，同樣可檢查是否成功設定：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[user]</span><br><span class="line">    name &#x3D; Eric</span><br><span class="line">    email &#x3D; asdwef@gmail.com</span><br></pre></td></tr></table></figure>
+
+<p>當你在專案提交 commit 時，就會是使用區域配置的使用者而非全域配置的使用者，這點要注意！此時就能夠正常提交 commit 囉。</p>
+<h2 id="初始化-Git-Repository"><a href="#初始化-Git-Repository" class="headerlink" title="初始化 Git Repository"></a>初始化 Git Repository</h2><p>接下來讓我們正式開始使用 Git 吧！首先請先新增一個空的資料夾：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir project</span><br></pre></td></tr></table></figure>
+
+<p>假設這一個資料夾就是我們專案放置的地方，使用 <code>cd</code> 移至這個資料夾：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> project</span><br></pre></td></tr></table></figure>
+
+<p>如果你的資料結構很複雜，也可以直接將專案資料夾拉進 bash 內：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> C:\Users\a7894\Desktop\project</span><br></pre></td></tr></table></figure>
+
+<p>接下來進行初始化 Git Repository 的動作，請輸入以下指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git init</span><br></pre></td></tr></table></figure>
+
+<p>此時會跳出已新增 <code>.git</code> 的提示，如下所示：</p>
+<p><img src="https://i.imgur.com/QnJrqHG.png" alt="git init"></p>
+<p>這一個 <code>.git</code> 檔案就是我們專案資料夾的 Repository，到了這邊已經完成讓 Git 針對此專案進行版控的動作</p>
+<h2 id="Git-基本指令"><a href="#Git-基本指令" class="headerlink" title="Git 基本指令"></a>Git 基本指令</h2><p><img src="https://i.imgur.com/scWvYQ1.jpg" alt="git 運作流程"></p>
+<p>讓我們借助<a href="https://www.hexschool.com/" target="_blank" rel="external nofollow noopener noreferrer">六角學院</a>所製作的流程圖說明 Git 是如何進行版控的，從上圖可以發現有四大部分需要我們了解，讓我們直接從實際應用操演一番。</p>
+<p>新增 <code>index.html</code> 檔案：</p>
+<figure class="highlight diff"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"> webpack-demo/</span><br><span class="line"> │</span><br><span class="line"><span class="addition">+├─── index.html</span></span><br></pre></td></tr></table></figure>
+
+<p>輸入以下指令查看當前目錄狀態：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git status</span><br></pre></td></tr></table></figure>
+
+<p>這一道指令可能是你往後最常使用的指令，主要用來查看當前目錄的狀態，如下所示：</p>
+<p><img src="https://i.imgur.com/7jvZNjc.png" alt="git status"></p>
+<p>從 Git 的提示可以看出，我們的 <code>index.html</code> 檔案目前狀態是 <code>Untracked</code>，關於檔案狀態的部分會再之後的檔案復原獨立文章在做討論，這邊我們只需要記得一個重點就是，<strong>所有剛新增的檔案初始存在區域都是屬於工作目錄</strong>，也就是上圖的第一個地方，請注意，<strong>在沒有提交半次 commit 的檔案，都是不受 Git 所版控的</strong>，也就是說，每一次的工作流程，都必須跑到最後一次 commit 記錄發生時，才能使用檔案復原或切換這些上面曾經展示過的功能，現在讓我們跑下一個工作流程，也就是將工作目錄檔案提交至索引區，執行以下指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git add index.html</span><br></pre></td></tr></table></figure>
+
+<p>or (全部檔案)</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git add .</span><br></pre></td></tr></table></figure>
+
+<p>or (在 Git 2.x 之後，效果如同 <code>git add .</code>)</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git add --all</span><br></pre></td></tr></table></figure>
+
+<p>此時一樣可透過 <code>git status</code> 查看目前狀態：</p>
+<p><img src="https://i.imgur.com/grzPncJ.png" alt="git add index.html"></p>
+<p>你會發現檔案的狀態又發生改變了，使用<strong>此命令主要是將存在工作目錄的檔案提交至索引內</strong>，也就是圖中的第二個部分，你可能會好奇這一個索引區域是幹嘛用的，以及目前我們到底成功提交 commit 了沒，答案是還沒，先來解釋索引的部分，在 Git 中，我們有時候會反悔當下的 commit，如果存在工作目錄的檔案只需要透過一道指令即可提交 commit，這就會造成多餘的 commit 產生，雖然一樣可透過指令回復並刪除指定的 commit，但相比於設立一個暫存區複雜許多，這一個索引區域本身就是一個暫存區域，主要是讓使用者檢查用，就這麼簡單，之後也會介紹如何將暫存區的檔案回復至工作目錄，接下來就是重頭戲了，執行以下指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git commit -m <span class="string">'新增 index.html'</span></span><br></pre></td></tr></table></figure>
+
+<p>當我們執行了上面這道命令後，<strong>存在索引區的檔案就會被提交至本地數據庫</strong>，也就是圖中第三個部分，這邊的 <code>-m</code> 是指 message 的意思，你可以替這一次提交附加一個訊息，以供未來檢視，可能會有人問，我可以直接打 <code>git commit</code> 就好嗎？此時會跳到 Vim 的命令模式，如下圖：</p>
+<p><img src="https://i.imgur.com/oD6TcQa.png" alt="Vie insert"></p>
+<p>看來還是得輸入訊息，如果你發現不能打字，可以按 <code>i</code> 進行 insert 的操作，就可以輸入內容了，最後輸入 <code>:wq</code> 完成編輯，也就是 <code>:w</code> 儲存後再 <code>:q</code> 關閉檔案。<strong>不管是使用哪一種方式，絕對不能輸入空的訊息內容</strong>，就算輸入並儲存了，Git 也會提示由於提交訊息為空而中止提交，也就是保持在索引區狀態，這點要注意！</p>
+<p>如果你認為預設的 Vim 編輯器不對你的胃口，你也可以更改為記事本或其他編輯器，下面為更改為 <code>VSCode</code> 編譯器的指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git config --global core.editor <span class="string">'code --wait'</span></span><br></pre></td></tr></table></figure>
+
+<p>到這邊一個基本的 Git 工作流程也就完成了，代表 commit 紀錄已經成功生成。此時可利用以下指令查看所有的 commit 紀錄：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">log</span></span><br></pre></td></tr></table></figure>
+
+<p>在使用 <code>git log</code> 指令時，如果加上額外參數，可以看到不一樣的輸出格式，例如加上 <code>--oneline</code> 或 <code>--graph</code> 或 <code>--all</code> 或 <code>-&lt;number&gt;</code>，可參考 <a href="https://git-scm.com/docs/git-log" target="_blank" rel="external nofollow noopener noreferrer">git-log Document</a> 自己慢慢玩，以下為一般輸出結果：</p>
+<p><img src="https://i.imgur.com/mMaJ7rN.png" alt="git log"></p>
+<p>如果你認為內建的日誌看起來很痛苦，你也可以使用 VSCode 中的 <a href="https://marketplace.visualstudio.com/items?itemName=donjayamanne.githistory" target="_blank" rel="external nofollow noopener noreferrer">Git History</a> 插件或像是 <a href="https://www.sourcetreeapp.com/" target="_blank" rel="external nofollow noopener noreferrer">Sourcetree</a> 等 GUI 圖形介面軟體，尤其是 Sourcetree 的部分，有關這一個軟體會在之後的文章單獨做介紹。</p>
+<p>到了這邊，我們已經成功提交了第一個 commit 記錄了，你可以嘗試提交多一點的紀錄，以加深整個流程的印象，可能會有人問，那上面那張圖的第四個部分呢？怎沒有講到？事實上，本地端的 Git 操作就只包含前三個部分，所謂的遠端數據庫就是指像是 GitHub、GitLab、Bitbucket 等平台，這些的本體都是屬於 Git 伺服器，我們一樣可透過 Git 指令將指定目錄推上去，達到遠端存取的作用，但在學習遠端操作前，我們必須先了解 Git 一個相當重要的操作，也就是分支 (branch) 的部分，了解了分支的正確用法，在來使用遠端操作，吸收才會扎實。關於分支的部分，將在下一篇文章做介紹。</p>
+<h2 id="設定-Git-指令縮寫"><a href="#設定-Git-指令縮寫" class="headerlink" title="設定 Git 指令縮寫"></a>設定 Git 指令縮寫</h2><p>我們在上面有提到關於 <code>git log</code> 可以加的參數，最後呈現的效果也會不同，但有一個最大的問題是，要打很多字阿！我們可以設定縮寫解決這一個問題：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git config --global alias.s status</span><br></pre></td></tr></table></figure>
+
+<p>此時輸入 <code>git s</code> 就會有 <code>git status</code> 的效果，是不是很方便？如果要增加參數，則必須以字串形式設定：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git config --global alias.l <span class="string">'log --oneline --graph --all'</span></span><br></pre></td></tr></table></figure>
+
+<p>同樣可至 <code>C:\Users\${USER}\.gitconfig</code> 檢查：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[alias]</span><br><span class="line">    s &#x3D; status</span><br><span class="line">    l &#x3D; log --oneline --graph --all</span><br></pre></td></tr></table></figure>
+
+<h2 id="Git-指令回顧"><a href="#Git-指令回顧" class="headerlink" title="Git 指令回顧"></a>Git 指令回顧</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 檢查 Git 版本</span></span><br><span class="line">git --version</span><br><span class="line"></span><br><span class="line"><span class="comment"># 新增全域使用者 (姓名)</span></span><br><span class="line">git config --global user.name <span class="string">'name'</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 新增全域使用者 (信箱)</span></span><br><span class="line">git config --global user.email <span class="string">'email'</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 新增區域使用者 (姓名)</span></span><br><span class="line">git config --<span class="built_in">local</span> user.name <span class="string">'name'</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 新增區域使用者 (信箱)</span></span><br><span class="line">git config --<span class="built_in">local</span> user.email <span class="string">'email'</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 檢查使用者設定</span></span><br><span class="line">git config --list</span><br><span class="line"></span><br><span class="line"><span class="comment"># 全域 Git 設定檔</span></span><br><span class="line">C:\Users\<span class="variable">$&#123;USER&#125;</span>\.gitconfig</span><br><span class="line"></span><br><span class="line"><span class="comment"># 專案 Git 設定檔</span></span><br><span class="line">/.git/config</span><br><span class="line"></span><br><span class="line"><span class="comment"># 初始化 Git Repositroy</span></span><br><span class="line">git init</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看當前目錄狀態</span></span><br><span class="line">git status</span><br><span class="line"></span><br><span class="line"><span class="comment"># 將工作目錄檔案提交至索引區 (指定檔案)</span></span><br><span class="line">git add &lt;file&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 將工作目錄檔案提交至索引區 (全部檔案)</span></span><br><span class="line">git add .</span><br><span class="line"></span><br><span class="line"><span class="comment"># 將工作目錄檔案提交至索引區 (在 Git 2.x 之後，效果如同 git add .)</span></span><br><span class="line">git add --all</span><br><span class="line"></span><br><span class="line"><span class="comment"># 將索引區檔案提交至本地數據庫</span></span><br><span class="line">git commit -m <span class="string">'message'</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 將索引區檔案提交至本地數據庫 (開啟預設編輯器)</span></span><br><span class="line">git commit</span><br><span class="line"></span><br><span class="line"><span class="comment"># 將預設的 Vim 編輯器改為 VSCode</span></span><br><span class="line">git config --global core.editor <span class="string">'code --wait'</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看目錄日誌</span></span><br><span class="line">git <span class="built_in">log</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看目錄日誌 (精簡化)</span></span><br><span class="line">git <span class="built_in">log</span> --oneline</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看目錄日誌 (線路圖)</span></span><br><span class="line">git <span class="built_in">log</span> --graph</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看目前日誌 (所有分支)</span></span><br><span class="line">git <span class="built_in">log</span> --all</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看目前日誌 (限制輸出的提交數目 =&gt; 新到舊 =&gt; 可被覆蓋)</span></span><br><span class="line">git <span class="built_in">log</span> -&lt;number&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看目錄日誌 (常用配置)</span></span><br><span class="line">git <span class="built_in">log</span> --oneline --graph --all</span><br><span class="line"></span><br><span class="line"><span class="comment"># 全域設定縮寫</span></span><br><span class="line">git config --global alias.s status</span><br><span class="line"></span><br><span class="line"><span class="comment"># 全域設定縮寫 (添加參數)</span></span><br><span class="line">git config --global alias.l <span class="string">'log --oneline --graph --all'</span></span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Git/" rel="tag"># Git</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2020-04-13-webpack-vueloader/" rel="next" title="Webpack 前端打包工具 - 使用 vue-loader 手動建置出 Vue CLI 環境">
+                  <i class="fa fa-chevron-left"></i> Webpack 前端打包工具 - 使用 vue-loader 手動建置出 Vue CLI 環境
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2020-04-17-git-branch/" rel="prev" title="Git 版本控制系統 - 分支的建立與合併分支中的快轉機制">
+                  Git 版本控制系統 - 分支的建立與合併分支中的快轉機制 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+          
+            
+              
+    <div class="comments" id="gitalk-container"></div>
+
+            
+          
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#筆記重點"><span class="nav-number">2.</span> <span class="nav-text">筆記重點</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#為什麼需要使用-Git？"><span class="nav-number">3.</span> <span class="nav-text">為什麼需要使用 Git？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安裝-Git-至-Windows-環境下"><span class="nav-number">4.</span> <span class="nav-text">安裝 Git 至 Windows 環境下</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用者設定-全域與區域差別"><span class="nav-number">5.</span> <span class="nav-text">使用者設定 &#x2F; 全域與區域差別</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#初始化-Git-Repository"><span class="nav-number">6.</span> <span class="nav-text">初始化 Git Repository</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Git-基本指令"><span class="nav-number">7.</span> <span class="nav-text">Git 基本指令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#設定-Git-指令縮寫"><span class="nav-number">8.</span> <span class="nav-text">設定 Git 指令縮寫</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Git-指令回顧"><span class="nav-number">9.</span> <span class="nav-text">Git 指令回顧</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Roya" src="/images/userLogo.jpg">
+  <p class="site-author-name" itemprop="name">Roya</p>
+  <div class="site-description" itemprop="description">Front-End Web Developer<br>學會運用比學會使用還要來的有用</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">69</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/awdr74100" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;awdr74100" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:a78945612385238@gmail.com" title="E-Mail &amp;rarr; mailto:a78945612385238@gmail.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Roya</span>
+</div>
+  <span class="post-meta-divider">轉載文章時請附上作者暱稱與原文連結</span>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+
+<script src="/js/utils.js?v=7.4.2.js"></script>
+
+
+<script src="/js/schemes/pisces.js?v=7.4.2.js"></script>
+
+
+<script src="/js/next-boot.js?v=7.4.2.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+  
+<script src="/js/local-search.js?v=7.4.2.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '7cdb0d531869e18caad8',
+      clientSecret: '0b6a38cef9c3ae1dcf0ea66e916ab68823dbab52',
+      repo: 'awdr74100.github.io',
+      owner: 'awdr74100',
+      admin: ['awdr74100'],
+      id: 'a92cd508d6faaedff812006c9347d395',
+        language: 'zh-TW',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+  
+
+
+</body>
+</html>

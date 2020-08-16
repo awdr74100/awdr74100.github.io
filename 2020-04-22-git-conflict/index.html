@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon-128.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png?v=7.4.2">
+  <link rel="mask-icon" href="/images/favicon-none.svg?v=7.4.2" color="#222">
+  <link rel="alternate" href="/atom.xml" title="Roya's Blog" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"default"},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '複製',
+      copy_success: '複製成功',
+      copy_failure: '複製失敗'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="在之前我們有提到 Git 主要被使用在多人協作開發，每個人各自完成屬於自己的工作，最後透過合併即可完成應用，但想的簡單，實作起來卻有些困難，過程中難免會有意外發生，比如說 A 同事與 B 同事先前在初始檔案各開了一個分支，但 A 同事發現這一份檔案存在 Bug，於是做了修復的動作，而 B 同事正好也發現了這一個 Bug 也做了修復，此時如果進行合併，就會造成所謂的合併衝突，此狀況不只會發生在本地分">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Git 版本控制系統 - 分支合併衝突與解決辦法">
+<meta property="og:url" content="https://awdr74100.github.io/2020-04-22-git-conflict/index.html">
+<meta property="og:site_name" content="Roya&#39;s Blog">
+<meta property="og:description" content="在之前我們有提到 Git 主要被使用在多人協作開發，每個人各自完成屬於自己的工作，最後透過合併即可完成應用，但想的簡單，實作起來卻有些困難，過程中難免會有意外發生，比如說 A 同事與 B 同事先前在初始檔案各開了一個分支，但 A 同事發現這一份檔案存在 Bug，於是做了修復的動作，而 B 同事正好也發現了這一個 Bug 也做了修復，此時如果進行合併，就會造成所謂的合併衝突，此狀況不只會發生在本地分">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/Qzr8J69.png">
+<meta property="og:image" content="https://i.imgur.com/s66X0qE.png">
+<meta property="og:image" content="https://i.imgur.com/qHOftjW.png">
+<meta property="og:image" content="https://i.imgur.com/iuVVaA4.png">
+<meta property="og:image" content="https://i.imgur.com/j2bzdhV.png">
+<meta property="og:image" content="https://i.imgur.com/CtrV3OY.png">
+<meta property="og:image" content="https://i.imgur.com/OO9EQwX.png">
+<meta property="og:image" content="https://i.imgur.com/lQLCEcW.png">
+<meta property="og:image" content="https://i.imgur.com/iB6eRgq.png">
+<meta property="og:image" content="https://i.imgur.com/OIxmorf.png">
+<meta property="og:image" content="https://i.imgur.com/1dHjcvI.png">
+<meta property="og:image" content="https://i.imgur.com/rzfkuKE.png">
+<meta property="og:image" content="https://i.imgur.com/bkOJpIs.png">
+<meta property="og:image" content="https://i.imgur.com/C7lYl3p.png">
+<meta property="og:image" content="https://i.imgur.com/E9tVpfv.png">
+<meta property="article:published_time" content="2020-04-22T06:47:31.000Z">
+<meta property="article:modified_time" content="2020-04-23T10:40:02.000Z">
+<meta property="article:author" content="Roya">
+<meta property="article:tag" content="Git">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/Qzr8J69.png">
+
+<link rel="canonical" href="https://awdr74100.github.io/2020-04-22-git-conflict/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Git 版本控制系統 - 分支合併衝突與解決辦法 | Roya's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-150715469-1"></script>
+    <script>
+      var host = window.location.hostname;
+      if (host !== "localhost" || !true) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-150715469-1');
+      }
+    </script>
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Roya's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">現代化 Web 開發技術學習分享</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>標籤<span class="badge">28</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分類<span class="badge">9</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>歸檔<span class="badge">69</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none" placeholder="搜尋..." spellcheck="false" type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://awdr74100.github.io/2020-04-22-git-conflict/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/userLogo.jpg">
+      <meta itemprop="name" content="Roya">
+      <meta itemprop="description" content="Front-End Web Developer<br>學會運用比學會使用還要來的有用">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Roya's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          Git 版本控制系統 - 分支合併衝突與解決辦法
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-04-22 14:47:31" itemprop="dateCreated datePublished" datetime="2020-04-22T14:47:31+08:00">2020-04-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-04-23 18:40:02" itemprop="dateModified" datetime="2020-04-23T18:40:02+08:00">2020-04-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Git/" itemprop="url" rel="index">
+                    <span itemprop="name">Git</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在之前我們有提到 Git 主要被使用在多人協作開發，每個人各自完成屬於自己的工作，最後透過合併即可完成應用，但想的簡單，實作起來卻有些困難，過程中難免會有意外發生，比如說 A 同事與 B 同事先前在初始檔案各開了一個分支，但 A 同事發現這一份檔案存在 Bug，於是做了修復的動作，而 B 同事正好也發現了這一個 Bug 也做了修復，此時如果進行合併，就會造成所謂的合併衝突，此狀況不只會發生在本地分支，遠端分支也同樣會發生，該如何解決此類的衝突，也就是本篇的主題。</p>
+<h2 id="筆記重點"><a href="#筆記重點" class="headerlink" title="筆記重點"></a>筆記重點</h2><ul>
+<li>本地分支合併衝突</li>
+<li>遠端分支合併衝突</li>
+<li>GitHub 保護機制</li>
+<li>Git 指令回顧</li>
+</ul>
+<h2 id="本地分支合併衝突"><a href="#本地分支合併衝突" class="headerlink" title="本地分支合併衝突"></a>本地分支合併衝突</h2><p>讓我們先來模擬衝突發生的情境：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">mkdir project</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> project</span><br><span class="line"></span><br><span class="line">git init</span><br><span class="line"></span><br><span class="line">touch index.html</span><br><span class="line"></span><br><span class="line">git add .</span><br><span class="line"></span><br><span class="line">git commit -m <span class="string">'add index.html'</span></span><br></pre></td></tr></table></figure>
+
+<p>修改 <code>index.html</code> 檔案：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"en"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">"viewport"</span> <span class="attr">content</span>=<span class="string">"width=device-width, initial-scale=1.0"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>Document<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">body</span>&gt;</span><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>再次提交 commit：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git add .</span><br><span class="line"></span><br><span class="line">git commit -m <span class="string">'update index.html'</span></span><br></pre></td></tr></table></figure>
+
+<p>到這邊已經完成初始化的動作了，假設目前有一位工程人員開了一個分支並提交了一次 commit 紀錄：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">git checkout -b dog</span><br><span class="line"></span><br><span class="line">touch all.css</span><br><span class="line"></span><br><span class="line">git add .</span><br><span class="line"></span><br><span class="line">git commit -m <span class="string">'add all.css'</span></span><br></pre></td></tr></table></figure>
+
+<p>此時他發現原本的 <code>index.html</code> 檔案標題打錯了，進行了修改：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"en"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">"viewport"</span> <span class="attr">content</span>=<span class="string">"width=device-width, initial-scale=1.0"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>dog<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">body</span>&gt;</span><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>並提交了 commit 紀錄：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git add .</span><br><span class="line"></span><br><span class="line">git commit -m <span class="string">'edit index.html &gt; title'</span></span><br></pre></td></tr></table></figure>
+
+<p>假設又有一位工程人員開了一個分支並修復 title 這個問題：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">git checkout master</span><br><span class="line"></span><br><span class="line">git checkout -b cat</span><br><span class="line"></span><br><span class="line">... edit index.html title</span><br><span class="line"></span><br><span class="line">git add .</span><br><span class="line"></span><br><span class="line">git commit -m <span class="string">'edit index.html &gt; title'</span></span><br></pre></td></tr></table></figure>
+
+<p>讓我們來看目前的日誌：</p>
+<p><img src="https://i.imgur.com/Qzr8J69.png" alt="查看目前 commit 紀錄-1"></p>
+<p>你會發現在 <code>dog</code> 分支與 <code>cat</code> 分支同時修改了 <code>index.html</code> 檔案的標題，這邊要注意，並不是修改同一份檔案就會發生衝突，而是修改同一份檔案的同一行代碼才會發生衝突，基本上 Git 有自己判定的標準，讓我們繼續來看衝突是如何發生的：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git checkout cat</span><br><span class="line"></span><br><span class="line">git merge dog</span><br></pre></td></tr></table></figure>
+
+<p>此時會跳出合併發生衝突的警告：</p>
+<p><img src="https://i.imgur.com/s66X0qE.png" alt="git 合併衝突"></p>
+<p>此時千萬不要慌張，讓我們先用 <code>git status</code> 壓壓驚：</p>
+<p><img src="https://i.imgur.com/qHOftjW.png" alt="查看檔案狀態-1"></p>
+<p>從上面可以得知，目前 <code>all.css</code> 已經被提交至索引區，代表這一個檔案沒有發生衝突，而 <code>index.html</code> 這個檔案就不一樣了，出現了 <code>Unmerged paths</code> 的狀態，且提示 <code>both modified</code> 字樣，代表兩個分支同時修改到了同份檔案的同行代碼，這時候 Git 提示可執行以下命令還原到未合併前的狀態：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git merge --abort</span><br></pre></td></tr></table></figure>
+
+<p>這很明顯是半途而廢的行為！遇到問題，解決它不就行了？讓我們先打開發生衝突的這一個檔案：</p>
+<!-- prettier-ignore-start -->
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"en"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">"viewport"</span> <span class="attr">content</span>=<span class="string">"width=device-width, initial-scale=1.0"</span> /&gt;</span></span><br><span class="line">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>cat<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">=======</span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>dog<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">&gt;&gt;&gt;&gt;&gt;&gt;&gt; dog</span><br><span class="line">  <span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">body</span>&gt;</span><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<!-- prettier-ignore-end -->
+
+<p>神奇的事情發生了！發生衝突的這個檔案居然出現了奇怪的符號，其實這是 Git 用來告訴我們何處發生了衝突，上半部是 <code>HEAD</code>，也就是請求合併的 <code>cat</code> 分支，中間是分隔線，接下是 <code>dog</code> 分支的內容，這時請去與 <code>dog</code> 分支的人討論究竟該用誰的修改，假設我們要用 <code>dog</code> 分支的人修改好了，請把 <code>cat</code> 內容與其餘標記都給它刪除：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"en"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">name</span>=<span class="string">"viewport"</span> <span class="attr">content</span>=<span class="string">"width=device-width, initial-scale=1.0"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>dog<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">body</span>&gt;</span><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>在這邊補充一點，如果你的編輯器是 VSCode，它會有選擇的提示喔！挺方便的，效果如下：</p>
+<p><img src="https://i.imgur.com/iuVVaA4.png" alt="VSCode 衝突提示"></p>
+<p>修改完後，老樣子，目前這個檔案還是存在於工作目錄，將它提交至索引區吧：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git add .</span><br></pre></td></tr></table></figure>
+
+<p>這時我們來看狀態長什麼樣子：</p>
+<p><img src="https://i.imgur.com/j2bzdhV.png" alt="查看檔案狀態-2"></p>
+<p>你會發現提示改變了，告訴我們所有衝突都已被修復，但此時還沒有結束喔，我們目前還是處於索引區，使用以下指令提交至本地數據庫：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git commit</span><br></pre></td></tr></table></figure>
+
+<p>這時你可能會想，為什麼沒有加 <code>-m</code> 參數呢？事實上，在這種情況下，我習慣使用預設的訊息，如果你跟我一樣單純使用 <code>git commit</code>，此時會跳出預設編輯器請你輸入提交訊息，而分支衝突本身就有預設的訊息內容了，也就代表直接關閉視窗即可，但如果你想要自訂訊息內容，那就照往常的加入 <code>-m &#39;message&#39;</code> 即可，這時候讓我們來看究竟合併成功了沒：</p>
+<p><img src="https://i.imgur.com/CtrV3OY.png" alt="查看檔案狀態-3"></p>
+<p>大功告成！分支已被成功合併，事實上，本地分支發生衝突的機率確實是挺高的，但只要跑過一次流程，就沒什麼好害怕的了，接下來進入到遠端分支合併衝突的部分。</p>
+<h2 id="遠端分支合併衝突"><a href="#遠端分支合併衝突" class="headerlink" title="遠端分支合併衝突"></a>遠端分支合併衝突</h2><p>在這邊我們需要先釐清遠端數據庫是怎麼處理我們的上傳檔案的，你可能會認為遠端是以 “更新” 的方式進行處理，但這個觀念是錯的，事實上遠端與本地端同樣都是使用合併的方式處理檔案，這也就導致可能發生與本地端相同的合併衝突問題。</p>
+<p>請先在 GitHub 隨便開一個遠端數據庫，並將本地端內容推上去：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git remote add origin git@github.com:awdr74100/conflict-demo.git</span><br><span class="line"></span><br><span class="line">git push -u origin --all</span><br></pre></td></tr></table></figure>
+
+<p>此時的日誌應該為：</p>
+<p><img src="https://i.imgur.com/OO9EQwX.png" alt="查看目前 commit 紀錄-2"></p>
+<p>在這邊補充一個指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git commit --amend -m <span class="string">'merge dog branch'</span></span><br></pre></td></tr></table></figure>
+
+<p>這個指令主要可用來修改最後一次提交的 commit 訊息，假設你不小心在提交 commit 時打錯字，這個指令就很用好，但不建議使用在以推至遠端數據庫的 commit 節點，必定會發生衝突：</p>
+<p><img src="https://i.imgur.com/lQLCEcW.png" alt="查看目前 commit 紀錄-3"></p>
+<p>你會發現原本的 <code>6aa88f4</code> 節點目前只剩遠端的 <code>cat</code> 分支指著，本地的 <code>cat</code> 分支反而指向了一個全新的 commit 節點，這邊你可能會有所誤會，修改訊息對於 Git 來說也算是一次全新的 commit 紀錄，但假設你是使用在本地尚未推至遠端的 commit 節點，原有的 <code>6aa88f4</code> 應該是會被 “隱藏” 才對，使用 <code>git log</code> 是看不到這一個節點的，上面為什麼看的到是因為遠端的 <code>cat</code> 分支指著，才導致這個節點被顯示出來。</p>
+<p>此時如果將本地推至遠端，就會產生所謂的遠端合併分支衝突：</p>
+<p><img src="https://i.imgur.com/iB6eRgq.png" alt="遠端分支合併衝突"></p>
+<p>對於遠端分支來說，應該是存在 <code>6aa88f4</code> 這一個節點的，但我們透過修改形成了一個全新的節點，原有的 <code>6aa88f4</code> 就被隱藏了，只要合併前的舊有紀錄有被更改的情形，就有可能發生衝突，因為版本對不上阿！</p>
+<p>有沒有發現 <code>non-fast-forward</code> 字樣？這不就是之前介紹的取消快轉合併嗎？這也證實了遠端是以合併的方式處理推上來的檔案，讓我們先來看目前的檔案狀態：</p>
+<p><img src="https://i.imgur.com/OIxmorf.png" alt="查看檔案狀態-4"></p>
+<p>Git 也直接跟你表明目前有衝突發生，請將遠端內容下載到本地端並進行合併，我們可以依造它指示的來做：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git pull</span><br></pre></td></tr></table></figure>
+
+<p>此時會跳出請你輸入此次合併提交的訊息：</p>
+<p><img src="https://i.imgur.com/1dHjcvI.png" alt="合併分支"></p>
+<p>再次執行 <code>git push</code>：</p>
+<p><img src="https://i.imgur.com/rzfkuKE.png" alt="push 成功"></p>
+<p>這一次 Push 就成功了，之前我們有說過 <code>git pull</code> 主要會將 <code>git fetch</code> 的內容直接執行 <code>git merge</code>，這也才導致直接跳出合併的訊息視窗，這樣子看起來是不是使用 <code>commit --amend</code> 挺麻煩的？我建議此命令不要用在以推至遠端的 commit 紀錄上，以免造成自己與夥伴的困擾。</p>
+<p>跑過一次上面的流程你大概就知道怎麼修復遠端分支的衝突了，你也可以嘗試使用 Fetch 來跑上面的流程，之後再透過與本地端發生衝突的修復方法來解決這一個衝突，兩者的原理是一模一樣的。</p>
+<h2 id="GitHub-保護機制"><a href="#GitHub-保護機制" class="headerlink" title="GitHub 保護機制"></a>GitHub 保護機制</h2><p>如果你是乖乖依照上面方法去修復衝突，倒是不必動用到 GitHub 的保護機制，但如果你是使用以下指令可就麻煩了：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push -f</span><br></pre></td></tr></table></figure>
+
+<p>這個 <code>-f</code> 等同於 <code>--force</code>，表示強制的意思，這個指令主要用在遠端分支發生衝突時，可以強迫上傳，並且覆蓋掉遠端的分支，你可以把它想像成最高權限的覆蓋動作，如果以我們剛才的例子來講，遠端發生衝突時，就可以直接使用這個指令，免去修復的困擾，但建議這個指令只用在自己身上，你可以想像，團隊裡有人沒有先知會大家就突然使用這個指令，此時會發生什麼事？回家吃自己吧！</p>
+<p>也因為這個指令帶來的後果太過於可怕，像是 GitHub 網站就有提供所謂的保護機制，可以避免某個分支被 Force Push，以下為示範：</p>
+<p>路徑：Settings &gt; Branches &gt; Branch protection</p>
+<p><img src="https://i.imgur.com/bkOJpIs.png" alt="保護機制-1"></p>
+<p>點擊 <code>Add rule</code> 並挑選適合的選項：</p>
+<p><img src="https://i.imgur.com/C7lYl3p.png" alt="保護機制-2"></p>
+<p><code>master</code> 分支已被保護：</p>
+<p><img src="https://i.imgur.com/E9tVpfv.png" alt="保護機制-3"></p>
+<p>這樣就完成囉，根據你挑選的保護選項，在每次推送前都會觸發，避免可能發生的可怕後果。</p>
+<h2 id="Git-指令回顧"><a href="#Git-指令回顧" class="headerlink" title="Git 指令回顧"></a>Git 指令回顧</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 還原至合併前狀態</span></span><br><span class="line">git merge --abort</span><br><span class="line"></span><br><span class="line"><span class="comment"># 修改最後一次 commit 訊息</span></span><br><span class="line">git commit --amend -m <span class="string">'message'</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 強制推送遠端分支</span></span><br><span class="line">git push -f</span><br><span class="line"></span><br><span class="line"><span class="comment"># 強制推送遠端分支 (同上)</span></span><br><span class="line">git push --force</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Git/" rel="tag"># Git</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2020-04-20-git-reset/" rel="next" title="Git 版本控制系統 - 檔案還原與重置提交">
+                  <i class="fa fa-chevron-left"></i> Git 版本控制系統 - 檔案還原與重置提交
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2020-04-27-git-diff/" rel="prev" title="Git 版本控制系統 - 比對檔案版本差異與標示說明">
+                  Git 版本控制系統 - 比對檔案版本差異與標示說明 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+          
+            
+              
+    <div class="comments" id="gitalk-container"></div>
+
+            
+          
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#筆記重點"><span class="nav-number">2.</span> <span class="nav-text">筆記重點</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#本地分支合併衝突"><span class="nav-number">3.</span> <span class="nav-text">本地分支合併衝突</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#遠端分支合併衝突"><span class="nav-number">4.</span> <span class="nav-text">遠端分支合併衝突</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GitHub-保護機制"><span class="nav-number">5.</span> <span class="nav-text">GitHub 保護機制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Git-指令回顧"><span class="nav-number">6.</span> <span class="nav-text">Git 指令回顧</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Roya" src="/images/userLogo.jpg">
+  <p class="site-author-name" itemprop="name">Roya</p>
+  <div class="site-description" itemprop="description">Front-End Web Developer<br>學會運用比學會使用還要來的有用</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">69</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/awdr74100" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;awdr74100" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:a78945612385238@gmail.com" title="E-Mail &amp;rarr; mailto:a78945612385238@gmail.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Roya</span>
+</div>
+  <span class="post-meta-divider">轉載文章時請附上作者暱稱與原文連結</span>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+
+<script src="/js/utils.js?v=7.4.2.js"></script>
+
+
+<script src="/js/schemes/pisces.js?v=7.4.2.js"></script>
+
+
+<script src="/js/next-boot.js?v=7.4.2.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+  
+<script src="/js/local-search.js?v=7.4.2.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '7cdb0d531869e18caad8',
+      clientSecret: '0b6a38cef9c3ae1dcf0ea66e916ab68823dbab52',
+      repo: 'awdr74100.github.io',
+      owner: 'awdr74100',
+      admin: ['awdr74100'],
+      id: '70c55a161e8491ac127b8deaea4adedd',
+        language: 'zh-TW',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+  
+
+
+</body>
+</html>

@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon-128.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png?v=7.4.2">
+  <link rel="mask-icon" href="/images/favicon-none.svg?v=7.4.2" color="#222">
+  <link rel="alternate" href="/atom.xml" title="Roya's Blog" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"default"},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '複製',
+      copy_success: '複製成功',
+      copy_failure: '複製失敗'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="nvm 全名為 Node Version Manager，是一套用來管理 Node.js 版本的工具，在現代開發中，我們很常導入現有的 npm 套件幫助開發，像是 Webpack、Gulp、Browserify 等等，而這些套件都得依靠 Node.js 環境才能運行，且由於版本的差異，可能會造成無法運行的錯誤，開發者須同時擁有多個 Node.js 版本才方便進行測試，有別於以往 Node.js 下">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在 Windows 環境下使用 nvm 管控 NodeJS">
+<meta property="og:url" content="https://awdr74100.github.io/2020-02-15-nodejs-nvm/index.html">
+<meta property="og:site_name" content="Roya&#39;s Blog">
+<meta property="og:description" content="nvm 全名為 Node Version Manager，是一套用來管理 Node.js 版本的工具，在現代開發中，我們很常導入現有的 npm 套件幫助開發，像是 Webpack、Gulp、Browserify 等等，而這些套件都得依靠 Node.js 環境才能運行，且由於版本的差異，可能會造成無法運行的錯誤，開發者須同時擁有多個 Node.js 版本才方便進行測試，有別於以往 Node.js 下">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/X994OQW.png">
+<meta property="og:image" content="https://i.imgur.com/RZfLlGA.png">
+<meta property="og:image" content="https://i.imgur.com/AwM3CEo.png">
+<meta property="og:image" content="https://i.imgur.com/fMnbj4Q.png">
+<meta property="og:image" content="https://i.imgur.com/yQzLzJd.png">
+<meta property="article:published_time" content="2020-02-15T07:16:09.000Z">
+<meta property="article:modified_time" content="2020-02-16T15:56:24.000Z">
+<meta property="article:author" content="Roya">
+<meta property="article:tag" content="Node.js">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/X994OQW.png">
+
+<link rel="canonical" href="https://awdr74100.github.io/2020-02-15-nodejs-nvm/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>在 Windows 環境下使用 nvm 管控 NodeJS | Roya's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-150715469-1"></script>
+    <script>
+      var host = window.location.hostname;
+      if (host !== "localhost" || !true) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-150715469-1');
+      }
+    </script>
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Roya's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">現代化 Web 開發技術學習分享</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>標籤<span class="badge">28</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分類<span class="badge">9</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>歸檔<span class="badge">69</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none" placeholder="搜尋..." spellcheck="false" type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://awdr74100.github.io/2020-02-15-nodejs-nvm/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/userLogo.jpg">
+      <meta itemprop="name" content="Roya">
+      <meta itemprop="description" content="Front-End Web Developer<br>學會運用比學會使用還要來的有用">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Roya's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          在 Windows 環境下使用 nvm 管控 NodeJS
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-02-15 15:16:09" itemprop="dateCreated datePublished" datetime="2020-02-15T15:16:09+08:00">2020-02-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-02-16 23:56:24" itemprop="dateModified" datetime="2020-02-16T23:56:24+08:00">2020-02-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Node-js/" itemprop="url" rel="index">
+                    <span itemprop="name">Node.js</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>nvm 全名為 Node Version Manager，是一套用來管理 Node.js 版本的工具，在現代開發中，我們很常導入現有的 npm 套件幫助開發，像是 Webpack、Gulp、Browserify 等等，而這些套件都得依靠 Node.js 環境才能運行，且由於版本的差異，可能會造成無法運行的錯誤，開發者須同時擁有多個 Node.js 版本才方便進行測試，有別於以往 Node.js 下載安裝檔造成版本的綁定，使用 nvm 可同時存在多個 Node.js 版本，使用簡單的指令即可切換版本，推薦給所有的 Node.js 開發者。</p>
+<h2 id="筆記重點"><a href="#筆記重點" class="headerlink" title="筆記重點"></a>筆記重點</h2><ul>
+<li>nvm 安裝</li>
+<li>nvm 基本使用</li>
+</ul>
+<h2 id="nvm-安裝"><a href="#nvm-安裝" class="headerlink" title="nvm 安裝"></a>nvm 安裝</h2><p>nvm 在不同系統中有對應的安裝工具，分別如下：</p>
+<ul>
+<li>Windows 用戶：<a href="https://github.com/coreybutler/nvm-windows" target="_blank" rel="external nofollow noopener noreferrer">nvm-windows</a></li>
+<li>Mac OS、Linux 用戶：<a href="https://github.com/nvm-sh/nvm" target="_blank" rel="external nofollow noopener noreferrer">nvm</a></li>
+</ul>
+<p>如果曾經透過官方下載 Node.js，請先執行以下動作：</p>
+<ul>
+<li>將 Node.js 完整移除</li>
+<li>將 <code>npm</code> 資料夾徹底移除(預設位置：<code>C：\users\userName\AppData\Roaming\npm</code>)</li>
+</ul>
+<hr>
+<p>由於筆者本身是使用 Windows 系統，下面介紹將會以此環境為主。</p>
+<p>首先從 <a href="https://github.com/coreybutler/nvm-windows/releases" target="_blank" rel="external nofollow noopener noreferrer">此處</a> 找到「<strong>nvm-setup.zip</strong>」下載並安裝，過程如同安裝一般程式，一路 <strong>Next</strong> 就對了！</p>
+<img src="https://i.imgur.com/X994OQW.png" alt="nvm-setup">
+
+<p>安裝完成後，可輸入 <code>nvm</code> 查看相關可用指令，如下圖所示：</p>
+<img src="https://i.imgur.com/RZfLlGA.png" alt="nvm-order">
+
+<p>nvm 常見指令如下：</p>
+<ul>
+<li><code>nvm list</code><ul>
+<li>列出本機已安裝的 Node.js 清單</li>
+</ul>
+</li>
+<li><code>nvm list available</code><ul>
+<li>列出所有官方可安裝的 Node.js 清單</li>
+</ul>
+</li>
+<li><code>nvm install latest</code><ul>
+<li>安裝最新版本的 Node.js</li>
+</ul>
+</li>
+<li><code>nvm install &lt;版本號&gt;</code><ul>
+<li>安裝特定版本號的 Node.js</li>
+</ul>
+</li>
+<li><code>nvm uninstall &lt;版本號&gt;</code><ul>
+<li>移除特定版本號的 Node.js</li>
+</ul>
+</li>
+<li><code>nvm use &lt;版本號&gt;</code><ul>
+<li>切換成指定 Node.js 版本</li>
+</ul>
+</li>
+</ul>
+<h2 id="nvm-基本使用"><a href="#nvm-基本使用" class="headerlink" title="nvm 基本使用"></a>nvm 基本使用</h2><p>輸入 <code>nvm list available</code> 確認官方可安裝 Node.js 清單：</p>
+<p><img src="https://i.imgur.com/AwM3CEo.png" alt="nvm-list-available"></p>
+<p>輸入 <code>nvm install 12.16.0</code> 安裝特定版本的 Node.js：</p>
+<p><img src="https://i.imgur.com/fMnbj4Q.png" alt="nvm-install"></p>
+<p>輸入 <code>nvm use 12.16.0</code> 切換成指定 Node.js 版本：</p>
+<p><img src="https://i.imgur.com/yQzLzJd.png" alt="nvm-use"></p>
+<p>以上為基本的 nvm 使用方式，這邊要注意的是，每一個 Node.js 版本，都隨附 npm 工具，而 npm 工具互相是獨立的全域環境，比如說 13.7.0 版本的全域 npm 套件是無法在 12.16.0 版本使用的。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Node-js/" rel="tag"># Node.js</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2020-02-10-gulp-final/" rel="next" title="Gulp 前端自動化 - 基於 Gulp 4 的學習總結">
+                  <i class="fa fa-chevron-left"></i> Gulp 前端自動化 - 基於 Gulp 4 的學習總結
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2020-02-16-nodejs-enableesm/" rel="prev" title="針對不同版本的 Node.js 開啟 ECMAScript 模塊支持">
+                  針對不同版本的 Node.js 開啟 ECMAScript 模塊支持 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+          
+            
+              
+    <div class="comments" id="gitalk-container"></div>
+
+            
+          
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#筆記重點"><span class="nav-number">2.</span> <span class="nav-text">筆記重點</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#nvm-安裝"><span class="nav-number">3.</span> <span class="nav-text">nvm 安裝</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#nvm-基本使用"><span class="nav-number">4.</span> <span class="nav-text">nvm 基本使用</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Roya" src="/images/userLogo.jpg">
+  <p class="site-author-name" itemprop="name">Roya</p>
+  <div class="site-description" itemprop="description">Front-End Web Developer<br>學會運用比學會使用還要來的有用</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">69</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/awdr74100" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;awdr74100" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:a78945612385238@gmail.com" title="E-Mail &amp;rarr; mailto:a78945612385238@gmail.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Roya</span>
+</div>
+  <span class="post-meta-divider">轉載文章時請附上作者暱稱與原文連結</span>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+
+<script src="/js/utils.js?v=7.4.2.js"></script>
+
+
+<script src="/js/schemes/pisces.js?v=7.4.2.js"></script>
+
+
+<script src="/js/next-boot.js?v=7.4.2.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+  
+<script src="/js/local-search.js?v=7.4.2.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '7cdb0d531869e18caad8',
+      clientSecret: '0b6a38cef9c3ae1dcf0ea66e916ab68823dbab52',
+      repo: 'awdr74100.github.io',
+      owner: 'awdr74100',
+      admin: ['awdr74100'],
+      id: '044fb3ec5be0d289b43a93081683a36d',
+        language: 'zh-TW',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+  
+
+
+</body>
+</html>

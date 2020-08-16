@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon-128.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png?v=7.4.2">
+  <link rel="mask-icon" href="/images/favicon-none.svg?v=7.4.2" color="#222">
+  <link rel="alternate" href="/atom.xml" title="Roya's Blog" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"default"},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '複製',
+      copy_success: '複製成功',
+      copy_failure: '複製失敗'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="CommonJS 為當初最早設計用來解決 JavaScript 模組化設計的規範，使用簡單的幾個語法，即可達到模組化的效果。本篇不會探討較新標準的其他規範，比如 ES6 Module 等等，將會把焦點放在如何以 CommonJS 規範針對 Gulp 進行模組化設計，以及 CommonJS 規範中最常被人拿來討論的 module.exports 與 exports 語法兩者差別。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Gulp 前端自動化 - CommonJS 模組化設計">
+<meta property="og:url" content="https://awdr74100.github.io/2020-01-26-gulp-modular/index.html">
+<meta property="og:site_name" content="Roya&#39;s Blog">
+<meta property="og:description" content="CommonJS 為當初最早設計用來解決 JavaScript 模組化設計的規範，使用簡單的幾個語法，即可達到模組化的效果。本篇不會探討較新標準的其他規範，比如 ES6 Module 等等，將會把焦點放在如何以 CommonJS 規範針對 Gulp 進行模組化設計，以及 CommonJS 規範中最常被人拿來討論的 module.exports 與 exports 語法兩者差別。">
+<meta property="og:locale" content="zh_TW">
+<meta property="article:published_time" content="2020-01-26T13:25:12.000Z">
+<meta property="article:modified_time" content="2020-01-28T09:26:48.000Z">
+<meta property="article:author" content="Roya">
+<meta property="article:tag" content="JavaScript">
+<meta property="article:tag" content="Gulp 4">
+<meta property="article:tag" content="Node.js">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://awdr74100.github.io/2020-01-26-gulp-modular/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Gulp 前端自動化 - CommonJS 模組化設計 | Roya's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-150715469-1"></script>
+    <script>
+      var host = window.location.hostname;
+      if (host !== "localhost" || !true) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-150715469-1');
+      }
+    </script>
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Roya's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">現代化 Web 開發技術學習分享</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>標籤<span class="badge">28</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分類<span class="badge">9</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>歸檔<span class="badge">69</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none" placeholder="搜尋..." spellcheck="false" type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://awdr74100.github.io/2020-01-26-gulp-modular/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/userLogo.jpg">
+      <meta itemprop="name" content="Roya">
+      <meta itemprop="description" content="Front-End Web Developer<br>學會運用比學會使用還要來的有用">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Roya's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          Gulp 前端自動化 - CommonJS 模組化設計
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-01-26 21:25:12" itemprop="dateCreated datePublished" datetime="2020-01-26T21:25:12+08:00">2020-01-26</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-01-28 17:26:48" itemprop="dateModified" datetime="2020-01-28T17:26:48+08:00">2020-01-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Gulp/" itemprop="url" rel="index">
+                    <span itemprop="name">Gulp</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>CommonJS 為當初最早設計用來解決 JavaScript 模組化設計的規範，使用簡單的幾個語法，即可達到模組化的效果。本篇不會探討較新標準的其他規範，比如 ES6 Module 等等，將會把焦點放在如何以 CommonJS 規範針對 Gulp 進行模組化設計，以及 CommonJS 規範中最常被人拿來討論的 module.exports 與 exports 語法兩者差別。</p>
+<h2 id="筆記重點"><a href="#筆記重點" class="headerlink" title="筆記重點"></a>筆記重點</h2><ul>
+<li>CommonJS 初始環境建構</li>
+<li>CommonJS 規範相關語法</li>
+<li>Gulp 相關套件安裝</li>
+<li>Gulp 模組化設計</li>
+</ul>
+<h2 id="CommonJS-初始環境建構"><a href="#CommonJS-初始環境建構" class="headerlink" title="CommonJS 初始環境建構"></a>CommonJS 初始環境建構</h2><p>專案結構：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">commonjs&#x2F;</span><br><span class="line">│</span><br><span class="line">├─── main.js              # JavaScript 主檔案</span><br><span class="line">└─── module.js            # JavaScript 模組</span><br></pre></td></tr></table></figure>
+
+<p>在之後講解到關於 CommonJS 規範相關語法時，都會以上面這一個專案結構做為測試目的。</p>
+<h2 id="CommonJS-規範相關語法"><a href="#CommonJS-規範相關語法" class="headerlink" title="CommonJS 規範相關語法"></a>CommonJS 規範相關語法</h2><div class="note warning">在 Node.js 中，一個 .js 檔即代表一個模組，每個模組內都有一個隱式(implicit)的 module 物件，這個 module 物件身上有一個 exports (即 module.exports) 屬性</div>
+
+<p>CommonJS 規範相關語法：</p>
+<ul>
+<li><code>module.exports</code>：導出模塊(推薦寫法)</li>
+<li><code>exports</code>：導出模塊</li>
+<li><code>require</code>：引入模塊</li>
+</ul>
+<p>內部原理：</p>
+<ul>
+<li><code>exports</code> = <code>module.exports</code> = <code>{}</code> = 空物件</li>
+<li><code>exports</code> 是 <code>module.exports</code> 的一個捷徑變數</li>
+<li><code>exports.xxx</code>，相當於在匯出物件上新增屬性，該屬性對呼叫模組直接可見</li>
+<li><code>exports = xxx</code>，相當於給 <code>exports</code> 物件重新賦值，<code>require</code> 無法訪問 <code>exports</code> 物件及其屬性</li>
+<li><code>require</code> 引用模組後，返回給呼叫者的是 <code>module.exports</code> 而不是 <code>exports</code></li>
+<li>由於一個模組只有一個 <code>exports</code>，當有多個物件需要 <code>exports</code> 時，可利用新增屬性方式掛載到物件上，最後統一導出</li>
+</ul>
+<h3 id="exports-module-exports-空物件"><a href="#exports-module-exports-空物件" class="headerlink" title="exports = module.exports = {} = 空物件"></a><code>exports</code> = <code>module.exports</code> = <code>{}</code> = 空物件</h3><p>路徑：<code>./module.js</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="built_in">module</span>.exports); <span class="comment">// &#123;&#125;</span></span><br><span class="line"><span class="built_in">console</span>.log(exports); <span class="comment">// &#123;&#125;</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">module</span>.exports === exports); <span class="comment">// true</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 以物件方式增加屬性</span></span><br><span class="line"><span class="built_in">module</span>.exports.test1 = <span class="string">'Hi module.exports'</span>;</span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">module</span>.exports); <span class="comment">// &#123; test1: 'Hi module.exports' &#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 以物件方式增加屬性</span></span><br><span class="line">exports.test2 = <span class="string">'Hi exports'</span>;</span><br><span class="line"><span class="built_in">console</span>.log(exports); <span class="comment">// &#123; test1: 'Hi module.exports', test2: 'Hi exports' &#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>從上面範例可以得知，<code>module.exports</code> 與 <code>exports</code> 本身是一個物件，而 <code>exports</code> 本身是 <code>module.exports</code> 的捷徑變數，兩者指向記憶體位址是一樣的，也就代表不管是操作 <code>module.exports</code> 還是 <code>exports</code> 物件，其實都是操作同一個物件。</p>
+<h3 id="exports-是-module-exports-的一個捷徑變數"><a href="#exports-是-module-exports-的一個捷徑變數" class="headerlink" title="exports 是 module.exports 的一個捷徑變數"></a><code>exports</code> 是 <code>module.exports</code> 的一個捷徑變數</h3><p>路徑：<code>./module.js</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 以物件方式增加屬性</span></span><br><span class="line"><span class="built_in">module</span>.exports.test1 = <span class="string">'Hi module.exports'</span>;</span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">module</span>.exports); <span class="comment">// &#123; test1: 'Hi module.exports' &#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 以物件方式增加屬性</span></span><br><span class="line">exports.test2 = <span class="string">'Hi exports'</span>;</span><br><span class="line"><span class="built_in">console</span>.log(exports); <span class="comment">// &#123; test1: 'Hi module.exports', test2: 'Hi exports' &#125;</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  test3: <span class="number">10</span>,</span><br><span class="line">&#125;;</span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">module</span>.exports); <span class="comment">// &#123; test3: 10 &#125;</span></span><br><span class="line"><span class="built_in">console</span>.log(exports); <span class="comment">// &#123; test1: 'Hi module.exports', test2: 'Hi exports' &#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>前面有講解到 <code>exports</code> 是 <code>module.exports</code> 的捷徑變數，但需要注意的是，這邊說的捷徑變數是指 <code>module.exports</code> 初始物件，如果 <code>module.exports</code> 有任何賦值動作，<code>exports</code> 只會透過捷徑映射到初始物件，如同上面範例。</p>
+<h3 id="exports-xxx，相當於在匯出物件上新增屬性，該屬性對呼叫模組直接可見"><a href="#exports-xxx，相當於在匯出物件上新增屬性，該屬性對呼叫模組直接可見" class="headerlink" title="exports.xxx，相當於在匯出物件上新增屬性，該屬性對呼叫模組直接可見"></a><code>exports.xxx</code>，相當於在匯出物件上新增屬性，該屬性對呼叫模組直接可見</h3><p>路徑：<code>./module.js</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fun = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'Hello World'</span>);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* --- 導出模塊 --- */</span></span><br><span class="line"><span class="built_in">module</span>.exports.fun = fun;</span><br></pre></td></tr></table></figure>
+
+<p>路徑：<code>./main.js</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* --- 導入模塊 ---*/</span></span><br><span class="line"><span class="keyword">const</span> obj = <span class="built_in">require</span>(<span class="string">'./module'</span>);</span><br><span class="line"><span class="built_in">console</span>.log(obj); <span class="comment">// &#123; fun: [Function: fun] &#125;</span></span><br><span class="line">obj.fun(); <span class="comment">// Hello World</span></span><br></pre></td></tr></table></figure>
+
+<p>在我們導出模塊時，可透過物件新增屬性的方式掛載內容，接收方只需要使用 <code>require</code> 導入模塊即可載入目標模塊的物件以及掛載內容，前面有提到 <code>exports</code> 是 <code>module.exports</code> 的捷徑變數，我們可改寫導出模塊方式：</p>
+<p>路徑：<code>./module.js</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fun = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'Hello World'</span>);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* --- 導出模塊 --- */</span></span><br><span class="line">exports.fun = fun;</span><br></pre></td></tr></table></figure>
+
+<h3 id="exports-xxx，相當於給-exports-物件重新賦值，require-無法訪問-exports-物件及其屬性"><a href="#exports-xxx，相當於給-exports-物件重新賦值，require-無法訪問-exports-物件及其屬性" class="headerlink" title="exports = xxx，相當於給 exports 物件重新賦值，require 無法訪問 exports 物件及其屬性"></a><code>exports = xxx</code>，相當於給 <code>exports</code> 物件重新賦值，<code>require</code> 無法訪問 <code>exports</code> 物件及其屬性</h3><p>路徑：<code>./module.js</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fun = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'Hello World'</span>);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* --- 將 module.exports 重新賦值 --- */</span></span><br><span class="line"><span class="built_in">module</span>.exports = fun;</span><br></pre></td></tr></table></figure>
+
+<p>路徑：<code>./main.js</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* --- 導入模塊 ---*/</span></span><br><span class="line"><span class="keyword">const</span> fun = <span class="built_in">require</span>(<span class="string">'./module'</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(fun); <span class="comment">// [Function: fun]</span></span><br><span class="line">fun(); <span class="comment">// Hello World</span></span><br></pre></td></tr></table></figure>
+
+<p>前面我們都是針對 <code>module.exports</code> 本身物件新增屬性，之後再導出模塊，事實上，我們可以直接針對 <code>module.exports</code> 重新賦值，這樣子的作法在導入模塊時，就不需要以物件方式拿取裡面的內容，可以直接進行取用，可能有人就在想，既然 <code>exports</code> 是 <code>module.exports</code> 的捷徑變數，那我們是否可針對 <code>exports</code> 重新賦值？如下面寫法：</p>
+<p>路徑：<code>./module.js</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fun = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'Hello World'</span>);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* --- 將 exports 重新賦值 --- */</span></span><br><span class="line">exports = fun;</span><br></pre></td></tr></table></figure>
+
+<p>答案是不行的，下段介紹會有說明。</p>
+<h3 id="require-引用模組後，返回給呼叫者的是-module-exports-而不是-exports"><a href="#require-引用模組後，返回給呼叫者的是-module-exports-而不是-exports" class="headerlink" title="require 引用模組後，返回給呼叫者的是 module.exports 而不是 exports"></a><code>require</code> 引用模組後，返回給呼叫者的是 <code>module.exports</code> 而不是 <code>exports</code></h3><p>路徑：<code>./module.js</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fun = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'Hello World'</span>);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* --- 將 exports 重新賦值 --- */</span></span><br><span class="line">exports = fun;</span><br></pre></td></tr></table></figure>
+
+<p>路徑：<code>./main.js</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* --- 導入模塊 ---*/</span></span><br><span class="line"><span class="keyword">const</span> fun = <span class="built_in">require</span>(<span class="string">'./module'</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(fun); <span class="comment">// &#123;&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>前面有提到，使用 <code>exports</code> 重新賦值時，<code>require</code> 接收到的或是一個空物件，造成此結果的原因在於 <code>require</code> 引用模組時，返回給呼叫者的是 <code>module.exports</code> 而不是 <code>exports</code>，<code>exports</code> 預設是 <code>module.exports</code> 的捷徑變數，代表兩者指向記憶體位址相同，當我們針對 <code>exports</code> 物件新增屬性時，<code>module.exports</code> 也會接連變動，但當我們針對 <code>exports</code> 重新賦值後，<code>exports</code> 就與 <code>module.exports</code> 無任何關係，兩個是完全不一樣的東西，這才導致使用 <code>require</code> 時，接收到的會是一個空物件，因為 <code>module.exports</code> 物件匯出時沒有任何掛載屬性，簡單來講，<code>exports</code> 只適合用以掛載屬性導出模塊，如果你想要避免兩者的使用陷阱，<code>module.exports</code> 是最好的選擇。</p>
+<h3 id="由於一個模組只有一個-exports，當有多個物件需要-exports-時，可利用新增屬性方式掛載到物件上，最後統一導出"><a href="#由於一個模組只有一個-exports，當有多個物件需要-exports-時，可利用新增屬性方式掛載到物件上，最後統一導出" class="headerlink" title="由於一個模組只有一個 exports，當有多個物件需要 exports 時，可利用新增屬性方式掛載到物件上，最後統一導出"></a>由於一個模組只有一個 <code>exports</code>，當有多個物件需要 <code>exports</code> 時，可利用新增屬性方式掛載到物件上，最後統一導出</h3><p>路徑：<code>./module.js</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> variable = <span class="string">'變數'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> fun = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'函式'</span>);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> people = &#123;</span><br><span class="line">  name: <span class="string">'Roya'</span>,</span><br><span class="line">  age: <span class="number">20</span>,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">exports.variable = variable;</span><br><span class="line">exports.fun = fun;</span><br><span class="line">exports.people = people;</span><br><span class="line"></span><br><span class="line"><span class="comment">// or</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// module.exports = &#123; variable: variable, fun: fun, people: people &#125;;</span></span><br></pre></td></tr></table></figure>
+
+<p>路徑：<code>./main.js</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> obj = <span class="built_in">require</span>(<span class="string">'./module'</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(obj);</span><br><span class="line"><span class="comment">/* </span></span><br><span class="line"><span class="comment">&#123; </span></span><br><span class="line"><span class="comment">  variable: '變數',</span></span><br><span class="line"><span class="comment">  fun: [Function: fun],</span></span><br><span class="line"><span class="comment">  people: &#123; name: 'Roya', age: 20 &#125;</span></span><br><span class="line"><span class="comment">&#125;</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p>由於一個 .js 檔案就等於一個 <code>module.exports</code>，如果有多個物件、變數、函式需要做導出時，可使用物件新增屬性方式掛載內容，如上面範例。此時也可以搭配物件解構直接取用掛載內容：</p>
+<p>路徑：<code>./main.js</code></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> &#123; variable, fun, people &#125; = <span class="built_in">require</span>(<span class="string">'./module'</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(variable); <span class="comment">// 變數</span></span><br><span class="line"><span class="built_in">console</span>.log(fun); <span class="comment">// [Function: fun]</span></span><br><span class="line"><span class="built_in">console</span>.log(people); <span class="comment">// &#123; name: 'Roya', age: 20 &#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="Gulp-相關套件安裝"><a href="#Gulp-相關套件安裝" class="headerlink" title="Gulp 相關套件安裝"></a>Gulp 相關套件安裝</h2><blockquote>
+<p>套件連結：<a href="https://www.npmjs.com/package/gulp-sass" target="_blank" rel="external nofollow noopener noreferrer">gulp-sass</a></p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install gulp-sass</span><br></pre></td></tr></table></figure>
+
+<p>此次範例會使用 gulp-sass 套件，請先進行安裝</p>
+<h2 id="Gulp-模組化設計"><a href="#Gulp-模組化設計" class="headerlink" title="Gulp 模組化設計"></a>Gulp 模組化設計</h2><p>初始專案結構：</p>
+<figure class="highlight diff"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"> gulp-demo/</span><br><span class="line"> │</span><br><span class="line"> ├─── node_modules/</span><br><span class="line"> │</span><br><span class="line"><span class="addition">+├─── gulpfile.js/         # Gulp 模組化配置相關檔案</span></span><br><span class="line"><span class="addition">+│   │</span></span><br><span class="line"><span class="addition">+│   ├─── index.js         # 預設 Gulp 編譯主檔案</span></span><br><span class="line"><span class="addition">+│   └─── compile.js       # Gulp 模組檔案 - SCSS 編譯</span></span><br><span class="line"> │</span><br><span class="line"> ├─── source/</span><br><span class="line"> │   │</span><br><span class="line"> │   └─── scss</span><br><span class="line"> │       │</span><br><span class="line"> │       └─── all.scss     # SCSS 主檔案</span><br><span class="line"> │</span><br><span class="line"><span class="deletion">-├─── gulpfile.js          # Gulp 單一配置檔</span></span><br><span class="line"> ├─── package-lock.json</span><br><span class="line"> └─── package.json         # 安裝 gulp、gulp-sass</span><br></pre></td></tr></table></figure>
+
+<p>請注意 Gulp 主檔案位置，原本我們都是使用 <code>gulpfile.js</code> 作為依據，設計模組化應用時，建議將同應用檔案放在同一個資料夾，所以我們新增了一個 <code>gulpfile.js</code> 資料夾，裡面新增了一個 <code>index.js</code> 檔案，這一個就是我們的 Gulp 主檔案，而 <code>compile.js</code> 是我們 SCSS 相關套件的模組檔案，下面會有說明。</p>
+<div class="note danger">gulpfile.js 資料夾默認是使用 index.js 作為執行檔案，要注意的是使用 CLI 執行任務時，入口路徑為 gulpfile.js 資料夾路徑，並不是 index.js 路徑</div>
+
+<p>Gulp 主檔案：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> gulp = <span class="built_in">require</span>(<span class="string">'gulp'</span>);</span><br><span class="line"><span class="comment">/* --- 導入模組 --- */</span></span><br><span class="line"><span class="keyword">const</span> &#123; compile &#125; = <span class="built_in">require</span>(<span class="string">'./compile'</span>);</span><br><span class="line"></span><br><span class="line">gulp.task(<span class="string">'default'</span>, gulp.series(compile));</span><br></pre></td></tr></table></figure>
+
+<p>Gulp 模組檔案：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> gulp = <span class="built_in">require</span>(<span class="string">'gulp'</span>);</span><br><span class="line"><span class="keyword">const</span> sass = <span class="built_in">require</span>(<span class="string">'gulp-sass'</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">/* --- 以函式方式宣告任務 --- */</span></span><br><span class="line"><span class="keyword">const</span> compile = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> gulp</span><br><span class="line">    .src(<span class="string">'./source/scss/*.scss'</span>)</span><br><span class="line">    .pipe(sass().on(<span class="string">'error'</span>, sass.logError))</span><br><span class="line">    .pipe(gulp.dest(<span class="string">'./public/css'</span>));</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* --- 導出模組 --- */</span></span><br><span class="line">exports.compile = compile;</span><br></pre></td></tr></table></figure>
+
+<p>之前我們都是使用 Task 名稱作為執行任務參數依據，在 Gulp 4 中可接受函式作為參數依據，就如同上面範例所演示，Gulp 主檔案使用 <code>gulp.series</code> 非同步方式執行任務，而這一個任務以往都是字串形式的 Task 名稱，但現在我們使用函式方式導入，而這一個函示就是 <code>./compile.js</code> 所宣告的函式，我們可以將任務內容寫到函式裡頭，最後再將這一個函式導出，即可完成模組化應用，相同方式可套用在其他模組，只需要了解 <code>exports</code> 與 <code>require</code> 原理，就能夠拆分出任何形式的模組。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+              <a href="/tags/Gulp-4/" rel="tag"># Gulp 4</a>
+              <a href="/tags/Node-js/" rel="tag"># Node.js</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2020-01-24-gulp-includebootstrap/" rel="next" title="Gulp 前端自動化 - 客製化 Bootstrap 樣式並進行編譯">
+                  <i class="fa fa-chevron-left"></i> Gulp 前端自動化 - 客製化 Bootstrap 樣式並進行編譯
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2020-01-28-gulp-upgradegulp/" rel="prev" title="Gulp 前端自動化 - 升級至 Gulp 4 完整說明">
+                  Gulp 前端自動化 - 升級至 Gulp 4 完整說明 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+          
+            
+              
+    <div class="comments" id="gitalk-container"></div>
+
+            
+          
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#筆記重點"><span class="nav-number">2.</span> <span class="nav-text">筆記重點</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CommonJS-初始環境建構"><span class="nav-number">3.</span> <span class="nav-text">CommonJS 初始環境建構</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CommonJS-規範相關語法"><span class="nav-number">4.</span> <span class="nav-text">CommonJS 規範相關語法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#exports-module-exports-空物件"><span class="nav-number">4.1.</span> <span class="nav-text">exports &#x3D; module.exports &#x3D; {} &#x3D; 空物件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#exports-是-module-exports-的一個捷徑變數"><span class="nav-number">4.2.</span> <span class="nav-text">exports 是 module.exports 的一個捷徑變數</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#exports-xxx，相當於在匯出物件上新增屬性，該屬性對呼叫模組直接可見"><span class="nav-number">4.3.</span> <span class="nav-text">exports.xxx，相當於在匯出物件上新增屬性，該屬性對呼叫模組直接可見</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#exports-xxx，相當於給-exports-物件重新賦值，require-無法訪問-exports-物件及其屬性"><span class="nav-number">4.4.</span> <span class="nav-text">exports &#x3D; xxx，相當於給 exports 物件重新賦值，require 無法訪問 exports 物件及其屬性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#require-引用模組後，返回給呼叫者的是-module-exports-而不是-exports"><span class="nav-number">4.5.</span> <span class="nav-text">require 引用模組後，返回給呼叫者的是 module.exports 而不是 exports</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#由於一個模組只有一個-exports，當有多個物件需要-exports-時，可利用新增屬性方式掛載到物件上，最後統一導出"><span class="nav-number">4.6.</span> <span class="nav-text">由於一個模組只有一個 exports，當有多個物件需要 exports 時，可利用新增屬性方式掛載到物件上，最後統一導出</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Gulp-相關套件安裝"><span class="nav-number">5.</span> <span class="nav-text">Gulp 相關套件安裝</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Gulp-模組化設計"><span class="nav-number">6.</span> <span class="nav-text">Gulp 模組化設計</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Roya" src="/images/userLogo.jpg">
+  <p class="site-author-name" itemprop="name">Roya</p>
+  <div class="site-description" itemprop="description">Front-End Web Developer<br>學會運用比學會使用還要來的有用</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">69</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/awdr74100" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;awdr74100" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:a78945612385238@gmail.com" title="E-Mail &amp;rarr; mailto:a78945612385238@gmail.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Roya</span>
+</div>
+  <span class="post-meta-divider">轉載文章時請附上作者暱稱與原文連結</span>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+
+<script src="/js/utils.js?v=7.4.2.js"></script>
+
+
+<script src="/js/schemes/pisces.js?v=7.4.2.js"></script>
+
+
+<script src="/js/next-boot.js?v=7.4.2.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+  
+<script src="/js/local-search.js?v=7.4.2.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '7cdb0d531869e18caad8',
+      clientSecret: '0b6a38cef9c3ae1dcf0ea66e916ab68823dbab52',
+      repo: 'awdr74100.github.io',
+      owner: 'awdr74100',
+      admin: ['awdr74100'],
+      id: 'cbd7fde748ff62a3a2b2d7a0b6161feb',
+        language: 'zh-TW',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+  
+
+
+</body>
+</html>

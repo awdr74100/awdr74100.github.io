@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon-128.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png?v=7.4.2">
+  <link rel="mask-icon" href="/images/favicon-none.svg?v=7.4.2" color="#222">
+  <link rel="alternate" href="/atom.xml" title="Roya's Blog" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"default"},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '複製',
+      copy_success: '複製成功',
+      copy_failure: '複製失敗'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="跑過前面的文章大概就知道 Git 整個的處理流程了，這次來補充介紹 cherry-pick 與 revert 指令，你可以把 cherry-pick 看做 rebase 底層使用的指令，事實上，rebase 之所以能夠依序的整理提交，過程就是使用 cherry-pick 來執行，而 revert 就更簡單了，以往我們會使用 reset 或 rebase 來重置提交，但僅限於尚未推至遠端的提交，如果">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Git 版本控制系統 - cherry-pick 合併提交與 revert 抵銷提交">
+<meta property="og:url" content="https://awdr74100.github.io/2020-05-05-git-cherrypick-revert/index.html">
+<meta property="og:site_name" content="Roya&#39;s Blog">
+<meta property="og:description" content="跑過前面的文章大概就知道 Git 整個的處理流程了，這次來補充介紹 cherry-pick 與 revert 指令，你可以把 cherry-pick 看做 rebase 底層使用的指令，事實上，rebase 之所以能夠依序的整理提交，過程就是使用 cherry-pick 來執行，而 revert 就更簡單了，以往我們會使用 reset 或 rebase 來重置提交，但僅限於尚未推至遠端的提交，如果">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/2sxQc3U.png">
+<meta property="og:image" content="https://i.imgur.com/OxR8Tcd.png">
+<meta property="og:image" content="https://i.imgur.com/92hu6rs.png">
+<meta property="og:image" content="https://i.imgur.com/ZXLBvtU.png">
+<meta property="og:image" content="https://i.imgur.com/ZurA1Hz.png">
+<meta property="og:image" content="https://i.imgur.com/8r0IuVu.png">
+<meta property="og:image" content="https://i.imgur.com/ENKj3f5.png">
+<meta property="og:image" content="https://i.imgur.com/ea8tLcO.png">
+<meta property="og:image" content="https://i.imgur.com/6EP7uLZ.png">
+<meta property="og:image" content="https://i.imgur.com/6EP7uLZ.png">
+<meta property="og:image" content="https://i.imgur.com/hEqJG7m.png">
+<meta property="og:image" content="https://i.imgur.com/HeGUTU0.png">
+<meta property="og:image" content="https://i.imgur.com/Tq0TYwj.png">
+<meta property="og:image" content="https://i.imgur.com/Y2zAeky.png">
+<meta property="article:published_time" content="2020-05-05T06:14:09.000Z">
+<meta property="article:modified_time" content="2020-05-05T17:40:05.000Z">
+<meta property="article:author" content="Roya">
+<meta property="article:tag" content="Git">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/2sxQc3U.png">
+
+<link rel="canonical" href="https://awdr74100.github.io/2020-05-05-git-cherrypick-revert/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Git 版本控制系統 - cherry-pick 合併提交與 revert 抵銷提交 | Roya's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-150715469-1"></script>
+    <script>
+      var host = window.location.hostname;
+      if (host !== "localhost" || !true) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-150715469-1');
+      }
+    </script>
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Roya's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">現代化 Web 開發技術學習分享</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>標籤<span class="badge">28</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分類<span class="badge">9</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>歸檔<span class="badge">69</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none" placeholder="搜尋..." spellcheck="false" type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://awdr74100.github.io/2020-05-05-git-cherrypick-revert/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/userLogo.jpg">
+      <meta itemprop="name" content="Roya">
+      <meta itemprop="description" content="Front-End Web Developer<br>學會運用比學會使用還要來的有用">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Roya's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          Git 版本控制系統 - cherry-pick 合併提交與 revert 抵銷提交
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-05-05 14:14:09" itemprop="dateCreated datePublished" datetime="2020-05-05T14:14:09+08:00">2020-05-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-05-06 01:40:05" itemprop="dateModified" datetime="2020-05-06T01:40:05+08:00">2020-05-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Git/" itemprop="url" rel="index">
+                    <span itemprop="name">Git</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>跑過前面的文章大概就知道 Git 整個的處理流程了，這次來補充介紹 cherry-pick 與 revert 指令，你可以把 cherry-pick 看做 rebase 底層使用的指令，事實上，rebase 之所以能夠依序的整理提交，過程就是使用 cherry-pick 來執行，而 revert 就更簡單了，以往我們會使用 reset 或 rebase 來重置提交，但僅限於尚未推至遠端的提交，如果重置到了遠端的提交，此時肯定會發生衝突，revert 主要就是被用來解決此問題，以不修改原始提交為原則，新增一個相反的提交以抵銷之前的修改。</p>
+<h2 id="筆記重點"><a href="#筆記重點" class="headerlink" title="筆記重點"></a>筆記重點</h2><ul>
+<li>cherry-pick 合併提交</li>
+<li>revert 抵銷提交</li>
+<li>Git 指令回顧</li>
+</ul>
+<h2 id="cherry-pick-合併提交"><a href="#cherry-pick-合併提交" class="headerlink" title="cherry-pick 合併提交"></a>cherry-pick 合併提交</h2><p>讓我們先新增一個專案並提交兩次 commit 紀錄：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">mkdir project</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> project</span><br><span class="line"></span><br><span class="line">git init</span><br><span class="line"></span><br><span class="line">touch index.html</span><br><span class="line"></span><br><span class="line">git add .</span><br><span class="line"></span><br><span class="line">git commit -m <span class="string">'add index.html'</span></span><br><span class="line"></span><br><span class="line">touch all.css</span><br><span class="line"></span><br><span class="line">git add .</span><br><span class="line"></span><br><span class="line">git commit -m <span class="string">'add all.css'</span></span><br></pre></td></tr></table></figure>
+
+<p>建立 <code>feature</code> 分支並提交兩次 commit 紀錄：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">git checkout -b feature</span><br><span class="line"></span><br><span class="line">touch all.js</span><br><span class="line"></span><br><span class="line">git add .</span><br><span class="line"></span><br><span class="line">git commit -m <span class="string">'add all.js'</span></span><br><span class="line"></span><br><span class="line">touch db.json</span><br><span class="line"></span><br><span class="line">git add .</span><br><span class="line"></span><br><span class="line">git commit -m <span class="string">'add db.json'</span></span><br></pre></td></tr></table></figure>
+
+<p>此時的線路圖狀態為：</p>
+<p><img src="https://i.imgur.com/2sxQc3U.png" alt="查看目前 commit 紀錄-1"></p>
+<p>在此情況下如果要進行合併我們通常會使用 merge 或 rebase 來完成，但如果我們不需要 <code>feature</code> 的全部提交呢？比如說我不想要 <code>ca6fca8</code> 這一個提交，你可能會打算用 rebase 來做，之後再用互動模式刪掉這一個提交，但這樣實在是太麻煩了，有沒有更簡單點的做法？讓我們先將 <code>HEAD</code> 切換回 <code>master</code> 分支：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git checkout master</span><br></pre></td></tr></table></figure>
+
+<p>使用 cherry-pick 挑選想要合併的 commit：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git cherry-pick 057edc1</span><br></pre></td></tr></table></figure>
+
+<p>此時會跳出 commit 以提交的提示：</p>
+<p><img src="https://i.imgur.com/OxR8Tcd.png" alt="commit 已提交"></p>
+<p>代表 <code>057edc1</code> 紀錄已經被我們複製過來囉，就是這麼簡單，讓我們來看目前的線路圖狀態：</p>
+<p><img src="https://i.imgur.com/92hu6rs.png" alt="查看目前 commit 紀錄-2"></p>
+<p>cherry-pick 能夠將它分支的 commit 撿過來並進行合併，達到不合併整條分支依然有它分支部分 commit 的效果，讓我們在試一次，回到 <code>feature</code> 分支新增幾個 commit：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">... edit index.html</span><br><span class="line"></span><br><span class="line">git commit -am <span class="string">'change index.html'</span></span><br><span class="line"></span><br><span class="line">touch touch all.scss</span><br><span class="line"></span><br><span class="line">git add .</span><br><span class="line"></span><br><span class="line">git commit -m <span class="string">'add all.scss'</span></span><br></pre></td></tr></table></figure>
+
+<p>這邊模擬衝突發生的情況，回到 <code>master</code> 分支並新增一個 commit：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">... edit index.html</span><br><span class="line"></span><br><span class="line">git commit -am <span class="string">'change index.html'</span></span><br></pre></td></tr></table></figure>
+
+<p>此時的線路圖狀態為：</p>
+<p><img src="https://i.imgur.com/ZXLBvtU.png" alt="查看目前 commit 紀錄-3"></p>
+<p>假設我想要 <code>feature</code> 分支的 <code>2841c5b</code> 與 <code>26af41f</code> 紀錄，可以這樣做：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git cherry-pick 2841c5b 26af41f</span><br></pre></td></tr></table></figure>
+
+<p>後面的 commit 是可以無限添加的，但如果 commit 太多，使用 rebase 可能是更好的選擇。</p>
+<p><code>cherry-pick</code> 與 <code>merge</code> 或 <code>rebase</code> 相同，都可能會遇到衝突的情況，如下所示：</p>
+<p><img src="https://i.imgur.com/ZurA1Hz.png" alt="cherry-pick 衝突發生"></p>
+<p>一樣先用 <code>git status</code> 壓壓驚：</p>
+<p><img src="https://i.imgur.com/8r0IuVu.png" alt="git status"></p>
+<p>cherry-pick 與 rebase 處理衝突方式幾乎一模一樣，畢竟 rebase 底層就是使用 cherry-pick 來做，cherry-pick 提示了可以使用以下指令處理衝突：</p>
+<ul>
+<li>跳過當下 commit，並執行下一個 commit：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git cherry-pick --skip</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>取消 cherry-pick 操作，回到 cherry-pick 前狀態：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git cherry-pick --abort</span><br></pre></td></tr></table></figure>
+
+<p>是不是與 rebase 差不多？逃避問題向來不是我們的風格，請將衝突解決並提交至索引區：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">... resolve conflict</span><br><span class="line"></span><br><span class="line">git add .</span><br></pre></td></tr></table></figure>
+
+<p>與 rebase 解法相同，但要注意關鍵字是 cherry-pick，執行以下命令以進行下一個任務：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git cherry-pick --<span class="built_in">continue</span></span><br></pre></td></tr></table></figure>
+
+<p>此時一樣會跳出 commit 以提交至本地數據庫的提示，最後的線路圖狀態為：</p>
+<p><img src="https://i.imgur.com/ENKj3f5.png" alt="查看目前 commit 紀錄-4"></p>
+<p>大功告成！這邊補充一點，我們拿 <code>feature</code> 分支的 <code>ca6fca8</code> 來做示範，執行以下指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git cherry-pick ca6fca8 -n</span><br></pre></td></tr></table></figure>
+
+<p><code>-n</code> 全名為 <code>--no-commit</code>，可告知 Git 不要自動提交，並將檔案放置在索引區，我們可以使用 <code>git status</code> 查看：</p>
+<p><img src="https://i.imgur.com/ea8tLcO.png" alt="查看檔案狀態-1"></p>
+<p>有關 <code>ca6fca8</code> 的更動就都被放到索引區了，如果當時 cherry-pick 是選取多個 commit 的話，所有更動都會一併被放置在索引區，此時你只要透過 commit 即可將所有提交當做一個 coomit 提交出去，或者你也可以各別提交達到與預設同樣的效果。</p>
+<p>這邊在補充一個參數，假設我們 cherry-pick 時不想要使用原先的提交訊息，可以這樣做：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git cherry-pick ca6fca8 -e</span><br></pre></td></tr></table></figure>
+
+<p><code>-e</code> 全名為 <code>--edit</code>，可告知 Git 需要編輯提交訊息，此時會跳出預設編輯器讓你輸入提交訊息，最後呈現的結果如下：</p>
+<p><img src="https://i.imgur.com/6EP7uLZ.png" alt="查看目前 commit 紀錄-5"></p>
+<h2 id="revert-抵銷提交"><a href="#revert-抵銷提交" class="headerlink" title="revert 抵銷提交"></a>revert 抵銷提交</h2><p>有時我們會遇到以被推至遠端的檔案存在 Bug 的問題，如果這一個檔案還未被推至遠端，你大可放心使用 reset 或 rebase 來重置這一個檔案，反正別人又同步不到你的提交，但如果你已經把檔案推至遠端了呢？且夥伴已經將你的提交同步到他的本地了，此時該怎麼半？如果你用 reset 或 rebase 修復這一個檔案並推至雲端，夥伴要與遠端溝通時，肯定會報錯，此時推薦使用 revert 來修復這個檔案，我們以之前的專案來做範例。</p>
+<p>目前線路圖狀態：</p>
+<p><img src="https://i.imgur.com/6EP7uLZ.png" alt="查看目前 commit 紀錄-6"></p>
+<p>這是我們之前最後的結果，先將此專案推至遠端：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git remote add origin git@github.com:awdr74100/revert-demo.git</span><br><span class="line"></span><br><span class="line">git push -u origin master</span><br></pre></td></tr></table></figure>
+
+<p>此時的線路圖狀態為：</p>
+<p><img src="https://i.imgur.com/hEqJG7m.png" alt="查看目前 commit 紀錄-7"></p>
+<p><code>master</code> 已經被同步到遠端數據庫上面了，此時我們發現 <code>18f9dcc</code> 這個 commit 存在 Bug 需要被修復，使用 reset 重置提交：</p>
+<blockquote>
+<p>這邊模擬錯誤的操作</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">git reset HEAD^</span><br><span class="line"></span><br><span class="line">... fix bug</span><br><span class="line"></span><br><span class="line">git add .</span><br><span class="line"></span><br><span class="line">git commit -m <span class="string">'add db.json'</span></span><br></pre></td></tr></table></figure>
+
+<p>此時的線路圖狀態為：</p>
+<p><img src="https://i.imgur.com/HeGUTU0.png" alt="查看目前 commit 紀錄-8"></p>
+<p>如果你將此提交推至遠端肯定會報衝突，就算你透過修復方式成功上傳，夥伴要同步時也會發生衝突，搞得大家都會發生衝突，這就是為什麼之前一直強調 rebase 與 reset 千萬不要用在以推至遠端的 commit 上，他們都會改變歷史紀錄，造成所謂的衝突發生，正確的做法應該是使用 revert 才對，先將提交進行還原：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git reset 18f9dcc --hard</span><br></pre></td></tr></table></figure>
+
+<p>使用 revert 反轉指定 commit 內容：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git revert 18f9dcc</span><br></pre></td></tr></table></figure>
+
+<p>此時的線路圖狀態為：</p>
+<p><img src="https://i.imgur.com/Tq0TYwj.png" alt="查看目前 commit 紀錄-9"></p>
+<p>你會發現多了一個 commit 紀錄，這一個 commit 剛好抵銷了 <code>18f9dcc</code> 的版本內容，類似 +10 + (-10) 的概念，達到了所謂重置的效果，此時 <code>c8a1261</code> 節點的狀態就會正好是 <code>474b25d</code> 節點的狀態，這也就是 revert 的功能，他會新增一個 commit 來抵銷指定的 commit 內容，對於 Git 來說，只是新增了一個 commit 紀錄，歷史紀錄並沒有更動到，不管是 Push 或 Fetch 也都不會有問題，讓我們在試一次：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git revert 474b25d --no-edit</span><br></pre></td></tr></table></figure>
+
+<p><code>--no-edit</code> 參數可用來告知 Git 直接使用預設訊息，過程就不會跳出輸入訊息視窗了，此時的線路圖狀態為：</p>
+<p><img src="https://i.imgur.com/Y2zAeky.png" alt="查看目前 commit 紀錄-10"></p>
+<p><code>474b25d</code> 也被我們反轉了，此時的版本狀態就會與 <code>f5315c1</code> 一樣，這邊要注意，revert 並不像 reset 是把指定節點後的提交全部重置，revert 只會作用在單個提交上，這時你可能會問，我可以 revert 更以前的提交嗎？答案是可以的，但要注意相依性的問題，以上面範例來看，<code>da58123</code> 是可以成功被 revert 的，但 <code>12981b3</code> 可能就不會 revert 的這麼順利，可以參考以下指令解決衝突的問題：</p>
+<ul>
+<li>跳過當下 commit，並執行下一個 commit：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git revert --skip</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>取消 revert 操作，回到 revert 前狀態：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git revert --abort</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>直行下一個進程：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git revert --<span class="built_in">continue</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="Git-指令回顧"><a href="#Git-指令回顧" class="headerlink" title="Git 指令回顧"></a>Git 指令回顧</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 合併單個指定提交</span></span><br><span class="line">git cherry-pick &lt;SHA-1&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 合併多個指定提交</span></span><br><span class="line">git cherry-pick &lt;SHA-1&gt; &lt;SHA-1&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 跳過當下 commit，並執行下一個 commit</span></span><br><span class="line">git cherry-pick --skip</span><br><span class="line"></span><br><span class="line"><span class="comment"># 取消 cherry-pick 操作，回到 cherry-pick 前狀態：</span></span><br><span class="line">git cherry-pick --abort</span><br><span class="line"></span><br><span class="line"><span class="comment"># 進入下一個 cherry-pick 進程</span></span><br><span class="line">git cherry-pick --<span class="built_in">continue</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 合併單個指定提交 (取消自動提交，並將檔案放置在索引區)</span></span><br><span class="line">git cherry-pick &lt;SHA-1&gt; -n</span><br><span class="line"></span><br><span class="line"><span class="comment"># 合併單個指定提交 (同上)</span></span><br><span class="line">git cherry-pick &lt;SHA-1&gt; --no-commit</span><br><span class="line"></span><br><span class="line"><span class="comment"># 合併單個指定提交 (修改提交訊息)</span></span><br><span class="line">git cherry-pick &lt;SHA-1&gt; -e</span><br><span class="line"></span><br><span class="line"><span class="comment"># 合併單個指定提交 (同上)</span></span><br><span class="line">git cherry-pick &lt;SHA-1&gt; --edit</span><br><span class="line"></span><br><span class="line"><span class="comment"># 反轉指定提交</span></span><br><span class="line">git revert &lt;SHA-1&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 反轉指定提交 (使用預設提交訊息)</span></span><br><span class="line">git revert &lt;SHA-1&gt; --no-edit</span><br><span class="line"></span><br><span class="line"><span class="comment"># 跳過當下 commit，並執行下一個 commit</span></span><br><span class="line">git revert --skip</span><br><span class="line"></span><br><span class="line"><span class="comment"># 取消 revert 操作，回到 revert 前狀態：</span></span><br><span class="line">git revert --abort</span><br><span class="line"></span><br><span class="line"><span class="comment"># 進入下一個 revert 進程</span></span><br><span class="line">git revert --<span class="built_in">continue</span></span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Git/" rel="tag"># Git</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2020-05-04-git-rebase/" rel="next" title="Git 版本控制系統 - rebase 合併分支與 pull --rebase 同步提交">
+                  <i class="fa fa-chevron-left"></i> Git 版本控制系統 - rebase 合併分支與 pull --rebase 同步提交
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2020-05-06-git-stash/" rel="prev" title="Git 版本控制系統 - stash 暫存修改內容">
+                  Git 版本控制系統 - stash 暫存修改內容 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+          
+            
+              
+    <div class="comments" id="gitalk-container"></div>
+
+            
+          
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#筆記重點"><span class="nav-number">2.</span> <span class="nav-text">筆記重點</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cherry-pick-合併提交"><span class="nav-number">3.</span> <span class="nav-text">cherry-pick 合併提交</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#revert-抵銷提交"><span class="nav-number">4.</span> <span class="nav-text">revert 抵銷提交</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Git-指令回顧"><span class="nav-number">5.</span> <span class="nav-text">Git 指令回顧</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Roya" src="/images/userLogo.jpg">
+  <p class="site-author-name" itemprop="name">Roya</p>
+  <div class="site-description" itemprop="description">Front-End Web Developer<br>學會運用比學會使用還要來的有用</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">69</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/awdr74100" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;awdr74100" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:a78945612385238@gmail.com" title="E-Mail &amp;rarr; mailto:a78945612385238@gmail.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Roya</span>
+</div>
+  <span class="post-meta-divider">轉載文章時請附上作者暱稱與原文連結</span>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+
+<script src="/js/utils.js?v=7.4.2.js"></script>
+
+
+<script src="/js/schemes/pisces.js?v=7.4.2.js"></script>
+
+
+<script src="/js/next-boot.js?v=7.4.2.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+  
+<script src="/js/local-search.js?v=7.4.2.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '7cdb0d531869e18caad8',
+      clientSecret: '0b6a38cef9c3ae1dcf0ea66e916ab68823dbab52',
+      repo: 'awdr74100.github.io',
+      owner: 'awdr74100',
+      admin: ['awdr74100'],
+      id: 'a4752c2697b901ff1f4bfea32b936061',
+        language: 'zh-TW',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+  
+
+
+</body>
+</html>

@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon-128.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png?v=7.4.2">
+  <link rel="mask-icon" href="/images/favicon-none.svg?v=7.4.2" color="#222">
+  <link rel="alternate" href="/atom.xml" title="Roya's Blog" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"default"},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '複製',
+      copy_success: '複製成功',
+      copy_failure: '複製失敗'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="一般在做各種開發時，我們很常引入一些 npm 套件加快功能的實現，比如說 AJAX 行為就很適合使用 axios 套件來完成，當我們使用 Webpack 進行打包時，相關的 npm 套件也會通通被打包進 bundle.js 內，但這樣的行為對效能來說是較不友善的，原因為 bundle.js 實在是太肥大了，正確的作法應該是將 node_modules 內的模組單獨打包成一個檔案，避免載入時間過長的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Webpack 前端打包工具 - 使用 SplitChunksPlugin 抽離公用模組">
+<meta property="og:url" content="https://awdr74100.github.io/2020-04-06-webpack-splitchunksplugin/index.html">
+<meta property="og:site_name" content="Roya&#39;s Blog">
+<meta property="og:description" content="一般在做各種開發時，我們很常引入一些 npm 套件加快功能的實現，比如說 AJAX 行為就很適合使用 axios 套件來完成，當我們使用 Webpack 進行打包時，相關的 npm 套件也會通通被打包進 bundle.js 內，但這樣的行為對效能來說是較不友善的，原因為 bundle.js 實在是太肥大了，正確的作法應該是將 node_modules 內的模組單獨打包成一個檔案，避免載入時間過長的">
+<meta property="og:locale" content="zh_TW">
+<meta property="article:published_time" content="2020-04-06T13:04:08.000Z">
+<meta property="article:modified_time" content="2020-04-08T08:37:29.000Z">
+<meta property="article:author" content="Roya">
+<meta property="article:tag" content="Node.js">
+<meta property="article:tag" content="w3HexSchool">
+<meta property="article:tag" content="Webpack">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://awdr74100.github.io/2020-04-06-webpack-splitchunksplugin/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Webpack 前端打包工具 - 使用 SplitChunksPlugin 抽離公用模組 | Roya's Blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-150715469-1"></script>
+    <script>
+      var host = window.location.hostname;
+      if (host !== "localhost" || !true) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-150715469-1');
+      }
+    </script>
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Roya's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">現代化 Web 開發技術學習分享</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>標籤<span class="badge">28</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分類<span class="badge">9</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>歸檔<span class="badge">69</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜尋
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none" placeholder="搜尋..." spellcheck="false" type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://awdr74100.github.io/2020-04-06-webpack-splitchunksplugin/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/userLogo.jpg">
+      <meta itemprop="name" content="Roya">
+      <meta itemprop="description" content="Front-End Web Developer<br>學會運用比學會使用還要來的有用">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Roya's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          Webpack 前端打包工具 - 使用 SplitChunksPlugin 抽離公用模組
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-04-06 21:04:08" itemprop="dateCreated datePublished" datetime="2020-04-06T21:04:08+08:00">2020-04-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2020-04-08 16:37:29" itemprop="dateModified" datetime="2020-04-08T16:37:29+08:00">2020-04-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Webpack/" itemprop="url" rel="index">
+                    <span itemprop="name">Webpack</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>一般在做各種開發時，我們很常引入一些 npm 套件加快功能的實現，比如說 AJAX 行為就很適合使用 axios 套件來完成，當我們使用 Webpack 進行打包時，相關的 npm 套件也會通通被打包進 bundle.js 內，但這樣的行為對效能來說是較不友善的，原因為 bundle.js 實在是太肥大了，正確的作法應該是將 node_modules 內的模組單獨打包成一個檔案，避免載入時間過長的問題。此篇將介紹如何使用 SplitChunksPlugin 抽離 node_modules 內模組使之成為獨立的檔案，後面也會介紹當我們在開發多頁式應用時，如何以 SplitChunksPlugin 抽離公用模組用以解決重複程式碼的問題。</p>
+<h2 id="筆記重點"><a href="#筆記重點" class="headerlink" title="筆記重點"></a>筆記重點</h2><ul>
+<li>相關套件安裝</li>
+<li>SplitChunksPlugin 基本使用</li>
+<li>SplitChunksPlugin 可傳遞選項</li>
+<li>補充：Dynamic import()</li>
+<li>補充：解決 MPA 所造成的重複代碼問題</li>
+<li>補充：抽離 Webpack 運行時代碼</li>
+</ul>
+<h2 id="相關套件安裝"><a href="#相關套件安裝" class="headerlink" title="相關套件安裝"></a>相關套件安裝</h2><p>過程會使用到的套件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install html-webpack-plugin clean-webpack-plugin webpack webpack-cli -D ; npm install axios -P</span><br></pre></td></tr></table></figure>
+
+<p>package.json：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"devDependencies"</span>: &#123;</span><br><span class="line">    <span class="attr">"clean-webpack-plugin"</span>: <span class="string">"^3.0.0"</span>,</span><br><span class="line">    <span class="attr">"html-webpack-plugin"</span>: <span class="string">"^4.0.4"</span>,</span><br><span class="line">    <span class="attr">"webpack"</span>: <span class="string">"^4.42.1"</span>,</span><br><span class="line">    <span class="attr">"webpack-cli"</span>: <span class="string">"^3.3.11"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"dependencies"</span>: &#123;</span><br><span class="line">    <span class="attr">"axios"</span>: <span class="string">"^0.19.2"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在 Webpack 4 中，SplitChunksPlugin 已預設裝載，我們不需要進行任何安裝動作，配置即可使用，事實上，SplitChunksPlugin 本身就已經開啟了，但預設配置是針對較為”特別”的情境才有作用，這才導致我們沒有感覺 SplitChunksPlugin 已經作用在當前還環境，為了保證結果如同預期，請先安裝上面所陳列的相關套件。</p>
+<h2 id="SplitChunksPlugin-基本使用"><a href="#SplitChunksPlugin-基本使用" class="headerlink" title="SplitChunksPlugin 基本使用"></a>SplitChunksPlugin 基本使用</h2><p>初始專案結構：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">webpack-demo&#x2F;</span><br><span class="line">│</span><br><span class="line">├─── node_modules&#x2F;</span><br><span class="line">├─── src&#x2F;</span><br><span class="line">│   │</span><br><span class="line">│   └─── js&#x2F;</span><br><span class="line">│       │</span><br><span class="line">│       ├─── a.js         # JavaScript 模組 (1)</span><br><span class="line">│       └─── b.js         # JavaScript 模組 (2)</span><br><span class="line">│   │</span><br><span class="line">│   ├─── index.html       # HTML 主檔案</span><br><span class="line">│   └─── main.js          # entry 入口檔案</span><br><span class="line">│</span><br><span class="line">├─── webpack.config.js    # Webpack 配置檔案</span><br><span class="line">├─── package-lock.json</span><br><span class="line">└─── package.json</span><br></pre></td></tr></table></figure>
+
+<p>配置 <code>webpack.config.js</code> 檔案：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">'path'</span>);</span><br><span class="line"><span class="keyword">const</span> &#123; CleanWebpackPlugin &#125; = <span class="built_in">require</span>(<span class="string">'clean-webpack-plugin'</span>);</span><br><span class="line"><span class="keyword">const</span> HtmlWebpackPlugin = <span class="built_in">require</span>(<span class="string">'html-webpack-plugin'</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  entry: <span class="string">'./src/main.js'</span>,</span><br><span class="line">  output: &#123;</span><br><span class="line">    path: path.resolve(__dirname, <span class="string">'dist'</span>),</span><br><span class="line">    filename: <span class="string">'[name].js'</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> CleanWebpackPlugin(),</span><br><span class="line">    <span class="keyword">new</span> HtmlWebpackPlugin(&#123;</span><br><span class="line">      template: <span class="string">'./src/index.html'</span>,</span><br><span class="line">      filename: <span class="string">'index.html'</span>,</span><br><span class="line">    &#125;),</span><br><span class="line">  ],</span><br><span class="line">  <span class="comment">// optimization.splitChunks 預設配置</span></span><br><span class="line">  optimization: &#123;</span><br><span class="line">    splitChunks: &#123;</span><br><span class="line">      chunks: <span class="string">'async'</span>,</span><br><span class="line">      minSize: <span class="number">30000</span>,</span><br><span class="line">      <span class="comment">// minRemainingSize: 0, (Webpack 5 才有此選項)</span></span><br><span class="line">      maxSize: <span class="number">0</span>,</span><br><span class="line">      minChunks: <span class="number">1</span>,</span><br><span class="line">      maxAsyncRequests: <span class="number">6</span>,</span><br><span class="line">      maxInitialRequests: <span class="number">4</span>,</span><br><span class="line">      automaticNameDelimiter: <span class="string">'~'</span>,</span><br><span class="line">      cacheGroups: &#123;</span><br><span class="line">        vendors: &#123;</span><br><span class="line">          test: <span class="regexp">/[\\/]node_modules[\\/]/</span>,</span><br><span class="line">          priority: <span class="number">-10</span>,</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="keyword">default</span>: &#123;</span><br><span class="line">          minChunks: <span class="number">2</span>,</span><br><span class="line">          priority: <span class="number">-20</span>,</span><br><span class="line">          reuseExistingChunk: <span class="literal">true</span>,</span><br><span class="line">        &#125;,</span><br><span class="line">      &#125;,</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>SplitChunksPlugin 不需要進行下載，直接可在 <code>optimization</code> 選項內進行配置，在前面有說過 Webpack 預設是有開啟 SplitChunksPlugin 的，但只針對”特殊”情境才有作用，這點下面會在說明，讓我們繼續完成編譯動作。</p>
+<p>entry 入口處 (<code>src/main.js</code>) 引入 JavaScript 模組：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">'./js/a'</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="string">'./js/b'</span>;</span><br></pre></td></tr></table></figure>
+
+<p>JavaScript 模組 (1)：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> axios <span class="keyword">from</span> <span class="string">'axios'</span>;</span><br></pre></td></tr></table></figure>
+
+<p>JavaScript 模組 (2)：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> axios <span class="keyword">from</span> <span class="string">'axios'</span>;</span><br></pre></td></tr></table></figure>
+
+<p>至 <code>package.json</code> 新增編譯指令：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"scripts"</span>: &#123;</span><br><span class="line">    <span class="attr">"build"</span>: <span class="string">"webpack --mode development"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>執行編譯指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm run build</span><br></pre></td></tr></table></figure>
+
+<p>此時打包生成的 <code>dist</code> 資料夾結構如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">webpack-demo&#x2F;</span><br><span class="line">│</span><br><span class="line">├─── dist&#x2F;</span><br><span class="line">│   │</span><br><span class="line">│   ├─── main.js</span><br><span class="line">│   └─── index.html</span><br></pre></td></tr></table></figure>
+
+<p>過程如同之前所介紹的，什麼事都沒有發生，讓我們將 SplitChunksPlugin 配置更改如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">  optimization: &#123;</span><br><span class="line">    splitChunks: &#123;</span><br><span class="line">      chunks: <span class="string">'initial'</span>, <span class="comment">// 全域配置</span></span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>再次執行編譯並查看結果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">webpack-demo&#x2F;</span><br><span class="line">│</span><br><span class="line">├─── dist&#x2F;</span><br><span class="line">│   │</span><br><span class="line">│   ├─── vendors~main.js</span><br><span class="line">│   ├─── main.js</span><br><span class="line">│   └─── index.html</span><br></pre></td></tr></table></figure>
+
+<p>此刻的你一定很錯亂，怎會突然新增了一個名為 <code>vendors~main.js</code> 的檔案，且檔案內容正好是 node_modules 內的相關模組 (此為 axios 套件)，太神奇了吧！讓我們先從剛剛修改的 <code>chunks</code> 選項開始說起：</p>
+<ul>
+<li>chunks：<code>async</code> | <code>initial</code> | <code>all</code><br>選擇那些類型的 chunk 是需要被優化的，默認為 <code>async</code></li>
+</ul>
+<p>當初我在認識 <code>chunks</code> 選項時，是直接以實作的方式去學習，因為官方文檔完全說的不清不楚阿！且如果你搜尋相關的文章，你會發現大部分都是直接翻譯官方文檔，我完全不懂這樣子的意義在哪？經過了反覆的嘗試，得出以下結論：</p>
+<ul>
+<li><code>async</code>：只處理 <a href="https://webpack.js.org/guides/lazy-loading/" target="_blank" rel="external nofollow noopener noreferrer">Lazy Loading</a> 的 chunks，例如 <code>import(xxx)</code> 語法載入的模組</li>
+<li><code>initial</code>：只處理同步加載的 chunk，例如 <code>import xxx</code> 語法載入的模組</li>
+<li><code>all</code>：兼容以上兩種方式，通通進行處理</li>
+</ul>
+<p>我們在 entry 內的所有模組都是使用 <code>import</code> 方式進行載入，這才導致 SplitChunksPlugin 在預設配置下沒有任何反應，因為 <code>chunks</code> 預設配置是 <code>async</code>，關於 <code>async</code> 的實際應用將會在下面補充介紹。理解了 <code>chunks</code> 是做什麼用，接下來換最為重要的 <code>cacheGroups</code> 選項部分：</p>
+<ul>
+<li><code>cacheGroups</code>：定義 chunks 所屬的緩存組</li>
+<li><code>{cacheGroups}</code>：緩存組名稱，可由 <code>name</code> 屬性更改</li>
+<li><code>cacheGroups.{cacheGroups}.priority</code>：緩存組優先級，默認為 <code>0</code></li>
+<li><code>cacheGroups.{cacheGroups}.test</code>：控制當下緩存組匹配的 chunk，省略它會選擇所有 chunk</li>
+<li><code>cacheGroups.{cacheGroups}.filename</code>：僅當 chunk 為同步加載時，才允許覆蓋文件名</li>
+<li><code>cacheGroups.{cacheGroups}.enforce</code>：忽略全域的<a href="https://webpack.js.org/plugins/split-chunks-plugin/#splitchunkscachegroupscachegroupenforce" target="_blank" rel="external nofollow noopener noreferrer">部分選項</a></li>
+</ul>
+<p><code>cacheGroups</code> 選項是使用 SplitChunksPlugin 成功與否的關鍵，這邊要注意的是上面提到的選項，都是 <code>cacheGroups</code> 專屬可配置的區域選項，有沒有注意到我說的是區域選項？事實上，<code>cacheGroups</code> 同層的選項都是屬於全域選項，也就是說你也可以在 <code>cacheGroups</code> 內配置 <code>chunks</code> 選項，一樣可以作用，且預設就已提供兩個 <code>cacheGroups</code> 供我們使用，為什麼前面單純的將 <code>chunks</code> 選項更改為 <code>initial</code> 就可以將 node_modules 內的模組抽離成獨立檔案，答案是不是呼之欲出了？</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">  optimization: &#123;</span><br><span class="line">    splitChunks: &#123;</span><br><span class="line">      chunks: <span class="string">'initial'</span>, <span class="comment">// 將 async 改為 initial</span></span><br><span class="line">      cacheGroups: &#123;</span><br><span class="line">        vendors: &#123;</span><br><span class="line">          test: <span class="regexp">/[\\/]node_modules[\\/]/</span>,</span><br><span class="line">          priority: <span class="number">-10</span>,</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="keyword">default</span>: &#123;</span><br><span class="line">          minChunks: <span class="number">2</span>,</span><br><span class="line">          priority: <span class="number">-20</span>,</span><br><span class="line">          reuseExistingChunk: <span class="literal">true</span>,</span><br><span class="line">        &#125;,</span><br><span class="line">      &#125;,</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>沒錯！就是依靠預設配置的 <code>vendors</code> 這一個 <code>cacheGroups</code>，為什麼之前採預設配置都沒有反應，就是因為 <code>vendors</code> 參考的全域 <code>chunks</code> 配置屬性為 <code>async</code>，但我們是採用同步加載方式引入模組，當然會沒有反應，此時將 <code>chunks</code> 改為 <code>initial</code> 即可正常啟動抽離 chunk 的動作，但一般我們並不會使用預設的 <code>cacheGroups</code>，通常都會新增客製的 <code>cacheGroups</code> 做使用，如下所示：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">  optimization: &#123;</span><br><span class="line">    splitChunks: &#123;</span><br><span class="line">      cacheGroups: &#123;</span><br><span class="line">        vendors: &#123;</span><br><span class="line">          test: <span class="regexp">/[\\/]node_modules[\\/]/</span>,</span><br><span class="line">          chunks: <span class="string">'initial'</span>,</span><br><span class="line">          name: <span class="string">'vendors'</span>,</span><br><span class="line">          enforce: <span class="literal">true</span>,</span><br><span class="line">          priority: <span class="number">10</span>, <span class="comment">// 預設為 0，必須大於預設 cacheGroups</span></span><br><span class="line">        &#125;,</span><br><span class="line">      &#125;,</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>上面是一個抽離 node_modules 相關模組使之成為獨立檔案的標準寫法，我們並沒有更改預設的全域配置，直接以區域配置進行客製化，將符合正規表達式的 chunk 抽離出來，且 chunk 的載入方式須為同步載入，忽略全域的部分選項，最後將 chunk 名稱更改為 vendors，此時的編譯結果如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">webpack-demo&#x2F;</span><br><span class="line">│</span><br><span class="line">├─── dist&#x2F;</span><br><span class="line">│   │</span><br><span class="line">│   ├─── vendors.js</span><br><span class="line">│   ├─── main.js</span><br><span class="line">│   └─── index.html</span><br></pre></td></tr></table></figure>
+
+<p>大功告成！如果 entry 內有任何引入 node_modules 模組的檔案，此模組都會被單獨打包進 vendors.js 內，如果你想要針對特定檔案進行抽離，只需要在正規表達式做撰寫即可，你也可以新增不同的 <code>cacheGroups</code> 專門針對不同要求做打包，優化整體的檔案結構。</p>
+<p>介紹到這邊，已經把最重要的 <code>cacheGroups</code> 與 <code>chunks</code> 屬性給釐清了，可能有人會問，那其他的屬性呢？像是 <code>minSize</code>、<code>maxSize</code>、<code>minChunks</code> 等等，是做什麼用的？事實上，這幾個選項就如同字面上的意思，舉個例子：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">  optimization: &#123;</span><br><span class="line">    splitChunks: &#123;</span><br><span class="line">      minSize: <span class="number">70000</span>, <span class="comment">// 限制最小大小 ( byte )</span></span><br><span class="line">      cacheGroups: &#123;</span><br><span class="line">        vendors: &#123;</span><br><span class="line">          test: <span class="regexp">/[\\/]node_modules[\\/]/</span>,</span><br><span class="line">          chunks: <span class="string">'initial'</span>,</span><br><span class="line">          name: <span class="string">'vendors'</span>,</span><br><span class="line">          enforce: <span class="literal">true</span>,</span><br><span class="line">        &#125;,</span><br><span class="line">      &#125;,</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>上面這種寫法是不影響 vendors 這個 <code>cacheGroups</code> 的，因為我們啟用了 <code>enforce</code> 選項，代表不參考全域的屬性，正確的寫法應該如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">  optimization: &#123;</span><br><span class="line">    splitChunks: &#123;</span><br><span class="line">      cacheGroups: &#123;</span><br><span class="line">        vendors: &#123;</span><br><span class="line">          test: <span class="regexp">/[\\/]node_modules[\\/]/</span>,</span><br><span class="line">          chunks: <span class="string">'initial'</span>,</span><br><span class="line">          name: <span class="string">'vendors'</span>,</span><br><span class="line">          enforce: <span class="literal">true</span>,</span><br><span class="line">          minSize: <span class="number">70000</span>, <span class="comment">// 限制最小大小 ( byte )</span></span><br><span class="line">        &#125;,</span><br><span class="line">      &#125;,</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>此時如果 node_modules 內的套件並沒有超過 70 KB，也就不會進入這一個 <code>cacheGroups</code>，自然就不會產生 vendors 這個檔案，各位可自行試試看剩餘這這些選項，其實都大同小異，最重要的 <code>cacheGroups</code> 與 <code>chunks</code> 觀念學會比較重要。</p>
+<h2 id="SplitChunksPlugin-可傳遞選項"><a href="#SplitChunksPlugin-可傳遞選項" class="headerlink" title="SplitChunksPlugin 可傳遞選項"></a>SplitChunksPlugin 可傳遞選項</h2><p>可參考 <a href="https://webpack.js.org/plugins/split-chunks-plugin/" target="_blank" rel="external nofollow noopener noreferrer">SplitChunksPlugin Options</a> 可傳遞參數列表，以下為常用的參數配置：</p>
+<ul>
+<li><p>automaticNameDelimiter：<code>String</code><br>指定用於生成名稱的連結符號，默認為 <code>~</code></p>
+</li>
+<li><p>minChunks：<code>Number</code><br>在做抽離代碼動作前，chunks 的最小引用次數，默認為 <code>1</code></p>
+</li>
+</ul>
+<p>範例：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="comment">//...</span></span><br><span class="line">  optimization: &#123;</span><br><span class="line">    splitChunks: &#123;</span><br><span class="line">      automaticNameDelimiter: <span class="string">'@'</span>,</span><br><span class="line">      minChunks: <span class="number">2</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="補充：Dynamic-import"><a href="#補充：Dynamic-import" class="headerlink" title="補充：Dynamic import()"></a>補充：Dynamic import()</h2><p>在前面有提到 <code>chunks</code> 選項預設的 <code>async</code> 不太適合我們當前的使用情境，因為我們是以靜態的方式載入模組，如下所示：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">'./js/a'</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="string">'./js/b'</span>;</span><br></pre></td></tr></table></figure>
+
+<p>這次我們來介紹如何動態載入模組，並搭配 <code>async</code> 選項做使用，請先將 entry 入口處更改如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 靜態載入</span></span><br><span class="line"><span class="keyword">import</span> $ <span class="keyword">from</span> <span class="string">'jquery'</span>; <span class="comment">// 請記得安裝</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 動態載入</span></span><br><span class="line"><span class="keyword">import</span>(<span class="comment">/* webpackChunkName: 'a' */</span> <span class="string">'./js/a'</span>);</span><br><span class="line"><span class="keyword">import</span>(<span class="comment">/* webpackChunkName: 'b' */</span> <span class="string">'./js/b'</span>);</span><br></pre></td></tr></table></figure>
+
+<p>有別於使用 <code>import</code> 靜態載入模組，<code>import()</code> 在某些情況下可能帶來更高的效能，這邊要注意的是，必須以上面的寫法來載入模組，註解處是用已告知此模組的 chunkName，如果把註解給移除，預設的 chunkName 為數字，較為不直覺，建議還是直接定義 chunkName 比較好，</p>
+<p>配置 <code>webpack.config.js</code> 檔案：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">'path'</span>);</span><br><span class="line"><span class="keyword">const</span> &#123; CleanWebpackPlugin &#125; = <span class="built_in">require</span>(<span class="string">'clean-webpack-plugin'</span>);</span><br><span class="line"><span class="keyword">const</span> HtmlWebpackPlugin = <span class="built_in">require</span>(<span class="string">'html-webpack-plugin'</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  entry: <span class="string">'./src/main.js'</span>,</span><br><span class="line">  output: &#123;</span><br><span class="line">    path: path.resolve(__dirname, <span class="string">'dist'</span>),</span><br><span class="line">    filename: <span class="string">'[name].js'</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> CleanWebpackPlugin(),</span><br><span class="line">    <span class="keyword">new</span> HtmlWebpackPlugin(&#123;</span><br><span class="line">      template: <span class="string">'./src/index.html'</span>,</span><br><span class="line">      filename: <span class="string">'index.html'</span>,</span><br><span class="line">    &#125;),</span><br><span class="line">  ],</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>這邊就只是單純的配置相關選項，前面有提到 <code>chunks</code> 預設的值為 <code>async</code>，我們不需要進行任何配置，預設就以作用 vendors 這一個 <code>cacheGroups</code>，讓我們直接進行編譯看看：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">webpack-demo&#x2F;</span><br><span class="line">│</span><br><span class="line">├─── dist&#x2F;</span><br><span class="line">│   │</span><br><span class="line">│   ├─── a.js</span><br><span class="line">│   ├─── b.js</span><br><span class="line">│   ├─── vendors~a~b.js</span><br><span class="line">│   ├─── main.js</span><br><span class="line">│   └─── index.html</span><br></pre></td></tr></table></figure>
+
+<p>從編譯結果可以得知，確實 node_modules 內的 axios 套件被抽離成 <code>vendors~a~b.js</code> 檔案，因為 <code>a.js</code> 與 <code>b.js</code> 是以動態載入的方式引入模組，檔案內的模組也就跟著作用，這邊有一點要注意的是，你會發現動態載入的模組也被抽離成獨立檔案了，這是基於 Webpack 預設的配置，與 SplitChunksPlugin 沒有關係。</p>
+<p>上面就是預設配置的 <code>async</code> 結果，眼尖的朋友應該發現其中的問題了，那就是 jQuery 也被打包進 main.js 內了，並沒有被抽離出來，原理如同之前所介紹的，SplitChunksPlugin 預設配置的 <code>async</code> 只針對動態載入的模組，如果我們需要同時處理動態與非動態載入的模組，可使用 <code>all</code> 選項，如下所示：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  optimization: &#123;</span><br><span class="line">    splitChunks: &#123;</span><br><span class="line">      chunks: <span class="string">'all'</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>此時的編譯結果如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">webpack-demo&#x2F;</span><br><span class="line">│</span><br><span class="line">├─── dist&#x2F;</span><br><span class="line">│   ├─── a.js</span><br><span class="line">│   ├─── b.js</span><br><span class="line">│   ├─── vendors~a~b.js   # 非同步載入的 axios 套件</span><br><span class="line">│   ├─── vendors~main.js  # 同步載入的 jquery 套件</span><br><span class="line">│   ├─── main.js</span><br><span class="line">│   └─── index.html</span><br></pre></td></tr></table></figure>
+
+<p>從上面結果可以得知，node_modules 內的模組都已經被抽離成獨立檔案了，因為 <code>all</code> 選項會同時處理動態與非動態載入的模組，你可能現在在想，為什麼 SplitChunksPlugin 預設的 <code>chunks</code> 選項不直接設為 <code>all</code> 呢？就不用這麼麻煩了啊！我是認為另外兩個選項在某些情境下還是有存在的必要，並不是說哪一個選項最好，還是得看當下情境較適合哪一個選項而定，並且，<code>all</code> 所產生的效果並非所有情境下都需要。</p>
+<h2 id="補充：解決-MPA-所造成的重複代碼問題"><a href="#補充：解決-MPA-所造成的重複代碼問題" class="headerlink" title="補充：解決 MPA 所造成的重複代碼問題"></a>補充：解決 MPA 所造成的重複代碼問題</h2><p>初始專案結構：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">webpack-demo&#x2F;</span><br><span class="line">│</span><br><span class="line">├─── node_modules&#x2F;</span><br><span class="line">├─── src&#x2F;</span><br><span class="line">│   │</span><br><span class="line">│   └─── js&#x2F;</span><br><span class="line">│       │</span><br><span class="line">│       ├─── a.js         # JavaScript 模組 (1)</span><br><span class="line">│       └─── b.js         # JavaScript 模組 (2)</span><br><span class="line">│   │</span><br><span class="line">│   ├─── contact.html     # HTML 檔案 (contact)</span><br><span class="line">│   ├─── contact.js       # entry 入口檔案 (contact)</span><br><span class="line">│   ├─── index.html       # HTML 主檔案 (index)</span><br><span class="line">│   └─── main.js          # entry 入口檔案 (index)</span><br><span class="line">│</span><br><span class="line">├─── webpack.config.js    # Webpack 配置檔案</span><br><span class="line">├─── package-lock.json</span><br><span class="line">└─── package.json</span><br></pre></td></tr></table></figure>
+
+<p>a.js：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> $ <span class="keyword">from</span> <span class="string">'jquery'</span>;</span><br><span class="line"><span class="keyword">import</span> fun <span class="keyword">from</span> <span class="string">'./c'</span>;</span><br></pre></td></tr></table></figure>
+
+<p>b.js：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> axios <span class="keyword">from</span> <span class="string">'axios'</span>;</span><br><span class="line"><span class="keyword">import</span> fun <span class="keyword">from</span> <span class="string">'./c'</span>;</span><br></pre></td></tr></table></figure>
+
+<p>c.js：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> () =&gt; &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'Hello World'</span>);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>main.js：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">'./js/a'</span>;</span><br></pre></td></tr></table></figure>
+
+<p>contact.js：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">'./js/b'</span>;</span><br></pre></td></tr></table></figure>
+
+<p>配置 <code>webpack.config.js</code> 檔案：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">'path'</span>);</span><br><span class="line"><span class="keyword">const</span> &#123; CleanWebpackPlugin &#125; = <span class="built_in">require</span>(<span class="string">'clean-webpack-plugin'</span>);</span><br><span class="line"><span class="keyword">const</span> HtmlWebpackPlugin = <span class="built_in">require</span>(<span class="string">'html-webpack-plugin'</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  entry: &#123;</span><br><span class="line">    main: <span class="string">'./src/main.js'</span>,</span><br><span class="line">    contact: <span class="string">'./src/contact.js'</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">  output: &#123;</span><br><span class="line">    path: path.resolve(__dirname, <span class="string">'dist'</span>),</span><br><span class="line">    filename: <span class="string">'[name].js'</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> CleanWebpackPlugin(),</span><br><span class="line">    <span class="keyword">new</span> HtmlWebpackPlugin(&#123;</span><br><span class="line">      template: <span class="string">'./src/index.html'</span>,</span><br><span class="line">      filename: <span class="string">'index.html'</span>,</span><br><span class="line">    &#125;),</span><br><span class="line">    <span class="keyword">new</span> HtmlWebpackPlugin(&#123;</span><br><span class="line">      template: <span class="string">'./src/contact.html'</span>,</span><br><span class="line">      filename: <span class="string">'contact.html'</span>,</span><br><span class="line">    &#125;),</span><br><span class="line">  ],</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>以上是 MPA (Multi-Page Application) 基本的開發流程，讓我們直接進行編譯看看：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">webpack-demo&#x2F;</span><br><span class="line">│</span><br><span class="line">├─── dist&#x2F;</span><br><span class="line">│   │</span><br><span class="line">│   ├─── contact.html</span><br><span class="line">│   ├─── contact.js</span><br><span class="line">│   ├─── index.html</span><br><span class="line">│   └─── index.js</span><br></pre></td></tr></table></figure>
+
+<p>從上面的編譯結果可以得知，確實相關的代碼都有成功被打包進去，但這邊有一個問題是，兩個頁面存在相同的代碼，也就是 <code>c.js</code> 的檔案內容，這樣會導致頁面加載到不必要的流量，關於這一個問題，我們一樣可以使用 SplitChunksPlugin 來解決，配置如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">  optimization: &#123;</span><br><span class="line">    splitChunks: &#123;</span><br><span class="line">      cacheGroups: &#123;</span><br><span class="line">        <span class="comment">// 抽離 node_modules</span></span><br><span class="line">        vendors: &#123;</span><br><span class="line">          test: <span class="regexp">/[\\/]node_modules[\\/]/</span>,</span><br><span class="line">          chunks: <span class="string">'initial'</span>,</span><br><span class="line">          name: <span class="string">'vendors'</span>,</span><br><span class="line">          priority: <span class="number">20</span>,</span><br><span class="line">          enforce: <span class="literal">true</span>,</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="comment">// 抽離公用模組</span></span><br><span class="line">        common: &#123;</span><br><span class="line">          chunks: <span class="string">'initial'</span>,</span><br><span class="line">          minSize: <span class="number">0</span>,</span><br><span class="line">          name: <span class="string">'common'</span>,</span><br><span class="line">          minChunks: <span class="number">2</span>,</span><br><span class="line">          priority: <span class="number">10</span>,</span><br><span class="line">        &#125;,</span><br><span class="line">      &#125;,</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>記得將全域的 <code>minSize</code> 與 <code>minChunks</code> 透過區域配置方式給覆蓋掉，避免無法進入 common 這個 <code>cacheGroups</code>。</p>
+<p>此時的編譯結果如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">webpack-demo&#x2F;</span><br><span class="line">│</span><br><span class="line">├─── dist&#x2F;</span><br><span class="line">│   │</span><br><span class="line">│   ├─── common.js        # 存在所有 node_modules 套件</span><br><span class="line">│   ├─── common.js        # 只存在 c.js</span><br><span class="line">│   ├─── contact.html</span><br><span class="line">│   ├─── contact.js</span><br><span class="line">│   ├─── index.html</span><br><span class="line">│   └─── index.js</span><br></pre></td></tr></table></figure>
+
+<p>這邊要注意！html-webpack-plugin 預設是載入所有 chunk 的，我們需要再各自頁面排除其他不相干的 chunk，如下所示：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">'path'</span>);</span><br><span class="line"><span class="keyword">const</span> &#123; CleanWebpackPlugin &#125; = <span class="built_in">require</span>(<span class="string">'clean-webpack-plugin'</span>);</span><br><span class="line"><span class="keyword">const</span> HtmlWebpackPlugin = <span class="built_in">require</span>(<span class="string">'html-webpack-plugin'</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  plugins: [</span><br><span class="line">    <span class="keyword">new</span> CleanWebpackPlugin(),</span><br><span class="line">    <span class="keyword">new</span> HtmlWebpackPlugin(&#123;</span><br><span class="line">      template: <span class="string">'./src/index.html'</span>,</span><br><span class="line">      filename: <span class="string">'index.html'</span>,</span><br><span class="line">      chunks: [<span class="string">'main'</span>], <span class="comment">// 僅包含名為 main 的 chunk</span></span><br><span class="line">    &#125;),</span><br><span class="line">    <span class="keyword">new</span> HtmlWebpackPlugin(&#123;</span><br><span class="line">      template: <span class="string">'./src/contact.html'</span>,</span><br><span class="line">      filename: <span class="string">'contact.html'</span>,</span><br><span class="line">      chunks: [<span class="string">'contact'</span>], <span class="comment">// 僅包含名為 contact 的 chunk</span></span><br><span class="line">    &#125;),</span><br><span class="line">  ],</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>大功告成！</p>
+<h2 id="補充：抽離-Webpack-運行時代碼"><a href="#補充：抽離-Webpack-運行時代碼" class="headerlink" title="補充：抽離 Webpack 運行時代碼"></a>補充：抽離 Webpack 運行時代碼</h2><p>Webpack 有 runtime 的概念，也就是在我們每次編譯後產生的檔案中落落長的那段代碼，為了盡可能的優化 Browser 緩存，我們可以將這段 runtime 代碼單獨抽離出來，這樣在某些文件發生改變後，一些與之相關的文件 hash 值並不會也隨之改變。</p>
+<p>通過配置 <code>runtimeChunk</code>：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  optimization: &#123;</span><br><span class="line">    runtimeChunk: <span class="string">'multiple'</span>, <span class="comment">// or true</span></span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>以上配置會為每個僅含有 runtime 的入口起點添加一個而外的 chunk，此時編譯結果如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">webpack-demo&#x2F;</span><br><span class="line">│</span><br><span class="line">├─── dist&#x2F;</span><br><span class="line">│   │</span><br><span class="line">│   ├─── common.js</span><br><span class="line">│   ├─── contact.html</span><br><span class="line">│   ├─── contact.js</span><br><span class="line">│   ├─── index.html</span><br><span class="line">│   ├─── main.js</span><br><span class="line">│   ├─── runtime~contact.js    # contact 的 runtime 文件</span><br><span class="line">│   ├─── runtime~main.js       # main 的 runtime 文件</span><br><span class="line">│   └─── vendors.js</span><br></pre></td></tr></table></figure>
+
+<p>配置 <code>single</code> or <code>Object.name</code> 會創建一個在所有生成 chunk 之間共享的 runtime 文件，如下所示：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  optimization: &#123;</span><br><span class="line">    runtimeChunk: <span class="string">'single'</span>, <span class="comment">//  runtime 文件預設名稱為 runtime.js</span></span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>or</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  optimization: &#123;</span><br><span class="line">    runtimeChunk: &#123;</span><br><span class="line">      name: <span class="string">'manifest'</span>, <span class="comment">// runtime 文件名稱為 manifest.js</span></span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>在這邊我們使用自訂名稱的方式抽離 runtime 文件，此時編譯結果如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">webpack-demo&#x2F;</span><br><span class="line">│</span><br><span class="line">├─── dist&#x2F;</span><br><span class="line">│   │</span><br><span class="line">│   ├─── common.js</span><br><span class="line">│   ├─── contact.html</span><br><span class="line">│   ├─── contact.js</span><br><span class="line">│   ├─── index.html</span><br><span class="line">│   ├─── main.js</span><br><span class="line">│   ├─── manifest.js           # 共享的 runtime 文件</span><br><span class="line">│   └─── vendors.js</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Node-js/" rel="tag"># Node.js</a>
+              <a href="/tags/w3HexSchool/" rel="tag"># w3HexSchool</a>
+              <a href="/tags/Webpack/" rel="tag"># Webpack</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2020-04-02-webpack-devtool/" rel="next" title="Webpack 前端打包工具 - 依照指定環境挑選適合的 SourceMap 類型">
+                  <i class="fa fa-chevron-left"></i> Webpack 前端打包工具 - 依照指定環境挑選適合的 SourceMap 類型
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2020-04-09-webpack-webpackmerge/" rel="prev" title="Webpack 前端打包工具 - 使用 webpack-merge 區分 dev 與 prod 環境">
+                  Webpack 前端打包工具 - 使用 webpack-merge 區分 dev 與 prod 環境 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+          
+            
+              
+    <div class="comments" id="gitalk-container"></div>
+
+            
+          
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#筆記重點"><span class="nav-number">2.</span> <span class="nav-text">筆記重點</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#相關套件安裝"><span class="nav-number">3.</span> <span class="nav-text">相關套件安裝</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SplitChunksPlugin-基本使用"><span class="nav-number">4.</span> <span class="nav-text">SplitChunksPlugin 基本使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SplitChunksPlugin-可傳遞選項"><span class="nav-number">5.</span> <span class="nav-text">SplitChunksPlugin 可傳遞選項</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#補充：Dynamic-import"><span class="nav-number">6.</span> <span class="nav-text">補充：Dynamic import()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#補充：解決-MPA-所造成的重複代碼問題"><span class="nav-number">7.</span> <span class="nav-text">補充：解決 MPA 所造成的重複代碼問題</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#補充：抽離-Webpack-運行時代碼"><span class="nav-number">8.</span> <span class="nav-text">補充：抽離 Webpack 運行時代碼</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Roya" src="/images/userLogo.jpg">
+  <p class="site-author-name" itemprop="name">Roya</p>
+  <div class="site-description" itemprop="description">Front-End Web Developer<br>學會運用比學會使用還要來的有用</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">69</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/awdr74100" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;awdr74100" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:a78945612385238@gmail.com" title="E-Mail &amp;rarr; mailto:a78945612385238@gmail.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Roya</span>
+</div>
+  <span class="post-meta-divider">轉載文章時請附上作者暱稱與原文連結</span>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+
+<script src="/js/utils.js?v=7.4.2.js"></script>
+
+
+<script src="/js/schemes/pisces.js?v=7.4.2.js"></script>
+
+
+<script src="/js/next-boot.js?v=7.4.2.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+  
+<script src="/js/local-search.js?v=7.4.2.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+  
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '7cdb0d531869e18caad8',
+      clientSecret: '0b6a38cef9c3ae1dcf0ea66e916ab68823dbab52',
+      repo: 'awdr74100.github.io',
+      owner: 'awdr74100',
+      admin: ['awdr74100'],
+      id: '26dd9d3b2c7af95f250f10f5dfd1d105',
+        language: 'zh-TW',
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+  
+
+
+</body>
+</html>
