@@ -1,1 +1,1 @@
-Refactoring using nuxt + nuxt-content.
+Refactoring using Nuxt + Markdown + Cloudflare Worker.
